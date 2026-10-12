@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6b3fd4" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Muggle Studies" />
+  <title>Muggle Studies</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app"></div>
+  <p class="sw-status" id="status"></p>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* Muggle Studies - car mode: a wider card in landscape, 64px+ buttons, larger type */
+.car-mode #app { padding: 12px 16px; }
+.car-mode .app { width: min(660px, calc(100vw - 340px)); min-width: 400px; height: calc(100dvh - 24px); padding: 14px 18px 16px; }
+.car-mode .stage { justify-content: flex-start; padding-top: 4px; }
+.car-mode .stage > :first-child { margin-top: auto; }
+.car-mode .stage > :last-child { margin-bottom: auto; }
+.car-mode .eyebrow { font-size: 0.95rem; }
+.car-mode h1 { font-size: 2rem; margin-bottom: 8px; }
+.car-mode h1.prompt { font-size: 1.55rem; margin-bottom: 12px; }
+.car-mode .sub, .car-mode .muted { font-size: 1.12rem; margin-bottom: 12px; }
+.car-mode .quote { margin-bottom: 14px; padding: 12px 14px; }
+.car-mode .quote p { font-size: 1.12rem; }
+.car-mode .profile-card, .car-mode .subject-card, .car-mode .level-card, .car-mode .choice, .car-mode .primary { min-height: 72px; font-size: 1.2rem; }
+.car-mode .profile-card strong, .car-mode .subject-card strong, .car-mode .level-card strong { font-size: 1.3rem; }
+.car-mode .profile-card span:nth-child(3), .car-mode .level-card em, .car-mode .level-card span { font-size: 1rem; }
+.car-mode .subjects { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.car-mode .levels { grid-template-columns: repeat(3, 1fr); }
+.car-mode .choices { grid-template-columns: 1fr 1fr; }
+.car-mode .choice { padding: 12px 14px; font-size: 1.15rem; }
+.car-mode .primary { min-height: 68px; font-size: 1.3rem; }
+.car-mode .text-btn { min-height: 64px; padding: 8px 18px; font-size: 1.15rem; font-weight: 700; color: #fff8ff;
+  border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 999px; background: rgba(255, 255, 255, 0.1); }
+.car-mode .text-btn.block { width: auto; margin: 14px auto 0; display: block; padding: 8px 26px; }
+.car-mode .who { font-size: 1rem; }
+.car-mode .teach, .car-mode .card-note { margin-top: 10px; padding: 10px 12px; font-size: 1.05rem; }
+.car-mode .stat strong { font-size: 1.8rem; }
+.car-mode .stats { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.car-mode .big-emoji { font-size: 3.4rem; margin: 4px 0 10px; }
+.car-mode .hint { margin-top: 12px; font-size: 1rem; }
+/* narrow windows: park the card to the right of the back button instead of centring it */
+@media (max-width: 1000px) {
+  .car-mode .app { width: calc(100vw - 206px); min-width: 0; max-width: 660px; margin-left: 194px; margin-right: 12px; }
+}
+@media (max-width: 1000px) {
+  .car-mode .subjects { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .car-mode .subject-card strong { font-size: 1.12rem; }
+}
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "muggle-studies";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Muggle Studies - car mode */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

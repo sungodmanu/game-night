@@ -1,0 +1,13 @@
+/* Venus Flytrap 3D - car mode */
+.car-mode #counter { left: calc(env(safe-area-inset-left, 0px) + 184px); }
+.car-mode #mute { width: 72px; height: 72px; }
+.car-mode #mute svg { width: 38px; height: 38px; }
+.car-mode .tag { min-height: 64px; font-size: 26px; padding: 10px 18px 10px 20px; }
+.car-mode .tag#tag1 { font-size: 24px; }
+.car-mode #namer .card { width: min(600px, 94vw); padding: 20px 20px 18px; }
+.car-mode #namer .title { font-size: 32px; margin: 4px 76px 14px; }
+.car-mode #nm-x { width: 64px; height: 64px; font-size: 30px; }
+.car-mode #nm-input { min-height: 64px; font-size: 28px; }
+.car-mode #nm-ok { min-height: 64px; min-width: 120px; font-size: 30px; }
+.car-mode #namer .chip { min-height: 64px; font-size: 23px; padding: 10px 18px; }
+@media (max-height: 500px) { .car-mode .tag { padding: 8px 14px; } }

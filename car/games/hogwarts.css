@@ -1,0 +1,22 @@
+/* Battle for Hogwarts v2 - car mode */
+.car-mode .round, .car-mode .small .round { width: 64px; height: 64px; padding: 14px; }
+.car-mode .round.fs, .car-mode .tipcard { display: none !important; }  /* the Tesla browser can't go full screen */
+.car-mode .topbar .car-back { order: -1; }
+.car-mode .dialog .next { width: 64px; height: 64px; font-size: 26px; }
+.car-mode .skippill, .car-mode .small:not(.portrait) .skippill { top: calc(86px + var(--safe-t)); min-height: 64px; padding: 10px 22px; font-size: 20px; }
+.car-mode .btn.small1, .car-mode .small .btn.small1 { min-height: 64px; padding: 10px 22px; font-size: clamp(18px, 2.8vmin, 22px); }
+.car-mode .small .btn { min-height: 64px; }
+.car-mode .endbox .btn { min-height: 64px; }
+.car-mode .pickwrap h2, .car-mode .ywrap h2 { padding-left: 160px; padding-right: 160px; }
+.car-mode .status .who { font-size: 19px; }
+/* keep the boss bar and the big banners clear of the (taller) car-mode top bar */
+.car-mode .bossbar { top: calc(92px + var(--safe-t)); }
+.car-mode .banner, .car-mode .small:not(.portrait) .banner { top: 31%; }
+/* narrow windows: a square back button leaves room for the status box and stage pill */
+@media (max-width: 900px) {
+  .car-mode .topbar .car-back { width: 68px; min-width: 0; height: 68px; padding: 0; border-radius: 20px; flex-direction: column; gap: 0; font-size: 15px; }
+  .car-mode .topbar .car-back .car-back-arrow { font-size: 28px; margin: 0; }
+}
+@media (max-width: 900px) {
+  .car-mode .stage { white-space: normal; text-overflow: clip; text-align: center; line-height: 1.2; border-radius: 18px; max-width: 30vw; }
+}

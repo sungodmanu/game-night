@@ -1,0 +1,8 @@
+{
+  "name": "game-night-tests",
+  "private": true,
+  "type": "module",
+  "description": "Playwright checks for the Game Night car builds (headless Chrome, Tesla UA, 1180x600 and 770x600).",
+  "scripts": { "test": "node run.mjs" },
+  "devDependencies": { "playwright": "^1.47.0" }
+}

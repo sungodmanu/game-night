@@ -1,0 +1,10 @@
+/* Snowball Fort Together - car mode. The back button lives at the bottom of the snowy divider:
+   the divider is a no-touch zone for the game, so neither player can hit it by accident. */
+.car-mode .mute { width: 64px; height: 64px; padding: 12px; }
+.car-mode .side .divider { padding: 8px 0 10px; }
+.car-mode .side .divider .car-back { width: 76px; min-width: 0; height: 76px; padding: 0; border-radius: 22px; flex-direction: column; gap: 2px; font-size: 15px; }
+.car-mode .side .divider .car-back .car-back-arrow { font-size: 30px; margin-top: 0; }
+.car-mode .stack .divider { padding: 0 10px; }
+.car-mode .stack .divider .car-back { height: 64px; min-width: 120px; font-size: 20px; }
+.car-mode .tag { font-size: 22px; padding: 8px 16px 8px 12px; }
+.car-mode .hint .bubble { font-size: 24px; }

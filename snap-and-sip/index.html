@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Snap &amp; Sip</title>
+<style>
+  :root {
+    --bg: #123024;
+    --card: #1c4636;
+    --ink: #f4ffe8;
+    --muted: #c5e6c0;
+    --good: #7dff9a;
+    --bad: #ff8d7a;
+    --sun: #ffd36a;
+    --fly: #1a1a1a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #2f6b4a, var(--bg) 55%);
+    color: var(--ink);
+    min-height: 100%;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 18px 6px; gap: 12px;
+  }
+  h1 { font-size: 1.4rem; margin: 0; letter-spacing: 0.02em; }
+  .sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+  button, input {
+    font: inherit; color: inherit;
+  }
+  button {
+    border: 0; border-radius: 999px; padding: 10px 14px;
+    background: #2d6a4f; cursor: pointer; min-height: 44px;
+  }
+  button:active { transform: translateY(1px); }
+  button.danger { background: #8a3b32; }
+  button.good { background: #246b3a; }
+  .wrap { padding: 8px 14px 28px; max-width: 1100px; margin: 0 auto; }
+  .banner {
+    background: #0e241c; border-radius: 16px; padding: 12px 14px; margin: 8px 0 14px;
+    color: var(--muted); min-height: 44px;
+  }
+  .banner strong { color: var(--sun); }
+  .plants { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 720px) { .plants { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card); border-radius: 22px; padding: 14px;
+    position: relative; overflow: hidden;
+  }
+  .card.picked { outline: 3px solid var(--sun); }
+  .name-row { display: flex; gap: 8px; align-items: center; }
+  input.name {
+    background: transparent; border: 0; border-bottom: 1px solid #3d7a5c;
+    font-size: 1.15rem; width: 100%; padding: 4px 0;
+  }
+  .stage {
+    height: 230px; position: relative; margin: 8px 0 4px;
+    background: linear-gradient(#87c8ff, #d7f5c8 55%, #3d6b32);
+    border-radius: 18px; overflow: hidden; touch-action: manipulation;
+  }
+  .sunorb {
+    position: absolute; width: 54px; height: 54px; border-radius: 50%;
+    background: var(--sun); top: 12px; right: 16px;
+    box-shadow: 0 0 24px #ffd36a;
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .pot {
+    position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+    width: 120px; text-align: center;
+  }
+  .soil {
+    height: 28px; background: #5a3a22; border-radius: 0 0 40px 40px;
+    border: 3px solid #c9824a; border-top: 0;
+  }
+  .stem {
+    width: 8px; height: 46px; background: #1f7a32; margin: 0 auto;
+  }
+  .trap {
+    width: 92px; height: 64px; margin: 0 auto -8px;
+    background: radial-gradient(circle at 30% 30%, #c6ff6a, #2f9e3a 60%, #145c22);
+    border-radius: 46px 46px 18px 18px;
+    border: 3px solid #0d3d16;
+    position: relative; transform-origin: 50% 100%;
+    transition: transform 0.12s ease-in;
+  }
+  .trap.snap { transform: scaleY(0.28) scaleX(1.08); }
+  .teeth {
+    position: absolute; left: 6px; right: 6px; top: -8px; height: 14px;
+    background: repeating-linear-gradient(90deg, transparent 0 8px, #f4ffe8 8px 12px);
+  }
+  .fly {
+    position: absolute; width: 18px; height: 12px; border-radius: 40%;
+    background: var(--fly); cursor: pointer; z-index: 3;
+  }
+  .fly:before, .fly:after {
+    content: ""; position: absolute; width: 12px; height: 8px;
+    background: rgba(255,255,255,0.55); border-radius: 50%; top: -6px;
+  }
+  .fly:before { left: -4px; } .fly:after { right: -4px; }
+  .bars { display: grid; gap: 6px; margin-top: 8px; font-size: 0.85rem; }
+  .bar { height: 10px; background: #0e241c; border-radius: 99px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; width: 50%; background: var(--good); }
+  .bar.bad > span { background: var(--bad); }
+  .bar.sun > span { background: var(--sun); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .actions button { flex: 1 1 120px; }
+  .note { font-size: 0.85rem; color: var(--muted); min-height: 2.4em; margin-top: 8px; }
+  footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+  .dead .trap { filter: grayscale(1); background: #6b6b6b; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Snap &amp; Sip</h1>
+    <div class="sub">Two flytraps. Distilled water. Real sun. Don't stuff them.</div>
+  </div>
+  <div id="clock" class="sub"></div>
+</header>
+<div class="wrap">
+  <div class="banner" id="away">Open this again later. They remember you.</div>
+  <div class="plants" id="plants"></div>
+  <footer>
+    <button id="reset" class="danger">Start over</button>
+  </footer>
+</div>
+<script>
+const KEY = "snap-and-sip-v1";
+const NAMES = ["Snap", "Nib"];
+const now = () => Date.now();
+
+function blankPlant(i) {
+  return {
+    name: NAMES[i],
+    health: 82,
+    hunger: 55,
+    water: 70,
+    sun: 40,
+    snaps: 0,
+    flies: 0,
+    tapMistakes: 0,
+    alive: true,
+    note: "Brand new and a little hungry."
+  };
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return { plants: [blankPlant(0), blankPlant(1)], last: now(), days: 1, visits: 1 };
+    const data = JSON.parse(raw);
+    if (!data.plants || data.plants.length !== 2) throw new Error("bad");
+    return data;
+  } catch (e) {
+    return { plants: [blankPlant(0), blankPlant(1)], last: now(), days: 1, visits: 1 };
+  }
+}
+
+let state = load();
+
+function clamp(n) { return Math.max(0, Math.min(100, n)); }
+
+function awayStory() {
+  const gap = now() - (state.last || now());
+  const hours = gap / 36e5;
+  if (hours < 0.15) {
+    state.visits = (state.visits || 1);
+    return "You just got here. The traps are watching your fingers.";
+  }
+  const bits = [];
+  const hrs = Math.max(1, Math.round(hours));
+  state.days = (state.days || 1) + Math.max(1, Math.round(hours / 8));
+  state.plants.forEach((p) => {
+    if (!p.alive) { bits.push(p.name + " is still waiting for a restart."); return; }
+    p.hunger = clamp(p.hunger + hrs * 3);
+    p.water = clamp(p.water - hrs * 2.2);
+    p.sun = clamp(p.sun - hrs * 1.4);
+    if (Math.random() < 0.45 && p.hunger > 40) {
+      p.hunger = clamp(p.hunger - 18);
+      p.flies += 1;
+      p.health = clamp(p.health + 4);
+      bits.push(p.name + " caught a wild fly while you were out.");
+    }
+    if (Math.random() < 0.28) {
+      p.water = clamp(p.water - 22);
+      p.health = clamp(p.health - 8);
+      p.tapMistakes += 1;
+      bits.push("Somebody gave " + p.name + " a splash of tap water. The soil looks cloudy.");
+    }
+    if (p.sun < 25) {
+      p.health = clamp(p.health - 6);
+      bits.push(p.name + " sat in the shade too long and got droopy.");
+    }
+    if (p.water < 20) {
+      p.health = clamp(p.health - 10);
+      bits.push(p.name + " is thirsty. Distilled water, not the sink.");
+    }
+    if (p.health <= 0) {
+      p.alive = false;
+      p.health = 0;
+      bits.push(p.name + " folded up. A fresh start can bring them back.");
+    }
+  });
+  if (!bits.length) bits.push("Quiet hours. Both plants mostly napped.");
+  return "While you were away (" + hrs + "h): " + bits.slice(0, 3).join(" ");
+}
+
+const awayText = awayStory();
+state.last = now();
+state.visits = (state.visits || 0) + (awayText.startsWith("You just") ? 0 : 1);
+
+function save() {
+  state.last = now();
+  localStorage.setItem(KEY, JSON.stringify(state));
+}
+
+function mood(p) {
+  if (!p.alive) return "Asleep for good, unless you start over.";
+  if (p.health < 30) return "Droopy. Needs sun and a careful sip.";
+  if (p.hunger < 15) return "Too full. Leave the flies alone.";
+  if (p.hunger > 75) return "Mouths open. A fly would help.";
+  if (p.water < 30) return "Thirsty for distilled water.";
+  return "Content, and a little nosy.";
+}
+
+function bar(label, value, kind) {
+  return `<div>${label} ${Math.round(value)}<div class="bar ${kind||""}"><span style="width:${value}%"></span></div></div>`;
+}
+
+function render() {
+  document.getElementById("clock").textContent = "Day " + state.days + " · visit " + state.visits;
+  document.getElementById("away").innerHTML = "<strong>News.</strong> " + awayText;
+  const root = document.getElementById("plants");
+  root.innerHTML = state.plants.map((p, i) => `
+    <article class="card ${p.alive ? "" : "dead"}" data-i="${i}">
+      <div class="name-row">
+        <input class="name" data-i="${i}" value="${p.name.replace(/"/g, "")}" maxlength="16" aria-label="Plant name">
+      </div>
+      <div class="stage" data-i="${i}">
+        <div class="sunorb" style="opacity:${0.25 + p.sun/130}; transform: scale(${0.7 + p.sun/180})"></div>
+        <div class="pot">
+          <div class="trap" id="trap-${i}"><div class="teeth"></div></div>
+          <div class="stem"></div>
+          <div class="soil"></div>
+        </div>
+      </div>
+      <div class="bars">
+        ${bar("Health", p.health, p.health < 35 ? "bad" : "")}
+        ${bar("Hunger", p.hunger, p.hunger < 15 ? "bad" : "")}
+        ${bar("Water", p.water, p.water < 30 ? "bad" : "")}
+        ${bar("Sun", p.sun, "sun")}
+      </div>
+      <div class="note">${p.note}<br>${mood(p)} · flies caught ${p.flies} · snaps ${p.snaps}</div>
+      <div class="actions">
+        <button class="good" data-act="distilled" data-i="${i}">Distilled water</button>
+        <button data-act="rain" data-i="${i}">Rainwater</button>
+        <button data-act="tap" data-i="${i}">Tap water</button>
+        <button data-act="sun" data-i="${i}">Windowsill</button>
+        <button data-act="shade" data-i="${i}">Shade</button>
+      </div>
+    </article>
+  `).join("");
+  state.plants.forEach((p, i) => spawnFlies(i, p.alive ? 3 : 0));
+  save();
+}
+
+const flyTimers = {};
+function spawnFlies(i, count) {
+  const stage = document.querySelector(`.stage[data-i="${i}"]`);
+  stage.querySelectorAll(".fly").forEach((n) => n.remove());
+  if (flyTimers[i]) flyTimers[i].forEach(clearInterval);
+  flyTimers[i] = [];
+  for (let n = 0; n < count; n++) {
+    const fly = document.createElement("button");
+    fly.className = "fly";
+    fly.setAttribute("aria-label", "Fly");
+    fly.style.left = (10 + Math.random() * 70) + "%";
+    fly.style.top = (12 + Math.random() * 45) + "%";
+    fly.addEventListener("pointerdown", (ev) => { ev.preventDefault(); ev.stopPropagation(); feed(i, fly); });
+    stage.appendChild(fly);
+    const timer = setInterval(() => {
+      if (!fly.isConnected) return;
+      fly.style.left = (8 + Math.random() * 74) + "%";
+      fly.style.top = (8 + Math.random() * 48) + "%";
+    }, 700 + Math.random() * 900);
+    flyTimers[i].push(timer);
+  }
+}
+
+function snap(i) {
+  const trap = document.getElementById("trap-" + i);
+  if (!trap) return;
+  trap.classList.add("snap");
+  state.plants[i].snaps += 1;
+  setTimeout(() => trap.classList.remove("snap"), 280);
+}
+
+function feed(i, fly) {
+  const p = state.plants[i];
+  snap(i);
+  if (!p.alive) { p.note = p.name + " can't eat right now."; render(); return; }
+  if (p.hunger < 18) {
+    p.health = clamp(p.health - 12);
+    p.hunger = clamp(p.hunger - 8);
+    p.note = "Too many flies. " + p.name + " looks queasy.";
+    if (p.health <= 0) { p.alive = false; p.note = p.name + " ate until it folded."; }
+  } else {
+    p.hunger = clamp(p.hunger - 22);
+    p.health = clamp(p.health + 6);
+    p.flies += 1;
+    p.note = p.name + " snapped a fly. Crunch.";
+  }
+  if (fly) fly.remove();
+  render();
+}
+
+function act(i, kind) {
+  const p = state.plants[i];
+  if (!p.alive && kind !== "restart") { p.note = "This one needs a fresh start from the bottom button."; render(); return; }
+  if (kind === "distilled") {
+    p.water = clamp(p.water + 28);
+    p.health = clamp(p.health + 4);
+    p.note = "A careful sip of distilled water. The leaves look brighter.";
+  } else if (kind === "rain") {
+    p.water = clamp(p.water + 18);
+    p.health = clamp(p.health + 2);
+    p.note = "Rainwater. Pretty good, a little random.";
+  } else if (kind === "tap") {
+    p.water = clamp(p.water + 8);
+    p.health = clamp(p.health - 14);
+    p.tapMistakes += 1;
+    p.note = "Tap water. Minerals the plant hates. Health dropped.";
+    if (p.health <= 0) { p.alive = false; p.note = "The tap water was the last straw."; }
+  } else if (kind === "sun") {
+    p.sun = clamp(p.sun + 26);
+    p.health = clamp(p.health + 5);
+    p.note = "Parked on the windowsill. Traps perk up.";
+  } else if (kind === "shade") {
+    p.sun = clamp(p.sun - 18);
+    p.health = clamp(p.health - 4);
+    p.note = "Moved into the shade. Fine for a minute, not for a day.";
+  }
+  render();
+}
+
+document.getElementById("plants").addEventListener("pointerdown", (ev) => {
+  const stage = ev.target.closest(".stage");
+  if (!stage || ev.target.classList.contains("fly")) return;
+  const i = Number(stage.dataset.i);
+  snap(i);
+  const p = state.plants[i];
+  if (p.alive) p.note = p.name + " snapped at your finger and missed. Rude, and cute.";
+  save();
+  const note = stage.parentElement.querySelector(".note");
+  if (note) note.innerHTML = `${p.note}<br>${mood(p)} · flies caught ${p.flies} · snaps ${p.snaps}`;
+});
+
+document.getElementById("plants").addEventListener("click", (ev) => {
+  const btn = ev.target.closest("button[data-act]");
+  if (!btn) return;
+  act(Number(btn.dataset.i), btn.dataset.act);
+});
+
+document.getElementById("plants").addEventListener("change", (ev) => {
+  if (!ev.target.classList.contains("name")) return;
+  const i = Number(ev.target.dataset.i);
+  state.plants[i].name = (ev.target.value || NAMES[i]).slice(0, 16);
+  save();
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Start both plants over? Their story will be forgotten.")) return;
+  state = { plants: [blankPlant(0), blankPlant(1)], last: now(), days: 1, visits: 1 };
+  location.reload();
+});
+
+render();
+</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* Snap & Sip (the original 2D flytrap) - car mode */
+.car-mode body { font-size: 19px; -webkit-tap-highlight-color: transparent; }
+.car-mode header { padding: 12px 18px 6px; justify-content: flex-start; gap: 18px; }
+.car-mode header > div:first-of-type { flex: 1 1 auto; min-width: 0; }
+.car-mode h1 { font-size: 1.7rem; }
+.car-mode .sub { font-size: 1rem; }
+.car-mode #clock { flex: 0 0 auto; white-space: nowrap; }
+.car-mode button { min-height: 64px; padding: 12px 18px; font-size: 20px; font-weight: 700; touch-action: manipulation; }
+.car-mode .actions { gap: 10px; }
+.car-mode .actions button { flex: 1 1 150px; }
+.car-mode input.name { min-height: 64px; font-size: 1.45rem; font-weight: 700; padding: 8px 2px; }
+.car-mode .banner { font-size: 1.05rem; }
+.car-mode .bars { font-size: 1rem; }
+.car-mode .bar { height: 14px; }
+.car-mode .note { font-size: 1rem; }
+.car-mode .stage { height: 210px; }
+.car-mode footer button { min-width: 200px; }
+/* flies: a 64px tap target with the fly drawn in the middle */
+.car-mode .fly { width: 64px; height: 64px; min-height: 64px; padding: 0; margin: -26px 0 0 -32px; border-radius: 50%;
+  background: radial-gradient(ellipse 13px 9px at 50% 56%, #1a1a1a 92%, transparent 100%); }
+.car-mode .fly:before, .car-mode .fly:after { width: 16px; height: 11px; top: 17px; }
+.car-mode .fly:before { left: 13px; } .car-mode .fly:after { right: 13px; left: auto; }
+/* big "start over?" card (replaces the tiny browser confirm) */
+.car-ask { position: fixed; inset: 0; z-index: 2147483001; display: grid; place-items: center; background: rgba(0, 0, 0, 0.6); padding: 16px; }
+.car-ask .box { width: min(560px, 94vw); background: #1c4636; border: 3px solid #ffd36a; border-radius: 26px; padding: 22px; text-align: center; }
+.car-ask p { font-size: 24px; font-weight: 700; margin: 0 0 18px; }
+.car-ask .row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.car-ask button { min-width: 180px; }
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "snap-and-sip";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Snap & Sip - car mode */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  var KEY = 'snap-and-sip-v1';
+  CAR.ready(function () {
+    var header = document.querySelector('header');
+    if (header) CAR.backButton('inflow', header, header.firstChild); else CAR.backButton('tl');
+  });
+  // "Start over": a big in-page question instead of window.confirm, and it really clears the save
+  // (the original sets a fresh state and reloads without saving it, so the old plants come back).
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest && e.target.closest('#reset');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    if (document.querySelector('.car-ask')) return;
+    var ask = document.createElement('div');
+    ask.className = 'car-ask';
+    ask.innerHTML = '<div class="box" role="dialog" aria-modal="true"><p>Start both plants over?<br>Their story will be forgotten.</p>' +
+      '<div class="row"><button type="button" class="danger" data-car="yes">Start over</button><button type="button" class="good" data-car="no">Keep them</button></div></div>';
+    ask.addEventListener('click', function (ev) {
+      var t = ev.target.closest('[data-car]');
+      if (!t && ev.target !== ask) return;
+      ev.stopPropagation();
+      if (t && t.getAttribute('data-car') === 'yes') {
+        try { localStorage.removeItem(KEY); } catch (err) {}
+        location.reload();
+        return;
+      }
+      ask.remove();
+    });
+    document.body.appendChild(ask);
+  }, true);
+})();
+</script>
+</body>
+</html>

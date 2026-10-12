@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e121b">
+<meta name="color-scheme" content="dark">
+<title>Game Night</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #0e121b; color: #f3f6fb; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+    -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none;
+    -webkit-text-size-adjust: 100%;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-right, 0px))
+             calc(16px + env(safe-area-inset-bottom, 0px)) calc(18px + env(safe-area-inset-left, 0px));
+  }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 auto 14px; max-width: 1200px; }
+  h1 { margin: 0; font-size: 38px; font-weight: 800; letter-spacing: 0.5px; }
+  h1 .moon { display: inline-block; width: 26px; height: 26px; border-radius: 50%; margin-right: 12px; vertical-align: -2px;
+    box-shadow: inset -8px -3px 0 0 #ffd77a; transform: rotate(-20deg); }
+  .note { font-size: 20px; color: #c3cad8; white-space: nowrap; }
+  .note b { color: #9fe3b0; font-weight: 700; }
+  main { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; max-width: 1200px; margin: 0 auto; }
+  .card {
+    grid-column: span 2; position: relative; display: flex; align-items: center; gap: 16px; min-height: 226px;
+    padding: 18px 20px; border-radius: 24px; text-decoration: none; color: inherit;
+    background: #171d2a; border: 2px solid #313a4f; box-shadow: 0 4px 0 #070a10;
+    touch-action: manipulation; outline: none; overflow: hidden;
+  }
+  .card.wide { grid-column: span 3; min-height: 196px; }
+  .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--c); }
+  .card:active, .card.down { transform: translateY(3px); box-shadow: 0 1px 0 #070a10; background: #1d2435; border-color: var(--c); }
+  .card:focus-visible { border-color: var(--c); }
+  .card canvas { flex: 0 0 auto; width: 112px; height: 112px; border-radius: 20px; background: #0f141f; }
+  .card .t { min-width: 0; }
+  .card h2 { margin: 0 0 8px; font-size: 28px; line-height: 1.12; font-weight: 800; }
+  .card h2 small { display: block; font-size: 17px; font-weight: 600; color: #aab3c5; margin-top: 4px; }
+  .card p { margin: 0; font-size: 19px; line-height: 1.3; color: #d3d9e5; }
+  @media (max-width: 1000px) {
+    main { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card, .card.wide { grid-column: span 1; min-height: 150px; padding: 14px 16px; gap: 14px; }
+    .card:last-child:nth-child(odd) { grid-column: span 2; }
+    .card canvas { width: 92px; height: 92px; }
+    .card h2 { font-size: 24px; }
+    .card p { font-size: 17px; }
+    h1 { font-size: 32px; }
+    .note { font-size: 18px; }
+  }
+  @media (max-width: 640px) { main { grid-template-columns: 1fr; } .card:last-child:nth-child(odd) { grid-column: span 1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="moon" aria-hidden="true"></span>Game Night</h1>
+  <div class="note"><b>●</b> Plays while parked.</div>
+</header>
+<main>
+  <a class="card" href="flytrap/" style="--c:#5fd16a">
+    <canvas data-art="flytrap" width="112" height="112" aria-hidden="true"></canvas>
+    <div class="t"><h2>Venus Flytrap 3D</h2><p>Feed Snappy the flytrap, one fly at a time.</p></div>
+  </a>
+  <a class="card" href="snowball-fort/" style="--c:#5aa9ff">
+    <canvas data-art="fort" width="112" height="112" aria-hidden="true"></canvas>
+    <div class="t"><h2>Snowball Fort Together</h2><p>Two players: one rolls, one throws.</p></div>
+  </a>
+  <a class="card" href="hogwarts/" style="--c:#f2c14e">
+    <canvas data-art="hogwarts" width="112" height="112" aria-hidden="true"></canvas>
+    <div class="t"><h2>Battle for Hogwarts</h2><p>Learn spells, then defend the castle.</p></div>
+  </a>
+  <a class="card wide" href="snap-and-sip/" style="--c:#8bd17c">
+    <canvas data-art="snap" width="112" height="112" aria-hidden="true"></canvas>
+    <div class="t"><h2>Snap &amp; Sip<small>the original flytrap</small></h2><p>Two traps to water, sun and feed.</p></div>
+  </a>
+  <a class="card wide" href="muggle-studies/" style="--c:#b48cff">
+    <canvas data-art="muggle" width="112" height="112" aria-hidden="true"></canvas>
+    <div class="t"><h2>Muggle Studies</h2><p>Short daily quizzes, then off to play.</p></div>
+  </a>
+</main>
+<script>
+(function () {
+  'use strict';
+  var TAU = Math.PI * 2;
+  function circle(g, x, y, r, fill) { g.beginPath(); g.arc(x, y, r, 0, TAU); g.fillStyle = fill; g.fill(); }
+  var ART = {
+    flytrap: function (g) {
+      g.fillStyle = '#16301d'; g.fillRect(0, 0, 112, 112);
+      g.fillStyle = '#c86a3c'; g.beginPath(); g.moveTo(34, 82); g.lineTo(78, 82); g.lineTo(72, 106); g.lineTo(40, 106); g.closePath(); g.fill();
+      g.strokeStyle = '#3fa64a'; g.lineWidth = 5; g.beginPath(); g.moveTo(56, 82); g.quadraticCurveTo(52, 66, 56, 54); g.stroke();
+      g.fillStyle = '#5fd16a'; g.beginPath(); g.ellipse(56, 40, 30, 14, -0.35, Math.PI, TAU); g.fill();
+      g.beginPath(); g.ellipse(56, 50, 30, 14, 0.3, 0, Math.PI); g.fill();
+      g.fillStyle = '#ff7c9c'; g.beginPath(); g.ellipse(56, 46, 24, 7, 0, 0, TAU); g.fill();
+      g.fillStyle = '#f3f6fb'; for (var i = 0; i < 6; i++) { g.beginPath(); g.moveTo(34 + i * 9, 40); g.lineTo(38 + i * 9, 46); g.lineTo(42 + i * 9, 40); g.fill(); }
+      circle(g, 92, 22, 7, '#2a2f45'); circle(g, 88, 16, 5, 'rgba(220,240,255,.8)'); circle(g, 97, 16, 5, 'rgba(220,240,255,.8)');
+    },
+    fort: function (g) {
+      var sky = g.createLinearGradient(0, 0, 0, 112); sky.addColorStop(0, '#2b4f86'); sky.addColorStop(1, '#a8cdf5'); g.fillStyle = sky; g.fillRect(0, 0, 112, 112);
+      g.fillStyle = '#eef5ff'; g.fillRect(0, 80, 112, 32);
+      for (var i = 0; i < 4; i++) { g.fillStyle = i % 2 ? '#dbe8f8' : '#f6faff'; g.fillRect(8 + i * 24, 62, 22, 18); g.fillRect(8 + i * 24, 54, 10, 8); }
+      circle(g, 36, 34, 13, '#ffffff'); circle(g, 32, 30, 4, '#e3eefc');
+      circle(g, 84, 26, 8, '#ffffff');
+      g.fillStyle = '#e53935'; g.fillRect(12, 92, 14, 14); g.fillStyle = '#1e88e5'; g.fillRect(86, 92, 14, 14);
+    },
+    hogwarts: function (g) {
+      var sky = g.createLinearGradient(0, 0, 0, 112); sky.addColorStop(0, '#0b1030'); sky.addColorStop(1, '#2a2f66'); g.fillStyle = sky; g.fillRect(0, 0, 112, 112);
+      circle(g, 84, 24, 11, '#f5efd0'); circle(g, 80, 21, 10, '#141a40');
+      g.fillStyle = '#f3f6fb'; [[14, 14], [30, 30], [50, 12], [98, 52], [64, 36]].forEach(function (s) { g.fillRect(s[0], s[1], 2, 2); });
+      g.fillStyle = '#3b3f66';
+      [[18, 58, 14, 54], [40, 44, 16, 68], [64, 52, 14, 60], [84, 62, 12, 50]].forEach(function (t) {
+        g.fillRect(t[0], t[1], t[2], t[3]);
+        g.beginPath(); g.moveTo(t[0] - 3, t[1]); g.lineTo(t[0] + t[2] / 2, t[1] - 22); g.lineTo(t[0] + t[2] + 3, t[1]); g.closePath(); g.fill();
+      });
+      g.fillStyle = '#f2c14e'; [[22, 70], [46, 58], [46, 76], [68, 66], [88, 74]].forEach(function (w) { g.fillRect(w[0], w[1], 5, 8); });
+      g.fillStyle = '#1c2140'; g.fillRect(0, 100, 112, 12);
+    },
+    snap: function (g) {
+      g.fillStyle = '#123024'; g.fillRect(0, 0, 112, 112);
+      circle(g, 88, 22, 12, '#ffd36a');
+      g.fillStyle = '#5a3a22'; g.beginPath(); g.moveTo(30, 84); g.lineTo(82, 84); g.lineTo(76, 104); g.lineTo(36, 104); g.closePath(); g.fill();
+      g.fillStyle = '#1f7a32'; g.fillRect(53, 62, 6, 22);
+      g.fillStyle = '#2f9e3a'; g.beginPath(); g.moveTo(32, 64); g.quadraticCurveTo(56, 26, 80, 64); g.closePath(); g.fill();
+      g.fillStyle = '#f4ffe8'; for (var i = 0; i < 5; i++) { g.fillRect(37 + i * 9, 40 + Math.abs(2 - i) * 4, 3, 7); }
+      g.fillStyle = '#7fd0ff'; g.beginPath(); g.moveTo(20, 28); g.quadraticCurveTo(10, 44, 20, 46); g.quadraticCurveTo(30, 44, 20, 28); g.fill();
+    },
+    muggle: function (g) {
+      var bg = g.createRadialGradient(40, 30, 6, 56, 56, 80); bg.addColorStop(0, '#8a5cf6'); bg.addColorStop(1, '#1a0b3a'); g.fillStyle = bg; g.fillRect(0, 0, 112, 112);
+      g.fillStyle = '#fff1a8'; g.fillRect(22, 56, 30, 38); g.fillStyle = '#ffd36b'; g.fillRect(52, 56, 30, 38);
+      g.fillStyle = '#5a2d00'; g.fillRect(50, 54, 4, 42);
+      g.strokeStyle = '#c9a77a'; g.lineWidth = 2; for (var i = 0; i < 3; i++) { g.beginPath(); g.moveTo(27, 66 + i * 8); g.lineTo(47, 66 + i * 8); g.stroke(); g.beginPath(); g.moveTo(57, 66 + i * 8); g.lineTo(77, 66 + i * 8); g.stroke(); }
+      g.strokeStyle = '#3b2412'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(86, 70); g.lineTo(70, 32); g.stroke();
+      g.fillStyle = '#ffdc46'; g.beginPath();
+      for (var k = 0; k < 10; k++) { var a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 5 : 12; g.lineTo(68 + Math.cos(a) * r, 24 + Math.sin(a) * r); }
+      g.closePath(); g.fill();
+    }
+  };
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  Array.prototype.forEach.call(document.querySelectorAll('canvas[data-art]'), function (c) {
+    var draw = ART[c.getAttribute('data-art')]; if (!draw) return;
+    c.width = 112 * dpr; c.height = 112 * dpr;
+    var g = c.getContext('2d'); if (!g) return;
+    g.scale(dpr, dpr); draw(g);
+  });
+  // instant press feedback on touch screens (there is no hover in the car)
+  Array.prototype.forEach.call(document.querySelectorAll('.card'), function (a) {
+    a.addEventListener('pointerdown', function () { a.classList.add('down'); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { a.addEventListener(t, function () { a.classList.remove('down'); }); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+/* Snap & Sip (the original 2D flytrap) - car mode */
+.car-mode body { font-size: 19px; -webkit-tap-highlight-color: transparent; }
+.car-mode header { padding: 12px 18px 6px; justify-content: flex-start; gap: 18px; }
+.car-mode header > div:first-of-type { flex: 1 1 auto; min-width: 0; }
+.car-mode h1 { font-size: 1.7rem; }
+.car-mode .sub { font-size: 1rem; }
+.car-mode #clock { flex: 0 0 auto; white-space: nowrap; }
+.car-mode button { min-height: 64px; padding: 12px 18px; font-size: 20px; font-weight: 700; touch-action: manipulation; }
+.car-mode .actions { gap: 10px; }
+.car-mode .actions button { flex: 1 1 150px; }
+.car-mode input.name { min-height: 64px; font-size: 1.45rem; font-weight: 700; padding: 8px 2px; }
+.car-mode .banner { font-size: 1.05rem; }
+.car-mode .bars { font-size: 1rem; }
+.car-mode .bar { height: 14px; }
+.car-mode .note { font-size: 1rem; }
+.car-mode .stage { height: 210px; }
+.car-mode footer button { min-width: 200px; }
+/* flies: a 64px tap target with the fly drawn in the middle */
+.car-mode .fly { width: 64px; height: 64px; min-height: 64px; padding: 0; margin: -26px 0 0 -32px; border-radius: 50%;
+  background: radial-gradient(ellipse 13px 9px at 50% 56%, #1a1a1a 92%, transparent 100%); }
+.car-mode .fly:before, .car-mode .fly:after { width: 16px; height: 11px; top: 17px; }
+.car-mode .fly:before { left: 13px; } .car-mode .fly:after { right: 13px; left: auto; }
+/* big "start over?" card (replaces the tiny browser confirm) */
+.car-ask { position: fixed; inset: 0; z-index: 2147483001; display: grid; place-items: center; background: rgba(0, 0, 0, 0.6); padding: 16px; }
+.car-ask .box { width: min(560px, 94vw); background: #1c4636; border: 3px solid #ffd36a; border-radius: 26px; padding: 22px; text-align: center; }
+.car-ask p { font-size: 24px; font-weight: 700; margin: 0 0 18px; }
+.car-ask .row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.car-ask button { min-width: 180px; }

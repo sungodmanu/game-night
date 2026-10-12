@@ -1,0 +1,37 @@
+/* Muggle Studies - car mode: a wider card in landscape, 64px+ buttons, larger type */
+.car-mode #app { padding: 12px 16px; }
+.car-mode .app { width: min(660px, calc(100vw - 340px)); min-width: 400px; height: calc(100dvh - 24px); padding: 14px 18px 16px; }
+.car-mode .stage { justify-content: flex-start; padding-top: 4px; }
+.car-mode .stage > :first-child { margin-top: auto; }
+.car-mode .stage > :last-child { margin-bottom: auto; }
+.car-mode .eyebrow { font-size: 0.95rem; }
+.car-mode h1 { font-size: 2rem; margin-bottom: 8px; }
+.car-mode h1.prompt { font-size: 1.55rem; margin-bottom: 12px; }
+.car-mode .sub, .car-mode .muted { font-size: 1.12rem; margin-bottom: 12px; }
+.car-mode .quote { margin-bottom: 14px; padding: 12px 14px; }
+.car-mode .quote p { font-size: 1.12rem; }
+.car-mode .profile-card, .car-mode .subject-card, .car-mode .level-card, .car-mode .choice, .car-mode .primary { min-height: 72px; font-size: 1.2rem; }
+.car-mode .profile-card strong, .car-mode .subject-card strong, .car-mode .level-card strong { font-size: 1.3rem; }
+.car-mode .profile-card span:nth-child(3), .car-mode .level-card em, .car-mode .level-card span { font-size: 1rem; }
+.car-mode .subjects { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.car-mode .levels { grid-template-columns: repeat(3, 1fr); }
+.car-mode .choices { grid-template-columns: 1fr 1fr; }
+.car-mode .choice { padding: 12px 14px; font-size: 1.15rem; }
+.car-mode .primary { min-height: 68px; font-size: 1.3rem; }
+.car-mode .text-btn { min-height: 64px; padding: 8px 18px; font-size: 1.15rem; font-weight: 700; color: #fff8ff;
+  border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 999px; background: rgba(255, 255, 255, 0.1); }
+.car-mode .text-btn.block { width: auto; margin: 14px auto 0; display: block; padding: 8px 26px; }
+.car-mode .who { font-size: 1rem; }
+.car-mode .teach, .car-mode .card-note { margin-top: 10px; padding: 10px 12px; font-size: 1.05rem; }
+.car-mode .stat strong { font-size: 1.8rem; }
+.car-mode .stats { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.car-mode .big-emoji { font-size: 3.4rem; margin: 4px 0 10px; }
+.car-mode .hint { margin-top: 12px; font-size: 1rem; }
+/* narrow windows: park the card to the right of the back button instead of centring it */
+@media (max-width: 1000px) {
+  .car-mode .app { width: calc(100vw - 206px); min-width: 0; max-width: 660px; margin-left: 194px; margin-right: 12px; }
+}
+@media (max-width: 1000px) {
+  .car-mode .subjects { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .car-mode .subject-card strong { font-size: 1.12rem; }
+}
