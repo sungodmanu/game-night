@@ -1,17 +1,18 @@
 Game Night — offline browser games, car-friendly builds.
 
 A tiny static site (GitHub Pages, `https://sungodmanu.github.io/game-night/`) with a big-card menu
-and car-friendly copies of five offline browser games, tuned for the Tesla in-car browser (Chromium,
+and car-friendly copies of six offline browser games, tuned for the Tesla in-car browser (Chromium,
 landscape ~1180×600, touch only, plays while parked).
 
 | Path | Game |
 |---|---|
-| `index.html` | **Game Night** menu: five big cards, no external images or fonts |
+| `index.html` | **Game Night** menu: six big cards, no external images or fonts |
 | `flytrap/` | Venus Flytrap 3D |
 | `snowball-fort/` | Snowball Fort Together (two players, one screen) |
 | `hogwarts/` | Battle for Hogwarts |
 | `snap-and-sip/` | Snap & Sip — the original flytrap |
 | `muggle-studies/` | Muggle Studies — short daily quizzes, then off to play |
+| `cheetah/` | Cheetah Cub Dash — a cheetah-cub runner for the kindergartner |
 
 Everything is self-contained: no network requests besides same-origin navigation, and every link
 and asset path is relative, so the site works from any sub-path. `.nojekyll` makes Pages serve the
@@ -34,9 +35,10 @@ and injects the layer.
 
     node build-car.js
 
-Inputs (read only): the four game folders next to this one (`../venus-flytrap-3d`,
-`../snowball-fort`, `../battle-for-hogwarts/release-v2`, `../venus-flytrap`; override with
-`FLYTRAP_SRC`, `FORT_SRC`, `HOGWARTS_SRC`, `SNAP_SRC`), plus a private folder that is never
+Inputs (read only): the five game folders next to this one (`../venus-flytrap-3d`,
+`../snowball-fort`, `../battle-for-hogwarts/release-v2`, `../venus-flytrap`,
+`../cheetah-run/release-v1/index-public.html` (built with the code names: `node build.js --public`); override with
+`FLYTRAP_SRC`, `FORT_SRC`, `HOGWARTS_SRC`, `SNAP_SRC`, `CHEETAH_SRC`), plus a private folder that is never
 committed (`../car-games-private`, override with `CAR_PRIVATE`) holding the Muggle Studies source
 files and `realnames.json`. The build refuses to finish if any real name, external URL or
 root-absolute path survives in the output.
@@ -57,7 +59,8 @@ left behind — pick the final names before the kids start.
 ## Saves
 
 Each game keeps its own `localStorage` key: `snappy-flytrap-3d-v1`, `snowball-fort-together-v1`,
-`battle-for-hogwarts-v1`, `snap-and-sip-v1`, `muggle-studies-state-v1`.
+`battle-for-hogwarts-v1`, `snap-and-sip-v1`, `muggle-studies-state-v1`; Cheetah Cub Dash uses the
+`cheetah-run:` prefix (one key per player: `cheetah-run:p1`, `cheetah-run:p2`, ..., plus roster/last-player/settings).
 
 ## Tests
 

@@ -25,6 +25,8 @@ const SRC = {
   fort: process.env.FORT_SRC || path.join(ROOT, '..', 'snowball-fort', 'index.html'),
   hogwarts: process.env.HOGWARTS_SRC || path.join(ROOT, '..', 'battle-for-hogwarts', 'release-v2', 'index.html'),
   snap: process.env.SNAP_SRC || path.join(ROOT, '..', 'venus-flytrap', 'index.html'),
+  // built with the public code names (cheetah-run: node build.js --public)
+  cheetah: process.env.CHEETAH_SRC || path.join(ROOT, '..', 'cheetah-run', 'release-v1', 'index-public.html'),
   muggle: process.env.MUGGLE_SRC || path.join(PRIVATE, 'muggle-studies')
 };
 const read = (p) => fs.readFileSync(p, 'utf8');
@@ -127,7 +129,8 @@ const GAMES = [
   { id: 'flytrap', dir: 'flytrap', src: SRC.flytrap, webgl: true },
   { id: 'snowball-fort', dir: 'snowball-fort', src: SRC.fort, webgl: true },
   { id: 'hogwarts', dir: 'hogwarts', src: SRC.hogwarts, webgl: true },
-  { id: 'snap-and-sip', dir: 'snap-and-sip', src: SRC.snap, webgl: false }
+  { id: 'snap-and-sip', dir: 'snap-and-sip', src: SRC.snap, webgl: false },
+  { id: 'cheetah', dir: 'cheetah', src: SRC.cheetah, webgl: true }
 ];
 const report = [];
 const outputs = [];

@@ -1,0 +1,7 @@
+/* Cheetah Cub Dash - car mode: make room for the "← Games" button (top-left, 132x64) */
+.car-mode #count { left: calc(env(safe-area-inset-left, 0px) + 176px); }
+.car-mode #prog { left: calc(env(safe-area-inset-left, 0px) + 330px); }
+.car-mode #racer { top: calc(env(safe-area-inset-top, 0px) + 88px); }
+.car-mode .s-start .toprow { left: calc(env(safe-area-inset-left, 0px) + 176px); }
+.car-mode .s-start .chips { left: calc(env(safe-area-inset-left, 0px) + 176px); }
+.car-mode .s-profiles .logo { padding: 0 150px; }

@@ -48,6 +48,7 @@ const GAMES = [
   { id: 'flytrap', key: 'snappy-flytrap-3d-v1', ready: () => !!(window.__game && window.__CAR && window.__game.fps), fixed: true },
   { id: 'snowball-fort', key: 'snowball-fort-together-v1', ready: () => !!(window.__game && window.__game.frames && window.__game.frames() > 3), fixed: true },
   { id: 'hogwarts', key: 'battle-for-hogwarts-v1', ready: () => !!(window.__game && window.__game.frames && window.__game.frames() > 3), fixed: true },
+  { id: 'cheetah', key: 'cheetah-run:', keyPrefix: true, ready: () => !!(window.__game && window.__game.frames && window.__game.frames() > 3 && window.__CAR), fixed: true },
   { id: 'snap-and-sip', key: 'snap-and-sip-v1', ready: () => document.querySelectorAll('#plants .card').length === 2, fixed: false },
   { id: 'muggle-studies', key: 'muggle-studies-state-v1', ready: () => !!(window.muggleStudies && document.querySelector('#app button')), fixed: false }
 ];
@@ -129,6 +130,13 @@ const STATES = {
     ['lord', async (p) => { await p.evaluate(() => { window.__game.start({ hero: 'voldemort', path: 'lord' }); window.__game.advance(3); }); await settle(p); }],
     ['hunt', async (p) => { await p.evaluate(() => { window.__game.start({ hero: 'harry', path: 'hunt' }); window.__game.advance(3); }); await settle(p); }]
   ],
+  'cheetah': [
+    ['start', async (p) => { await p.locator('.pcard[data-id=p1]').tap(); await settle(p, 800); }],
+    ['editor', async (p) => { await p.locator('#b-edit').tap(); await settle(p, 800); }, async (p) => { await p.locator('#b-done').tap(); await settle(p); }],
+    ['race setup', async (p) => { await p.locator('#b-race').tap(); await settle(p); }, async (p) => { await p.locator('#b-race-x').tap(); await settle(p); }],
+    ['leaderboard', async (p) => { await p.locator('#b-board').tap(); await settle(p); }, async (p) => { await p.locator('#b-board-x').tap(); await settle(p); }],
+    ['running', async (p) => { await p.locator('#b-play').tap(); await p.evaluate(() => { __game.pause(); __game.auto(); __game.advance(8); __game.pause(false); }); await settle(p, 800); }]
+  ],
   'snap-and-sip': [
     ['start-over dialog', async (p) => { await p.tap('#reset'); await p.waitForSelector('.car-ask', { state: 'visible' }); },
      async (p) => { await p.locator('.car-ask button').filter({ hasText: /keep|no|cancel/i }).first().tap(); await settle(p); }, true]
@@ -171,6 +179,18 @@ const SAVES = {
     await reload(page, g);
     const after = await page.evaluate(() => ({ muted: window.__game.state().muted, hero: JSON.parse(localStorage.getItem('battle-for-hogwarts-v1') || '{}').hero }));
     return { ok: before.muted === true && after.muted === true && after.hero === 'voldemort', before: before.muted, after };
+  },
+  async 'cheetah'(page, g) {
+    await page.locator('.pcard[data-id=p1]').tap();
+    await page.locator('#b-edit').tap(); await page.locator('#s-edit [data-v=Dash]').tap(); await page.locator('#s-edit [data-v=glow]').tap(); await page.locator('#b-done').tap();
+    await page.locator('#b-play').tap();
+    await page.evaluate(() => { __game.pause(); __game.auto(); __game.advance(15); __game.autosave(); });
+    const before = await page.evaluate(() => __game.profile('p1'));
+    await reload(page, g);
+    const after = await page.evaluate(() => __game.profile('p1'));
+    const shown = await page.evaluate(() => document.body.innerText);
+    return { ok: after.cubName === 'Dash' && after.fur === 'glow' && !!after.run && Math.abs(after.run.dist - before.run.dist) < 2,
+      before: { n: before.cubName, d: before.run && before.run.dist }, after: { n: after.cubName, d: after.run && after.run.dist }, codeNamesShown: shown.includes(CODE.older) && shown.includes(CODE.younger) };
   },
   async 'snap-and-sip'(page, g) {
     const name = page.locator('input.name').nth(1);
@@ -235,7 +255,7 @@ try {
       const m = await page.evaluate(() => ({ title: document.title, cards: [...document.querySelectorAll('a.card')].map(a => { const r = a.getBoundingClientRect(); return { href: a.getAttribute('href'), w: r.width, h: r.height, right: r.right, bottom: r.bottom }; }),
         parked: document.body.innerText.includes('Plays while parked.'), sw: document.documentElement.scrollWidth }));
       check(`${tag} menu: title "Game Night"`, m.title === 'Game Night', m.title);
-      check(`${tag} menu: five cards with relative links`, m.cards.length === 5 && m.cards.every(c => /^[a-z-]+\/$/.test(c.href)), m.cards.map(c => c.href));
+      check(`${tag} menu: six cards with relative links`, m.cards.length === 6 && m.cards.every(c => /^[a-z-]+\/$/.test(c.href)), m.cards.map(c => c.href));
       check(`${tag} menu: "Plays while parked." note`, m.parked);
       check(`${tag} menu: cards are big (>= 64px) and nothing overflows sideways`, m.cards.every(c => c.w >= 64 && c.h >= 64 && c.right <= W + 0.5) && m.sw <= W, m.cards);
       if (W === 1180) await shot(page, 'menu'); else await shot(page, 'menu-770');
@@ -275,7 +295,9 @@ try {
       const sv = await SAVES[g.id](page, g);
       check(`${L}: save persists across reload`, sv.ok, sv);
       const keys = await page.evaluate(() => Object.keys(localStorage));
-      check(`${L}: saves only under its own key "${g.key}"`, keys.length === 1 && keys[0] === g.key, keys);
+      if (g.keyPrefix) check(`${L}: saves only under its own keys "${g.key}*"`, keys.length >= 1 && keys.every(k => k.startsWith(g.key)), keys);
+      else check(`${L}: saves only under its own key "${g.key}"`, keys.length === 1 && keys[0] === g.key, keys);
+      if (g.id === 'cheetah') check(`${L}: profiles show the code names`, sv.codeNamesShown, sv);
       if (g.id === 'muggle-studies') check(`${L}: profiles use the code names`, sv.profiles.join() === [CODE.older, CODE.younger].map(n => n.toLowerCase().replace(/[^a-z0-9]/g, '')).join() && sv.codeNamesShown, sv);
       if (g.id === 'snowball-fort') {
         await page.reload({ waitUntil: 'load' }); await boot(page, g);
