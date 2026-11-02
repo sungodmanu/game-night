@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#5c2a1a">
+<title>Pizza Rush</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#3d1f12;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#3a1a10;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 10%,#ffb347 0%,#e87a3a 35%,#8b3a1a 75%,#3d1f12 100%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#5c3317;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.45)}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:10}
+#overlay > *{pointer-events:auto}
+#hud{position:absolute;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 12px 0;display:flex;gap:8px;align-items:flex-start;justify-content:space-between;pointer-events:none;z-index:5}
+#hud.hidden{display:none}
+.icon-btn{position:absolute;z-index:30;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.92);color:#3a1a10;font-size:22px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+/* Mute / FS stay top-right of the app — never sit on Quit */
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(56px + env(safe-area-inset-right))}
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#3a1a10;background:#ffe566;box-shadow:0 4px 0 #d4b000,0 8px 18px rgba(0,0,0,.2);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d4b000,0 4px 10px rgba(0,0,0,.2)}
+.btn.big{font-size:24px;padding:14px 26px;border-radius:22px;min-height:56px}
+.btn.green{background:#7dff9a;box-shadow:0 4px 0 #2db854,0 8px 18px rgba(0,0,0,.2)}
+.btn.blue{background:#7ec8ff;box-shadow:0 4px 0 #2a7fbf,0 8px 18px rgba(0,0,0,.2)}
+.btn.pink{background:#ff9ad4;box-shadow:0 4px 0 #d44f9a,0 8px 18px rgba(0,0,0,.2)}
+.btn.orange{background:#ffb347;box-shadow:0 4px 0 #d47800,0 8px 18px rgba(0,0,0,.2)}
+.btn.red{background:#ff7a7a;box-shadow:0 4px 0 #c04040,0 8px 18px rgba(0,0,0,.2)}
+.btn.ghost{background:rgba(255,255,255,.55);color:#3a1a10;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.panel{background:linear-gradient(180deg,#fff6e8 0%,#ffe0b8 100%);border:4px solid #e8a04a;border-radius:28px;padding:18px;box-shadow:0 16px 50px rgba(0,0,0,.35),inset 0 1px 0 #fff;max-width:min(1000px,96vw);max-height:min(94dvh,94vh);overflow:auto;color:#3a1a10}
+.title{font-size:clamp(26px,5vw,42px);font-weight:900;letter-spacing:.5px;text-align:center;color:#8b2e0e;text-shadow:0 2px 0 rgba(255,255,255,.6);margin-bottom:6px}
+.sub{text-align:center;opacity:.9;margin-bottom:12px;font-size:15px;color:#5c3317;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:8px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:200px;border-radius:24px;background:linear-gradient(160deg,#fff 0%,#ffe8c8 100%);border:4px solid #f0a830;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.2);color:#3a1a10}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px;margin-top:2px;color:#8b2e0e}
+.profile-card .meta{font-size:14px;opacity:.85;text-align:center;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#fff;border:2px solid #f0c070;font-weight:800;min-height:36px;color:#5c3317;font-size:14px}
+.toast{position:absolute;top:18%;left:50%;transform:translateX(-50%);background:rgba(60,20,10,.88);color:#fff;padding:12px 20px;border-radius:16px;font-weight:800;font-size:20px;z-index:40;pointer-events:none;animation:pop .45s ease}
+@keyframes pop{0%{transform:translateX(-50%) scale(.6);opacity:0}40%{transform:translateX(-50%) scale(1.06);opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
+.hidden{display:none!important}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px;width:100%;max-width:760px;max-height:46vh;overflow:auto;padding:4px}
+.lvl{min-width:52px;min-height:52px;border-radius:14px;border:3px solid #f0c070;background:#fff;color:#8b2e0e;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 3px 0 #e8a04a}
+.lvl.done{background:#7dff9a;border-color:#2db854}
+.lvl.rush{background:linear-gradient(160deg,#ffb088,#ff6b6b);color:#fff;border-color:#c04040}
+.lvl.vip{background:linear-gradient(160deg,#ffe566,#f0a830);border-color:#d4a017}
+.lvl.locked{opacity:.35;cursor:default;box-shadow:none}
+.lvl.cur{outline:3px solid #ff6b35;outline-offset:2px}
+
+.ing-btn{min-width:64px;min-height:72px;width:72px;height:80px;border-radius:16px;border:3px solid #f0a830;background:linear-gradient(180deg,#ffffff,#fff3d6);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;color:#5c3317;font-weight:800;font-size:11px;padding:4px 2px 6px;box-shadow:0 3px 0 #e08a20}
+.ing-btn canvas{width:52px;height:44px;pointer-events:none;border-radius:10px;background:rgba(255,200,120,.25)}
+.ing-btn.sel{border-color:#2db854;background:linear-gradient(180deg,#e8ffe8,#b8f5c8);box-shadow:0 3px 0 #2db854,0 0 0 3px rgba(125,255,154,.45)}
+.ing-btn.locked{opacity:.35;filter:grayscale(.7);cursor:default}
+.ing-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1;min-width:0}
+.ing-line{display:flex;flex-direction:row;align-items:center;gap:8px;width:100%;margin:3px 0}
+.ing-label{flex:0 0 64px;font-weight:900;font-size:13px;color:#8b2e0e;text-align:right}
+
+.upgrade-card{min-width:130px;min-height:110px;border-radius:18px;background:linear-gradient(180deg,#fff,#ffe8c8);border:3px solid #f0a830;padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#3a1a10;font-weight:800;font-size:13px;text-align:center;box-shadow:0 4px 0 #e08a20}
+.upgrade-card.owned{border-color:#2db854;background:linear-gradient(180deg,#e8ffe8,#c8f5d8)}
+.upgrade-card.locked{opacity:.4;cursor:default}
+.coin-btn{min-width:52px;min-height:52px;width:56px;height:56px;border-radius:50%;border:3px solid #c9a227;background:radial-gradient(circle at 35% 30%,#ffe566,#d4a017);color:#3a1a10;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 3px 0 #8a6a00;display:flex;align-items:center;justify-content:center;padding:0}
+.coin-btn:active{transform:translateY(2px)}
+.coin-tray{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:6px}
+.coin-target-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:100%}
+.coin-target-row canvas{width:28px;height:28px}
+.patience{height:12px;border-radius:8px;background:rgba(0,0,0,.12);overflow:hidden;width:100%;max-width:160px;border:2px solid #e8a04a}
+.patience > i{display:block;height:100%;background:linear-gradient(90deg,#7dff9a,#ffe566,#ff7a7a);width:100%;transform-origin:left}
+
+/* Play layout */
+.play-panel{width:min(1100px,98vw)!important;padding:8px 12px!important;background:linear-gradient(180deg,#fff8ee 0%,#ffd9a8 100%)!important;overflow:hidden!important;max-height:min(96dvh,580px)!important}
+/* Reserve room so Quit never sits under mute/fullscreen */
+.play-top{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;align-items:center;width:100%;margin-bottom:4px;padding-right:128px;box-sizing:border-box}
+.play-top #btnQuit{margin-left:auto;flex-shrink:0}
+.play-grid{display:grid;grid-template-columns:180px 1fr 280px;gap:8px;width:100%;align-items:stretch;min-height:0}
+.play-left,.play-center,.play-right{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.order-canvas,.pizza-canvas{display:block;border-radius:18px;background:linear-gradient(180deg,#fff,#ffe8c8);border:3px solid #f0a830;box-shadow:0 4px 14px rgba(0,0,0,.12);width:100%;height:auto;max-height:min(400px,58vh)}
+.pizza-canvas.pizza-pay{max-height:min(180px,42vh)}
+.play-right{align-items:stretch;overflow:hidden;max-height:min(460px,72vh);padding-right:2px;display:flex;flex-direction:column}
+.ings-scroll{flex:1;min-height:0;overflow:auto;width:100%;padding-bottom:4px}
+.bake-row{flex-shrink:0;padding:6px 0 2px;margin-top:2px;background:linear-gradient(180deg,rgba(255,248,238,0),#ffe0b0 25%,#ffd9a8 100%);width:100%;display:flex;justify-content:center;z-index:2}
+.bake-meter{position:relative;width:92%;height:22px;border-radius:12px;background:#f3e6d0;border:2px solid #e8a04a;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.12)}
+.bake-zones{position:absolute;inset:0;display:flex;pointer-events:none;z-index:0}
+.bake-zones i{display:block;height:100%}
+.bake-zones .z-early{background:rgba(180,180,180,.35)}
+.bake-zones .z-good{background:linear-gradient(90deg,rgba(125,255,154,.55),rgba(255,229,102,.65))}
+.bake-zones .z-late{background:rgba(255,122,122,.45)}
+.bake-ideal{position:absolute;top:0;bottom:0;width:3px;background:#2db854;z-index:2;transform:translateX(-1px);box-shadow:0 0 0 1px rgba(255,255,255,.7)}
+.bake-fill{position:absolute;left:0;top:0;bottom:0;z-index:1;background:linear-gradient(90deg,#6ad0ff,#7dff9a 40%,#ffe566 70%,#ff7a7a);opacity:.92;transition:width .08s linear;pointer-events:none}
+.bake-legend{display:flex;justify-content:space-between;width:92%;font-size:10px;font-weight:800;color:#8b2e0e;margin:2px 0 4px;opacity:.85}
+.bake-legend .leg-good{color:#1a7a3a}
+.bake-legend .leg-late{color:#c04040}
+.msg{font-weight:800;font-size:13px;color:#8b2e0e;text-align:center;min-height:18px}
+.pay-panel-right{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:4px;justify-content:center;flex:1}
+.pay-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%}
+
+@media (max-width:900px),(max-height:650px){
+  .play-grid{grid-template-columns:150px 1fr 260px;gap:6px}
+  .ing-btn{width:56px;height:64px;min-width:52px;min-height:56px}
+  .ing-btn canvas{width:40px;height:32px}
+  .ing-label{flex:0 0 48px;font-size:11px}
+  .play-panel{max-height:min(96dvh,560px)!important;padding:6px 8px!important}
+  .order-canvas,.pizza-canvas{max-height:min(300px,48vh)}
+  .pizza-canvas.pizza-pay{max-height:min(150px,36vh)}
+  .play-right{max-height:min(420px,70vh);overflow:hidden}
+  .play-top{padding-right:128px}
+  .profile-card{min-height:160px;width:min(240px,40vw)}
+  .title{font-size:clamp(22px,4.5vw,32px)}
+  .btn.big{min-height:48px;font-size:18px;padding:10px 18px}
+}
+@media (max-width:700px),(orientation:portrait) and (max-width:500px){
+  /* Tall narrow: order+pizza side-by-side, ingredients below — all must fit without scroll */
+  .play-panel{max-height:min(96dvh,820px)!important;padding:4px 6px!important;overflow:hidden!important}
+  .play-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:4px}
+  .play-left{grid-column:1;grid-row:1}
+  .play-center{grid-column:2;grid-row:1}
+  .play-right{grid-column:1 / -1;grid-row:2;max-height:min(360px,48vh);overflow:hidden}
+  .order-canvas{max-height:min(200px,28vh)}
+  .pizza-canvas{max-height:min(200px,28vh)}
+  .pizza-canvas.pizza-pay{max-height:min(140px,20vh)}
+  .play-top{padding-right:128px}
+  .profile-card{width:min(300px,80vw)}
+  .ings-scroll{max-height:min(220px,30vh)}
+  .pay-panel-right{max-height:min(280px,40vh)}
+}
+@media (max-height:420px) and (orientation:landscape){
+  .play-grid{grid-template-columns:110px 1fr 230px;gap:4px}
+  .ing-btn{width:48px;height:50px;min-width:48px;min-height:48px;font-size:9px;padding:2px}
+  .ing-btn canvas{width:30px;height:22px}
+  .ing-label{flex:0 0 40px;font-size:10px}
+  .ing-line{margin:0}
+  .play-panel{max-height:96dvh!important;padding:3px 6px!important}
+  .order-canvas{max-height:min(170px,58vh)}
+  .pizza-canvas{max-height:min(180px,58vh)}
+  .pizza-canvas.pizza-pay{max-height:min(120px,40vh)}
+  .play-right{max-height:min(310px,86vh)}
+  .play-top{padding-right:128px;gap:4px;margin-bottom:2px}
+  .play-top .chip{padding:3px 8px;min-height:26px;font-size:11px}
+  .btn.big{min-height:48px;font-size:15px;padding:8px 14px}
+  .coin-btn{width:48px;height:48px;min-width:48px;min-height:48px}
+  .pay-panel-right{gap:4px}
+  .msg{font-size:12px;min-height:14px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Pizza Rush"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="overlay"></div>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Pizza Rush — core namespace & helpers */
+const PR = window.PR = {
+  VERSION: 1,
+  SAVE_KEY: 'pizza-rush-v1',
+  W: 1180, H: 600,
+  DAY_COUNT: 36,
+  profiles: {
+    alpha: { id: 'alpha', defaultName: 'Player 1', label: 'Easy', noGameOver: true, patience: false, mathMode: 'count', tipMul: 1.2 },
+    beta:  { id: 'beta',  defaultName: 'Player 2', label: 'Challenge', noGameOver: false, patience: true, mathMode: 'ops', tipMul: 1.0, hearts: 3 }
+  },
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  keys: Object.create(null),
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  run: null
+};
+
+PR.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+PR.lerp = (a, b, t) => a + (b - a) * t;
+PR.rand = (a, b) => a + Math.random() * (b - a);
+PR.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+PR.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+PR.now = () => performance.now();
+
+PR.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1400);
+};
+
+PR.fitCanvas = () => {
+  const c = PR.canvas;
+  if (!c) return;
+  if (c.width !== PR.W) c.width = PR.W;
+  if (c.height !== PR.H) c.height = PR.H;
+};
+
+PR.clear = (color) => {
+  const ctx = PR.ctx;
+  ctx.fillStyle = color || '#4a2418';
+  ctx.fillRect(0, 0, PR.W, PR.H);
+};
+
+PR.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* Gentle WebAudio SFX */
+PR.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = PR.muted ? 0 : 0.35;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (PR.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.18, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function noise(dur, vol) {
+    if (PR.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const n = Math.max(1, (c.sampleRate * dur) | 0);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = vol || 0.08;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1400;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start();
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      PR.muted = !!m;
+      if (master) master.gain.value = PR.muted ? 0 : 0.35;
+      try { localStorage.setItem('pr-mute', PR.muted ? '1' : '0'); } catch (_) {}
+    },
+    loadMute() {
+      try { PR.muted = localStorage.getItem('pr-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = PR.muted ? '🔇' : '🔊';
+    },
+    click() { tone(320, 0.05, 'triangle', 0.07); },
+    soft() { tone(360, 0.08, 'sine', 0.08); },
+    plop() { tone(220, 0.1, 'sine', 0.1, 140); },
+    sauce() { tone(180, 0.12, 'triangle', 0.09, 120); noise(0.05, 0.04); },
+    cheese() { tone(440, 0.1, 'sine', 0.1); },
+    topping() { tone(520, 0.08, 'triangle', 0.09); },
+    oven() { tone(140, 0.2, 'sawtooth', 0.06, 90); noise(0.12, 0.05); },
+    ding() { tone(880, 0.12, 'sine', 0.12); setTimeout(() => tone(1175, 0.14, 'sine', 0.1), 70); },
+    burn() { tone(90, 0.25, 'sawtooth', 0.08, 50); noise(0.2, 0.07); },
+    slice() { tone(700, 0.06, 'triangle', 0.08); noise(0.04, 0.04); },
+    coin() { tone(660, 0.07, 'sine', 0.1); setTimeout(() => tone(880, 0.09, 'sine', 0.09), 50); },
+    tip() { tone(523, 0.08, 'sine', 0.1); setTimeout(() => tone(659, 0.1, 'sine', 0.1), 60); setTimeout(() => tone(784, 0.14, 'sine', 0.1), 120); },
+    win() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.16, 'sine', 0.12), i * 90)); },
+    fail() { tone(200, 0.2, 'sine', 0.1, 90); setTimeout(() => tone(140, 0.25, 'triangle', 0.1, 70), 120); },
+    customer() { tone(400, 0.1, 'sine', 0.09); setTimeout(() => tone(500, 0.1, 'sine', 0.08), 80); },
+    upgrade() { tone(400, 0.1, 'sine', 0.1); setTimeout(() => tone(600, 0.14, 'sine', 0.12), 80); setTimeout(() => tone(800, 0.18, 'sine', 0.1), 160); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage autosave with in-memory fallback */
+PR.Save = (() => {
+  function blankProfile(id) {
+    const meta = PR.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      maxDay: 1,
+      cleared: {},
+      coins: 0,
+      tips: 0,
+      upgrades: [],
+      decorations: [],
+      unlockedToppings: ['pepperoni', 'mushroom'],
+      hearts: meta.hearts || 3,
+      playSeconds: 0,
+      pizzasServed: 0
+    };
+  }
+
+  function blankState() {
+    return {
+      v: PR.VERSION,
+      lastProfile: null,
+      profiles: {
+        alpha: blankProfile('alpha'),
+        beta: blankProfile('beta')
+      }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(PR.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return PR.memStore;
+  }
+
+  function writeRaw(data) {
+    PR.memStore = data;
+    try {
+      localStorage.setItem(PR.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== PR.VERSION) {
+      PR.state = blankState();
+      save();
+      return PR.state;
+    }
+    for (const id of ['alpha', 'beta']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+      if (!Array.isArray(raw.profiles[id].upgrades)) raw.profiles[id].upgrades = [];
+      if (!Array.isArray(raw.profiles[id].decorations)) raw.profiles[id].decorations = [];
+      if (!Array.isArray(raw.profiles[id].unlockedToppings)) raw.profiles[id].unlockedToppings = ['pepperoni', 'mushroom'];
+    }
+    PR.state = raw;
+    return PR.state;
+  }
+
+  function save() {
+    if (!PR.state) return false;
+    return writeRaw(PR.state);
+  }
+
+  function profile(id) {
+    if (!PR.state) load();
+    return PR.state.profiles[id || PR.state.lastProfile || 'alpha'];
+  }
+
+  function setProfile(id) {
+    PR.state.lastProfile = id;
+    save();
+  }
+
+  return { load, save, profile, setProfile, blankProfile, blankState, readRaw, writeRaw };
+})();
+
+})();
+/* ==== 30-art.js ==== */
+;(function(){
+/* Canvas drawing — bright original pizza art, kid-readable icons */
+PR.Art = (() => {
+  function crustColor(id) {
+    return ({ thin: '#e8c48a', thick: '#d4a05a', stuffed: '#c9894a', glutenfree: '#f0d9a8' })[id] || '#e8c48a';
+  }
+  function sauceColor(id) {
+    return ({ tomato: '#c0392b', white: '#f5e6c8', pesto: '#3d8b4f', bbq: '#6b3a1f' })[id] || '#c0392b';
+  }
+  function cheeseColor(id) {
+    return ({ mozzarella: '#ffe566', cheddar: '#f0a830', vegan: '#d8ef8a', none: 'transparent' })[id] || '#ffe566';
+  }
+  function toppingColor(id) {
+    return ({
+      pepperoni: '#b83227', mushroom: '#c4a882', olive: '#2d3436', pepper: '#27ae60',
+      onion: '#d5a6d8', pineapple: '#f4d03f', basil: '#1e8449', sausage: '#8b4513',
+      spinach: '#196f3d', tomato: '#e74c3c', corn: '#f7dc6f', jalapeno: '#52be80'
+    })[id] || '#888';
+  }
+
+  function drawPizza(ctx, x, y, r, pizza, opts) {
+    opts = opts || {};
+    pizza = pizza || {};
+    const crust = pizza.crust || 'thin';
+    // plate
+    if (opts.plate) {
+      ctx.beginPath();
+      ctx.arc(x, y + 4, r * 1.12, 0, Math.PI * 2);
+      ctx.fillStyle = '#f5f5f5';
+      ctx.fill();
+      ctx.strokeStyle = '#ddd';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    // crust
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = crustColor(crust);
+    ctx.fill();
+    ctx.strokeStyle = '#b8864a';
+    ctx.lineWidth = Math.max(2, r * 0.04);
+    ctx.stroke();
+    if (crust === 'thick' || crust === 'stuffed') {
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.88, 0, Math.PI * 2);
+      ctx.strokeStyle = crust === 'stuffed' ? '#a86b30' : '#c9975a';
+      ctx.lineWidth = r * (crust === 'stuffed' ? 0.1 : 0.06);
+      ctx.stroke();
+    }
+    if (pizza.sauce) {
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.78, 0, Math.PI * 2);
+      ctx.fillStyle = sauceColor(pizza.sauce);
+      ctx.globalAlpha = 0.92;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    if (pizza.cheese && pizza.cheese !== 'none') {
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.7, 0, Math.PI * 2);
+      ctx.fillStyle = cheeseColor(pizza.cheese);
+      ctx.globalAlpha = 0.9;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      for (let i = 0; i < 10; i++) {
+        const a = (i / 10) * Math.PI * 2 + 0.4;
+        const d = r * 0.32;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, r * 0.09, 0, Math.PI * 2);
+        ctx.fillStyle = cheeseColor(pizza.cheese);
+        ctx.fill();
+      }
+    }
+    const tops = pizza.toppings || [];
+    tops.forEach((t, ti) => {
+      // scatter several pieces so pizza looks real (not one lonely topping)
+      const many = (t === 'pepperoni' || t === 'mushroom' || t === 'olive' || t === 'sausage' || t === 'pepper') ? 8 : 5;
+      for (let i = 0; i < many; i++) {
+        const a = (i / many) * Math.PI * 2 + ti * 0.7 + 0.2;
+        const ring = 0.22 + (i % 4) * 0.12; // 0.22..0.58 across pizza
+        const d = r * Math.min(0.68, ring);
+        const size = r * (0.11 + (i % 3) * 0.015);
+        drawTopping(ctx, x + Math.cos(a) * d, y + Math.sin(a) * d, size, t);
+      }
+    });
+    if (opts.burned) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(40,20,10,0.55)';
+      ctx.fill();
+    }
+    if (opts.slices && opts.slices > 1) {
+      ctx.strokeStyle = 'rgba(60,30,10,0.55)';
+      ctx.lineWidth = Math.max(2, r * 0.03);
+      for (let i = 0; i < opts.slices; i++) {
+        const a = (i / opts.slices) * Math.PI * 2 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+        ctx.stroke();
+      }
+    }
+    // empty dough hint
+    if (!pizza.sauce && !pizza.cheese && !(pizza.toppings && pizza.toppings.length) && opts.emptyHint) {
+      ctx.strokeStyle = 'rgba(180,120,60,0.45)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function drawTopping(ctx, x, y, s, id) {
+    ctx.fillStyle = toppingColor(id);
+    if (id === 'pepperoni' || id === 'sausage' || id === 'tomato') {
+      ctx.beginPath(); ctx.arc(x, y, s, 0, Math.PI * 2); ctx.fill();
+      if (id === 'pepperoni') {
+        ctx.fillStyle = '#8e2419';
+        ctx.beginPath(); ctx.arc(x - s * 0.25, y - s * 0.2, s * 0.22, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + s * 0.2, y + s * 0.15, s * 0.18, 0, Math.PI * 2); ctx.fill();
+      }
+      if (id === 'tomato') {
+        ctx.fillStyle = '#f5d76e';
+        ctx.beginPath(); ctx.arc(x, y, s * 0.25, 0, Math.PI * 2); ctx.fill();
+      }
+    } else if (id === 'mushroom') {
+      ctx.beginPath();
+      ctx.ellipse(x, y - s * 0.15, s * 1.05, s * 0.65, 0, Math.PI, 0);
+      ctx.fill();
+      ctx.fillStyle = '#a89070';
+      ctx.fillRect(x - s * 0.28, y - s * 0.05, s * 0.56, s * 0.75);
+    } else if (id === 'olive') {
+      ctx.beginPath(); ctx.ellipse(x, y, s * 0.75, s * 0.55, 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f5f5f5';
+      ctx.beginPath(); ctx.ellipse(x, y, s * 0.28, s * 0.2, 0.4, 0, Math.PI * 2); ctx.fill();
+    } else if (id === 'pepper' || id === 'jalapeno') {
+      ctx.beginPath();
+      ctx.moveTo(x - s, y);
+      ctx.quadraticCurveTo(x, y - s * 1.25, x + s, y);
+      ctx.quadraticCurveTo(x, y + s * 0.65, x - s, y);
+      ctx.fill();
+      ctx.fillStyle = '#1e8449';
+      ctx.fillRect(x - s * 0.12, y - s * 1.15, s * 0.24, s * 0.35);
+    } else if (id === 'onion') {
+      ctx.strokeStyle = toppingColor(id); ctx.lineWidth = Math.max(2, s * 0.25);
+      ctx.beginPath(); ctx.arc(x, y, s * 0.75, 0.2, Math.PI * 1.7); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, s * 0.45, 0.4, Math.PI * 1.5); ctx.stroke();
+    } else if (id === 'pineapple' || id === 'corn') {
+      ctx.beginPath();
+      ctx.moveTo(x, y - s);
+      ctx.lineTo(x + s * 0.75, y + s * 0.55);
+      ctx.lineTo(x - s * 0.75, y + s * 0.55);
+      ctx.closePath(); ctx.fill();
+      if (id === 'corn') {
+        ctx.fillStyle = '#e67e22';
+        ctx.beginPath(); ctx.arc(x, y, s * 0.2, 0, Math.PI * 2); ctx.fill();
+      }
+    } else if (id === 'basil' || id === 'spinach') {
+      ctx.beginPath();
+      ctx.ellipse(x, y, s * 0.95, s * 0.55, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(x + s * 0.35, y + s * 0.15, s * 0.7, s * 0.4, 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(x, y, s * 0.7, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawIngredientIcon(canvas, kind, id) {
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    // soft warm tile bg
+    ctx.fillStyle = 'rgba(255, 220, 160, 0.35)';
+    PR.roundRect(ctx, 1, 1, w - 2, h - 2, 8);
+    ctx.fill();
+    const cx = w / 2, cy = h / 2, s = Math.min(w, h);
+    if (kind === 'crust') {
+      const r = s * 0.38;
+      drawPizza(ctx, cx, cy, r, { crust: id }, {});
+      if (id === 'thin') {
+        ctx.strokeStyle = '#a86b30'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(cx, cy, r * 0.7, 0, Math.PI * 2); ctx.stroke();
+      }
+    } else if (kind === 'sauce') {
+      // splat
+      ctx.fillStyle = sauceColor(id);
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx - s * 0.22, cy - s * 0.1, s * 0.14, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + s * 0.2, cy + s * 0.12, s * 0.12, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + s * 0.05, cy - s * 0.22, s * 0.1, 0, Math.PI * 2); ctx.fill();
+    } else if (kind === 'cheese') {
+      if (id === 'none') {
+        ctx.strokeStyle = '#999'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(cx, cy, s * 0.28, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx - s * 0.2, cy - s * 0.2); ctx.lineTo(cx + s * 0.2, cy + s * 0.2); ctx.stroke();
+      } else {
+        // cheese pile / shreds
+        ctx.fillStyle = cheeseColor(id);
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.3, cy + s * 0.2);
+        ctx.lineTo(cx - s * 0.1, cy - s * 0.28);
+        ctx.lineTo(cx + s * 0.15, cy + s * 0.05);
+        ctx.lineTo(cx + s * 0.32, cy - s * 0.15);
+        ctx.lineTo(cx + s * 0.28, cy + s * 0.28);
+        ctx.lineTo(cx - s * 0.28, cy + s * 0.28);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(200,150,40,0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    } else {
+      drawTopping(ctx, cx, cy, s * 0.3, id);
+    }
+  }
+
+  function drawCustomer(ctx, x, y, scale, style, mood) {
+    scale = scale || 1;
+    const skin = ['#f5c6a5', '#d4a574', '#8d5524', '#c68642'][style % 4];
+    const shirt = ['#3498db', '#9b59b6', '#e67e22', '#1abc9c', '#e74c3c', '#2ecc71'][style % 6];
+    ctx.fillStyle = shirt;
+    PR.roundRect(ctx, x - 22 * scale, y + 8 * scale, 44 * scale, 50 * scale, 10 * scale);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y - 10 * scale, 20 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = skin;
+    ctx.fill();
+    ctx.fillStyle = ['#2c1810', '#5d4037', '#f1c40f', '#1a1a1a', '#c0392b'][style % 5];
+    ctx.beginPath();
+    ctx.ellipse(x, y - 22 * scale, 18 * scale, 10 * scale, 0, Math.PI, 0);
+    ctx.fill();
+    ctx.fillStyle = '#222';
+    ctx.beginPath(); ctx.arc(x - 7 * scale, y - 12 * scale, 2.2 * scale, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 7 * scale, y - 12 * scale, 2.2 * scale, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#222'; ctx.lineWidth = 1.8 * scale; ctx.lineCap = 'round';
+    ctx.beginPath();
+    if (mood === 'happy') {
+      ctx.arc(x, y - 5 * scale, 6 * scale, 0.2, Math.PI - 0.2);
+    } else if (mood === 'mad') {
+      ctx.moveTo(x - 6 * scale, y + 2 * scale);
+      ctx.quadraticCurveTo(x, y - 4 * scale, x + 6 * scale, y + 2 * scale);
+    } else {
+      ctx.moveTo(x - 5 * scale, y - 2 * scale);
+      ctx.lineTo(x + 5 * scale, y - 2 * scale);
+    }
+    ctx.stroke();
+  }
+
+  /**
+   * Big kid-readable order card: pizza preview + ingredient icon strip.
+   * Drawn into its own canvas so it never clips off-stage.
+   */
+  function drawOrderCard(canvas, order, customerStyle, mood) {
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    // warm card
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#fffef8');
+    g.addColorStop(1, '#ffe8c0');
+    ctx.fillStyle = g;
+    PR.roundRect(ctx, 2, 2, w - 4, h - 4, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#e8a04a';
+    ctx.lineWidth = 3;
+    PR.roundRect(ctx, 2, 2, w - 4, h - 4, 16);
+    ctx.stroke();
+
+    // Layout: bubble on TOP (~55%), customer FULLY visible in bottom band (never covered)
+    const custBand = Math.max(96, Math.floor(h * 0.42));
+    const bubbleBottom = h - custBand - 2;
+    const bx = w / 2;
+    const by = 8 + (bubbleBottom - 8) / 2;
+    const bw = w - 14;
+    const bh = bubbleBottom - 16;
+
+    // speech bubble
+    ctx.fillStyle = '#ffffff';
+    PR.roundRect(ctx, bx - bw / 2, by - bh / 2, bw, bh, 14);
+    ctx.fill();
+    ctx.strokeStyle = '#f0a830';
+    ctx.lineWidth = 3;
+    PR.roundRect(ctx, bx - bw / 2, by - bh / 2, bw, bh, 14);
+    ctx.stroke();
+    // short tail — stays above customer head
+    const tailY = by + bh / 2;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(bx - 10, tailY - 1);
+    ctx.lineTo(bx, Math.min(tailY + 8, bubbleBottom - 2));
+    ctx.lineTo(bx + 10, tailY - 1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#f0a830';
+    ctx.beginPath();
+    ctx.moveTo(bx - 10, tailY - 1);
+    ctx.lineTo(bx, Math.min(tailY + 8, bubbleBottom - 2));
+    ctx.lineTo(bx + 10, tailY - 1);
+    ctx.stroke();
+
+    // pizza in bubble (slightly smaller so icons fit)
+    const pr = Math.min(bw, bh) * 0.30;
+    drawPizza(ctx, bx, by - 8, pr, order, { plate: true });
+
+    // ingredient icon strip
+    const icons = [];
+    if (order.crust) icons.push(['crust', order.crust]);
+    if (order.sauce) icons.push(['sauce', order.sauce]);
+    if (order.cheese) icons.push(['cheese', order.cheese]);
+    (order.toppings || []).forEach((tp) => icons.push(['topping', tp]));
+    const iconSize = Math.min(32, Math.floor((bw - 12) / Math.max(icons.length, 1)) - 4);
+    const gap = 5;
+    const totalW = icons.length * iconSize + Math.max(0, icons.length - 1) * gap;
+    let ix = bx - totalW / 2 + iconSize / 2;
+    const iy = by + bh / 2 - iconSize / 2 - 8;
+    icons.forEach(([kind, id]) => {
+      ctx.fillStyle = '#fff0c8';
+      ctx.beginPath();
+      ctx.arc(ix, iy, iconSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#d47800';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      if (kind === 'crust') {
+        drawPizza(ctx, ix, iy, iconSize * 0.34, { crust: id }, {});
+      } else if (kind === 'sauce') {
+        ctx.fillStyle = sauceColor(id);
+        ctx.beginPath(); ctx.arc(ix, iy, iconSize * 0.3, 0, Math.PI * 2); ctx.fill();
+      } else if (kind === 'cheese') {
+        if (id === 'none') {
+          ctx.strokeStyle = '#666'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(ix, iy, iconSize * 0.26, 0, Math.PI * 2); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(ix - iconSize * 0.18, iy - iconSize * 0.18); ctx.lineTo(ix + iconSize * 0.18, iy + iconSize * 0.18); ctx.stroke();
+        } else {
+          ctx.fillStyle = cheeseColor(id);
+          ctx.beginPath();
+          ctx.moveTo(ix, iy - iconSize * 0.3);
+          ctx.lineTo(ix + iconSize * 0.3, iy + iconSize * 0.26);
+          ctx.lineTo(ix - iconSize * 0.3, iy + iconSize * 0.26);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#c9894a'; ctx.lineWidth = 2; ctx.stroke();
+        }
+      } else {
+        drawTopping(ctx, ix, iy, iconSize * 0.32, id);
+      }
+      ix += iconSize + gap;
+    });
+
+    // customer FULLY below bubble — head top stays under bubbleBottom
+    // drawCustomer head top ≈ cy - 32*scale; keep that >= bubbleBottom + 4
+    const scale = Math.min(1.05, (custBand - 8) / 100);
+    const headTopClear = bubbleBottom + 6;
+    const cy = Math.max(headTopClear + 32 * scale, h - custBand * 0.38);
+    drawCustomer(ctx, w / 2, cy, scale, customerStyle || 0, mood || 'happy');
+  }
+
+  /** Big workspace pizza canvas */
+  function drawWorkspace(canvas, pizza, opts) {
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    opts = opts || {};
+    ctx.clearRect(0, 0, w, h);
+    // counter wood
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#c9894a');
+    g.addColorStop(0.55, '#a86b30');
+    g.addColorStop(1, '#8B4513');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    // wood lines
+    ctx.strokeStyle = 'rgba(80,40,10,0.15)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, 20 + i * (h / 5));
+      ctx.lineTo(w, 30 + i * (h / 5));
+      ctx.stroke();
+    }
+    // oven glow corner
+    if (opts.ovenGlow) {
+      const og = ctx.createRadialGradient(w - 40, 40, 5, w - 40, 40, 80);
+      og.addColorStop(0, 'rgba(255,140,40,0.7)');
+      og.addColorStop(1, 'rgba(255,140,40,0)');
+      ctx.fillStyle = og;
+      ctx.fillRect(w - 140, 0, 140, 140);
+    }
+    const r = Math.min(w, h) * 0.38;
+    drawPizza(ctx, w / 2, h / 2 + 6, r, pizza || {}, {
+      plate: true,
+      burned: opts.burned,
+      slices: opts.slices || 0,
+      emptyHint: true
+    });
+  }
+
+  function drawCoin(ctx, x, y, r, value) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+    g.addColorStop(0, '#ffe566');
+    g.addColorStop(1, '#d4a017');
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = '#8a6a00';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#3a1a10';
+    ctx.font = 'bold ' + Math.floor(r * 0.9) + 'px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(value), x, y + 1);
+  }
+
+  function drawShopBg(ctx, loc, dayOpts) {
+    const skies = {
+      downtown: ['#87CEEB', '#f5d76e'],
+      beach: ['#f9e79f', '#5dade2'],
+      mountain: ['#aed6f1', '#f5cba7']
+    };
+    const sky = skies[loc] || skies.downtown;
+    const g = ctx.createLinearGradient(0, 0, 0, PR.H);
+    g.addColorStop(0, sky[0]);
+    g.addColorStop(0.55, sky[1]);
+    g.addColorStop(1, '#c9894a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, PR.W, PR.H);
+    // warm floor
+    ctx.fillStyle = '#a0522d';
+    ctx.fillRect(0, PR.H * 0.58, PR.W, PR.H * 0.42);
+    ctx.fillStyle = '#cd853f';
+    for (let i = 0; i < 14; i++) ctx.fillRect(i * 90, PR.H * 0.58, 40, PR.H * 0.42);
+    // counter
+    ctx.fillStyle = '#8B4513';
+    PR.roundRect(ctx, 30, PR.H * 0.64, PR.W - 60, 70, 12);
+    ctx.fill();
+    ctx.fillStyle = '#D2691E';
+    PR.roundRect(ctx, 30, PR.H * 0.64, PR.W - 60, 16, 8);
+    ctx.fill();
+    if (loc === 'beach') {
+      ctx.fillStyle = '#f4d03f';
+      ctx.fillRect(0, PR.H * 0.5, PR.W, PR.H * 0.08);
+      ctx.fillStyle = '#2980b9';
+      ctx.fillRect(0, PR.H * 0.44, PR.W, PR.H * 0.08);
+    } else if (loc === 'mountain') {
+      ctx.fillStyle = '#566573';
+      ctx.beginPath(); ctx.moveTo(80, PR.H * 0.58); ctx.lineTo(240, PR.H * 0.28); ctx.lineTo(400, PR.H * 0.58); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(340, PR.H * 0.58); ctx.lineTo(560, PR.H * 0.22); ctx.lineTo(780, PR.H * 0.58); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.moveTo(240, PR.H * 0.28); ctx.lineTo(210, PR.H * 0.36); ctx.lineTo(270, PR.H * 0.36); ctx.fill();
+    } else {
+      ctx.fillStyle = '#5d6d7e';
+      for (let i = 0; i < 8; i++) {
+        const bx = 50 + i * 140;
+        const bh = 70 + (i % 3) * 35;
+        ctx.fillStyle = '#5d6d7e';
+        ctx.fillRect(bx, PR.H * 0.58 - bh, 100, bh);
+        ctx.fillStyle = '#f9e79f';
+        for (let wy = 0; wy < 3; wy++) {
+          ctx.fillRect(bx + 15, PR.H * 0.58 - bh + 12 + wy * 26, 16, 16);
+          ctx.fillRect(bx + 55, PR.H * 0.58 - bh + 12 + wy * 26, 16, 16);
+        }
+      }
+    }
+    // oven
+    ctx.fillStyle = '#3d3d3d';
+    PR.roundRect(ctx, PR.W - 210, PR.H * 0.3, 150, 150, 16);
+    ctx.fill();
+    ctx.fillStyle = '#1a1a1a';
+    PR.roundRect(ctx, PR.W - 190, PR.H * 0.36, 110, 95, 10);
+    ctx.fill();
+    if (dayOpts && dayOpts.ovenGlow) {
+      ctx.fillStyle = 'rgba(255,120,40,0.6)';
+      PR.roundRect(ctx, PR.W - 190, PR.H * 0.36, 110, 95, 10);
+      ctx.fill();
+    }
+    // hanging lamp
+    ctx.strokeStyle = '#5c3317';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(PR.W / 2, 0); ctx.lineTo(PR.W / 2, 40); ctx.stroke();
+    ctx.fillStyle = '#ffe566';
+    ctx.beginPath(); ctx.moveTo(PR.W / 2 - 30, 40); ctx.lineTo(PR.W / 2 + 30, 40); ctx.lineTo(PR.W / 2, 70); ctx.closePath(); ctx.fill();
+  }
+
+  // keep old name as alias for any leftover callers
+  function drawOrderBubble(ctx, x, y, order) {
+    const bw = 140, bh = 130;
+    ctx.fillStyle = '#ffffff';
+    PR.roundRect(ctx, x - bw / 2, y - bh, bw, bh, 14);
+    ctx.fill();
+    ctx.strokeStyle = '#f0a830';
+    ctx.lineWidth = 3;
+    PR.roundRect(ctx, x - bw / 2, y - bh, bw, bh, 14);
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(x - 12, y - 4);
+    ctx.lineTo(x, y + 10);
+    ctx.lineTo(x + 12, y - 4);
+    ctx.fill();
+    drawPizza(ctx, x, y - bh / 2 - 4, 40, order || {}, {});
+  }
+
+  return {
+    crustColor, sauceColor, cheeseColor, toppingColor,
+    drawPizza, drawTopping, drawIngredientIcon,
+    drawCustomer, drawCoin, drawShopBg, drawOrderBubble,
+    drawOrderCard, drawWorkspace
+  };
+})();
+
+})();
+/* ==== 40-data.js ==== */
+;(function(){
+/* Ingredients, upgrades, day definitions (36 days / 3 locations) */
+PR.Data = (() => {
+  const CRUSTS = [
+    { id: 'thin', name: 'Thin', price: 2 },
+    { id: 'thick', name: 'Thick', price: 3 },
+    { id: 'stuffed', name: 'Stuffed', price: 4, unlockDay: 8 },
+    { id: 'glutenfree', name: 'GF', price: 4, unlockDay: 16 }
+  ];
+  const SAUCES = [
+    { id: 'tomato', name: 'Tomato', price: 1 },
+    { id: 'white', name: 'White', price: 2, unlockDay: 5 },
+    { id: 'pesto', name: 'Pesto', price: 2, unlockDay: 12 },
+    { id: 'bbq', name: 'BBQ', price: 2, unlockDay: 20 }
+  ];
+  const CHEESES = [
+    { id: 'mozzarella', name: 'Mozz', price: 2 },
+    { id: 'cheddar', name: 'Cheddar', price: 2, unlockDay: 6 },
+    { id: 'vegan', name: 'Vegan', price: 3, unlockDay: 14 },
+    { id: 'none', name: 'None', price: 0 }
+  ];
+  const TOPPINGS = [
+    { id: 'pepperoni', name: 'Pep', price: 2 },
+    { id: 'mushroom', name: 'Shroom', price: 1 },
+    { id: 'olive', name: 'Olive', price: 1, unlockDay: 3 },
+    { id: 'pepper', name: 'Pepper', price: 1, unlockDay: 4 },
+    { id: 'onion', name: 'Onion', price: 1, unlockDay: 7 },
+    { id: 'pineapple', name: 'Pine', price: 2, unlockDay: 9 },
+    { id: 'basil', name: 'Basil', price: 1, unlockDay: 10 },
+    { id: 'sausage', name: 'Sausage', price: 2, unlockDay: 11 },
+    { id: 'spinach', name: 'Spinach', price: 1, unlockDay: 15 },
+    { id: 'tomato', name: 'Tomato', price: 1, unlockDay: 17 },
+    { id: 'corn', name: 'Corn', price: 1, unlockDay: 22 },
+    { id: 'jalapeno', name: 'Jalapeno', price: 2, unlockDay: 25 }
+  ];
+
+  const UPGRADES = [
+    { id: 'fast-oven', name: 'Fast Oven', cost: 25, desc: 'Bake 30% faster' },
+    { id: 'wide-counter', name: 'Wide Counter', cost: 40, desc: 'Build 2 pizzas' },
+    { id: 'auto-slice', name: 'Auto Slicer', cost: 55, desc: 'Instant perfect slices' },
+    { id: 'tip-jar', name: 'Tip Jar', cost: 30, desc: '+20% tips' },
+    { id: 'menu-board', name: 'Menu Board', cost: 20, desc: 'See orders longer' },
+    { id: 'extra-cheese', name: 'Cheese Tower', cost: 35, desc: 'Unlock cheddar early' }
+  ];
+
+  const DECORS = [
+    { id: 'plant', name: 'Plant', cost: 15 },
+    { id: 'neon', name: 'Neon Sign', cost: 45 },
+    { id: 'poster', name: 'Poster', cost: 20 },
+    { id: 'fairy', name: 'Fairy Lights', cost: 35 },
+    { id: 'trophy', name: 'Trophy', cost: 60 }
+  ];
+
+  const LOCS = [
+    { id: 'downtown', name: 'Downtown Slice', days: [1, 12] },
+    { id: 'beach', name: 'Beach Boardwalk', days: [13, 24] },
+    { id: 'mountain', name: 'Mountain Lodge', days: [25, 36] }
+  ];
+
+  function priceOf(order) {
+    let p = 0;
+    const c = CRUSTS.find((x) => x.id === order.crust); if (c) p += c.price;
+    const s = SAUCES.find((x) => x.id === order.sauce); if (s) p += s.price;
+    const ch = CHEESES.find((x) => x.id === order.cheese); if (ch) p += ch.price;
+    (order.toppings || []).forEach((t) => {
+      const top = TOPPINGS.find((x) => x.id === t); if (top) p += top.price;
+    });
+    return p;
+  }
+
+  function unlockedList(list, day, profile) {
+    return list.filter((item) => {
+      if (!item.unlockDay) return true;
+      if (item.unlockDay <= day) return true;
+      if (profile && profile.unlockedToppings && profile.unlockedToppings.includes(item.id)) return true;
+      if (profile && profile.upgrades && item.id === 'cheddar' && profile.upgrades.includes('extra-cheese')) return true;
+      return false;
+    });
+  }
+
+  function makeDays() {
+    const days = [];
+    const rng = PR.seeded(42);
+    const allTops = TOPPINGS.map((t) => t.id);
+    for (let d = 1; d <= 36; d++) {
+      const loc = d <= 12 ? 'downtown' : d <= 24 ? 'beach' : 'mountain';
+      const isRush = d % 6 === 0;
+      const isVip = d % 9 === 0;
+      const custCount = isRush ? 5 + (d > 18 ? 2 : 0) : isVip ? 3 : 3 + Math.floor(d / 12);
+      const customers = [];
+      for (let i = 0; i < custCount; i++) {
+        const dayCrusts = unlockedList(CRUSTS, d).map((x) => x.id);
+        const daySauces = unlockedList(SAUCES, d).map((x) => x.id);
+        const dayCheeses = unlockedList(CHEESES, d).map((x) => x.id);
+        const dayTops = unlockedList(TOPPINGS, d).map((x) => x.id);
+        const nTops = Math.min(dayTops.length, 1 + Math.floor(rng() * (1 + Math.floor(d / 10))));
+        const tops = [];
+        const pool = dayTops.slice();
+        for (let t = 0; t < nTops && pool.length; t++) {
+          const idx = (rng() * pool.length) | 0;
+          tops.push(pool.splice(idx, 1)[0]);
+        }
+        const order = {
+          crust: dayCrusts[(rng() * dayCrusts.length) | 0],
+          sauce: daySauces[(rng() * daySauces.length) | 0],
+          cheese: dayCheeses[(rng() * dayCheeses.length) | 0],
+          toppings: tops,
+          slices: isVip ? 8 : (2 + ((rng() * 3) | 0) * 2) // 2,4,6,8
+        };
+        if (order.slices < 2) order.slices = 4;
+        const base = priceOf(order);
+        const pay = isVip ? base + 5 + ((rng() * 6) | 0) : base + ((rng() * 4) | 0);
+        customers.push({
+          id: 'c' + d + '-' + i,
+          style: (rng() * 6) | 0,
+          order,
+          price: base,
+          pays: Math.max(base, pay),
+          vip: isVip && i === 0,
+          patience: isRush ? 18 + rng() * 8 : 28 + rng() * 12,
+          slicesWanted: order.slices
+        });
+      }
+      days.push({
+        day: d,
+        loc,
+        locName: LOCS.find((l) => l.id === loc).name,
+        rush: isRush,
+        vip: isVip,
+        customers,
+        goalServe: customers.length,
+        bakeIdeal: isRush ? 3.2 : 4.0,
+        bakeBurn: isRush ? 5.5 : 7.0,
+        title: isVip ? 'VIP Night' : isRush ? 'Rush Hour' : 'Day ' + d
+      });
+    }
+    return days;
+  }
+
+  const DAYS = makeDays();
+
+  function getDay(n) {
+    return DAYS[(n - 1) | 0] || null;
+  }
+
+  function summary() {
+    return DAYS.map((d) => ({
+      day: d.day, loc: d.loc, rush: d.rush, vip: d.vip, customers: d.customers.length
+    }));
+  }
+
+  return {
+    CRUSTS, SAUCES, CHEESES, TOPPINGS, UPGRADES, DECORS, LOCS, DAYS,
+    priceOf, unlockedList, getDay, summary
+  };
+})();
+
+})();
+/* ==== 50-shop.js ==== */
+;(function(){
+/* Day simulation: build → bake → slice → pay → serve; plus solver */
+PR.Shop = (() => {
+  function meta() {
+    const id = PR.state && PR.state.lastProfile;
+    return PR.profiles[id || 'alpha'];
+  }
+
+  function hasUpgrade(id) {
+    const p = PR.Save.profile();
+    return p.upgrades && p.upgrades.includes(id);
+  }
+
+  function blankPizza() {
+    return { crust: null, sauce: null, cheese: null, toppings: [] };
+  }
+
+  function startDay(dayNum, pid) {
+    if (pid) PR.Save.setProfile(pid);
+    const day = PR.Data.getDay(dayNum);
+    if (!day) return null;
+    const m = meta();
+    const p = PR.Save.profile();
+    const bakeMul = hasUpgrade('fast-oven') ? 0.7 : 1;
+    PR.run = {
+      dayNum,
+      day: JSON.parse(JSON.stringify(day)),
+      meta: m,
+      phase: 'build', // build | bake | slice | pay | between | won | lost
+      custIndex: 0,
+      pizza: blankPizza(),
+      bakeT: 0,
+      bakeTarget: day.bakeIdeal * bakeMul,
+      bakeBurn: day.bakeBurn * bakeMul,
+      baking: false,
+      baked: false,
+      burned: false,
+      slices: 0,
+      slicesWanted: 4,
+      payGiven: 0,
+      served: 0,
+      left: 0,
+      tipsEarned: 0,
+      coinsEarned: 0,
+      hearts: m.noGameOver ? 99 : (p.hearts || 3),
+      failed: false,
+      won: false,
+      patienceLeft: 0,
+      patienceMax: 0,
+      t0: PR.now(),
+      message: '',
+      ovenGlow: false
+    };
+    beginCustomer();
+    return PR.run;
+  }
+
+  function currentCustomer() {
+    const r = PR.run;
+    if (!r) return null;
+    return r.day.customers[r.custIndex] || null;
+  }
+
+  function beginCustomer() {
+    const r = PR.run;
+    const c = currentCustomer();
+    if (!c) {
+      finishDay(true);
+      return;
+    }
+    r.phase = 'build';
+    r.pizza = blankPizza();
+    r.bakeT = 0;
+    r.baking = false;
+    r.baked = false;
+    r.burned = false;
+    r.bakeQuality = null;
+    r.slices = 0;
+    r.slicesWanted = c.slicesWanted || c.order.slices || 4;
+    r.payGiven = 0;
+    r.patienceMax = c.patience;
+    r.patienceLeft = c.patience;
+    r.ovenGlow = false;
+    r.message = c.vip ? 'VIP order!' : 'New customer!';
+    PR.Audio.customer();
+  }
+
+  function matchOrder(pizza, order) {
+    if (pizza.crust !== order.crust) return false;
+    if (pizza.sauce !== order.sauce) return false;
+    if (pizza.cheese !== order.cheese) return false;
+    const a = (pizza.toppings || []).slice().sort().join(',');
+    const b = (order.toppings || []).slice().sort().join(',');
+    return a === b;
+  }
+
+  function setCrust(id) {
+    const r = PR.run; if (!r || r.phase !== 'build') return;
+    r.pizza.crust = id; PR.Audio.plop();
+  }
+  function setSauce(id) {
+    const r = PR.run; if (!r || r.phase !== 'build') return;
+    r.pizza.sauce = id; PR.Audio.sauce();
+  }
+  function setCheese(id) {
+    const r = PR.run; if (!r || r.phase !== 'build') return;
+    r.pizza.cheese = id; PR.Audio.cheese();
+  }
+  function toggleTopping(id) {
+    const r = PR.run; if (!r || r.phase !== 'build') return;
+    const tops = r.pizza.toppings;
+    const i = tops.indexOf(id);
+    if (i >= 0) tops.splice(i, 1);
+    else tops.push(id);
+    PR.Audio.topping();
+  }
+
+  function canBake() {
+    const r = PR.run;
+    if (!r || r.phase !== 'build') return false;
+    const p = r.pizza;
+    return !!(p.crust && p.sauce && p.cheese !== null && p.cheese !== undefined);
+  }
+
+  function startBake() {
+    const r = PR.run;
+    if (!canBake()) return false;
+    r.phase = 'bake';
+    r.baking = true;
+    r.bakeT = 0;
+    r.ovenGlow = true;
+    PR.Audio.oven();
+    return true;
+  }
+
+  function tick(dt) {
+    const r = PR.run;
+    if (!r || r.won || r.failed) return;
+    // patience for player 2
+    if (r.meta.patience && r.phase !== 'between' && r.phase !== 'won' && r.phase !== 'lost') {
+      r.patienceLeft -= dt;
+      if (r.patienceLeft <= 0) {
+        customerLeave();
+        return;
+      }
+    }
+    if (r.phase === 'bake' && r.baking) {
+      r.bakeT += dt;
+      // Player 1: if they wait past perfect toward burn, auto-pull (never burn)
+      if (r.meta.noGameOver && r.bakeT >= r.bakeBurn - 0.25 && r.bakeT < r.bakeBurn) {
+        r.bakeT = r.bakeTarget; // credit as perfect
+        r.message = 'Pulled for you — nice timing!';
+        pullOven();
+        return;
+      }
+      if (r.bakeT >= r.bakeBurn) {
+        r.burned = true;
+        r.baking = false;
+        r.baked = true;
+        r.ovenGlow = false;
+        PR.Audio.burn();
+        // burned pizza: player 1 remakes, player 2 loses a heart
+        if (r.meta.noGameOver) {
+          r.message = 'Oops, burned! Try again.';
+          r.phase = 'build';
+          r.pizza = blankPizza();
+          r.baked = false;
+          r.burned = false;
+          r.bakeT = 0;
+        } else {
+          loseHeart('Burned the pizza!');
+        }
+      }
+    }
+  }
+
+  /**
+   * Pull ALWAYS responds. Never a dead button.
+   * - Player 1 early: keep baking with a gentle nudge (pizza stays).
+   * - Player 2 early: accept as underbaked (customer less happy / smaller tip).
+   * - Green/yellow/late: advance to slice/pay.
+   */
+  function pullOven() {
+    const r = PR.run;
+    if (!r || r.phase !== 'bake') return false;
+    if (!r.baking && !r.baked) return false;
+
+    const early = r.bakeT < r.bakeTarget * 0.55;
+    if (early && r.meta.noGameOver && r.baking) {
+      // Gentle: keep baking, do NOT wipe the pizza or leave bake phase
+      r.message = 'Needs a bit longer!';
+      PR.Audio.soft();
+      return false; // still baking — button worked, feedback shown
+    }
+
+    r.baking = false;
+    r.baked = true;
+    r.ovenGlow = false;
+    if (early) {
+      r.bakeQuality = 'under';
+      r.message = 'A little doughy — oh well!';
+    } else if (r.bakeT >= r.bakeTarget * 0.85 && r.bakeT <= r.bakeTarget * 1.15) {
+      r.bakeQuality = 'perfect';
+      r.message = 'Perfect bake!';
+    } else if (r.bakeT > r.bakeTarget * 1.15) {
+      r.bakeQuality = 'late';
+      r.message = 'A bit toasty!';
+    } else {
+      r.bakeQuality = 'ok';
+      r.message = 'Baked!';
+    }
+    PR.Audio.ding();
+    if (hasUpgrade('auto-slice')) {
+      r.slices = r.slicesWanted;
+      r.phase = 'pay';
+      setupPay();
+    } else {
+      r.phase = 'slice';
+      r.slices = 0;
+    }
+    return true;
+  }
+
+  function addSlice() {
+    const r = PR.run;
+    if (!r || r.phase !== 'slice') return;
+    r.slices++;
+    PR.Audio.slice();
+    if (r.slices >= r.slicesWanted) {
+      r.phase = 'pay';
+      setupPay();
+    }
+  }
+
+  function setupPay() {
+    const r = PR.run;
+    const c = currentCustomer();
+    r.payGiven = 0;
+    r.payTarget = changeNeeded(c);
+    r.message = r.meta.mathMode === 'count'
+      ? 'Count coins to make ' + r.payTarget
+      : 'Make change: paid ' + c.pays + ', price ' + c.price;
+  }
+
+  function changeNeeded(c) {
+    // Player 1: count coins up to 10 — tip/change visual equal to min(price, 10) style counting
+    // We ask them to count out the price (capped visual help) OR the change
+    const m = meta();
+    if (m.mathMode === 'count') {
+      // count the price amount (1-10)
+      return Math.min(10, Math.max(1, c.price));
+    }
+    // Player 2: change = pays - price; sometimes multiply slices
+    let change = c.pays - c.price;
+    if (c.vip || (c.order.slices >= 6 && c.price > 8)) {
+      // multiplication challenge: tip = slices * 1
+      change = c.pays - c.price;
+    }
+    return Math.max(0, change);
+  }
+
+  function addCoin(v) {
+    const r = PR.run;
+    if (!r || r.phase !== 'pay') return;
+    r.payGiven += v;
+    PR.Audio.coin();
+  }
+
+  function clearPay() {
+    const r = PR.run;
+    if (!r || r.phase !== 'pay') return;
+    r.payGiven = 0;
+  }
+
+  function confirmPay() {
+    const r = PR.run;
+    if (!r || r.phase !== 'pay') return false;
+    const c = currentCustomer();
+    const okOrder = matchOrder(r.pizza, c.order);
+    const okSlice = r.slices === r.slicesWanted || hasUpgrade('auto-slice');
+    const okPay = r.payGiven === r.payTarget;
+    if (!okOrder) {
+      r.message = 'Wrong toppings! Fix the pizza.';
+      if (!r.meta.noGameOver) loseHeart('Wrong order');
+      else { r.phase = 'build'; r.pizza = blankPizza(); r.slices = 0; }
+      return false;
+    }
+    if (!okSlice) {
+      r.message = 'Need ' + r.slicesWanted + ' slices.';
+      return false;
+    }
+    if (!okPay) {
+      r.message = 'That is not the right amount. Try again!';
+      if (!r.meta.noGameOver && r.payGiven > r.payTarget + 3) loseHeart('Bad change');
+      r.payGiven = 0;
+      return false;
+    }
+    // success
+    let tip = 2;
+    if (r.bakeQuality === 'perfect' || (r.bakeT >= r.bakeTarget * 0.85 && r.bakeT <= r.bakeTarget * 1.15)) tip += 2;
+    if (r.bakeQuality === 'under') tip = Math.max(0, tip - 2);
+    if (r.meta.patience) tip += Math.floor(r.patienceLeft / 8);
+    else tip += 2;
+    if (c.vip) tip += 5;
+    if (hasUpgrade('tip-jar')) tip = Math.ceil(tip * 1.2);
+    tip = Math.ceil(tip * (r.meta.tipMul || 1));
+    r.tipsEarned += tip;
+    r.coinsEarned += c.price + tip;
+    r.served++;
+    PR.Audio.tip();
+    r.message = 'Nice! +' + tip + ' tip';
+    if (r.solving) {
+      // solver advances customers itself
+      return true;
+    }
+    nextCustomer();
+    return true;
+  }
+
+  function nextCustomer() {
+    const r = PR.run;
+    r.custIndex++;
+    if (r.custIndex >= r.day.customers.length) {
+      finishDay(true);
+    } else if (r.solving) {
+      beginCustomer();
+    } else {
+      r.phase = 'between';
+      setTimeout(() => {
+        if (PR.run === r && !r.won && !r.failed) beginCustomer();
+      }, 400);
+    }
+  }
+
+  function customerLeave() {
+    const r = PR.run;
+    r.left++;
+    r.message = 'Customer left…';
+    PR.Audio.fail();
+    if (r.meta.noGameOver) {
+      nextCustomer();
+    } else {
+      loseHeart('Customer left');
+    }
+  }
+
+  function loseHeart(why) {
+    const r = PR.run;
+    if (r.meta.noGameOver) return;
+    r.hearts--;
+    r.message = why || 'Oh no!';
+    if (r.hearts <= 0) {
+      r.failed = true;
+      r.phase = 'lost';
+      finishDay(false);
+    } else {
+      // remake for this customer
+      r.phase = 'build';
+      r.pizza = blankPizza();
+      r.bakeT = 0;
+      r.baking = false;
+      r.baked = false;
+      r.burned = false;
+      r.slices = 0;
+      r.payGiven = 0;
+      r.patienceLeft = Math.max(8, r.patienceMax * 0.6);
+    }
+  }
+
+  function finishDay(won) {
+    const r = PR.run;
+    if (!r) return;
+    r.won = !!won && !r.failed;
+    r.phase = r.won ? 'won' : 'lost';
+    if (r.won) PR.Audio.win();
+    else PR.Audio.fail();
+    const p = PR.Save.profile();
+    if (r.won) {
+      p.coins += r.coinsEarned;
+      p.tips += r.tipsEarned;
+      p.pizzasServed += r.served;
+      p.cleared[r.dayNum] = {
+        served: r.served,
+        tips: r.tipsEarned,
+        coins: r.coinsEarned
+      };
+      if (r.dayNum >= p.maxDay) p.maxDay = Math.min(PR.DAY_COUNT, r.dayNum + 1);
+      // unlock toppings by day
+      PR.Data.TOPPINGS.forEach((t) => {
+        if (t.unlockDay && t.unlockDay <= r.dayNum && !p.unlockedToppings.includes(t.id)) {
+          p.unlockedToppings.push(t.id);
+        }
+      });
+    }
+    PR.Save.save();
+  }
+
+  function buyUpgrade(id) {
+    const p = PR.Save.profile();
+    const u = PR.Data.UPGRADES.find((x) => x.id === id);
+    if (!u || p.upgrades.includes(id) || p.coins < u.cost) return false;
+    p.coins -= u.cost;
+    p.upgrades.push(id);
+    PR.Save.save();
+    PR.Audio.upgrade();
+    return true;
+  }
+
+  function buyDecor(id) {
+    const p = PR.Save.profile();
+    const d = PR.Data.DECORS.find((x) => x.id === id);
+    if (!d || p.decorations.includes(id) || p.coins < d.cost) return false;
+    p.coins -= d.cost;
+    p.decorations.push(id);
+    PR.Save.save();
+    PR.Audio.upgrade();
+    return true;
+  }
+
+  /**
+   * Deterministic autoplay proving a day is beatable.
+   * Steps through each customer: build correct pizza, bake ideal time, slice, pay exact.
+   */
+  function solve(dayNum, pid, opts) {
+    opts = opts || {};
+    const snap = JSON.stringify(PR.Save.profile(pid || (PR.state && PR.state.lastProfile) || 'alpha'));
+    startDay(dayNum, pid);
+    const r = PR.run;
+    if (!r) return { ok: false, reason: 'no-day' };
+    r.solving = true;
+    const maxSteps = opts.maxSteps || 5000;
+    let steps = 0;
+    const customers = r.day.customers;
+    for (let ci = 0; ci < customers.length; ci++) {
+      if (r.won || r.failed) break;
+      r.custIndex = ci;
+      beginCustomer();
+      const c = currentCustomer();
+      const o = c.order;
+      setCrust(o.crust);
+      setSauce(o.sauce);
+      setCheese(o.cheese);
+      (o.toppings || []).forEach((t) => toggleTopping(t));
+      if (!matchOrder(r.pizza, o)) {
+        return { ok: false, day: dayNum, reason: 'build-mismatch', steps };
+      }
+      startBake();
+      // simulate ideal bake
+      r.bakeT = r.bakeTarget;
+      r.baking = true;
+      pullOven();
+      steps++;
+      if (r.phase === 'slice') {
+        while (r.slices < r.slicesWanted && steps < maxSteps) {
+          addSlice();
+          steps++;
+        }
+      }
+      if (r.phase !== 'pay') {
+        // auto-slice path
+        if (r.phase === 'build') return { ok: false, day: dayNum, reason: 'bake-reject', steps };
+      }
+      // pay exact
+      setupPay();
+      r.payGiven = r.payTarget;
+      const ok = confirmPay();
+      steps++;
+      if (!ok && r.failed) return { ok: false, day: dayNum, reason: 'pay-fail', steps };
+      // confirmPay may have advanced; ensure served count
+    }
+    // force win state if all served
+    if (r.served >= r.day.goalServe || r.custIndex >= customers.length) {
+      if (!r.won) finishDay(true);
+    }
+    const result = {
+      ok: !!r.won && !r.failed,
+      day: dayNum,
+      pid: pid || r.meta.id,
+      served: r.served,
+      tips: r.tipsEarned,
+      steps,
+      loc: r.day.loc,
+      rush: r.day.rush,
+      vip: r.day.vip
+    };
+    // restore profile economy from snap so solver is side-effect light on shop coins
+    // but keep maxDay progress if proof mode wants it — default restore
+    if (!opts.keepProgress) {
+      try {
+        const restored = JSON.parse(snap);
+        Object.assign(PR.Save.profile(pid || restored.id), restored);
+        PR.Save.save();
+      } catch (_) {}
+    }
+    return result;
+  }
+
+  function getRun() { return PR.run; }
+
+  return {
+    startDay, tick, getRun, currentCustomer,
+    setCrust, setSauce, setCheese, toggleTopping,
+    canBake, startBake, pullOven, addSlice,
+    addCoin, clearPay, confirmPay, changeNeeded,
+    buyUpgrade, buyDecor, matchOrder, solve,
+    hasUpgrade, beginCustomer, finishDay
+  };
+})();
+
+})();
+/* ==== 60-ui.js ==== */
+;(function(){
+/* Screens: profiles, hub, day select, redesigned play, upgrades */
+PR.UI = (() => {
+  function overlay(html) {
+    PR.overlay.innerHTML = html;
+    PR.overlay.style.pointerEvents = 'auto';
+  }
+  function clearOverlay() {
+    PR.overlay.innerHTML = '';
+    PR.overlay.style.pointerEvents = 'none';
+  }
+  /** Click + pointerup so touch and mouse both fire; debounce double-fire. */
+  function bindTap(el, fn) {
+    if (!el) return;
+    let lock = 0;
+    const go = (e) => {
+      const now = Date.now();
+      if (now - lock < 80) return;
+      lock = now;
+      if (e && e.type === 'pointerup' && e.pointerType === 'touch') {
+        try { e.preventDefault(); } catch (_) {}
+      }
+      fn(e);
+    };
+    el.addEventListener('click', go);
+    el.addEventListener('pointerup', go);
+  }
+  function showHud(on) {
+    PR.hud.classList.toggle('hidden', !on);
+  }
+
+  function profilePicker() {
+    PR.screen = 'profiles';
+    showHud(false);
+    clearOverlay();
+    const st = PR.state;
+    const canContinue = !!(st && st.lastProfile);
+    let html = '<div class="panel col"><div class="title">Pizza Rush</div>';
+    html += '<div class="sub">Pick a chef · offline pizza shop</div><div class="row">';
+    for (const id of ['alpha', 'beta']) {
+      const meta = PR.profiles[id];
+      const p = PR.Save.profile(id);
+      html += '<button class="profile-card" type="button" data-id="' + id + '">';
+      html += '<canvas width="110" height="110" data-avatar="' + id + '"></canvas>';
+      html += '<h2>' + meta.defaultName + '</h2>';
+      html += '<div class="meta">' + meta.label + (meta.noGameOver ? ' · no game overs' : ' · patience meters') + '</div>';
+      html += '<div class="chip">Day ' + p.maxDay + ' · ' + p.coins + ' coins</div>';
+      html += '</button>';
+    }
+    html += '</div>';
+    if (canContinue) {
+      html += '<button class="btn big green" id="btnContinue" type="button">Continue</button>';
+    }
+    html += '</div>';
+    overlay(html);
+    PR.overlay.querySelectorAll('.profile-card').forEach((el) => {
+      const id = el.getAttribute('data-id');
+      const cv = el.querySelector('canvas');
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff6e0';
+      PR.roundRect(ctx, 0, 0, 110, 110, 16);
+      ctx.fill();
+      PR.Art.drawCustomer(ctx, 55, 58, 1.55, id === 'alpha' ? 0 : 2, 'happy');
+      // mini pizza badge
+      PR.Art.drawPizza(ctx, 88, 88, 16, { crust: 'thin', sauce: 'tomato', cheese: 'mozzarella', toppings: ['pepperoni'] }, {});
+      el.onclick = () => { PR.Audio.unlock(); PR.Audio.click(); pick(id); };
+    });
+    const cont = document.getElementById('btnContinue');
+    if (cont) cont.onclick = () => { PR.Audio.unlock(); PR.Audio.click(); pick(st.lastProfile); };
+  }
+
+  function pick(id) {
+    PR.Save.setProfile(id);
+    hub();
+  }
+
+  function hub() {
+    PR.screen = 'hub';
+    showHud(false);
+    const p = PR.Save.profile();
+    const meta = PR.profiles[p.id];
+    let html = '<div class="panel col">';
+    html += '<div class="title">Chef ' + p.name + '</div>';
+    html += '<div class="sub">' + meta.label + ' · ' + p.coins + ' coins · ' + p.tips + ' tips · pizzas ' + p.pizzasServed + '</div>';
+    html += '<canvas id="hubArt" width="200" height="120" style="border-radius:16px;border:3px solid #f0a830;background:#fff"></canvas>';
+    html += '<div class="row">';
+    html += '<button class="btn big orange" id="btnDays" type="button">Open Shop</button>';
+    html += '<button class="btn big blue" id="btnUpgrades" type="button">Upgrades</button>';
+    html += '<button class="btn ghost" id="btnProfiles" type="button">Switch Chef</button>';
+    html += '</div></div>';
+    overlay(html);
+    const hc = document.getElementById('hubArt');
+    if (hc) {
+      const ctx = hc.getContext('2d');
+      PR.Art.drawPizza(ctx, 100, 62, 48, { crust: 'thick', sauce: 'tomato', cheese: 'mozzarella', toppings: ['pepperoni', 'mushroom', 'olive'] }, { plate: true });
+    }
+    document.getElementById('btnDays').onclick = () => { PR.Audio.click(); daySelect(); };
+    document.getElementById('btnUpgrades').onclick = () => { PR.Audio.click(); upgrades(); };
+    document.getElementById('btnProfiles').onclick = () => { PR.Audio.click(); profilePicker(); };
+  }
+
+  function daySelect() {
+    PR.screen = 'days';
+    const p = PR.Save.profile();
+    let html = '<div class="panel col"><div class="title">Choose a Day</div>';
+    html += '<div class="sub">36 days · Downtown · Beach · Mountain</div>';
+    html += '<div class="level-grid">';
+    for (let d = 1; d <= PR.DAY_COUNT; d++) {
+      const day = PR.Data.getDay(d);
+      const locked = d > p.maxDay;
+      const done = !!p.cleared[d];
+      let cls = 'lvl';
+      if (locked) cls += ' locked';
+      if (done) cls += ' done';
+      if (day.rush) cls += ' rush';
+      if (day.vip) cls += ' vip';
+      if (d === p.maxDay) cls += ' cur';
+      html += '<button class="' + cls + '" type="button" data-day="' + d + '"' + (locked ? ' disabled' : '') + '>' + d + '</button>';
+    }
+    html += '</div><div class="row" style="margin-top:12px">';
+    html += '<button class="btn ghost" id="btnBackHub" type="button">Back</button>';
+    html += '</div></div>';
+    overlay(html);
+    PR.overlay.querySelectorAll('.lvl:not(.locked)').forEach((el) => {
+      el.onclick = () => {
+        PR.Audio.click();
+        startPlay(+el.getAttribute('data-day'));
+      };
+    });
+    document.getElementById('btnBackHub').onclick = () => { PR.Audio.click(); hub(); };
+  }
+
+  function upgrades() {
+    PR.screen = 'upgrades';
+    const p = PR.Save.profile();
+    let html = '<div class="panel col"><div class="title">Shop Upgrades</div>';
+    html += '<div class="sub">Coins: ' + p.coins + '</div><div class="row">';
+    PR.Data.UPGRADES.forEach((u) => {
+      const owned = p.upgrades.includes(u.id);
+      html += '<button class="upgrade-card' + (owned ? ' owned' : '') + '" type="button" data-up="' + u.id + '">';
+      html += '<canvas width="64" height="48" data-upicon="' + u.id + '"></canvas>';
+      html += '<div>' + u.name + '</div><div style="opacity:.8;font-size:12px;font-weight:600">' + u.desc + '</div>';
+      html += '<div class="chip">' + (owned ? 'Owned' : u.cost + ' coins') + '</div></button>';
+    });
+    html += '</div><div class="sub" style="margin-top:10px">Decorations</div><div class="row">';
+    PR.Data.DECORS.forEach((d) => {
+      const owned = p.decorations.includes(d.id);
+      html += '<button class="upgrade-card' + (owned ? ' owned' : '') + '" type="button" data-dec="' + d.id + '">';
+      html += '<canvas width="64" height="40" data-decicon="' + d.id + '"></canvas>';
+      html += '<div>' + d.name + '</div><div class="chip">' + (owned ? 'Owned' : d.cost + ' coins') + '</div></button>';
+    });
+    html += '</div><button class="btn ghost" id="btnBackHub2" type="button">Back</button></div>';
+    overlay(html);
+    paintUpgradeIcons();
+    PR.overlay.querySelectorAll('[data-up]').forEach((el) => {
+      el.onclick = () => {
+        const id = el.getAttribute('data-up');
+        if (PR.Shop.buyUpgrade(id)) { PR.toast('Upgraded!'); upgrades(); }
+        else PR.toast('Need more coins');
+      };
+    });
+    PR.overlay.querySelectorAll('[data-dec]').forEach((el) => {
+      el.onclick = () => {
+        const id = el.getAttribute('data-dec');
+        if (PR.Shop.buyDecor(id)) { PR.toast('Decor added!'); upgrades(); }
+        else PR.toast('Need more coins');
+      };
+    });
+    document.getElementById('btnBackHub2').onclick = () => { PR.Audio.click(); hub(); };
+  }
+
+  function paintUpgradeIcons() {
+    PR.overlay.querySelectorAll('canvas[data-upicon]').forEach((cv) => {
+      const id = cv.getAttribute('data-upicon');
+      const ctx = cv.getContext('2d');
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      if (id === 'fast-oven') {
+        ctx.fillStyle = '#ff8c42';
+        PR.roundRect(ctx, 8, 6, 48, 36, 8); ctx.fill();
+        ctx.fillStyle = '#ffe566';
+        ctx.beginPath(); ctx.moveTo(32, 12); ctx.lineTo(40, 28); ctx.lineTo(24, 28); ctx.fill();
+      } else if (id === 'auto-slice') {
+        PR.Art.drawPizza(ctx, 32, 24, 18, { crust: 'thin', sauce: 'tomato', cheese: 'mozzarella' }, { slices: 6 });
+      } else if (id === 'tip-jar') {
+        ctx.fillStyle = '#7ec8ff';
+        PR.roundRect(ctx, 18, 8, 28, 32, 6); ctx.fill();
+        PR.Art.drawCoin(ctx, 32, 24, 10, 1);
+      } else if (id === 'extra-cheese') {
+        PR.Art.drawIngredientIcon(cv, 'cheese', 'cheddar');
+      } else if (id === 'wide-counter') {
+        ctx.fillStyle = '#c9894a';
+        PR.roundRect(ctx, 4, 16, 56, 18, 4); ctx.fill();
+        PR.Art.drawPizza(ctx, 20, 24, 10, { crust: 'thin', sauce: 'tomato' }, {});
+        PR.Art.drawPizza(ctx, 44, 24, 10, { crust: 'thick', sauce: 'pesto' }, {});
+      } else {
+        ctx.fillStyle = '#ffe566';
+        PR.roundRect(ctx, 10, 8, 44, 32, 8); ctx.fill();
+        ctx.fillStyle = '#8b2e0e';
+        ctx.font = 'bold 16px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('?', 32, 30);
+      }
+    });
+    PR.overlay.querySelectorAll('canvas[data-decicon]').forEach((cv) => {
+      const id = cv.getAttribute('data-decicon');
+      const ctx = cv.getContext('2d');
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      const colors = { plant: '#27ae60', neon: '#ff6ec7', poster: '#3498db', fairy: '#f5d76e', trophy: '#f0a830' };
+      ctx.fillStyle = colors[id] || '#f0a830';
+      PR.roundRect(ctx, 12, 6, 40, 28, 8);
+      ctx.fill();
+    });
+  }
+
+  function startPlay(dayNum) {
+    PR.Shop.startDay(dayNum);
+    PR.screen = 'play';
+    renderPlayUI();
+    showHud(true);
+  }
+
+  function renderPlayUI() {
+    const r = PR.run;
+    if (!r) return;
+    const c = PR.Shop.currentCustomer();
+    const p = PR.Save.profile();
+    const day = r.day;
+
+    let html = '<div class="panel play-panel">';
+    html += '<div class="play-top">';
+    html += '<div class="chip">' + day.locName + ' · Day ' + day.day + (day.rush ? ' · RUSH' : '') + (day.vip ? ' · VIP' : '') + '</div>';
+    html += '<div class="chip">Served ' + r.served + '/' + day.goalServe + '</div>';
+    if (!r.meta.noGameOver) html += '<div class="chip">Hearts ' + r.hearts + '</div>';
+    html += '<div class="chip">Tips ' + r.tipsEarned + '</div>';
+    html += '<button class="btn ghost" id="btnQuit" type="button">Quit</button>';
+    html += '</div>';
+
+    if (r.phase === 'won' || r.phase === 'lost') {
+      html += '<div class="col" style="padding:20px">';
+      html += '<canvas id="endArt" width="160" height="160"></canvas>';
+      html += '<div class="title">' + (r.won ? 'Day Complete!' : 'Day Over') + '</div>';
+      html += '<div class="sub">Served ' + r.served + ' · Tips ' + r.tipsEarned + ' · Coins +' + r.coinsEarned + '</div>';
+      html += '<div class="row"><button class="btn big green" id="btnHub" type="button">Hub</button>';
+      html += '<button class="btn big orange" id="btnNext" type="button">' + (r.won ? 'Next Day' : 'Retry') + '</button></div></div></div>';
+      overlay(html);
+      const ea = document.getElementById('endArt');
+      if (ea) {
+        const ctx = ea.getContext('2d');
+        if (r.won) PR.Art.drawPizza(ctx, 80, 80, 60, { crust: 'thick', sauce: 'tomato', cheese: 'mozzarella', toppings: ['pepperoni', 'basil'] }, { plate: true });
+        else {
+          ctx.fillStyle = '#ffcccc';
+          PR.roundRect(ctx, 20, 20, 120, 120, 20); ctx.fill();
+          PR.Art.drawCustomer(ctx, 80, 80, 1.6, 1, 'mad');
+        }
+      }
+      bindTap(document.getElementById('btnQuit'), () => { hub(); });
+      bindTap(document.getElementById('btnHub'), () => { hub(); });
+      bindTap(document.getElementById('btnNext'), () => {
+        if (r.won) startPlay(Math.min(PR.DAY_COUNT, r.dayNum + 1));
+        else startPlay(r.dayNum);
+      });
+      return;
+    }
+
+    // 3-column play grid
+    html += '<div class="play-grid">';
+
+    // LEFT — customer + order bubble
+    html += '<div class="play-left">';
+    html += '<canvas class="order-canvas" id="orderCard" width="180" height="240"></canvas>';
+    if (r.meta.patience) {
+      const pct = Math.max(0, r.patienceLeft / r.patienceMax);
+      html += '<div class="patience" title="Patience"><i style="width:' + (pct * 100) + '%"></i></div>';
+    }
+    html += '<div class="msg" id="msg">' + (r.message || '') + '</div>';
+    html += '</div>';
+
+    // CENTER — pizza (compact on pay so controls fit)
+    html += '<div class="play-center">';
+    if (r.phase === 'pay') {
+      html += '<canvas class="pizza-canvas pizza-pay" id="workspace" width="200" height="160"></canvas>';
+    } else {
+      html += '<canvas class="pizza-canvas" id="workspace" width="300" height="280"></canvas>';
+    }
+    if (r.phase === 'bake') {
+      html += bakeMeterHtml(r);
+      html += '<button class="btn big orange" id="btnPull" type="button">Pull Pizza</button>';
+    } else if (r.phase === 'slice') {
+      html += '<div class="msg">Tap to cut ' + r.slicesWanted + ' slices (' + r.slices + ')</div>';
+      html += '<button class="btn big pink" id="btnSlice" type="button">Slice</button>';
+    } else if (r.phase === 'pay') {
+      html += '<div class="msg">' + (r.message || 'Count the coins') + '</div>';
+    } else if (r.phase === 'between') {
+      html += '<div class="msg">Next customer…</div>';
+    }
+    html += '</div>';
+
+    // RIGHT — ingredients OR pay controls (never duplicate order card)
+    html += '<div class="play-right">';
+    if (r.phase === 'build') {
+      html += '<div class="ings-scroll">';
+      html += sectionIngs('Crust', 'crust', PR.Data.CRUSTS, r.pizza.crust, day.day, p);
+      html += sectionIngs('Sauce', 'sauce', PR.Data.SAUCES, r.pizza.sauce, day.day, p);
+      html += sectionIngs('Cheese', 'cheese', PR.Data.CHEESES, r.pizza.cheese, day.day, p);
+      html += sectionIngs('Toppings', 'topping', PR.Data.TOPPINGS, null, day.day, p, r.pizza.toppings);
+      html += '</div>';
+      html += '<div class="bake-row"><button class="btn big green" id="btnBake" type="button"' + (PR.Shop.canBake() ? '' : ' disabled') + '>Bake!</button></div>';
+    } else if (r.phase === 'pay') {
+      html += mathPanel(r, c);
+    } else {
+      html += '<div class="msg" style="padding:12px;font-size:14px">';
+      if (r.phase === 'bake') html += 'Watch the oven — pull when the bar is green or yellow!';
+      else if (r.phase === 'slice') html += 'Tap Slice until you match the order.';
+      else html += 'Hang tight…';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    html += '</div></div>';
+    overlay(html);
+
+    paintPlayCanvases(r, c);
+
+    const quit = document.getElementById('btnQuit');
+    bindTap(quit, () => { PR.run = null; hub(); });
+
+    PR.overlay.querySelectorAll('.ing-btn').forEach((el) => {
+      bindTap(el, () => {
+        const kind = el.getAttribute('data-kind');
+        const id = el.getAttribute('data-id');
+        if (kind === 'crust') PR.Shop.setCrust(id);
+        else if (kind === 'sauce') PR.Shop.setSauce(id);
+        else if (kind === 'cheese') PR.Shop.setCheese(id);
+        else PR.Shop.toggleTopping(id);
+        renderPlayUI();
+      });
+    });
+    bindTap(document.getElementById('btnBake'), () => { if (PR.Shop.startBake()) renderPlayUI(); });
+    bindTap(document.getElementById('btnPull'), () => {
+      const advanced = PR.Shop.pullOven();
+      renderPlayUI(); // always refresh so early-nudge message shows, or slice appears
+      if (!advanced) {
+        // still baking — ensure meter stays live
+        updateBakeMeter();
+      }
+    });
+    bindTap(document.getElementById('btnSlice'), () => { PR.Shop.addSlice(); renderPlayUI(); });
+    bindTap(document.getElementById('btnClearPay'), () => { PR.Shop.clearPay(); renderPlayUI(); });
+    bindTap(document.getElementById('btnConfirmPay'), () => { PR.Shop.confirmPay(); renderPlayUI(); });
+    PR.overlay.querySelectorAll('.coin-btn').forEach((el) => {
+      bindTap(el, () => { PR.Shop.addCoin(+el.getAttribute('data-v')); renderPlayUI(); });
+    });
+  }
+
+  function bakeMeterHtml(r) {
+    const pct = Math.min(1, r.bakeT / r.bakeBurn) * 100;
+    const greenStart = (r.bakeTarget * 0.55 / r.bakeBurn) * 100;
+    const greenEnd = (r.bakeTarget * 1.15 / r.bakeBurn) * 100;
+    const ideal = (r.bakeTarget / r.bakeBurn) * 100;
+    let html = '<div class="bake-meter" id="bakeMeter" aria-label="oven progress">';
+    html += '<div class="bake-zones">';
+    html += '<i class="z-early" style="width:' + greenStart + '%"></i>';
+    html += '<i class="z-good" style="width:' + (greenEnd - greenStart) + '%"></i>';
+    html += '<i class="z-late" style="width:' + (100 - greenEnd) + '%"></i>';
+    html += '</div>';
+    html += '<div class="bake-ideal" style="left:' + ideal + '%" title="perfect"></div>';
+    html += '<div class="bake-fill" id="bakeFill" style="width:' + pct + '%"></div>';
+    html += '</div>';
+    html += '<div class="bake-legend"><span class="leg-early">raw</span><span class="leg-good">green / yellow</span><span class="leg-late">burn</span></div>';
+    return html;
+  }
+
+  /** Patch bake meter in place — never tear down Pull button mid-press. */
+  function updateBakeMeter() {
+    const r = PR.run;
+    if (!r || r.phase !== 'bake') return;
+    const fill = document.getElementById('bakeFill');
+    if (fill) {
+      fill.style.width = (Math.min(1, r.bakeT / r.bakeBurn) * 100) + '%';
+    }
+    const msg = document.getElementById('msg');
+    if (msg && r.message) msg.textContent = r.message;
+  }
+
+  function paintPlayCanvases(r, c) {
+    const order = document.getElementById('orderCard');
+    if (order && c) {
+      const mood = (r.meta.patience && r.patienceLeft < r.patienceMax * 0.3) ? 'mad' : 'happy';
+      PR.Art.drawOrderCard(order, c.order, c.style, mood);
+    }
+    const ws = document.getElementById('workspace');
+    if (ws) {
+      PR.Art.drawWorkspace(ws, r.pizza, {
+        burned: r.burned,
+        ovenGlow: r.ovenGlow,
+        slices: (r.phase === 'slice' || r.phase === 'pay') ? r.slices : 0
+      });
+    }
+    const mini = document.getElementById('orderMini');
+    if (mini && c) {
+      PR.Art.drawOrderCard(mini, c.order, c.style, 'happy');
+    }
+    PR.overlay.querySelectorAll('canvas[data-ing]').forEach((cv) => {
+      const [kind, id] = cv.getAttribute('data-ing').split(':');
+      PR.Art.drawIngredientIcon(cv, kind === 'topping' ? 'topping' : kind, id);
+    });
+    PR.overlay.querySelectorAll('canvas.coin-vis').forEach((cv) => {
+      const cx = cv.width / 2, cy = cv.height / 2, rr = Math.min(cx, cy) - 1;
+      PR.Art.drawCoin(cv.getContext('2d'), cx, cy, rr, 1);
+    });
+    PR.overlay.querySelectorAll('canvas.coin-face').forEach((cv) => {
+      const v = +cv.getAttribute('data-v');
+      PR.Art.drawCoin(cv.getContext('2d'), cv.width / 2, cv.height / 2, Math.min(cv.width, cv.height) / 2 - 2, v);
+    });
+  }
+
+  function sectionIngs(title, kind, list, selected, day, profile, selectedArr) {
+    let html = '<div class="ing-line"><div class="ing-label">' + title + '</div><div class="ing-row">';
+    const unlocked = PR.Data.unlockedList(list, day, profile);
+    unlocked.forEach((item) => {
+      const isSel = selectedArr ? selectedArr.includes(item.id) : selected === item.id;
+      html += '<button class="ing-btn' + (isSel ? ' sel' : '') + '" type="button" data-kind="' + kind + '" data-id="' + item.id + '">';
+      html += '<canvas width="64" height="48" data-ing="' + kind + ':' + item.id + '"></canvas>';
+      html += '<span>' + item.name + '</span></button>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function mathPanel(r, c) {
+    let html = '<div class="pay-panel-right">';
+    if (r.meta.mathMode === 'count') {
+      html += '<div class="msg">Count out <b>' + r.payTarget + '</b></div>';
+      html += '<div class="coin-target-row">';
+      const show = Math.min(r.payTarget, 10);
+      for (let i = 0; i < show; i++) {
+        html += '<canvas width="28" height="28" class="coin-vis" data-i="' + i + '"></canvas>';
+      }
+      if (r.payTarget > 10) html += '<span class="chip">×' + r.payTarget + '</span>';
+      html += '</div>';
+    } else {
+      html += '<div class="msg">Price <b>' + c.price + '</b> · Paid <b>' + c.pays + '</b></div>';
+      html += '<div class="msg">Change <b>' + r.payTarget + '</b></div>';
+    }
+    html += '<div class="chip" id="givenChip">Given: ' + r.payGiven + ' / ' + r.payTarget + '</div>';
+    html += '<div class="coin-tray">';
+    const coins = r.meta.mathMode === 'count' ? [1] : [1, 2, 5, 10];
+    coins.forEach((v) => {
+      html += '<button class="coin-btn" type="button" data-v="' + v + '" aria-label="coin ' + v + '">';
+      html += '<canvas class="coin-face" width="36" height="36" data-v="' + v + '"></canvas>';
+      html += '</button>';
+    });
+    html += '</div><div class="pay-actions">';
+    html += '<button class="btn ghost" id="btnClearPay" type="button">Clear</button>';
+    html += '<button class="btn big green" id="btnConfirmPay" type="button">Serve</button>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function drawBackdrop() {
+    if (!PR.ctx) return;
+    const r = PR.run;
+    const loc = (r && r.day && r.day.loc) || 'downtown';
+    PR.Art.drawShopBg(PR.ctx, loc, { ovenGlow: r && r.ovenGlow });
+    const p = PR.state && PR.Save.profile();
+    if (p && p.decorations) {
+      p.decorations.forEach((id, i) => {
+        const x = 80 + i * 90;
+        const y = PR.H * 0.52;
+        PR.ctx.fillStyle = id === 'neon' ? '#ff6ec7' : id === 'plant' ? '#27ae60' : '#f5d76e';
+        PR.roundRect(PR.ctx, x, y, 50, 40, 8);
+        PR.ctx.fill();
+      });
+    }
+  }
+
+  return {
+    profilePicker, hub, daySelect, upgrades, startPlay,
+    renderPlayUI, updateBakeMeter,
+    drawBackdrop, pick
+  };
+})();
+
+})();
+/* ==== 90-game.js ==== */
+;(function(){
+/* Bootstrap, loop, window.__game */
+(function boot() {
+  function init() {
+    PR.canvas = document.getElementById('game');
+    PR.ctx = PR.canvas.getContext('2d');
+    PR.overlay = document.getElementById('overlay');
+    PR.hud = document.getElementById('hud');
+    PR.fitCanvas();
+    PR.Audio.loadMute();
+    PR.Save.load();
+
+    document.getElementById('muteBtn').onclick = () => {
+      PR.Audio.unlock();
+      PR.Audio.setMuted(!PR.muted);
+      document.getElementById('muteBtn').textContent = PR.muted ? '🔇' : '🔊';
+    };
+    const fsBtn = document.getElementById('fsBtn');
+    if (!document.documentElement.requestFullscreen && !document.documentElement.webkitRequestFullscreen) {
+      fsBtn.style.display = 'none';
+    } else {
+      fsBtn.onclick = () => {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+        } else {
+          (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        }
+      };
+    }
+
+    window.addEventListener('resize', PR.fitCanvas);
+    window.addEventListener('orientationchange', () => setTimeout(PR.fitCanvas, 100));
+
+    ['pointerdown', 'touchstart', 'keydown'].forEach((ev) =>
+      window.addEventListener(ev, () => PR.Audio.unlock(), { passive: true })
+    );
+
+    const autosave = () => PR.Save.save();
+    window.addEventListener('pagehide', autosave);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) autosave(); });
+    setInterval(autosave, 5000);
+
+    window.__game = {
+      PR,
+      save: PR.Save,
+      pick: (id) => { PR.Save.setProfile(id); PR.UI.hub(); },
+      profiles: () => PR.UI.profilePicker(),
+      hub: () => PR.UI.hub(),
+      start: (day, pid) => {
+        if (pid) PR.Save.setProfile(pid);
+        PR.UI.startPlay(day || 1);
+      },
+      getRun: () => PR.Shop.getRun(),
+      solve: (day, pid, opts) => PR.Shop.solve(day, pid, opts),
+      solveAll: (pid, opts) => {
+        const out = [];
+        for (let i = 1; i <= PR.DAY_COUNT; i++) {
+          out.push(PR.Shop.solve(i, pid || 'alpha', Object.assign({ proof: true }, opts || {})));
+        }
+        return out;
+      },
+      days: () => PR.Data.summary(),
+      dayCount: () => PR.DAY_COUNT,
+      resetSave: () => { PR.state = PR.Save.blankState(); PR.Save.save(); },
+      setMaxDay: (n, pid) => {
+        const p = PR.Save.profile(pid || PR.state.lastProfile);
+        p.maxDay = n;
+        PR.Save.save();
+      },
+      screen: () => PR.screen,
+      state: () => PR.state,
+      buyUpgrade: (id) => PR.Shop.buyUpgrade(id),
+      render: () => PR.UI.renderPlayUI()
+    };
+
+    PR.lastT = PR.now();
+    function frame(t) {
+      const dt = Math.min(0.05, (t - PR.lastT) / 1000);
+      PR.lastT = t;
+      if (PR.screen === 'play' && PR.run) {
+        const prevPhase = PR.run.phase;
+        PR.Shop.tick(dt);
+        // refresh UI while baking or patience changing
+        if (PR.run.phase !== prevPhase) {
+          PR.UI.renderPlayUI();
+        } else if (PR.run.phase === 'bake') {
+          // NEVER full-rebuild overlay while baking — that destroyed Pull mid-press.
+          PR.UI.updateBakeMeter();
+        }
+      }
+      PR.UI.drawBackdrop();
+      PR.raf = requestAnimationFrame(frame);
+    }
+    PR.raf = requestAnimationFrame(frame);
+
+    PR.UI.profilePicker();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "pizza-rush";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

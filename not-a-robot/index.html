@@ -1,0 +1,3123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#2f6fd6">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; media-src data:">
+<title>Totally Not A Robot</title>
+<style>:root{
+  --blue:#2f6fd6; --blue2:#4a8af4; --ink:#1d2433; --muted:#5b6475; --bg:#eef3fb; --card:#fff; --ok:#2e9b4f; --oops:#f0a33a;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+  --vh:100vh;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --reserve:300px;
+  --sw:min(500px, calc(100vw - 44px - var(--sal) - var(--sar)));
+  --sh:max(190px, calc(var(--vh) - var(--reserve) - var(--sat) - var(--sab)));
+  --sq:min(var(--sw), var(--sh));
+}
+@supports (height:100dvh){ :root{ --vh:100dvh; } }
+@media (max-height:700px){ :root{ --reserve:268px; } }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;overscroll-behavior:none}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;overflow:hidden}
+#app{height:100%;padding:calc(8px + var(--sat)) calc(8px + var(--sar)) calc(8px + var(--sab)) calc(8px + var(--sal))}
+.screen{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.screen[hidden],[hidden]{display:none!important}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:12px;border:2px solid #c9d4e8;background:#fff;color:var(--ink);font:600 18px/1 var(--font);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .08s,background .15s}
+.btn:active{transform:scale(.96)}
+.btn:focus-visible,.tile:focus-visible,.big-check:focus-visible{outline:3px solid #ffb300;outline-offset:2px}
+.btn.primary,.btn.verify{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.verify{font-size:19px;letter-spacing:.04em;text-transform:uppercase;padding:0 24px}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.icon{padding:0;width:48px;font-size:24px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+/* start */
+.logo{font-size:clamp(34px,7vw,64px);margin:0;text-align:center;line-height:1.05;letter-spacing:-.02em}
+.logo span{color:#e8572a;display:inline-block;transform:rotate(-6deg)}
+.tag{margin:0;color:var(--muted);font-size:clamp(16px,2.4vw,20px);text-align:center}
+.captcha-box{display:flex;align-items:center;justify-content:space-between;gap:16px;width:min(360px,94vw);padding:14px 14px 14px 16px;background:#f9f9f9;border:1px solid #d3d3d3;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.big-check{display:flex;align-items:center;gap:14px;border:0;background:none;font:500 19px var(--font);color:var(--ink);cursor:pointer;min-height:56px;padding:0}
+.big-check .box{position:relative;width:34px;height:34px;border:2px solid #c1c1c1;border-radius:4px;background:#fff;display:inline-block;flex:none}
+.big-check .mark{position:absolute;inset:0;display:none;color:#1ea362;font-size:30px;line-height:30px;text-align:center;font-weight:900}
+.big-check .spinner{position:absolute;inset:2px;border:4px solid #4a8af4;border-right-color:transparent;border-radius:50%;display:none;animation:spin .7s linear infinite}
+.big-check.spin .box{border-color:transparent}.big-check.spin .spinner{display:block}
+.big-check.done .box{border-color:transparent}.big-check.done .mark{display:block}
+.brand{display:flex;flex-direction:column;align-items:center;color:#7a7a7a;text-align:center}
+.brand svg{width:34px;height:34px}.brand small{font-size:10px;line-height:1.3}
+.start-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.note{margin:0;color:var(--muted);min-height:1em}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* game */
+#scr-game{justify-content:flex-start;gap:8px}
+.topbar{width:min(560px,100%);display:flex;align-items:center;gap:8px}
+.tb-mid{flex:1;text-align:center;min-width:0}
+.lvl-num{font-weight:800;font-size:15px;color:var(--blue)}
+.lvl-title{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.dot{width:8px;height:8px;border-radius:50%;background:#cfd8e6}.dot.done{background:var(--ok)}.dot.cur{background:var(--blue);transform:scale(1.35)}
+.panel{position:relative;width:min(560px,100%);background:var(--card);border:1px solid #d0d7e2;border-radius:10px;box-shadow:0 6px 24px rgba(30,50,90,.12);overflow:hidden;display:flex;flex-direction:column}
+.panel-instr{background:var(--blue2);color:#fff;padding:12px 18px;font-size:clamp(17px,2.3vw,20px);line-height:1.25;min-height:64px}
+.panel-instr small{display:block;font-size:.8em;opacity:.95}
+.panel-instr b{display:block;font-size:1.45em;line-height:1.15}
+.panel-instr i{font-style:normal;opacity:.85;font-size:.85em}
+.panel-body{position:relative;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:120px}
+.hint{margin:0 12px 8px;padding:8px 12px;border-radius:8px;background:#fff7d6;border:1px solid #f3d36b;font-size:16px;line-height:1.3}
+.panel-foot{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid #e3e8f0;min-height:64px}
+.quip{flex:1;font-size:15px;line-height:1.25;color:#8a4b00;background:#fff1dc;border-radius:8px;padding:6px 10px;animation:pop .25s ease-out}
+.quip.info{color:#174a8b;background:#e6f0ff}
+#btn-verify{margin-left:auto}
+.panel.wobble{animation:wobble .5s ease-in-out}
+@keyframes wobble{0%,100%{transform:none}20%{transform:translateX(-8px) rotate(-1deg)}40%{transform:translateX(7px) rotate(1deg)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.pass-overlay{position:absolute;inset:0;background:rgba(255,255,255,.82);display:flex;align-items:center;justify-content:center;z-index:20;animation:pop .2s}
+.pass-card{text-align:center;font-size:24px;font-weight:800;color:var(--ok)}
+.pass-tick{width:84px;height:84px;margin:0 auto 8px;border-radius:50%;background:var(--ok);color:#fff;font-size:54px;line-height:84px}
+/* tiles */
+.tile-grid{display:grid;gap:6px;width:var(--sq);height:var(--sq)}
+.tile-grid.cols2{grid-template-columns:repeat(2,1fr)}.tile-grid.cols3{grid-template-columns:repeat(3,1fr)}
+.tile-grid.cols3.rows2{height:calc(var(--sq) * .68)}
+.tile{position:relative;border:0;padding:6%;background:#eef2f7;border-radius:6px;cursor:pointer;min-width:48px;min-height:48px;transition:transform .12s, padding .12s;display:flex;align-items:center;justify-content:center}
+.tile svg{width:100%;height:100%;pointer-events:none}
+.tile.sel{padding:13%;background:#dbe8ff;box-shadow:inset 0 0 0 3px var(--blue2)}
+.tile .tick{position:absolute;left:4px;top:4px;width:26px;height:26px;border-radius:50%;background:var(--blue2);color:#fff;font-weight:900;font-size:16px;line-height:26px;display:none}
+.tile.sel .tick{display:block}
+.big-q{font-size:clamp(18px,2.6vw,22px);text-align:center;margin:0}
+/* generic stage box */
+.stage{position:relative;width:var(--sw);height:var(--sh);max-height:420px;background:#f4f7fb;border-radius:8px;overflow:hidden;touch-action:none}
+/* level-specific */
+.fruit-eq{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;font-size:clamp(28px,5vw,44px);font-weight:900}
+.fruit-pile{display:flex;flex-wrap:wrap;justify-content:center;max-width:calc(var(--sq) * .4);gap:2px}
+.fruit-pile svg{width:calc(var(--sq) * .17);height:calc(var(--sq) * .17)}
+.choices{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.choice{min-width:72px;min-height:64px;font-size:30px;font-weight:800}
+.choice.sel{background:#dbe8ff;border-color:var(--blue2);box-shadow:inset 0 0 0 2px var(--blue2)}
+.rot-wrap{--rw:min(calc(var(--sq) * .8), calc(var(--sw) - 128px));width:var(--rw);height:var(--rw);padding:0;border:0;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.15);cursor:pointer;transition:transform .35s cubic-bezier(.3,1.4,.6,1)}
+.rot-wrap svg{width:100%;height:100%;display:block;pointer-events:none}
+.row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.slider-val{font-size:clamp(44px,8vw,72px);font-weight:900;color:var(--blue);line-height:1;font-variant-numeric:tabular-nums}
+.slider-unit{font-size:16px;color:var(--muted);text-align:center}
+.track{position:relative;width:calc(var(--sw) - 40px);height:56px;touch-action:none;cursor:pointer}
+.track::before{content:"";position:absolute;left:0;right:0;top:24px;height:8px;border-radius:4px;background:#d6deea}
+.track .fill{position:absolute;left:0;top:24px;height:8px;border-radius:4px;background:var(--blue2)}
+.track .thumb{position:absolute;top:4px;width:48px;height:48px;margin-left:-24px;border-radius:50%;background:#fff;border:3px solid var(--blue);box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:grab;display:flex;align-items:center;justify-content:center;font-size:22px}
+.hold-btn{position:relative;width:calc(var(--sq) * .62);height:calc(var(--sq) * .62);max-width:260px;max-height:260px;border-radius:50%;border:0;background:var(--blue);color:#fff;font:800 22px var(--font);cursor:pointer;touch-action:none;box-shadow:0 6px 0 #1d4fa3;transition:transform .1s}
+.hold-btn.holding{transform:translateY(4px) scale(.97);box-shadow:0 2px 0 #1d4fa3;animation:giggle .25s infinite}
+.hold-btn svg{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);transform:rotate(-90deg);pointer-events:none}
+@keyframes giggle{0%,100%{rotate:0deg}25%{rotate:-2deg}75%{rotate:2deg}}
+.dog-stage .dog{position:absolute;left:50%;bottom:4%;width:min(64%,calc(var(--sh) * .9));aspect-ratio:1;transform:translateX(-50%)}
+.dog-stage .dog svg,.dog-stage .hat svg{width:100%;height:100%;pointer-events:none}
+.dog-stage .hat{position:absolute;width:min(24%,calc(var(--sh) * .3));aspect-ratio:1;cursor:grab;touch-action:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.25));z-index:2}
+.dog-stage .hat.drag{cursor:grabbing;transform:scale(1.08)}
+.dog-stage .hat-target{position:absolute;border:3px dashed rgba(47,111,214,.0);border-radius:50%}
+.runaway{position:absolute;display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9f9f9;border:1px solid #d3d3d3;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.1);transition:left .25s cubic-bezier(.3,1.5,.6,1),top .25s cubic-bezier(.3,1.5,.6,1);white-space:nowrap;font-size:17px}
+.runaway .cb{width:48px;height:48px;border:2px solid #c1c1c1;border-radius:6px;background:#fff;cursor:pointer;font-size:32px;color:#1ea362;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0}
+.runaway .face{font-size:15px;color:var(--muted)}
+.wobbly{display:flex;gap:4px;justify-content:center;padding:14px 8px;background:repeating-linear-gradient(45deg,#f2f2f2 0 8px,#e8e8e8 8px 16px);border-radius:8px;width:var(--sw)}
+.wobbly span{display:inline-block;font:900 clamp(34px,6vw,52px)/1 "Comic Sans MS","Chalkboard SE","Marker Felt",cursive;color:#3b3b6d;animation:wob 1.6s ease-in-out infinite;transition:color .2s}
+.wobbly span.swap{color:#d84315}
+@keyframes wob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-6px) rotate(8deg)}}
+.txt-in{box-sizing:border-box;max-width:100%;font:700 26px var(--font);width:min(320px,calc(var(--sw) - 20px));min-height:56px;padding:6px 14px;border:2px solid #c9d4e8;border-radius:10px;text-align:center;text-transform:uppercase;-webkit-user-select:text;user-select:text}
+.txt-in:focus{outline:none;border-color:var(--blue2)}
+.still-ring{width:calc(var(--sq) * .55);height:calc(var(--sq) * .55);max-width:240px;max-height:240px;position:relative}
+.still-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.still-ring .n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:900;color:var(--blue)}
+.draw-wrap{position:relative;width:var(--sq);height:var(--sq);max-width:400px;max-height:400px}
+.draw-wrap canvas{width:100%;height:100%;background:#fffef6;border:2px dashed #c9d4e8;border-radius:10px;touch-action:none;cursor:crosshair;display:block}
+.draw-score{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:22px;font-weight:900;color:var(--blue);pointer-events:none}
+.typed{min-height:52px;min-width:min(300px,calc(var(--sw) - 20px));padding:8px 14px;border:2px solid #c9d4e8;border-radius:10px;font:800 28px/1.2 var(--font);text-align:center;letter-spacing:.08em;background:#fff}
+.kb{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;width:var(--sw)}
+.kb .key{min-height:48px;padding:0;font-size:20px;border-radius:8px}
+.kb-row{display:flex;gap:8px;justify-content:center}
+.boss{display:flex;flex-direction:column;align-items:center;gap:12px;width:var(--sw);min-height:min(260px,var(--sh));justify-content:center;position:relative}
+.boss-q{font-size:clamp(20px,3.2vw,28px);font-weight:900;text-align:center;margin:0;line-height:1.2}
+.boss .btn{font-size:20px}
+.boss .yes{background:var(--ok);border-color:var(--ok);color:#fff}
+.boss .yes.done{background:#cfe9d6;border-color:#9fd3ad;color:#2e7d4f}
+.boss .huge{min-height:min(120px,calc(var(--sh) * .45));font-size:clamp(22px,4vw,34px);width:min(100%,420px)}
+.boss .meter{width:min(100%,360px);height:14px;border-radius:7px;background:#e3e8f0;overflow:hidden}
+.boss .meter i{display:block;height:100%;background:linear-gradient(90deg,#66bb6a,#ffca28,#ff7043);width:0;transition:width .2s}
+/* certificate */
+#scr-cert{position:relative;overflow:hidden}
+.cert{position:relative;width:min(560px,100%);max-height:calc(var(--vh) - 110px - var(--sat) - var(--sab));overflow:auto;background:#fffdf4;border:10px double #d4a72c;border-radius:12px;padding:16px 22px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.seal{width:84px;height:84px;margin:0 auto}.seal svg{width:100%;height:100%}
+.cert-head{font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:#8a6d1d}
+.cert-title{font:900 clamp(30px,6vw,46px)/1.1 Georgia,"Times New Roman",serif;color:#7a4b00;margin:4px 0}
+.cert-body{margin:6px 0 10px;font-size:16px;line-height:1.4}
+.cert-stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0}
+.cert-stats div{background:#fff3cd;border-radius:8px;padding:6px 14px;min-width:110px}
+.cert-stats .wide{flex-basis:100%}
+.cert-stats dt{font-size:12px;text-transform:uppercase;color:#8a6d1d}.cert-stats dd{margin:0;font-size:22px;font-weight:800}
+.cert-stats .wide dd{font-size:17px}
+.cert-sign{display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px;font-family:"Snell Roundhand","Brush Script MT",cursive;font-size:20px;gap:10px;text-align:left}
+.cert-sign small{display:block;font:12px -apple-system,Arial,sans-serif;color:var(--muted)}
+.cert-sign #cert-date{font:14px -apple-system,Arial,sans-serif;color:var(--muted)}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:fall 3s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,30,50,.45);display:flex;align-items:center;justify-content:center;padding:calc(12px + var(--sat)) 12px calc(12px + var(--sab));z-index:50}
+.modal-card{background:#fff;border-radius:14px;width:min(620px,100%);max-height:100%;overflow:auto;padding:12px 16px 16px}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+.modal-head h2{margin:0;font-size:22px}
+.levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.lvl-btn{position:relative;min-height:56px;border-radius:10px;border:2px solid #c9d4e8;background:#fff;display:flex;align-items:center;gap:8px;padding:6px 10px;font:600 14px var(--font);color:var(--ink);cursor:pointer;text-align:left}
+.lvl-btn .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--blue2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.lvl-btn.beaten{border-color:#9fd3ad;background:#f0faf3}.lvl-btn.beaten .n{background:var(--ok)}
+.lvl-btn:disabled{opacity:.5;cursor:default}.lvl-btn .lock{margin-left:auto}
+/* short landscape (Tesla 1180x600 etc.) */
+@media (max-height:700px) and (min-aspect-ratio:4/3){
+  #scr-game{gap:4px}
+  .topbar .lvl-title{display:none}
+  .panel-instr{padding:8px 16px;min-height:52px}
+  .panel-body{padding:8px}
+  .panel-foot{min-height:60px;padding:6px 10px}
+  .hint{margin:0 12px 6px;padding:6px 10px;font-size:15px}
+  .panel,.topbar{width:min(640px,100%)}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+/* roomy desktop (Mac 1440x900 etc.) */
+@media (min-width:900px) and (min-height:760px){
+  :root{ --sw:min(580px, calc(100vw - 44px)); --reserve:320px; }
+  .panel,.topbar{width:660px}
+  .panel-instr{font-size:21px;padding:14px 22px}
+  .lvl-num{font-size:17px}
+}
+.mascot{width:clamp(64px,10vh,96px);height:clamp(64px,10vh,96px);animation:bob 2.4s ease-in-out infinite}
+.mascot svg{width:100%;height:100%}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+@media (max-height:520px){ .mascot{display:none} }
+/* ===== v2 levels 15-44 ===== */
+.dots{display:grid;grid-template-columns:repeat(var(--nd,15),minmax(0,1fr));gap:2px;width:min(100%,420px);margin:4px auto 0}
+.dot{width:auto;height:6px;border-radius:3px}.dot.cur{transform:scaleY(1.5)}
+.levels-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.stage.s2{height:calc(var(--sh) - 60px)}
+.pips{display:flex;gap:8px;justify-content:center}
+.pips i{width:16px;height:16px;border-radius:50%;background:#dfe6f1;border:2px solid #c9d4e8;transition:background .2s}
+.pips i.on{background:var(--ok);border-color:var(--ok)}
+.choice.pic{width:min(96px,calc((var(--sw) - 30px) / 4));min-width:56px;height:min(96px,calc(var(--sh) * .34));min-height:56px;padding:6px}
+.choice.pic svg{width:100%;height:100%}
+.choice.time{min-width:96px;font-size:26px}
+.show-obj{width:min(150px,calc(var(--sh) - 120px));aspect-ratio:1}.show-obj svg{width:100%;height:100%}
+.shadow svg{filter:brightness(0) opacity(.8);width:100%;height:100%;display:block}
+.shadow{display:block;width:100%;height:100%}
+/* color confusion */
+.stroop-word{font:900 clamp(44px,9vw,72px)/1 var(--font);letter-spacing:.03em;padding:min(20px,calc(var(--sh) * .06)) 0;text-shadow:0 2px 0 rgba(0,0,0,.08)}
+.stroop-word.pop{animation:pop .25s}
+.choice.swatch{font-size:17px;gap:6px;padding:0 12px;min-width:96px}
+.choice.swatch i{width:20px;height:20px;border-radius:50%;flex:none;border:2px solid rgba(0,0,0,.15)}
+/* balloon */
+.pump-stage{background:linear-gradient(#e3f2fd,#f4f7fb)}
+.pump-zone{position:absolute;left:0;right:0;top:4%;height:16%;border-top:3px dashed #2e9b4f;border-bottom:3px dashed #2e9b4f;background:rgba(46,155,79,.08)}
+.pump-zone span{position:absolute;right:8px;top:2px;font-size:12px;color:#2e9b4f;font-weight:700}
+.pump-balloon{position:absolute;left:50%;bottom:0;height:88%;aspect-ratio:.75;transform-origin:50% 100%;transition:transform .2s cubic-bezier(.3,1.5,.6,1)}
+.pump-balloon svg{width:100%;height:100%}
+.pump-balloon.popped{transform:translateX(-50%) scale(1.25)!important;opacity:0;transition:transform .15s,opacity .2s}
+.pump-btn{min-width:160px;font-size:20px}
+/* line up */
+.lineup{display:flex;align-items:flex-end;justify-content:center;gap:6px;width:var(--sw);height:min(180px,calc(var(--sh) - 20px))}
+.lu{position:relative;flex:1;height:100%;min-width:48px;border:2px solid #c9d4e8;border-radius:10px;background:#fff;display:flex;align-items:flex-end;justify-content:center;padding:4px 2px;cursor:pointer}
+.lu-in{display:block;aspect-ratio:1}.lu-in svg{width:100%;height:100%}
+.lu.ok{background:#e9f7ee;border-color:var(--ok)}
+.lu em{position:absolute;top:4px;left:6px;font:800 18px var(--font);color:var(--ok);font-style:normal}
+/* pattern train */
+.train{display:flex;gap:3px;align-items:center;justify-content:center;width:var(--sw);padding:6px 4px 10px;border-bottom:4px solid #8d6e63;flex-wrap:nowrap}
+.car{flex:1;max-width:52px;aspect-ratio:1;background:#fff3e0;border:2px solid #ffb74d;border-radius:8px;padding:3px;display:flex;align-items:center;justify-content:center}
+.car svg{width:100%;height:100%}
+.car.q{font:900 24px var(--font);color:var(--blue);background:#e3f0ff;border-color:var(--blue2);border-style:dashed}
+/* drum */
+.drum-btn{width:min(190px,calc(var(--sh) - 80px));aspect-ratio:1;border:0;background:none;padding:0;cursor:pointer;touch-action:manipulation}
+.drum-btn svg{width:100%;height:100%}
+.drum-btn.boom{animation:boom .18s ease-out}
+@keyframes boom{50%{transform:scale(.92)}}
+/* dot to dot */
+.dots-stage{background:#fffdf5}
+.dot-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.dot-lines line{stroke:#2f6fd6;stroke-width:4;stroke-linecap:round}
+.dot-fill{fill:rgba(255,213,79,.45);stroke:none}
+.dotn{position:absolute;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;border:3px solid #2f6fd6;background:#fff;color:#2f6fd6;font:800 20px var(--font);cursor:pointer;z-index:2}
+.dotn.ok{background:#2f6fd6;color:#fff}
+/* opposite day / d-pad */
+.big-arrow{width:min(130px,calc(var(--sh) - 60px));aspect-ratio:1;transition:transform .25s}
+.big-arrow svg{width:100%;height:100%}
+.dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:4px}
+.dpad .btn{width:52px;height:52px;min-height:52px}
+.dp-up{grid-column:2;grid-row:1}.dp-left{grid-column:1;grid-row:2}.dp-right{grid-column:3;grid-row:2}.dp-down{grid-column:2;grid-row:3}
+.row{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:nowrap}
+/* riddle */
+.riddle-q{margin:0;font-size:clamp(19px,3vw,24px);font-weight:700;text-align:center;line-height:1.3;max-width:var(--sw)}
+/* find verify */
+.fv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:var(--sw)}
+.btn.fv{min-height:56px;padding:0 6px;font:800 18px var(--font);letter-spacing:.05em;background:var(--blue);border-color:var(--blue);color:#fff}
+/* what's missing */
+.wm-box{display:flex;gap:6px;justify-content:center;width:var(--sw);min-height:64px}
+.wm-item{flex:1;max-width:84px;aspect-ratio:1;background:#f4f7fb;border-radius:10px;padding:4px;display:flex;align-items:center;justify-content:center}
+.wm-item svg{width:100%;height:100%}
+.wm-item.q{font:900 30px var(--font);color:var(--blue);border:2px dashed var(--blue2)}
+.wm-bar{width:var(--sw);height:8px;border-radius:4px;background:#e3e8f0;overflow:hidden}
+.wm-bar i{display:block;height:100%;width:100%;background:var(--blue2);transform-origin:left}
+.wm-bar.run i{animation:drain 3.2s linear forwards}
+@keyframes drain{to{transform:scaleX(0)}}
+/* bubbles */
+.bubbles{background:linear-gradient(#e1f5fe,#b3e5fc)}
+.bubble{position:absolute;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;border:2px solid rgba(255,255,255,.95);background:radial-gradient(circle at 32% 30%,#fff 0 12%,rgba(255,255,255,.35) 13% 40%,rgba(129,212,250,.35) 70%,rgba(79,195,247,.5));cursor:pointer;padding:6px;animation:bob2 3s ease-in-out infinite}
+.bubble .bfish{display:block;width:100%;height:100%}.bubble .bfish svg{width:100%;height:100%}
+.bubble.gone{animation:popout .25s forwards;pointer-events:none}
+@keyframes bob2{0%,100%{transform:translateY(-4px)}50%{transform:translateY(5px)}}
+@keyframes popout{to{transform:scale(1.5);opacity:0}}
+/* fair share */
+.fs-jar{display:flex;flex-wrap:wrap;gap:2px;align-items:center;justify-content:center;min-height:40px;padding:4px 10px;border:2px solid #b0bec5;border-radius:12px;background:#f5f9fc;max-width:var(--sw)}
+.fs-label{font-size:13px;color:var(--muted);margin-right:6px;font-weight:700}
+.ck{width:28px;height:28px;display:inline-block}.ck svg{width:100%;height:100%}
+.fs-row{display:flex;gap:10px;justify-content:center;width:var(--sw)}
+.fs-col{flex:1;max-width:160px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.fs-pal{width:min(64px,calc(var(--sh) * .2));aspect-ratio:1}.fs-pal svg{width:100%;height:100%}
+.fs-pile{display:flex;flex-wrap:wrap;justify-content:center;min-height:30px;max-width:120px}
+.fs-btns{display:flex;gap:6px}
+/* clock */
+.clock-face{width:min(170px,calc(var(--sh) - 90px));aspect-ratio:1}.clock-face svg{width:100%;height:100%}
+/* picky monster + drag pieces */
+.piece{position:absolute;width:64px;height:64px;cursor:grab;touch-action:none;z-index:3;filter:drop-shadow(0 3px 3px rgba(0,0,0,.2));transition:left .25s,top .25s}
+.piece.drag{transition:none;cursor:grabbing;z-index:5;transform:scale(1.1)}
+.piece svg{width:100%;height:100%;pointer-events:none}
+.pm-monster{position:absolute;left:4%;top:50%;transform:translateY(-50%);height:88%;aspect-ratio:1;max-width:52%}
+.pm-monster svg{width:100%;height:100%}
+.pm-monster.chomp{animation:boom .3s 2}
+.pm-snack.eaten{transform:scale(0);transition:transform .3s}
+/* dusty window */
+.dw-stage{background:#e3f2fd;border:6px solid #8d6e63;cursor:crosshair}
+.dw-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 min(120px,calc(var(--sh) * .4)) var(--font);color:#1d4fa3}
+.dw-dust{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+/* stop on green */
+.sg-track{position:relative;width:calc(var(--sw) - 20px);height:56px;margin:min(30px,calc(var(--sh) * .1)) 0;border-radius:28px;background:#e3e8f0;border:2px solid #c9d4e8}
+.sg-zone{position:absolute;top:0;bottom:0;background:#81c784;border-left:2px solid #2e9b4f;border-right:2px solid #2e9b4f}
+.sg-zone.hit{background:#43a047}
+.sg-dot{position:absolute;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#ffca28;border:3px solid #f57f17;box-shadow:0 0 12px #ffca28}
+.sg-dot.frozen{background:#fff}
+.sg-stop{min-width:180px;min-height:64px;font-size:24px;background:#e53935;border-color:#c62828}
+/* paint by numbers */
+.pn-pic{width:min(240px,calc(var(--sh) - 10px),calc(var(--sw) - 120px));aspect-ratio:1;border:2px solid #c9d4e8;border-radius:8px;overflow:hidden}
+.pn-svg{width:100%;height:100%;display:block}
+.pn-svg [data-r]{fill:#fff;stroke:#90a4ae;stroke-width:.8;cursor:pointer;transition:fill .2s}
+.pn-svg text{font:800 8px var(--font);fill:#455a64;text-anchor:middle;pointer-events:none}
+.pn-key{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.pn-paint{min-width:52px;min-height:48px;font-size:20px;padding:0 6px;gap:4px}
+.pn-paint i{width:22px;height:22px;border-radius:50%;border:2px solid rgba(0,0,0,.2)}
+.pn-row{gap:10px}
+/* balance */
+.bs-scale{position:relative;width:min(340px,var(--sw));height:min(150px,calc(var(--sh) - 90px))}
+.bs-beam{position:absolute;left:0;right:0;top:20%;height:8px;background:#8d6e63;border-radius:4px;transition:transform .4s cubic-bezier(.3,1.4,.6,1)}
+.bs-pan{position:absolute;top:8px;width:42%;min-height:40px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;padding:4px;border-radius:0 0 30px 30px;border:3px solid #8d6e63;border-top:0;transition:transform .4s;background:rgba(255,255,255,.6)}
+.bs-pan.l{left:0}.bs-pan.r{right:0}
+.bs-post{position:absolute;left:50%;top:20%;bottom:0;width:10px;margin-left:-5px;background:#6d4c41;border-radius:4px 4px 0 0}
+.bs-blk{min-width:30px;height:30px;padding:0 4px;border-radius:6px;background:#ffb74d;border:2px solid #ef6c00;font:800 16px/26px var(--font);text-align:center}
+.bs-blk.big{min-width:40px;height:40px;font-size:22px;line-height:36px;background:#90caf9;border-color:#1e88e5}
+.bs-scale.level .bs-beam{background:#2e9b4f}
+.bs-pick{min-width:56px;min-height:56px}
+/* copycat */
+.cc-pads{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(240px,calc(var(--sh) - 70px));aspect-ratio:1}
+.cc-pad{border:0;border-radius:18px;cursor:pointer;opacity:.55;transition:opacity .12s,transform .12s;min-height:48px}
+.cc-pad.lit{opacity:1;transform:scale(1.05);box-shadow:0 0 18px rgba(255,255,255,.9) inset}
+.cc-green{background:#43a047}.cc-red{background:#e53935}.cc-yellow{background:#fdd835}.cc-blue{background:#1e88e5}
+.cc-pads.busy .cc-pad{cursor:default}
+/* cups */
+.cs-stage{background:linear-gradient(#f4f7fb 70%,#d7ccc8 70%)}
+.cup{position:absolute;bottom:14%;width:min(25%,calc(var(--sh) * .45));aspect-ratio:1;transform:translateX(-50%);border:0;background:none;padding:0;cursor:pointer;transition:left .5s ease-in-out,transform .3s;z-index:2}
+.cup svg{width:100%;height:100%}
+.cup.up{transform:translate(-50%,-55%)}
+.cup.hop{z-index:3}
+.cs-ball{position:absolute;bottom:14%;width:min(10%,calc(var(--sh) * .16));aspect-ratio:1;transform:translateX(-50%);z-index:1}
+.cs-ball svg{width:100%;height:100%}.cs-ball.hidden{visibility:hidden}
+/* oven dial */
+.od-box{position:relative;width:min(250px,calc(var(--sh) - 10px),calc(var(--sw) - 130px));aspect-ratio:1;border-radius:50%;background:#eceff1;border:3px solid #b0bec5}
+.od-label{position:absolute;transform:translate(-50%,-50%);font:700 13px var(--font);color:#37474f;white-space:nowrap}
+.od-knob{position:absolute;left:50%;top:50%;width:52%;aspect-ratio:1;border-radius:50%;background:radial-gradient(#fafafa,#cfd8dc);border:3px solid #78909c;cursor:grab;touch-action:none;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:transform .15s}
+.od-knob i{position:absolute;left:50%;top:-2px;width:8px;height:44%;margin-left:-4px;border-radius:4px;background:#e53935}
+.od-row{gap:10px}
+/* spot difference */
+.sd-wrap{display:flex;gap:12px;justify-content:center}
+.sd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:min(calc((var(--sw) - 12px) / 2),var(--sh));aspect-ratio:1;padding:4px;background:#e3e8f0;border-radius:10px}
+.sd-cell{border:0;border-radius:6px;background:#fff;padding:3px;cursor:pointer;min-width:0;min-height:0}
+.sd-cell svg{width:100%;height:100%}
+.sd-cell.found{box-shadow:0 0 0 3px var(--ok) inset}
+.sd-cell.nope{animation:wobble .4s}
+/* tidy up */
+.tu-stage{background:#fff8e1}
+.tu-bin{position:absolute;bottom:4%;width:42%;height:48%;border:3px dashed #8d6e63;border-radius:14px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font:800 15px var(--font);color:#6d4c41}
+.tu-bin.bowl{left:4%;background:rgba(129,199,132,.18);border-color:#43a047;color:#2e7d32}
+.tu-bin.box{right:4%;background:rgba(144,202,249,.22);border-color:#1e88e5;color:#1565c0}
+/* maze */
+.mz-grid{position:relative;display:grid;grid-template-columns:repeat(5,1fr);width:min(250px,calc(var(--sh) - 6px),calc(var(--sw) - 180px));min-width:170px;aspect-ratio:1;background:#fffdf5;border-radius:6px}
+.mz-cell{border:2px solid transparent}
+.mz-cell.wn{border-top-color:#5d4037}.mz-cell.we{border-right-color:#5d4037}.mz-cell.ws{border-bottom-color:#5d4037}.mz-cell.ww{border-left-color:#5d4037}
+.mz-tok{position:absolute;width:20%;height:20%;padding:3px;transition:left .15s,top .15s;pointer-events:none}
+.mz-tok svg{width:100%;height:100%}
+.mz-tok.flip svg{transform:scaleX(-1)}
+.mz-tok.bump{animation:wobble .3s}
+.mz-row{gap:12px}
+/* fireflies */
+.ff-stage{background:radial-gradient(circle at 50% 120%,#283593,#0d1333)}
+.ff{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border:0;background:none;padding:4px;cursor:pointer;opacity:.45;transition:opacity .15s,filter .15s}
+.ff svg{width:100%;height:100%}
+.ff .glow{fill:#555}
+.ff.lit{opacity:1;filter:drop-shadow(0 0 10px #ffee58)}.ff.lit .glow{fill:#ffee58}
+.ff.caught{animation:tojar .6s forwards;pointer-events:none}
+@keyframes tojar{to{opacity:0;transform:translateY(40px) scale(.3)}}
+.ff-jar{position:absolute;right:8px;bottom:8px;padding:6px 12px;border-radius:10px 10px 16px 16px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.6);color:#fff59d;font:800 18px var(--font)}
+.ff-jar.pop{animation:pop .3s}
+/* jigsaw */
+.jg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:min(260px,calc(var(--sh) - 6px),calc(var(--sw) - 96px));aspect-ratio:1;background:#90a4ae;padding:3px;border-radius:8px}
+.jg-cell{border:0;padding:0;background:#fff;cursor:pointer;overflow:hidden;min-width:0;min-height:0}
+.jg-cell svg{width:100%;height:100%;display:block}
+.jg-cell.sel{outline:4px solid #ffb300;outline-offset:-4px}
+.jg-peek{width:76px;aspect-ratio:1;border:2px solid #c9d4e8;border-radius:6px;overflow:hidden;opacity:.85}.jg-peek svg{width:100%;height:100%;display:block}
+/* lights on */
+.lo-house{display:flex;flex-direction:column;align-items:center}
+.lo-roof{width:0;height:0;border-left:min(130px,calc(var(--sh) * .38)) solid transparent;border-right:min(130px,calc(var(--sh) * .38)) solid transparent;border-bottom:min(46px,calc(var(--sh) * .12)) solid #c62828}
+.lo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;background:#a1887f;width:min(220px,calc(var(--sh) * .66));aspect-ratio:1;border-radius:0 0 6px 6px}
+.lo-win{border:3px solid #5d4037;border-radius:6px;background:#263238;cursor:pointer;min-width:48px;min-height:48px;transition:background .15s}
+.lo-win.on{background:#ffe082;box-shadow:0 0 14px #ffd54f inset}
+/* star catcher */
+.sc-stage{background:linear-gradient(#1a237e,#3949ab 85%,#558b2f 85%);cursor:none}
+.sc-star{position:absolute;top:0;width:44px;height:44px;margin-left:-22px;pointer-events:none}
+.sc-star svg{width:100%;height:100%}
+.sc-star.hide{opacity:0}.sc-star.caught{opacity:0;transition:opacity .3s}
+.sc-basket{position:absolute;bottom:2%;width:20%;height:22%;transform:translateX(-50%);pointer-events:none}
+.sc-basket svg{width:100%;height:100%}
+</style>
+</head>
+<body>
+<main id="app">
+
+<section id="scr-start" class="screen">
+  <div id="mascot" class="mascot" aria-hidden="true"></div>
+  <h1 class="logo">Totally <span>Not</span> A Robot</h1>
+  <p class="tag">A very serious test for very real humans.</p>
+  <div class="captcha-box">
+    <button id="start-check" class="big-check" type="button" role="checkbox" aria-checked="false" aria-label="I'm not a robot">
+      <span class="box"><span class="spinner"></span><span class="mark">&#10003;</span></span>
+      <span class="lbl">I'm not a robot</span>
+    </button>
+    <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="none" stroke="#4a8af4" stroke-width="5" stroke-dasharray="70 30"/><path d="M30 8 l4 9 l-9-1z" fill="#4a8af4"/></svg><small>noCAPTCHA-ish<br>Privacy · Snacks</small></div>
+  </div>
+  <div class="start-btns">
+    <button id="btn-continue" class="btn primary" type="button" hidden>Continue</button>
+    <button id="btn-levels" class="btn" type="button" hidden>Levels</button>
+    <button class="btn btn-mute icon" type="button" aria-label="Mute">&#128264;</button>
+  </div>
+  <p id="start-note" class="note"></p>
+  <p class="note small">Tap the box to begin. Sound starts after your first tap.</p>
+</section>
+
+<section id="scr-game" class="screen" hidden>
+  <header class="topbar">
+    <button id="btn-home" class="btn icon" type="button" aria-label="Home">&#8962;</button>
+    <div class="tb-mid"><div id="lvl-num" class="lvl-num">Level 1</div><div id="lvl-title" class="lvl-title"></div><div id="dots" class="dots"></div></div>
+    <button class="btn btn-mute icon" type="button" aria-label="Mute">&#128264;</button>
+  </header>
+  <div id="panel" class="panel">
+    <div id="panel-instr" class="panel-instr"></div>
+    <div id="panel-body" class="panel-body"></div>
+    <div id="hint" class="hint" hidden></div>
+    <div class="panel-foot">
+      <button id="btn-refresh" class="btn icon ghost" type="button" aria-label="New puzzle" title="New puzzle">&#8635;</button>
+      <div id="quip" class="quip" hidden aria-live="polite"></div>
+      <button id="btn-verify" class="btn verify" type="button">Verify</button>
+    </div>
+    <div id="pass-overlay" class="pass-overlay" hidden><div class="pass-card"><div class="pass-tick">&#10003;</div><div id="pass-text">Human!</div></div></div>
+  </div>
+</section>
+
+<section id="scr-cert" class="screen" hidden>
+  <div id="confetti" class="confetti"></div>
+  <div class="cert">
+    <div id="cert-seal" class="seal"></div>
+    <div class="cert-head">Official Certificate of</div>
+    <div class="cert-title">CERTIFIED HUMAN</div>
+    <p class="cert-body">The bearer of this certificate has passed every test, outsmarted the robot detector, and is officially, totally, <b>not a robot</b>.</p>
+    <dl class="cert-stats">
+      <div><dt>Time</dt><dd id="cert-time">0:00</dd></div>
+      <div><dt>Wobbles</dt><dd id="cert-fails">0</dd></div>
+      <div class="wide"><dt>Rating</dt><dd id="cert-rating"></dd></div>
+    </dl>
+    <div class="cert-sign"><span>Dr. Beep Boop<small>Chief Human Inspector (a human, honest)</small></span><span id="cert-date"></span></div>
+  </div>
+  <div class="start-btns">
+    <button id="btn-again" class="btn primary" type="button">Play again</button>
+    <button id="btn-cert-levels" class="btn" type="button">Levels</button>
+  </div>
+</section>
+
+<div id="levels-modal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head"><h2>Levels</h2><button id="btn-levels-close" class="btn icon" type="button" aria-label="Close">&#10005;</button></div>
+    <div id="levels-grid" class="levels-grid"></div>
+  </div>
+</div>
+</main>
+<script>"use strict";
+/* ==== js/00-core.js ==== */
+;(function(){
+/* Totally Not A Robot — core namespace + helpers */
+var TNR = (window.TNR = window.TNR || {});
+TNR.version = '2.0.0';
+TNR.levels = [];
+TNR.registerLevel = function (def) { TNR.levels.push(def); };
+
+TNR.el = function (tag, attrs, children) {
+  var e = document.createElement(tag);
+  if (attrs) for (var k in attrs) {
+    if (k === 'class') e.className = attrs[k];
+    else if (k === 'html') e.innerHTML = attrs[k];
+    else if (k === 'text') e.textContent = attrs[k];
+    else if (k === 'style') e.style.cssText = attrs[k];
+    else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  (children || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return e;
+};
+TNR.shuffle = function (a) {
+  a = a.slice();
+  for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+};
+TNR.pick = function (a) { return a[Math.floor(Math.random() * a.length)]; };
+TNR.rint = function (lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); };
+TNR.clamp = function (v, lo, hi) { return Math.max(lo, Math.min(hi, v)); };
+TNR.fmtTime = function (ms) {
+  var s = Math.max(0, Math.round(ms / 1000)), m = Math.floor(s / 60);
+  return m + ':' + String(s % 60).padStart(2, '0');
+};
+/* A tile grid used by several picture levels. items: [{svg, label, data}] */
+TNR.tileGrid = function (ctx, items, opts) {
+  opts = opts || {};
+  var grid = TNR.el('div', { class: 'tile-grid cols' + (opts.cols || 3), role: 'group' });
+  var tiles = items.map(function (it, i) {
+    var t = TNR.el('button', { class: 'tile', type: 'button', 'aria-label': it.label || ('tile ' + (i + 1)), 'data-i': String(i), html: it.svg || '' });
+    t.appendChild(TNR.el('span', { class: 'tick', html: '&#10003;' }));
+    t.addEventListener('click', function () {
+      if (opts.single) tiles.forEach(function (o) { if (o !== t) o.classList.remove('sel'); });
+      t.classList.toggle('sel');
+      TNR.sfx.tap();
+      if (opts.onChange) opts.onChange();
+    });
+    grid.appendChild(t);
+    return t;
+  });
+  ctx.body.appendChild(grid);
+  return {
+    el: grid, tiles: tiles,
+    selected: function () { return tiles.map(function (t, i) { return t.classList.contains('sel') ? i : -1; }).filter(function (i) { return i >= 0; }); }
+  };
+};
+TNR.sameSet = function (a, b) {
+  if (a.length !== b.length) return false;
+  var s = a.slice().sort().join(','), t = b.slice().sort().join(',');
+  return s === t;
+};
+
+})();
+/* ==== js/05-kit.js ==== */
+;(function(){
+/* v2 helper kit shared by levels 16-45: choice rows, progress pips, draggable pieces, geometry. */
+TNR.esc = function (s) {
+  return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+};
+/* A row of choice buttons. opts: [{v, html?, label?}] -> {el, get()} */
+TNR.choices = function (ctx, opts, cfg) {
+  cfg = cfg || {};
+  var row = TNR.el('div', { class: 'choices' + (cfg.cls ? ' ' + cfg.cls : '') }), chosen = null;
+  var btns = opts.map(function (o) {
+    var b = TNR.el('button', { class: 'btn choice' + (cfg.btnCls ? ' ' + cfg.btnCls : ''), type: 'button', 'data-v': String(o.v), 'aria-label': o.label || String(o.v), html: o.html != null ? o.html : TNR.esc(o.v) });
+    b.addEventListener('click', function () {
+      if (b.disabled) return;
+      btns.forEach(function (x) { x.classList.remove('sel'); });
+      b.classList.add('sel'); chosen = o.v; TNR.sfx.tap();
+      if (cfg.onPick) cfg.onPick(o.v, b);
+    });
+    row.appendChild(b);
+    return b;
+  });
+  (cfg.parent || ctx.body).appendChild(row);
+  return {
+    el: row, buttons: btns,
+    get: function () { return chosen; },
+    clear: function () { chosen = null; btns.forEach(function (x) { x.classList.remove('sel'); }); },
+    disable: function (d) { btns.forEach(function (x) { x.disabled = !!d; }); }
+  };
+};
+/* Little progress pips (e.g. rounds won). */
+TNR.pips = function (n) {
+  var w = TNR.el('div', { class: 'pips', 'aria-hidden': 'true' }), ps = [];
+  for (var i = 0; i < n; i++) { var p = TNR.el('i'); w.appendChild(p); ps.push(p); }
+  return { el: w, set: function (k) { ps.forEach(function (p, i) { p.classList.toggle('on', i < k); }); } };
+};
+TNR.centerOf = function (el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+TNR.inside = function (pt, el, pad) {
+  var r = el.getBoundingClientRect(); pad = pad || 0;
+  return pt.x >= r.left - pad && pt.x <= r.right + pad && pt.y >= r.top - pad && pt.y <= r.bottom + pad;
+};
+/* Place an absolutely-positioned piece inside its stage (stage-relative px, clamped). */
+TNR.placeIn = function (stage, piece, x, y) {
+  piece.style.left = TNR.clamp(x, 0, Math.max(0, stage.clientWidth - piece.offsetWidth)) + 'px';
+  piece.style.top = TNR.clamp(y, 0, Math.max(0, stage.clientHeight - piece.offsetHeight)) + 'px';
+};
+/* Pointer-event drag (mouse + touch + pen) of a piece inside a stage. cfg.onDrop(centerPoint) */
+TNR.draggable = function (ctx, piece, stage, cfg) {
+  cfg = cfg || {};
+  var drag = null;
+  piece.style.touchAction = 'none';
+  piece.addEventListener('pointerdown', function (e) {
+    if (cfg.enabled && !cfg.enabled()) return;
+    var r = piece.getBoundingClientRect();
+    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    piece.classList.add('drag'); try { piece.setPointerCapture(e.pointerId); } catch (x) {}
+    TNR.sfx.tap(); e.preventDefault();
+    if (cfg.onStart) cfg.onStart();
+  });
+  piece.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var s = stage.getBoundingClientRect();
+    TNR.placeIn(stage, piece, e.clientX - s.left - drag.dx, e.clientY - s.top - drag.dy);
+  });
+  function drop() {
+    if (!drag) return; drag = null; piece.classList.remove('drag');
+    if (cfg.onDrop && !ctx._dead) cfg.onDrop(TNR.centerOf(piece));
+  }
+  piece.addEventListener('pointerup', drop); piece.addEventListener('pointercancel', drop);
+};
+
+})();
+/* ==== js/10-art.js ==== */
+;(function(){
+/* Original hand-written SVG art (viewBox 0 0 100 100). */
+(function () {
+  function svg(inner, extra) { return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"' + (extra || '') + '>' + inner + '</svg>'; }
+  var eyes = function (x1, x2, y, r) { return '<circle cx="' + x1 + '" cy="' + y + '" r="' + r + '" fill="#222"/><circle cx="' + x2 + '" cy="' + y + '" r="' + r + '" fill="#222"/><circle cx="' + (x1 + r / 3) + '" cy="' + (y - r / 3) + '" r="' + (r / 3) + '" fill="#fff"/><circle cx="' + (x2 + r / 3) + '" cy="' + (y - r / 3) + '" r="' + (r / 3) + '" fill="#fff"/>'; };
+  var A = {};
+  A.pumpkin = function () {
+    return svg('<path d="M50 30 q-3-12 6-16" stroke="#3d7a2a" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M56 22 q14-8 18 4 q-12 2-18-4z" fill="#5fae3e"/>' +
+      '<ellipse cx="30" cy="60" rx="20" ry="27" fill="#e8741c"/><ellipse cx="70" cy="60" rx="20" ry="27" fill="#e8741c"/>' +
+      '<ellipse cx="50" cy="60" rx="20" ry="29" fill="#f68a2a"/>' +
+      '<path d="M40 40 q-6 20 0 40 M60 40 q6 20 0 40" stroke="#c95f10" stroke-width="2.5" fill="none"/>');
+  };
+  A.apple = function () {
+    return svg('<path d="M50 30 q2-12 8-16" stroke="#6b4423" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M54 24 q14-10 22 0 q-12 8-22 0z" fill="#4caf50"/>' +
+      '<path d="M50 32 c-12-8-36-4-34 24 c2 22 18 34 34 28 c16 6 32-6 34-28 c2-28-22-32-34-24z" fill="#e53935"/>' +
+      '<ellipse cx="34" cy="48" rx="5" ry="9" fill="#ff8a80" opacity=".7"/>');
+  };
+  A.banana = function () {
+    return svg('<path d="M18 30 q6 46 64 44 q6-2 2-8 q-46 2-56-38z" fill="#ffd54f" stroke="#c9a227" stroke-width="2"/>' +
+      '<path d="M18 30 l-4-6 l8 0z" fill="#6d4c41"/><path d="M84 66 l6 2 l-3 5z" fill="#6d4c41"/>');
+  };
+  A.strawberry = function () {
+    var seeds = '';
+    [[40, 45], [55, 42], [48, 55], [38, 62], [60, 58], [50, 70], [44, 78], [62, 70], [32, 50], [66, 46]].forEach(function (p) { seeds += '<ellipse cx="' + p[0] + '" cy="' + p[1] + '" rx="1.6" ry="2.6" fill="#ffe082"/>'; });
+    return svg('<path d="M50 90 C20 70 18 40 30 32 C40 26 60 26 70 32 C82 40 80 70 50 90z" fill="#e53950"/>' + seeds +
+      '<path d="M30 32 l10-12 l6 8 l4-12 l4 12 l6-8 l10 12 q-20 6-40 0z" fill="#43a047"/>');
+  };
+  A.orange = function () {
+    return svg('<circle cx="50" cy="55" r="32" fill="#fb8c00"/><circle cx="40" cy="44" r="6" fill="#ffb74d" opacity=".7"/>' +
+      '<path d="M50 24 q8-10 18-6 q-8 10-18 6z" fill="#43a047"/><circle cx="50" cy="24" r="2.5" fill="#6d4c41"/>');
+  };
+  A.cat = function (col) {
+    col = col || '#f4a259';
+    return svg('<path d="M22 42 L26 12 L44 30z M78 42 L74 12 L56 30z" fill="' + col + '" stroke="#5a3a1a" stroke-width="2"/>' +
+      '<path d="M28 34 L29 20 L38 30z M72 34 L71 20 L62 30z" fill="#ffb3c1"/>' +
+      '<ellipse cx="50" cy="56" rx="34" ry="30" fill="' + col + '" stroke="#5a3a1a" stroke-width="2"/>' + eyes(38, 62, 52, 5) +
+      '<path d="M46 62 h8 l-4 5z" fill="#ff6f91"/><path d="M50 67 q-5 6-10 2 M50 67 q5 6 10 2" stroke="#5a3a1a" stroke-width="2" fill="none"/>' +
+      '<path d="M18 60 h18 M18 67 l18-3 M82 60 h-18 M82 67 l-18-3" stroke="#5a3a1a" stroke-width="1.5"/>');
+  };
+  A.dog = function () {
+    return svg('<ellipse cx="50" cy="56" rx="30" ry="30" fill="#c8915a" stroke="#5a3a1a" stroke-width="2"/>' +
+      '<path d="M24 34 q-16 4-12 32 q8 4 14-6z M76 34 q16 4 12 32 q-8 4-14-6z" fill="#7a4e2a"/>' +
+      '<ellipse cx="50" cy="70" rx="15" ry="11" fill="#f1d3b0"/>' + eyes(39, 61, 50, 4.5) +
+      '<ellipse cx="50" cy="64" rx="6" ry="4.5" fill="#222"/><path d="M50 68 v5 q-5 4-9 0 M50 73 q5 4 9 0" stroke="#222" stroke-width="2" fill="none"/>' +
+      '<path d="M47 76 q3 9 7 0z" fill="#ff6f91"/>');
+  };
+  A.fish = function () {
+    return svg('<path d="M14 50 q30-34 62 0 q-32 34-62 0z" fill="#4fc3f7" stroke="#0277bd" stroke-width="2"/>' +
+      '<path d="M74 50 l18-16 v32z" fill="#29b6f6" stroke="#0277bd" stroke-width="2"/><circle cx="28" cy="46" r="4" fill="#222"/>' +
+      '<path d="M44 38 q6 12 0 24" stroke="#0277bd" stroke-width="2" fill="none"/>');
+  };
+  A.toaster = function () {
+    return svg('<path d="M30 30 q4-12 10-2 M58 30 q4-12 10-2" stroke="#d7a86e" stroke-width="10" fill="none" stroke-linecap="round"/>' +
+      '<rect x="14" y="34" width="72" height="50" rx="14" fill="#b0bec5" stroke="#546e7a" stroke-width="2"/>' +
+      '<rect x="24" y="30" width="18" height="6" rx="2" fill="#37474f"/><rect x="54" y="30" width="18" height="6" rx="2" fill="#37474f"/>' +
+      '<rect x="80" y="48" width="10" height="6" rx="2" fill="#37474f"/>' + eyes(38, 62, 56, 4) + '<path d="M42 68 q8 6 16 0" stroke="#222" stroke-width="2.5" fill="none"/>');
+  };
+  A.robot = function () {
+    return svg('<line x1="50" y1="8" x2="50" y2="22" stroke="#607d8b" stroke-width="4"/><circle cx="50" cy="8" r="5" fill="#ff5252"/>' +
+      '<rect x="20" y="22" width="60" height="50" rx="10" fill="#90a4ae" stroke="#455a64" stroke-width="2.5"/>' +
+      '<rect x="30" y="34" width="14" height="12" rx="2" fill="#00e5ff"/><rect x="56" y="34" width="14" height="12" rx="2" fill="#00e5ff"/>' +
+      '<rect x="34" y="56" width="32" height="8" rx="2" fill="#455a64"/><path d="M38 56 v8 M46 56 v8 M54 56 v8 M62 56 v8" stroke="#90a4ae" stroke-width="2"/>' +
+      '<rect x="12" y="38" width="8" height="16" rx="3" fill="#607d8b"/><rect x="80" y="38" width="8" height="16" rx="3" fill="#607d8b"/>' +
+      '<rect x="34" y="74" width="32" height="18" rx="4" fill="#78909c"/>');
+  };
+  A.frog = function () {
+    return svg('<ellipse cx="50" cy="62" rx="36" ry="26" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/>' +
+      '<circle cx="32" cy="38" r="12" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/><circle cx="68" cy="38" r="12" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/>' +
+      '<circle cx="32" cy="38" r="7" fill="#fff"/><circle cx="68" cy="38" r="7" fill="#fff"/><circle cx="33" cy="39" r="3.5" fill="#222"/><circle cx="69" cy="39" r="3.5" fill="#222"/>' +
+      '<path d="M30 66 q20 14 40 0" stroke="#2e7d32" stroke-width="3" fill="none" stroke-linecap="round"/>');
+  };
+  A.owl = function () {
+    return svg('<path d="M24 22 l10 12 h32 l10-12 v50 q-26 24-52 0z" fill="#8d6e63" stroke="#4e342e" stroke-width="2"/>' +
+      '<circle cx="38" cy="44" r="11" fill="#fff"/><circle cx="62" cy="44" r="11" fill="#fff"/><circle cx="38" cy="44" r="5" fill="#222"/><circle cx="62" cy="44" r="5" fill="#222"/>' +
+      '<path d="M46 54 l4 8 l4-8z" fill="#ffa000"/><ellipse cx="50" cy="74" rx="14" ry="10" fill="#bcaaa4"/>');
+  };
+  A.ghost = function () {
+    return svg('<path d="M24 86 V44 a26 26 0 0 1 52 0 V86 l-9-7 l-8 7 l-9-7 l-9 7 l-8-7z" fill="#f5f5ff" stroke="#9fa8da" stroke-width="2"/>' + eyes(40, 60, 46, 4.5) +
+      '<ellipse cx="50" cy="60" rx="5" ry="6" fill="#222"/>');
+  };
+  A.leaf = function () {
+    return svg('<path d="M20 80 C20 40 50 18 84 16 C82 52 60 80 20 80z" fill="#8bc34a" stroke="#558b2f" stroke-width="2"/><path d="M20 80 L70 30" stroke="#558b2f" stroke-width="2.5"/>');
+  };
+  A.cupcake = function () {
+    return svg('<path d="M24 56 l8 32 h36 l8-32z" fill="#ffcc80" stroke="#e65100" stroke-width="2"/>' +
+      '<path d="M36 58 l2 28 M50 58 v28 M64 58 l-2 28" stroke="#e65100" stroke-width="1.5"/>' +
+      '<path d="M20 58 q-4-16 12-18 q0-16 18-14 q18-2 18 14 q16 2 12 18z" fill="#f48fb1" stroke="#c2185b" stroke-width="2"/><circle cx="50" cy="20" r="6" fill="#e53935"/>');
+  };
+  A.sun = function () {
+    var r = ''; for (var i = 0; i < 8; i++) { var a = i * Math.PI / 4; r += '<line x1="' + (50 + Math.cos(a) * 30) + '" y1="' + (50 + Math.sin(a) * 30) + '" x2="' + (50 + Math.cos(a) * 44) + '" y2="' + (50 + Math.sin(a) * 44) + '" stroke="#ffb300" stroke-width="5" stroke-linecap="round"/>'; }
+    return svg(r + '<circle cx="50" cy="50" r="24" fill="#ffd54f"/>' + eyes(42, 58, 46, 3) + '<path d="M42 56 q8 6 16 0" stroke="#222" stroke-width="2" fill="none"/>');
+  };
+  A.sock = function () {
+    return svg('<path d="M36 12 h28 v44 l14 14 q8 10-2 18 q-8 6-18-2 l-24-22 z" fill="#ab47bc" stroke="#6a1b9a" stroke-width="2"/>' +
+      '<rect x="36" y="12" width="28" height="10" fill="#fff" stroke="#6a1b9a" stroke-width="2"/><path d="M36 34 h28 M36 44 h28" stroke="#fff" stroke-width="4"/>');
+  };
+  A.rocket = function () {
+    return svg('<path d="M50 8 q20 20 16 56 h-32 q-4-36 16-56z" fill="#eceff1" stroke="#455a64" stroke-width="2"/><circle cx="50" cy="38" r="8" fill="#4fc3f7" stroke="#455a64" stroke-width="2"/>' +
+      '<path d="M34 50 l-12 22 h14z M66 50 l12 22 h-14z" fill="#e53935"/><path d="M40 66 q10 26 20 0z" fill="#ffa000"/>');
+  };
+  A.hat = function () {
+    return svg('<ellipse cx="50" cy="78" rx="44" ry="10" fill="#37474f"/><rect x="26" y="20" width="48" height="58" rx="6" fill="#455a64"/>' +
+      '<rect x="26" y="60" width="48" height="10" fill="#e53935"/><circle cx="62" cy="65" r="5" fill="#ffd54f"/>');
+  };
+  /* scene with a clear "up": sky, sun top, grass bottom, house, tree */
+  A.scene = function () {
+    return svg('<rect width="100" height="100" fill="#bfe6ff"/><rect y="74" width="100" height="26" fill="#7cc35a"/>' +
+      '<circle cx="82" cy="18" r="10" fill="#ffd54f"/><path d="M8 24 q6-8 14 0 q6-6 12 2 h-26z" fill="#fff"/>' +
+      '<rect x="22" y="46" width="34" height="30" fill="#ffcc80" stroke="#8d6e63" stroke-width="2"/><path d="M18 48 L39 28 L60 48z" fill="#e53935" stroke="#8d6e63" stroke-width="2"/>' +
+      '<rect x="34" y="58" width="10" height="18" fill="#8d6e63"/><rect x="26" y="52" width="7" height="7" fill="#90caf9"/>' +
+      '<rect x="74" y="52" width="6" height="24" fill="#795548"/><circle cx="77" cy="46" r="13" fill="#43a047"/>');
+  };
+  A.dogBig = function () {
+    /* full dog, head near top for hat drop */
+    return svg('<ellipse cx="52" cy="78" rx="26" ry="16" fill="#c8915a" stroke="#5a3a1a" stroke-width="1.5"/>' +
+      '<rect x="32" y="84" width="8" height="12" rx="3" fill="#c8915a"/><rect x="62" y="84" width="8" height="12" rx="3" fill="#c8915a"/>' +
+      '<path d="M78 74 q14-10 10-22" stroke="#c8915a" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="50" cy="50" rx="20" ry="18" fill="#c8915a" stroke="#5a3a1a" stroke-width="1.5"/>' +
+      '<path d="M32 40 q-10 4-8 22 q6 2 10-4z M68 40 q10 4 8 22 q-6 2-10-4z" fill="#7a4e2a"/>' +
+      '<ellipse cx="50" cy="58" rx="10" ry="7" fill="#f1d3b0"/>' + eyes(43, 57, 47, 3) +
+      '<ellipse cx="50" cy="54" rx="4" ry="3" fill="#222"/><path d="M47 62 q3 6 6 0z" fill="#ff6f91"/>');
+  };
+  A.seal = function () {
+    var p = ''; for (var i = 0; i < 24; i++) { var a = i * Math.PI / 12, r = i % 2 ? 40 : 46; p += (i ? 'L' : 'M') + (50 + Math.cos(a) * r).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); }
+    return svg('<path d="' + p + 'z" fill="#ffca28" stroke="#f57f17" stroke-width="2"/><circle cx="50" cy="50" r="30" fill="#fff8e1" stroke="#f57f17" stroke-width="2"/>' +
+      '<path d="M36 50 l10 10 l20-22" stroke="#2e7d32" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>');
+  };
+  A.empty = function () { return ''; };
+  TNR.art = A;
+})();
+
+})();
+/* ==== js/12-art2.js ==== */
+;(function(){
+/* More original hand-written SVG art for v2 levels (viewBox 0 0 100 100). */
+(function () {
+  function svg(inner, vb) { return '<svg viewBox="' + (vb || '0 0 100 100') + '" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + inner + '</svg>'; }
+  var A = TNR.art;
+  A.socky = function (col, pat) {
+    var body = '<path d="M36 8 h28 v50 l12 12 q8 10-2 18 q-8 6-18-2 l-22-20 z" fill="' + col + '" stroke="#333" stroke-width="2.5"/>' +
+      '<rect x="36" y="8" width="28" height="9" fill="#fff" opacity=".85" stroke="#333" stroke-width="2.5"/>';
+    var p = '';
+    if (pat === 'stripes') p = '<rect x="37.5" y="24" width="25" height="6" fill="#fff"/><rect x="37.5" y="36" width="25" height="6" fill="#fff"/><rect x="37.5" y="48" width="25" height="6" fill="#fff"/>';
+    else if (pat === 'dots') p = '<circle cx="44" cy="27" r="3.5" fill="#fff"/><circle cx="56" cy="35" r="3.5" fill="#fff"/><circle cx="44" cy="45" r="3.5" fill="#fff"/><circle cx="56" cy="54" r="3.5" fill="#fff"/><circle cx="62" cy="72" r="3.5" fill="#fff"/>';
+    return svg(body + p);
+  };
+  A.balloon = function (col) {
+    return svg('<path d="M50 78 q-4 8 2 12 q-6 4 0 8" stroke="#777" stroke-width="1.5" fill="none"/>' +
+      '<ellipse cx="50" cy="40" rx="30" ry="36" fill="' + (col || '#ef5350') + '"/><path d="M46 75 h8 l-4 5z" fill="' + (col || '#ef5350') + '"/>' +
+      '<ellipse cx="38" cy="26" rx="6" ry="10" fill="#fff" opacity=".45"/>', '0 0 100 100');
+  };
+  A.cookie = function () {
+    return svg('<circle cx="50" cy="50" r="38" fill="#e0a95b" stroke="#a86b2d" stroke-width="3"/>' +
+      '<circle cx="36" cy="38" r="5" fill="#5d3a1a"/><circle cx="60" cy="34" r="4" fill="#5d3a1a"/><circle cx="54" cy="58" r="5" fill="#5d3a1a"/><circle cx="34" cy="62" r="4" fill="#5d3a1a"/><circle cx="68" cy="56" r="3.5" fill="#5d3a1a"/>');
+  };
+  A.monster = function (open) {
+    var mouth = open ? '<ellipse cx="50" cy="66" rx="24" ry="16" fill="#5a1530"/><path d="M30 60 l5 7 l5-7 l5 7 l5-7 l5 7 l5-7 l5 7 l5-7" fill="#fff"/>'
+      : '<path d="M30 64 q20 14 40 0" stroke="#5a1530" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    return svg('<path d="M24 22 l6 12 M76 22 l-6 12" stroke="#6a3d9a" stroke-width="6" stroke-linecap="round"/>' +
+      '<path d="M14 90 q-4-60 36-62 q40 2 36 62 q-8-6-12 0 q-6-6-12 0 q-6-6-12 0 q-6-6-12 0 q-4-6-12 0z" fill="#9c6ade"/>' +
+      '<circle cx="38" cy="44" r="11" fill="#fff"/><circle cx="62" cy="44" r="11" fill="#fff"/><circle cx="40" cy="46" r="5" fill="#222"/><circle cx="60" cy="46" r="5" fill="#222"/>' + mouth);
+  };
+  A.cup = function () {
+    return svg('<path d="M20 90 L30 14 h40 L80 90z" fill="#ef5350" stroke="#b71c1c" stroke-width="3"/><rect x="16" y="84" width="68" height="10" rx="4" fill="#c62828"/>' +
+      '<path d="M32 30 h36 M30 46 h40" stroke="#ffcdd2" stroke-width="5"/>');
+  };
+  A.star = function (col) {
+    return svg('<path d="M50 6 L62 36 L94 38 L69 58 L78 90 L50 72 L22 90 L31 58 L6 38 L38 36z" fill="' + (col || '#ffd54f') + '" stroke="#f9a825" stroke-width="3" stroke-linejoin="round"/>');
+  };
+  A.basket = function () {
+    return svg('<path d="M10 40 h80 l-10 46 h-60z" fill="#c8915a" stroke="#6d4c2e" stroke-width="3"/><path d="M14 52 h72 M17 66 h66 M30 40 v46 M50 40 v46 M70 40 v46" stroke="#8d6239" stroke-width="2.5"/>' +
+      '<path d="M22 40 q28-34 56 0" stroke="#6d4c2e" stroke-width="5" fill="none"/>');
+  };
+  A.firefly = function () {
+    return svg('<ellipse cx="34" cy="38" rx="16" ry="10" fill="#e3f2fd" opacity=".8" transform="rotate(-25 34 38)"/><ellipse cx="66" cy="38" rx="16" ry="10" fill="#e3f2fd" opacity=".8" transform="rotate(25 66 38)"/>' +
+      '<ellipse class="glow" cx="50" cy="66" rx="14" ry="16" fill="#cddc39"/><circle cx="50" cy="40" r="11" fill="#455a64"/><circle cx="46" cy="38" r="2.5" fill="#fff"/><circle cx="54" cy="38" r="2.5" fill="#fff"/>' +
+      '<path d="M45 30 q-6-12-12-12 M55 30 q6-12 12-12" stroke="#455a64" stroke-width="2.5" fill="none"/>');
+  };
+  A.mouse = function () {
+    return svg('<circle cx="30" cy="34" r="14" fill="#bdbdbd" stroke="#616161" stroke-width="2"/><circle cx="70" cy="34" r="14" fill="#bdbdbd" stroke="#616161" stroke-width="2"/><circle cx="30" cy="34" r="7" fill="#f8bbd0"/><circle cx="70" cy="34" r="7" fill="#f8bbd0"/>' +
+      '<ellipse cx="50" cy="58" rx="28" ry="26" fill="#bdbdbd" stroke="#616161" stroke-width="2"/><circle cx="41" cy="54" r="4" fill="#222"/><circle cx="59" cy="54" r="4" fill="#222"/><circle cx="50" cy="66" r="5" fill="#f06292"/>' +
+      '<path d="M30 66 h-16 M30 70 l-14 5 M70 66 h16 M70 70 l14 5" stroke="#616161" stroke-width="1.5"/>');
+  };
+  A.cheese = function () {
+    return svg('<path d="M10 70 L80 30 L92 66 V80 H10z" fill="#ffd54f" stroke="#f9a825" stroke-width="3" stroke-linejoin="round"/><path d="M10 70 H92" stroke="#f9a825" stroke-width="2"/>' +
+      '<circle cx="34" cy="74" r="4" fill="#f9a825"/><circle cx="62" cy="62" r="5" fill="#f9a825"/><circle cx="76" cy="74" r="3" fill="#f9a825"/>');
+  };
+  A.drum = function () {
+    return svg('<path d="M18 36 v34 q32 18 64 0 v-34" fill="#e53935" stroke="#8e1b1b" stroke-width="3"/><path d="M18 40 l16 34 l16-34 l16 34 l16-34" stroke="#ffd54f" stroke-width="3" fill="none"/>' +
+      '<ellipse cx="50" cy="36" rx="32" ry="12" fill="#fff8e1" stroke="#8e1b1b" stroke-width="3"/><path d="M70 8 L56 30 M30 8 L44 30" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/><circle cx="70" cy="8" r="5" fill="#ffcc80"/><circle cx="30" cy="8" r="5" fill="#ffcc80"/>');
+  };
+  A.ball = function () {
+    return svg('<circle cx="50" cy="50" r="38" fill="#fff" stroke="#333" stroke-width="2.5"/><path d="M50 12 q-24 38 0 76" fill="#e53935"/><path d="M50 12 q24 38 0 76" fill="#1e88e5"/><path d="M50 12 q-24 38 0 76 q24-38 0-76" fill="#ffd54f"/><circle cx="50" cy="50" r="38" fill="none" stroke="#333" stroke-width="2.5"/>');
+  };
+  A.teddy = function () {
+    return svg('<circle cx="28" cy="24" r="11" fill="#a1704a"/><circle cx="72" cy="24" r="11" fill="#a1704a"/><circle cx="50" cy="38" r="24" fill="#b98258"/><ellipse cx="50" cy="76" rx="26" ry="20" fill="#b98258"/>' +
+      '<ellipse cx="50" cy="46" rx="10" ry="7" fill="#e6c39a"/><circle cx="50" cy="43" r="3" fill="#222"/><circle cx="41" cy="34" r="3" fill="#222"/><circle cx="59" cy="34" r="3" fill="#222"/><ellipse cx="50" cy="78" rx="12" ry="10" fill="#e6c39a"/>');
+  };
+  /* simple shapes for patterns */
+  A.shape = function (k) {
+    var m = {
+      circle: '<circle cx="50" cy="50" r="34" fill="#e53935"/>',
+      square: '<rect x="18" y="18" width="64" height="64" rx="6" fill="#1e88e5"/>',
+      triangle: '<path d="M50 14 L88 84 H12z" fill="#43a047" stroke-linejoin="round"/>',
+      star: '<path d="M50 8 L61 38 L93 39 L68 58 L77 90 L50 71 L23 90 L32 58 L7 39 L39 38z" fill="#fbc02d"/>',
+      heart: '<path d="M50 86 C14 60 10 36 26 24 C38 16 48 24 50 32 C52 24 62 16 74 24 C90 36 86 60 50 86z" fill="#ec407a"/>'
+    };
+    return svg(m[k] || '');
+  };
+  A.clock = function (h, m) {
+    var ticks = '';
+    for (var i = 1; i <= 12; i++) {
+      var a = i * Math.PI / 6, x = 50 + Math.sin(a) * 36, y = 50 - Math.cos(a) * 36;
+      ticks += '<text x="' + x.toFixed(1) + '" y="' + (y + 4.5).toFixed(1) + '" font-size="12" font-weight="700" text-anchor="middle" fill="#1d2433" font-family="Arial,sans-serif">' + i + '</text>';
+    }
+    var ha = ((h % 12) + m / 60) * 30, ma = m * 6;
+    return svg('<circle cx="50" cy="50" r="46" fill="#fff" stroke="#2f6fd6" stroke-width="5"/>' + ticks +
+      '<line x1="50" y1="50" x2="50" y2="28" stroke="#1d2433" stroke-width="5.5" stroke-linecap="round" transform="rotate(' + ha + ' 50 50)"/>' +
+      '<line x1="50" y1="50" x2="50" y2="17" stroke="#e8572a" stroke-width="3.5" stroke-linecap="round" transform="rotate(' + ma + ' 50 50)"/><circle cx="50" cy="50" r="4" fill="#1d2433"/>');
+  };
+  A.arrow = function () {
+    return svg('<path d="M50 8 L86 48 H62 V92 H38 V48 H14z" fill="#2f6fd6" stroke="#1d4fa3" stroke-width="3" stroke-linejoin="round"/>');
+  };
+})();
+
+})();
+/* ==== js/20-audio.js ==== */
+;(function(){
+/* Soft WebAudio sound effects. Nothing plays until the first user gesture. */
+(function () {
+  var ac = null, master = null, muted = false;
+  function ensure() {
+    if (ac) { if (ac.state === 'suspended') try { ac.resume(); } catch (e) {} return ac; }
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ac = new AC();
+      master = ac.createGain(); master.gain.value = 0.18; master.connect(ac.destination);
+    } catch (e) { ac = null; }
+    return ac;
+  }
+  function tone(freq, start, dur, type, vol, glideTo, vibrato) {
+    if (muted || !ac) return;
+    try {
+      var t0 = ac.currentTime + (start || 0);
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t0);
+      if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t0 + dur);
+      if (vibrato) {
+        var lfo = ac.createOscillator(), lg = ac.createGain();
+        lfo.frequency.value = vibrato; lg.gain.value = freq * 0.06;
+        lfo.connect(lg); lg.connect(o.frequency); lfo.start(t0); lfo.stop(t0 + dur + 0.05);
+      }
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(vol || 0.5, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(master);
+      o.start(t0); o.stop(t0 + dur + 0.05);
+    } catch (e) {}
+  }
+  TNR.sfx = {
+    unlock: function () { ensure(); },
+    setMuted: function (m) { muted = !!m; },
+    isMuted: function () { return muted; },
+    tap: function () { tone(660, 0, 0.07, 'sine', 0.25); },
+    pop: function () { tone(520, 0, 0.12, 'triangle', 0.3, 900); },
+    wobble: function () { tone(330, 0, 0.45, 'sine', 0.35, 250, 9); },
+    good: function () { tone(523, 0, 0.18, 'triangle', 0.35); tone(784, 0.12, 0.3, 'triangle', 0.35); },
+    tick: function () { tone(880, 0, 0.05, 'sine', 0.15); },
+    note: function (f) { tone(f, 0, 0.32, 'sine', 0.3); },
+    soft: function () { tone(392, 0, 0.18, 'triangle', 0.22, 330); },
+    fanfare: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.13, 0.35, 'triangle', 0.35); }); }
+  };
+})();
+
+})();
+/* ==== js/30-save.js ==== */
+;(function(){
+/* localStorage save (schema v1). Keyed by level id so new levels can be added later without breaking saves. */
+(function () {
+  var KEY = 'totally-not-a-robot.save.v1';
+  function blank() { return { v: 1, beaten: [], current: null, totalFails: 0, elapsedMs: 0, finished: false, muted: false, bestMs: null }; }
+  TNR.save = {
+    KEY: KEY,
+    load: function () {
+      var d = blank();
+      try {
+        var raw = window.localStorage.getItem(KEY);
+        if (raw) {
+          var s = JSON.parse(raw);
+          if (s && typeof s === 'object') {
+            if (Array.isArray(s.beaten)) d.beaten = s.beaten.filter(function (x) { return typeof x === 'string'; });
+            if (typeof s.current === 'string') d.current = s.current;
+            if (typeof s.totalFails === 'number') d.totalFails = s.totalFails;
+            if (typeof s.elapsedMs === 'number') d.elapsedMs = s.elapsedMs;
+            d.finished = !!s.finished; d.muted = !!s.muted;
+            if (typeof s.bestMs === 'number') d.bestMs = s.bestMs;
+          }
+        }
+      } catch (e) {}
+      return d;
+    },
+    write: function (d) { try { window.localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch (e) { return false; } },
+    clear: function () { try { window.localStorage.removeItem(KEY); } catch (e) {} },
+    blank: blank
+  };
+})();
+
+})();
+/* ==== levels/01-pumpkins.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'pumpkins', title: 'Pumpkin Patrol',
+  instruction: '<small>Select all squares with</small><b>pumpkins</b>',
+  hint: 'Pumpkins are round and orange with a green stem. Tap every one, then press Verify!',
+  quips: ['That one is not a pumpkin. It is a lifestyle choice.', 'A pumpkin is hiding from you!', 'The pumpkins are counting on you.'],
+  passMsg: 'Pumpkin expert! ✓',
+  setup: function (ctx) {
+    var others = ['apple', 'ghost', 'leaf', 'cupcake', 'sun', 'orange', 'owl'];
+    var n = TNR.rint(3, 4), pos = TNR.shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, n);
+    var fill = TNR.shuffle(others);
+    var items = [];
+    for (var i = 0; i < 9; i++) {
+      var p = pos.indexOf(i) >= 0, k = p ? 'pumpkin' : fill[i % fill.length];
+      items.push({ svg: TNR.art[k](), label: k });
+    }
+    var g = TNR.tileGrid(ctx, items);
+    ctx.debug = { answer: pos.slice().sort() };
+    return {
+      check: function () {
+        var s = g.selected();
+        if (!s.length) return 'You picked nothing! The pumpkins feel ignored.';
+        if (s.some(function (i) { return pos.indexOf(i) < 0; })) return 'One of those is not a pumpkin. Look again!';
+        if (s.length < pos.length) return 'Almost! There is still a pumpkin you missed.';
+        return true;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/02-not-a-cat.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'not-a-cat', title: 'Cat Inspection',
+  instruction: '<small>Click the picture that is</small><b>NOT a cat</b><i>(the cats are watching)</i>',
+  hint: 'Three of these say "meow". One of them definitely does not. Pick that one!',
+  quips: ['That is a cat. It is offended now.', 'Meow? That means "wrong" in cat.', 'The cat says you picked a cat.'],
+  passMsg: 'Not a cat. Correct! ✓',
+  setup: function (ctx) {
+    var cols = TNR.shuffle(['#f4a259', '#9e9e9e', '#4e4e4e', '#ffe0b2', '#e0a96d']);
+    var odd = TNR.pick(['toaster', 'fish', 'dog', 'frog']);
+    var at = TNR.rint(0, 3), items = [];
+    for (var i = 0; i < 4; i++) items.push(i === at ? { svg: TNR.art[odd](), label: odd } : { svg: TNR.art.cat(cols[i]), label: 'cat' });
+    var g = TNR.tileGrid(ctx, items, { cols: 2, single: true });
+    ctx.debug = { answer: [at], odd: odd };
+    return {
+      check: function () {
+        var s = g.selected();
+        if (!s.length) return 'Pick one! The cats are getting impatient.';
+        return s[0] === at ? true : null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/03-click-robot.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'click-robot', title: 'Snitch Test',
+  instruction: '<small>To prove you are not a robot,</small><b>click the robot</b>',
+  hint: 'Look for the one made of metal with square eyes and an antenna.',
+  quips: ['That is not a robot. That is a perfectly nice animal.', 'Beep boop? No. Try again.', 'The robot is hiding in plain sight.'],
+  passMsg: 'A robot would never snitch on a robot! ✓',
+  setup: function (ctx) {
+    var others = TNR.shuffle(['cat', 'dog', 'frog', 'owl', 'fish']);
+    var at = TNR.rint(0, 5), items = [];
+    for (var i = 0, k = 0; i < 6; i++) {
+      if (i === at) items.push({ svg: TNR.art.robot(), label: 'robot' });
+      else { var nm = others[k++ % others.length]; items.push({ svg: TNR.art[nm](), label: nm }); }
+    }
+    var g = TNR.tileGrid(ctx, items, { single: true });
+    g.el.classList.add('rows2');
+    ctx.debug = { answer: [at] };
+    return { check: function () { var s = g.selected(); if (!s.length) return 'Click the robot first!'; return s[0] === at ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/04-fruit-math.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'fruit-math', title: 'Fruit Math',
+  instruction: '<small>Robots cannot count fruit. Can you?</small><b>How many altogether?</b>',
+  hint: 'Count every fruit on both sides, one by one. Point with your finger!',
+  quips: ['Hmm, some fruit went missing. Count again!', 'Close! Did a fruit roll away?', 'My calculator is laughing. Gently.'],
+  passMsg: 'Fruit-tastic counting! ✓',
+  setup: function (ctx) {
+    var fruit = TNR.pick(['apple', 'banana', 'strawberry', 'orange']);
+    var a = TNR.rint(1, 4), b = TNR.rint(1, 3), ans = a + b;
+    function pile(n) { var p = TNR.el('div', { class: 'fruit-pile' }); for (var i = 0; i < n; i++) p.innerHTML += TNR.art[fruit](); return p; }
+    var eq = TNR.el('div', { class: 'fruit-eq' }, [pile(a), TNR.el('span', { text: '+' }), pile(b), TNR.el('span', { text: '= ?' })]);
+    ctx.body.appendChild(eq);
+    var opts = [ans];
+    [ans - 1, ans + 1, ans + 2, ans - 2].forEach(function (v) { if (v > 0 && opts.length < 4 && opts.indexOf(v) < 0) opts.push(v); });
+    opts.sort(function (x, y) { return x - y; });
+    var row = TNR.el('div', { class: 'choices' }), chosen = null;
+    opts.forEach(function (v) {
+      var bt = TNR.el('button', { class: 'btn choice', type: 'button', 'data-v': String(v), text: String(v) });
+      bt.addEventListener('click', function () {
+        row.querySelectorAll('.choice').forEach(function (o) { o.classList.remove('sel'); });
+        bt.classList.add('sel'); chosen = v; TNR.sfx.tap();
+      });
+      row.appendChild(bt);
+    });
+    ctx.body.appendChild(row);
+    ctx.debug = { answer: ans, a: a, b: b, fruit: fruit };
+    return { check: function () { if (chosen === null) return 'Pick a number, then Verify!'; return chosen === ans ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/05-nothing.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'nothing', title: 'The Void',
+  instruction: '<small>Select all squares with...</small><b>nothing</b><i>(yes, really)</i>',
+  hint: 'Pick the squares that are completely empty. Leave the ones with pictures alone!',
+  quips: ['There is clearly SOMETHING in that square.', 'You missed some nothing. Nothing is sneaky.', 'Nothing is harder to find than you think.'],
+  passMsg: 'You found nothing. Well done! ✓',
+  setup: function (ctx) {
+    var n = TNR.rint(3, 5), empty = TNR.shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, n);
+    var stuff = TNR.shuffle(['sock', 'rocket', 'cupcake', 'pumpkin', 'frog', 'sun', 'banana']);
+    var items = [];
+    for (var i = 0; i < 9; i++) items.push(empty.indexOf(i) >= 0 ? { svg: '', label: 'empty square' } : { svg: TNR.art[stuff[i % stuff.length]](), label: stuff[i % stuff.length] });
+    var g = TNR.tileGrid(ctx, items);
+    ctx.debug = { answer: empty.slice().sort() };
+    return {
+      check: function () {
+        var s = g.selected();
+        if (!s.length) return 'You selected nothing... which is not the same as selecting nothing. Pick the empty squares!';
+        if (s.some(function (i) { return empty.indexOf(i) < 0; })) return 'That square has SOMETHING in it!';
+        if (s.length < empty.length) return 'There is more nothing to find!';
+        return true;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/06-rotate.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'rotate', title: 'Upside Downside',
+  instruction: '<small>Tap the picture to turn it.</small><b>Make it right-side up</b>',
+  hint: 'The sun and sky go at the TOP. The green grass goes at the BOTTOM.',
+  quips: ['The house is getting dizzy.', 'The sun does not usually live down there.', 'Gravity disagrees. Try again!'],
+  passMsg: 'Gravity restored! ✓',
+  setup: function (ctx) {
+    var turns = TNR.rint(1, 3), deg = turns * 90;
+    var wrap = TNR.el('button', { class: 'rot-wrap', type: 'button', 'aria-label': 'Rotate picture', html: TNR.art.scene() });
+    function apply() { wrap.style.transform = 'rotate(' + deg + 'deg)'; ctx.debug.turns = ((deg / 90) % 4 + 4) % 4; }
+    ctx.debug = {};
+    wrap.addEventListener('click', function () { deg += 90; TNR.sfx.tap(); apply(); });
+    var row = TNR.el('div', { class: 'row' });
+    var l = TNR.el('button', { class: 'btn icon', type: 'button', 'aria-label': 'Turn left', html: '&#10226;' });
+    var r = TNR.el('button', { class: 'btn icon', type: 'button', 'aria-label': 'Turn right', html: '&#10227;' });
+    l.addEventListener('click', function () { deg -= 90; TNR.sfx.tap(); apply(); });
+    r.addEventListener('click', function () { deg += 90; TNR.sfx.tap(); apply(); });
+    row.appendChild(l); row.appendChild(wrap); row.appendChild(r);
+    ctx.body.appendChild(row);
+    apply();
+    return { check: function () { return ctx.debug.turns === 0 ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/07-slider-42.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'slider-42', title: 'The Answer',
+  instruction: '<small>Drag the slider to exactly</small><b>42</b><i>(not 41. not 43. FORTY-TWO.)</i>',
+  hint: 'Drag close to 42, then use the − and + buttons to nudge it exactly.',
+  passMsg: 'Exactly 42. The universe approves! ✓',
+  setup: function (ctx) {
+    var units = TNR.pick(['bananas', 'sneezes', 'tiny hats', 'happy ducks', 'wiggles']);
+    var val = TNR.pick([7, 12, 88, 95, 63]);
+    var big = TNR.el('div', { class: 'slider-val', text: '0' });
+    var unit = TNR.el('div', { class: 'slider-unit', text: units });
+    var track = TNR.el('div', { class: 'track', role: 'slider', 'aria-valuemin': '0', 'aria-valuemax': '100', tabindex: '0' });
+    var fill = TNR.el('div', { class: 'fill' }), thumb = TNR.el('div', { class: 'thumb' });
+    track.appendChild(fill); track.appendChild(thumb);
+    var minus = TNR.el('button', { class: 'btn icon', type: 'button', 'aria-label': 'Minus one', text: '−' });
+    var plus = TNR.el('button', { class: 'btn icon', type: 'button', 'aria-label': 'Plus one', text: '+' });
+    function set(v, sound) {
+      v = TNR.clamp(Math.round(v), 0, 100);
+      if (v !== val && sound) TNR.sfx.tick();
+      val = v; big.textContent = String(v); track.setAttribute('aria-valuenow', String(v));
+      fill.style.width = v + '%'; thumb.style.left = v + '%';
+      big.style.color = v === 42 ? '#2e9b4f' : '';
+      ctx.debug.value = v;
+    }
+    ctx.debug = {};
+    var dragging = false;
+    function fromEvent(e) { var r = track.getBoundingClientRect(); set((e.clientX - r.left) / r.width * 100, true); }
+    track.addEventListener('pointerdown', function (e) { dragging = true; try { track.setPointerCapture(e.pointerId); } catch (x) {} fromEvent(e); e.preventDefault(); });
+    track.addEventListener('pointermove', function (e) { if (dragging) fromEvent(e); });
+    ['pointerup', 'pointercancel'].forEach(function (ev) { track.addEventListener(ev, function () { dragging = false; }); });
+    track.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') set(val - 1, true); if (e.key === 'ArrowRight') set(val + 1, true); });
+    minus.addEventListener('click', function () { set(val - 1, true); });
+    plus.addEventListener('click', function () { set(val + 1, true); });
+    ctx.body.appendChild(big); ctx.body.appendChild(unit); ctx.body.appendChild(track);
+    ctx.body.appendChild(TNR.el('div', { class: 'row' }, [minus, plus]));
+    set(val);
+    return {
+      check: function () {
+        if (val === 42) return true;
+        if (Math.abs(val - 42) <= 2) return 'That is ' + val + '. SO close it tickles!';
+        return val + ' ' + units + '? We need exactly 42!';
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/08-hold.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'hold', title: 'Patience Test',
+  instruction: '<small>Robots are always in a hurry.</small><b>Hold the button for 3 seconds</b>',
+  hint: 'Press and keep holding until the ring goes all the way around. Do not let go!',
+  passMsg: 'So patient. So human. ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var NEED = 3000, C = 2 * Math.PI * 46;
+    var btn = TNR.el('button', { class: 'hold-btn', type: 'button', html: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#cfe0ff" stroke-width="6"/><circle class="ring" cx="50" cy="50" r="46" fill="none" stroke="#ffca28" stroke-width="6" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '"/></svg><span class="lbl">Hold to<br>VERIFY</span>' });
+    var ring = btn.querySelector('.ring'), lbl = btn.querySelector('.lbl');
+    var words = ['hehe', 'that tickles!', 'hold on...', 'almost...', 'keep going!'];
+    var t0 = 0, held = false, done = false, lastWord = -1;
+    ctx.debug = { progress: 0 };
+    function start(e) { if (done) return; held = true; t0 = performance.now(); btn.classList.add('holding'); try { btn.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); }
+    function stop() {
+      if (!held || done) return;
+      held = false; btn.classList.remove('holding');
+      var p = (performance.now() - t0) / NEED;
+      ring.style.strokeDashoffset = C; lbl.innerHTML = 'Hold to<br>VERIFY'; ctx.debug.progress = 0;
+      if (p > 0.04) ctx.fail(p > 0.7 ? 'Nooo, you were SO close! Hold a tiny bit longer.' : TNR.pick(['Too quick! That is exactly what a robot would do.', 'Let go already? Robots are always rushing.', 'Hold it longer! Like hugging a sleepy cat.']));
+    }
+    btn.addEventListener('pointerdown', start);
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { btn.addEventListener(ev, stop); });
+    btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    ctx.raf(function () {
+      if (!held || done) return;
+      var p = Math.min(1, (performance.now() - t0) / NEED);
+      ctx.debug.progress = p;
+      ring.style.strokeDashoffset = String(C * (1 - p));
+      var w = Math.min(words.length - 1, Math.floor(p * words.length));
+      if (w !== lastWord) { lastWord = w; lbl.textContent = words[w]; TNR.sfx.tick(); }
+      if (p >= 1) { done = true; held = false; btn.classList.remove('holding'); lbl.innerHTML = '&#10003;'; ctx.pass(); }
+    });
+    ctx.body.appendChild(btn);
+    return {};
+  }
+});
+
+})();
+/* ==== levels/09-hat-dog.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'hat-dog', title: 'Fashion Check',
+  instruction: '<small>Robots have no sense of style.</small><b>Drag the hat onto the dog\'s head</b>',
+  hint: 'Press on the hat, keep holding, and slide it right on top of the dog\'s head. Then Verify!',
+  quips: ['The dog is still hatless. And sad.', 'That is a hat for the floor, not the dog.', 'A little higher... dogs wear hats on their HEADS.'],
+  passMsg: 'Very dapper dog! ✓',
+  setup: function (ctx) {
+    var stage = TNR.el('div', { class: 'stage dog-stage' });
+    var dog = TNR.el('div', { class: 'dog', html: TNR.art.dogBig() });
+    var hat = TNR.el('div', { class: 'hat', html: TNR.art.hat(), role: 'img', 'aria-label': 'hat' });
+    stage.appendChild(dog); stage.appendChild(hat);
+    ctx.body.appendChild(stage);
+    function target() {
+      var d = dog.getBoundingClientRect();
+      return { x: d.left + d.width * 0.5, y: d.top + d.width * 0.25, tol: d.width * 0.17 };
+    }
+    function hatCenter() { var h = hat.getBoundingClientRect(); return { x: h.left + h.width / 2, y: h.top + h.height / 2 }; }
+    function place(x, y) { // x,y = stage-relative top-left
+      var sw = stage.clientWidth, sh = stage.clientHeight, hw = hat.offsetWidth, hh = hat.offsetHeight;
+      hat.style.left = TNR.clamp(x, 0, sw - hw) + 'px'; hat.style.top = TNR.clamp(y, 0, sh - hh) + 'px';
+    }
+    place(8, 8);
+    ctx.timeout(function () { place(8, 8); }, 50);
+    var drag = null;
+    hat.addEventListener('pointerdown', function (e) {
+      var h = hat.getBoundingClientRect();
+      drag = { dx: e.clientX - h.left, dy: e.clientY - h.top };
+      hat.classList.add('drag'); try { hat.setPointerCapture(e.pointerId); } catch (x) {}
+      TNR.sfx.tap(); e.preventDefault();
+    });
+    hat.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var s = stage.getBoundingClientRect();
+      place(e.clientX - s.left - drag.dx, e.clientY - s.top - drag.dy);
+    });
+    function drop() {
+      if (!drag) return; drag = null; hat.classList.remove('drag');
+      var t = target(), c = hatCenter();
+      if (Math.hypot(t.x - c.x, t.y - c.y) < t.tol) { // snap
+        var s = stage.getBoundingClientRect();
+        place(t.x - s.left - hat.offsetWidth / 2, t.y - s.top - hat.offsetHeight / 2);
+        TNR.sfx.pop();
+      }
+    }
+    hat.addEventListener('pointerup', drop); hat.addEventListener('pointercancel', drop);
+    ctx.debug = { target: target, hat: hatCenter };
+    return {
+      check: function () {
+        var t = target(), c = hatCenter();
+        return Math.hypot(t.x - c.x, t.y - c.y) < t.tol ? true : null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/10-runaway.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'runaway', title: 'The Shy Checkbox',
+  instruction: '<small>Easy one! Just tick the box:</small><b>I\'m not a robot</b><i>(it is a little shy)</i>',
+  hint: 'Keep chasing it! The checkbox gets tired after a few runs. Then tick it and press Verify.',
+  quips: ['The box is still empty. It is out there... running.', 'You have to actually tick it!', 'The checkbox giggles at you. Chase it!'],
+  passMsg: 'Caught it! ✓',
+  setup: function (ctx) {
+    var stage = TNR.el('div', { class: 'stage' });
+    var box = TNR.el('div', { class: 'runaway' });
+    var cb = TNR.el('button', { class: 'cb', type: 'button', role: 'checkbox', 'aria-checked': 'false', 'aria-label': 'I am not a robot' });
+    var face = TNR.el('span', { class: 'face', text: '(catch me!)' });
+    box.appendChild(cb); box.appendChild(TNR.el('span', { text: "I'm not a robot" })); box.appendChild(face);
+    stage.appendChild(box); ctx.body.appendChild(stage);
+    var MAX = 5, flees = 0, checked = false;
+    var faces = ['(nope!)', '(too slow!)', '(wheee!)', '(huff... puff...)', '(ok ok, I\'m tired. You win.)'];
+    function center() { var r = cb.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+    function moveTo(x, y) { box.style.left = x + 'px'; box.style.top = y + 'px'; }
+    function initial() { moveTo(Math.max(4, (stage.clientWidth - box.offsetWidth) / 2), Math.max(4, (stage.clientHeight - box.offsetHeight) / 2)); }
+    initial();
+    function flee(px, py) {
+      var s = stage.getBoundingClientRect(), bw = box.offsetWidth, bh = box.offsetHeight;
+      var best = null, bestD = -1;
+      for (var i = 0; i < 12; i++) {
+        var x = Math.random() * Math.max(1, s.width - bw - 8) + 4, y = Math.random() * Math.max(1, s.height - bh - 8) + 4;
+        var d = Math.hypot(s.left + x + 24 - px, s.top + y + bh / 2 - py);
+        if (d > bestD) { bestD = d; best = [x, y]; }
+      }
+      moveTo(best[0], best[1]);
+      face.textContent = faces[Math.min(flees, faces.length - 1)];
+      flees++; ctx.debug.flees = flees; ctx.debug.tired = flees >= MAX;
+      TNR.sfx.pop();
+    }
+    ctx.debug = { flees: 0, tired: false, center: center };
+    var lastFlee = 0;
+    ctx.listen(stage, 'pointermove', function (e) {
+      if (e.pointerType !== 'mouse' || checked || flees >= MAX) return;
+      var c = center();
+      if (Math.hypot(e.clientX - c.x, e.clientY - c.y) < 70 && performance.now() - lastFlee > 300) { lastFlee = performance.now(); flee(e.clientX, e.clientY); }
+    });
+    cb.addEventListener('pointerdown', function (e) {
+      if (flees < MAX && !checked) { e.preventDefault(); lastFlee = performance.now(); flee(e.clientX, e.clientY); cb.dataset.fled = '1'; }
+    });
+    cb.addEventListener('click', function () {
+      if (cb.dataset.fled) { delete cb.dataset.fled; return; }
+      if (flees < MAX) return;
+      checked = !checked; cb.innerHTML = checked ? '&#10003;' : ''; cb.setAttribute('aria-checked', String(checked));
+      face.textContent = checked ? '(fine. you got me.)' : '(phew)';
+      ctx.debug.checked = checked; TNR.sfx.tap();
+    });
+    return { check: function () { return checked ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/11-wobbly-word.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'wobbly-word', title: 'Wobbly Word',
+  instruction: '<small>Type the wobbly word.</small><b>Careful: the letters swap!</b>',
+  hint: '', /* set dynamically */
+  quips: ['Hmm, that word got scrambled. Try again!', 'The letters swapped while you blinked.', 'Close! Wait for the letters to sit still.'],
+  passMsg: 'Wobble-proof reading! ✓',
+  setup: function (ctx) {
+    var word = TNR.pick(['PICKLE', 'WAFFLE', 'NOODLE', 'MUFFIN', 'PENGUIN', 'TACO', 'GIGGLE', 'PUDDLE', 'WOMBAT', 'SPROUT']);
+    var hint = document.getElementById('hint');
+    hint.innerHTML = '<b>Hint:</b> It has ' + word.length + ' letters and starts with <b>' + word[0] + '</b>. Wait for the orange letters to go back!';
+    var wob = TNR.el('div', { class: 'wobbly', 'aria-label': 'wobbly word' });
+    var spans = word.split('').map(function (ch, i) { var s = TNR.el('span', { text: ch, style: 'animation-delay:' + (-i * 0.27) + 's' }); wob.appendChild(s); return s; });
+    var input = TNR.el('input', { class: 'txt-in', type: 'text', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'characters', spellcheck: 'false', maxlength: '14', placeholder: 'type here', 'aria-label': 'Type the word' });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('btn-verify').click(); });
+    ctx.body.appendChild(wob); ctx.body.appendChild(input);
+    ctx.interval(function () {
+      if (word.length < 2) return;
+      var i = TNR.rint(0, word.length - 2), j = i + 1;
+      if (word[i] === word[j]) return;
+      spans[i].textContent = word[j]; spans[j].textContent = word[i];
+      spans[i].classList.add('swap'); spans[j].classList.add('swap');
+      ctx.timeout(function () { spans[i].textContent = word[i]; spans[j].textContent = word[j]; spans[i].classList.remove('swap'); spans[j].classList.remove('swap'); }, 650);
+    }, 1400);
+    ctx.debug = { answer: word };
+    return {
+      check: function () {
+        var v = input.value.trim().toUpperCase().replace(/\s+/g, '');
+        if (!v) { input.focus(); return 'Type the word into the box first!'; }
+        if (v === word) return true;
+        ctx.timeout(function () { try { input.focus(); input.select(); } catch (e) {} }, 30);
+        return null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/12-dont-touch.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'dont-touch', title: 'Statue Mode',
+  instruction: '<small>Robots can never sit still.</small><b>Don\'t touch ANYTHING for 5 seconds</b>',
+  hint: 'Take your hand off the mouse (or screen) and wait. Freeze like a statue!',
+  passMsg: 'Excellent statue skills! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var NEED = 5000, C = 2 * Math.PI * 44;
+    var ring = TNR.el('div', { class: 'still-ring', html: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#e3e8f0" stroke-width="8"/><circle class="arc" cx="50" cy="50" r="44" fill="none" stroke="#4a8af4" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="0"/></svg><div class="n">5</div>' });
+    var msg = TNR.el('p', { class: 'big-q', text: 'Get ready...' });
+    ctx.body.appendChild(ring); ctx.body.appendChild(msg);
+    var arc = ring.querySelector('.arc'), num = ring.querySelector('.n');
+    var state = 'ready', t0 = 0, moved = 0, lastXY = null, done = false;
+    ctx.debug = { state: state };
+    function arm(delay) {
+      state = 'ready'; ctx.debug.state = state; msg.textContent = 'Get ready...'; num.textContent = '5'; arc.style.strokeDashoffset = '0';
+      ctx.timeout(function () { state = 'counting'; ctx.debug.state = state; t0 = performance.now(); moved = 0; lastXY = null; msg.textContent = 'Shhh... freeze!'; }, delay);
+    }
+    function disturb(kind) {
+      if (state !== 'counting' || done) return;
+      state = 'oops'; ctx.debug.state = state;
+      ctx.fail(TNR.pick(['You touched it! I felt that.', 'I saw that wiggle!', 'Statues do not ' + kind + '. Try again!', 'A robot twitch? Let us start over.']));
+      msg.textContent = 'Oops! Starting over...';
+      ctx.timeout(function () { arm(1200); }, 900);
+    }
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) { ctx.listen(window, ev, function (e) { if (e.target && e.target.closest && e.target.closest('.topbar,#btn-refresh,.modal')) return; disturb(ev === 'keydown' ? 'type' : 'tap'); }, { passive: true }); });
+    ctx.listen(window, 'pointermove', function (e) {
+      if (state !== 'counting') return;
+      if (lastXY) moved += Math.hypot(e.clientX - lastXY[0], e.clientY - lastXY[1]);
+      lastXY = [e.clientX, e.clientY];
+      if (moved > 30) disturb('wiggle');
+    }, { passive: true });
+    ctx.raf(function () {
+      if (state !== 'counting' || done) return;
+      var p = Math.min(1, (performance.now() - t0) / NEED);
+      arc.style.strokeDashoffset = String(C * p);
+      var n = Math.ceil(5 * (1 - p)); if (num.textContent !== String(n)) { num.textContent = String(n); if (n > 0) TNR.sfx.tick(); }
+      ctx.debug.progress = p;
+      if (p >= 1) { done = true; state = 'done'; ctx.debug.state = state; ctx.pass(); }
+    });
+    arm(1500);
+    return {};
+  }
+});
+
+})();
+/* ==== levels/13-circle.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'circle', title: 'Circle Inspector',
+  instruction: '<small>Robots draw perfect circles. Humans draw...</small><b>Draw a circle (score 70%+)</b>',
+  hint: 'Draw one big round loop and finish where you started. Go slowly, like tracing a cookie!',
+  passMsg: 'A fine human circle! ✓',
+  setup: function (ctx) {
+    var wrap = TNR.el('div', { class: 'draw-wrap' });
+    var cv = TNR.el('canvas', { 'aria-label': 'drawing area' });
+    var label = TNR.el('div', { class: 'draw-score', text: 'Draw here!' });
+    wrap.appendChild(cv); wrap.appendChild(label); ctx.body.appendChild(wrap);
+    var g = cv.getContext('2d'), pts = [], drawing = false, score = null, dpr = 1;
+    function size() {
+      dpr = window.devicePixelRatio || 1;
+      var r = cv.getBoundingClientRect();
+      cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr));
+      redraw();
+    }
+    function redraw() {
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+      g.lineWidth = 6; g.lineCap = 'round'; g.lineJoin = 'round';
+      g.strokeStyle = score === null ? '#2f6fd6' : score >= 70 ? '#2e9b4f' : '#f0a33a';
+      g.beginPath(); pts.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke();
+    }
+    function pos(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+    cv.addEventListener('pointerdown', function (e) { drawing = true; pts = [pos(e)]; score = null; ctx.debug.score = null; label.textContent = ''; try { cv.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); redraw(); });
+    cv.addEventListener('pointermove', function (e) { if (!drawing) return; pts.push(pos(e)); redraw(); });
+    function end() {
+      if (!drawing) return; drawing = false;
+      score = grade(pts); ctx.debug.score = score;
+      if (score === null) { label.textContent = 'Draw a bigger loop!'; }
+      else {
+        label.textContent = score + '% · ' + (score >= 95 ? 'Suspiciously perfect... are you a compass?' : score >= 85 ? 'Lovely! Very human wobble.' : score >= 70 ? 'That is a circle! Mostly.' : score >= 40 ? 'That is more of a potato.' : 'Is that... a noodle?');
+        if (score >= 70) TNR.sfx.pop();
+      }
+      redraw();
+    }
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+    function grade(p) {
+      if (p.length < 8) return null;
+      var cx = 0, cy = 0; p.forEach(function (q) { cx += q[0]; cy += q[1]; }); cx /= p.length; cy /= p.length;
+      var ds = p.map(function (q) { return Math.hypot(q[0] - cx, q[1] - cy); });
+      var R = ds.reduce(function (a, b) { return a + b; }, 0) / ds.length;
+      if (R < 25) return null;
+      var sd = Math.sqrt(ds.reduce(function (a, d) { return a + (d - R) * (d - R); }, 0) / ds.length);
+      var round = 1 - sd / R;
+      var sweep = 0;
+      for (var i = 1; i < p.length; i++) {
+        var a1 = Math.atan2(p[i - 1][1] - cy, p[i - 1][0] - cx), a2 = Math.atan2(p[i][1] - cy, p[i][0] - cx), d = a2 - a1;
+        if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; sweep += d;
+      }
+      var cover = Math.min(1, Math.abs(sweep) / (2 * Math.PI * 0.95));
+      var gap = Math.hypot(p[0][0] - p[p.length - 1][0], p[0][1] - p[p.length - 1][1]) / R;
+      var closePen = Math.max(0, gap - 0.35) * 0.25;
+      var s = TNR.clamp((round - 0.55) / 0.43, 0, 1) * cover - closePen;
+      return Math.round(TNR.clamp(s, 0, 1) * 100);
+    }
+    size();
+    ctx.listen(window, 'resize', size);
+    ctx.debug = { score: null };
+    return {
+      check: function () {
+        if (score === null) return 'Draw a circle in the box first!';
+        if (score >= 70) return true;
+        return 'Only ' + score + '%. ' + TNR.pick(['That looks like a potato. A nice potato!', 'Rounder! Imagine tracing a cookie.', 'Robots would be jealous of that wobble... but no.']);
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/14-shuffled-keyboard.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'shuffled-keyboard', title: 'Keyboard Chaos',
+  instruction: '<small>Type your favorite color.</small><b>(the keyboard is a bit... shuffled)</b>',
+  hint: 'Try RED: find R, then E, then D. The keys jump around after every press, so look carefully!',
+  passMsg: 'What a lovely color! ✓',
+  setup: function (ctx) {
+    var COLORS = ['RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'PINK', 'BLACK', 'WHITE', 'BROWN', 'GRAY', 'GREY', 'GOLD', 'SILVER', 'TEAL', 'CYAN',
+      'MAGENTA', 'VIOLET', 'INDIGO', 'LIME', 'NAVY', 'MAROON', 'BEIGE', 'TAN', 'TURQUOISE', 'LAVENDER', 'PEACH', 'MINT', 'RAINBOW', 'AQUA', 'CORAL', 'LILAC', 'SKYBLUE', 'PLUM', 'ROSE', 'CRIMSON', 'SCARLET', 'AMBER', 'OLIVE', 'BRONZE', 'COPPER'];
+    var typed = '';
+    var out = TNR.el('div', { class: 'typed', 'aria-live': 'polite', text: '' });
+    var kb = TNR.el('div', { class: 'kb' });
+    var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    function render() {
+      out.textContent = typed || '\u00a0';
+      kb.innerHTML = '';
+      TNR.shuffle(letters).forEach(function (ch) {
+        var k = TNR.el('button', { class: 'btn key', type: 'button', 'data-key': ch, text: ch });
+        k.addEventListener('click', function () { if (typed.length < 12) { typed += ch; TNR.sfx.tap(); } render(); });
+        kb.appendChild(k);
+      });
+      ctx.debug.typed = typed;
+    }
+    var back = TNR.el('button', { class: 'btn', type: 'button', 'data-key': 'BACK', html: '&#9003; Back' });
+    var clear = TNR.el('button', { class: 'btn', type: 'button', 'data-key': 'CLEAR', text: 'Clear' });
+    back.addEventListener('click', function () { typed = typed.slice(0, -1); TNR.sfx.tap(); render(); });
+    clear.addEventListener('click', function () { typed = ''; TNR.sfx.tap(); render(); });
+    ctx.body.appendChild(out); ctx.body.appendChild(kb); ctx.body.appendChild(TNR.el('div', { class: 'kb-row' }, [back, clear]));
+    /* Real keyboards work too (with a cheeky comment). */
+    ctx.listen(window, 'keydown', function (e) {
+      if (/^[a-z]$/i.test(e.key)) { if (typed.length < 12) typed += e.key.toUpperCase(); render(); ctx.say('Hey! No real keyboards. ...Okay, fine, just this once.'); }
+      else if (e.key === 'Backspace') { typed = typed.slice(0, -1); render(); }
+      else if (e.key === 'Enter') document.getElementById('btn-verify').click();
+    });
+    ctx.debug = {};
+    render();
+    return {
+      check: function () {
+        if (!typed) return 'Type a color first! Any color you like.';
+        if (COLORS.indexOf(typed) >= 0) return true;
+        return '"' + typed + '" is not a color. ' + TNR.pick(['Yet.', 'Maybe on another planet.', 'Nice try, robot!', 'Sounds like a sneeze!']);
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/15-sock-drawer.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'sock-drawer', title: 'Sock Drawer',
+  instruction: '<small>The washing machine ate some socks.</small><b>Find the matching pair</b>',
+  hint: 'Two socks have the same color AND the same pattern. Tap both of them, then Verify!',
+  quips: ['Those two are not twins. Not even cousins.', 'Close! Check the stripes and dots.', 'One sock is still lonely.'],
+  passMsg: 'Perfect pair! ✓',
+  setup: function (ctx) {
+    var cols = TNR.shuffle(['#e53935', '#1e88e5', '#43a047', '#fdd835', '#8e24aa', '#fb8c00']).slice(0, 4);
+    var combos = [];
+    cols.forEach(function (c) { ['stripes', 'dots', 'plain'].forEach(function (p) { combos.push([c, p]); }); });
+    var uniq = TNR.shuffle(combos).slice(0, 5), pair = uniq[0];
+    var list = TNR.shuffle(uniq.concat([pair]));
+    var answer = [];
+    var items = list.map(function (c, i) { if (c === pair) answer.push(i); return { svg: TNR.art.socky(c[0], c[1]), label: c[1] + ' sock' }; });
+    var g = TNR.tileGrid(ctx, items);
+    g.el.classList.add('rows2');
+    ctx.debug = { answer: answer };
+    return {
+      check: function () {
+        var s = g.selected();
+        if (s.length !== 2) return s.length < 2 ? 'Pick TWO socks. Socks come in pairs!' : 'Too many socks! Just one pair, please.';
+        return TNR.sameSet(s, answer) ? true : null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/16-color-confusion.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'color-confusion', title: 'Color Confusion',
+  instruction: '<small>Don\'t read the word!</small><b>Tap the color of the PAINT</b><i>(3 in a row)</i>',
+  hint: 'Ignore what the word says. Look at what color the letters are painted, and tap that color.',
+  passMsg: 'Your eyes beat your brain! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var C = { RED: '#e53935', BLUE: '#1e66d0', GREEN: '#2e9b4f', PURPLE: '#8e44ad' };
+    var names = Object.keys(C), NEED = 3, round = 0, word = '', ink = '', done = false;
+    var pips = TNR.pips(NEED), big = TNR.el('div', { class: 'stroop-word', 'aria-live': 'polite' });
+    ctx.body.appendChild(pips.el); ctx.body.appendChild(big);
+    var row = TNR.el('div', { class: 'choices' });
+    names.forEach(function (n) {
+      var b = TNR.el('button', { class: 'btn choice swatch', type: 'button', 'data-v': n, html: '<i style="background:' + C[n] + '"></i>' + n.charAt(0) + n.slice(1).toLowerCase() });
+      b.addEventListener('click', function () { pickC(n); });
+      row.appendChild(b);
+    });
+    ctx.body.appendChild(row);
+    function next() {
+      var w; do { w = TNR.pick(names); } while (w === word);
+      word = w; do { ink = TNR.pick(names); } while (ink === word);
+      big.textContent = word; big.style.color = C[ink];
+      big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
+      ctx.debug.word = word; ctx.debug.ink = ink; ctx.debug.round = round;
+    }
+    function pickC(n) {
+      if (done) return;
+      if (n === ink) {
+        round++; pips.set(round); TNR.sfx.pop(); ctx.debug.round = round;
+        if (round >= NEED) { done = true; ctx.timeout(function () { ctx.pass(); }, 250); } else next();
+      } else ctx.fail(n === word ? 'You read the WORD! Look at the paint color instead.' : 'Hmm, that paint is not ' + n.toLowerCase() + '. Look closer!');
+    }
+    ctx.debug = {};
+    next();
+    return {};
+  }
+});
+
+})();
+/* ==== levels/17-balloon-pump.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'balloon-pump', title: 'Pump It Up',
+  instruction: '<small>Pump the balloon up into the dotted zone.</small><b>Don\'t pop it!</b>',
+  hint: 'Press Pump one at a time. Stop when the top of the balloon is inside the dotted zone, then Verify.',
+  quips: ['That balloon is still a bit floppy.', 'More air, please!', 'Puff puff... not yet!'],
+  passMsg: 'Perfectly puffy! ✓',
+  setup: function (ctx) {
+    var MIN = 8, MAX = 10, air = 0, popped = false;
+    var col = TNR.pick(['#ef5350', '#42a5f5', '#66bb6a', '#ab47bc', '#ffa726']);
+    var stage = TNR.el('div', { class: 'stage s2 pump-stage' });
+    var zone = TNR.el('div', { class: 'pump-zone', html: '<span>zone</span>' });
+    var bal = TNR.el('div', { class: 'pump-balloon', html: TNR.art.balloon(col) });
+    var count = TNR.el('div', { class: 'pump-count', text: '' });
+    stage.appendChild(zone); stage.appendChild(bal); stage.appendChild(count);
+    var pump = TNR.el('button', { class: 'btn primary pump-btn', type: 'button', 'data-act': 'pump', html: '&#128168; Pump!' });
+    ctx.body.appendChild(stage); ctx.body.appendChild(pump);
+    function render() {
+      bal.style.transform = 'translateX(-50%) scale(' + Math.max(0.12, air / MAX) + ')';
+      bal.classList.toggle('happy', air >= MIN && air <= MAX);
+      ctx.debug.air = air;
+    }
+    pump.addEventListener('click', function () {
+      if (popped) return;
+      air++; render();
+      if (air > MAX) {
+        popped = true; bal.classList.add('popped'); TNR.sfx.soft();
+        ctx.fail(TNR.pick(['POP! Oops, too much air. Here is a fresh balloon.', 'Fwoomp! That one popped. New balloon!']));
+        ctx.timeout(function () { air = 0; popped = false; bal.classList.remove('popped'); render(); }, 800);
+      } else TNR.sfx.note(300 + air * 40);
+    });
+    ctx.debug = { air: 0, min: MIN, max: MAX };
+    render();
+    return {
+      check: function () {
+        if (popped) return 'Wait for the new balloon!';
+        if (air < MIN) return air === 0 ? 'The balloon is totally flat! Press Pump.' : null;
+        return true;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/18-shadow-match.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'shadow-match', title: 'Shadow Match',
+  instruction: '<small>Robots don\'t have shadows.</small><b>Which shadow belongs to this?</b>',
+  hint: 'Look at the outline: ears, tails, wings and corners. Find the shadow with the same shape.',
+  quips: ['That shadow belongs to someone else!', 'Spooky... but wrong shadow.', 'Look at the edges again.'],
+  passMsg: 'Shadow detective! ✓',
+  setup: function (ctx) {
+    var pool = TNR.shuffle(['cat', 'dog', 'fish', 'frog', 'owl', 'ghost', 'rocket', 'robot', 'cupcake', 'banana', 'sock', 'toaster', 'teddy', 'monster']);
+    var opts = pool.slice(0, 4), ans = opts[0];
+    ctx.body.appendChild(TNR.el('div', { class: 'show-obj', html: TNR.art[ans]() }));
+    var c = TNR.choices(ctx, TNR.shuffle(opts).map(function (k) { return { v: k, label: 'shadow', html: '<span class="shadow">' + TNR.art[k]() + '</span>' }; }), { btnCls: 'pic' });
+    ctx.debug = { answer: ans };
+    return { check: function () { var v = c.get(); if (v === null) return 'Tap a shadow first!'; return v === ans ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/19-line-up.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'line-up', title: 'Line Up',
+  instruction: '<small>Tap them in order, from</small><b>smallest to biggest</b>',
+  hint: 'Start with the teeniest one. Each tap should be a little bigger than the last.',
+  passMsg: 'Tidy line! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var who = TNR.pick(['frog', 'owl', 'fish', 'cat', 'teddy']);
+    var sizes = [34, 48, 62, 78, 96], order = TNR.shuffle([0, 1, 2, 3, 4]);
+    var row = TNR.el('div', { class: 'lineup' }), next = 0, done = false;
+    var btns = order.map(function (sz, i) {
+      var b = TNR.el('button', { class: 'lu', type: 'button', 'data-i': String(i), 'aria-label': who + ' size ' + (sz + 1), html: '<span class="lu-in" style="width:' + sizes[sz] + '%">' + TNR.art[who]() + '</span><em></em>' });
+      b.addEventListener('click', function () {
+        if (done || b.classList.contains('ok')) return;
+        if (sz === next) {
+          b.classList.add('ok'); b.querySelector('em').textContent = String(next + 1); TNR.sfx.note(330 + next * 60); next++;
+          if (next === 5) { done = true; ctx.timeout(function () { ctx.pass(); }, 300); }
+        } else {
+          btns.forEach(function (x) { x.classList.remove('ok'); x.querySelector('em').textContent = ''; }); next = 0;
+          ctx.fail(TNR.pick(['Whoa, that one is too big to go next! Start again.', 'Not that one yet! Smallest first.', 'The line got jumbled. From the start!']));
+        }
+        ctx.debug.next = next;
+      });
+      row.appendChild(b);
+      return b;
+    });
+    ctx.body.appendChild(row);
+    var ans = []; for (var s = 0; s < 5; s++) ans.push(order.indexOf(s));
+    ctx.debug = { order: ans, next: 0 };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/20-pattern-train.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'pattern-train', title: 'Pattern Train',
+  instruction: '<small>Choo choo! What comes</small><b>next on the train?</b>',
+  hint: 'Say the shapes out loud: "circle, square, circle, square..." and listen for the repeat.',
+  quips: ['That wagon would derail the pattern!', 'Choo... no. Look at the repeat again.', 'The train conductor shakes her head kindly.'],
+  passMsg: 'All aboard the pattern train! ✓',
+  setup: function (ctx) {
+    var kinds = TNR.shuffle(['circle', 'square', 'triangle', 'star', 'heart']);
+    var units = [[0, 1], [0, 1, 2], [0, 0, 1], [0, 1, 1], [0, 1, 2, 2]];
+    var u = TNR.pick(units), seq = [];
+    for (var i = 0; i < 8; i++) seq.push(kinds[u[i % u.length]]);
+    var ans = seq[7];
+    var train = TNR.el('div', { class: 'train' });
+    seq.slice(0, 7).forEach(function (k) { train.appendChild(TNR.el('span', { class: 'car', html: TNR.art.shape(k) })); });
+    train.appendChild(TNR.el('span', { class: 'car q', text: '?' }));
+    ctx.body.appendChild(train);
+    var opts = TNR.shuffle(kinds.slice(0, 4).indexOf(ans) >= 0 ? kinds.slice(0, 4) : kinds.slice(0, 3).concat([ans]));
+    var c = TNR.choices(ctx, opts.map(function (k) { return { v: k, label: k, html: TNR.art.shape(k) }; }), { btnCls: 'pic' });
+    ctx.debug = { answer: ans };
+    return { check: function () { var v = c.get(); if (v === null) return 'Pick the next wagon first!'; return v === ans ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/21-drum-count.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'drum-count', title: 'Drum Count',
+  instruction: '', /* set in setup */
+  hint: 'Count out loud with each tap: one, two, three... Then press Verify. Press Start over if you lose count.',
+  passMsg: 'Rhythm of a true human! ✓',
+  setup: function (ctx) {
+    var N = TNR.rint(5, 8), taps = 0;
+    document.getElementById('panel-instr').innerHTML = '<small>No counter on screen. Robots need counters!</small><b>Tap the drum exactly ' + N + ' times</b>';
+    var drum = TNR.el('button', { class: 'drum-btn', type: 'button', 'aria-label': 'drum', html: TNR.art.drum() });
+    var again = TNR.el('button', { class: 'btn', type: 'button', 'data-act': 'reset', text: 'Start over' });
+    drum.addEventListener('click', function () {
+      taps++; ctx.debug.taps = taps; TNR.sfx.note(TNR.pick([196, 220, 247]));
+      drum.classList.remove('boom'); void drum.offsetWidth; drum.classList.add('boom');
+    });
+    again.addEventListener('click', function () { taps = 0; ctx.debug.taps = 0; TNR.sfx.tap(); ctx.say('Fresh start. Count from one!'); });
+    ctx.body.appendChild(drum); ctx.body.appendChild(again);
+    ctx.debug = { n: N, taps: 0 };
+    return {
+      check: function () {
+        var t = taps; taps = 0; ctx.debug.taps = 0;
+        if (t === N) return true;
+        if (t === 0) return 'Not a single boom! Tap the drum ' + N + ' times.';
+        return 'That was ' + t + ' tap' + (t === 1 ? '' : 's') + '. ' + (t < N ? 'A few more booms!' : 'Too many booms!') + ' Let\u2019s count again from one.';
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/22-dot-to-dot.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'dot-to-dot', title: 'Dot to Dot',
+  instruction: '<small>Connect the dots in order:</small><b>1, 2, 3, 4, 5, 6!</b>',
+  hint: 'Find number 1 first, then 2, then 3... all the way to 6.',
+  passMsg: 'Ta-da! A masterpiece! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var N = 6;
+    var stage = TNR.el('div', { class: 'stage dots-stage' });
+    var lines = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    lines.setAttribute('viewBox', '0 0 100 100'); lines.setAttribute('preserveAspectRatio', 'none'); lines.setAttribute('class', 'dot-lines');
+    stage.appendChild(lines); ctx.body.appendChild(stage);
+    var W = Math.max(200, stage.clientWidth), H = Math.max(160, stage.clientHeight), pts = [];
+    for (var tries = 0; pts.length < N && tries < 4000; tries++) {
+      var x = 34 + Math.random() * (W - 68), y = 34 + Math.random() * (H - 68), minD = tries < 2500 ? 86 : 60;
+      if (pts.every(function (p) { return Math.hypot(p[0] - x, p[1] - y) >= minD; })) pts.push([x, y]);
+    }
+    while (pts.length < N) pts.push([34 + (pts.length % 3) * (W - 68) / 2, 34 + Math.floor(pts.length / 3) * (H - 68)]);
+    var fr = pts.map(function (p) { return [p[0] / W * 100, p[1] / H * 100]; });
+    var next = 0, done = false;
+    var dots = fr.map(function (p, i) {
+      var b = TNR.el('button', { class: 'dotn', type: 'button', 'data-n': String(i + 1), text: String(i + 1), style: 'left:' + p[0] + '%;top:' + p[1] + '%' });
+      b.addEventListener('click', function () {
+        if (done) return;
+        if (i === next) {
+          b.classList.add('ok'); TNR.sfx.note(300 + i * 50);
+          if (i > 0) addLine(fr[i - 1], fr[i]);
+          next++; ctx.debug.next = next;
+          if (next === N) {
+            done = true; addLine(fr[N - 1], fr[0]);
+            var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            poly.setAttribute('points', fr.map(function (q) { return q.join(','); }).join(' ')); poly.setAttribute('class', 'dot-fill');
+            lines.insertBefore(poly, lines.firstChild);
+            ctx.say(TNR.pick(['It is... a wonky star-fish-cloud!', 'A rare Squiggle-o-saurus!', 'Beautiful! It is a... um... modern art!']));
+            ctx.timeout(function () { ctx.pass(); }, 700);
+          }
+        } else if (!b.classList.contains('ok')) {
+          next = 0; ctx.debug.next = 0; lines.innerHTML = ''; dots.forEach(function (d) { d.classList.remove('ok'); });
+          ctx.fail(TNR.pick(['Oops, that is number ' + (i + 1) + '! Start again at 1.', 'The pencil slipped! Back to dot 1.', 'Not that one yet. Begin with 1!']));
+        }
+      });
+      stage.appendChild(b);
+      return b;
+    });
+    function addLine(a, b) {
+      var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]); l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]);
+      l.setAttribute('vector-effect', 'non-scaling-stroke');
+      lines.appendChild(l);
+    }
+    ctx.debug = { next: 0, n: N };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/23-opposite-day.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'opposite-day', title: 'Opposite Day',
+  instruction: '<small>Today everything is backwards!</small><b>Tap the OPPOSITE way</b><i>(4 in a row)</i>',
+  hint: 'If the arrow points up, tap down. If it points left, tap right!',
+  passMsg: 'Expertly backwards! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var DIRS = { up: 0, right: 90, down: 180, left: 270 }, OPP = { up: 'down', down: 'up', left: 'right', right: 'left' };
+    var NEED = 4, round = 0, dir = null, done = false;
+    var pips = TNR.pips(NEED);
+    var arrow = TNR.el('div', { class: 'big-arrow', html: TNR.art.arrow() });
+    var pad = TNR.el('div', { class: 'dpad' });
+    var SYM = { up: '&#9650;', down: '&#9660;', left: '&#9664;', right: '&#9654;' };
+    ['up', 'left', 'right', 'down'].forEach(function (d) {
+      var b = TNR.el('button', { class: 'btn icon dp-' + d, type: 'button', 'data-dir': d, 'aria-label': d, html: SYM[d] });
+      b.addEventListener('click', function () {
+        if (done) return;
+        if (d === OPP[dir]) {
+          round++; pips.set(round); TNR.sfx.pop(); ctx.debug.round = round;
+          if (round >= NEED) { done = true; ctx.timeout(function () { ctx.pass(); }, 250); } else nextDir();
+        } else ctx.fail(d === dir ? 'That is the SAME way! It is opposite day!' : 'Hmm, that is sideways. Opposite, please!');
+      });
+      pad.appendChild(b);
+    });
+    var row = TNR.el('div', { class: 'row' }, [arrow, pad]);
+    ctx.body.appendChild(pips.el); ctx.body.appendChild(row);
+    function nextDir() {
+      var d; do { d = TNR.pick(Object.keys(DIRS)); } while (d === dir);
+      dir = d; arrow.style.transform = 'rotate(' + DIRS[d] + 'deg)'; ctx.debug.dir = d; ctx.debug.answer = OPP[d];
+    }
+    ctx.debug = { round: 0 };
+    nextDir();
+    return {};
+  }
+});
+
+})();
+/* ==== levels/24-riddle.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'riddle', title: 'Riddle Time',
+  instruction: '<small>Robots are terrible at riddles.</small><b>Type the answer</b>',
+  hint: '', /* set in setup */
+  quips: ['Good guess! But not quite.', 'Hmm, think about it a different way.', 'Ooh, creative! Try again though.'],
+  passMsg: 'Riddle master! ✓',
+  setup: function (ctx) {
+    var R = TNR.pick([
+      { q: 'I have hands, but I can\'t clap. What am I?', a: ['CLOCK', 'WATCH'] },
+      { q: 'I am full of holes, but I can still hold water. What am I?', a: ['SPONGE'] },
+      { q: 'What gets wetter the more it dries?', a: ['TOWEL'] },
+      { q: 'What must be broken before you can use it?', a: ['EGG', 'EGGS'] },
+      { q: 'I have keys but no locks, and you can play me. What am I?', a: ['PIANO', 'KEYBOARD'] },
+      { q: 'I have four legs but I can\'t walk. What am I?', a: ['TABLE', 'CHAIR', 'BED'] },
+      { q: 'What has a neck but no head?', a: ['BOTTLE', 'SHIRT', 'GUITAR'] },
+      { q: 'I go up when the rain comes down. What am I?', a: ['UMBRELLA'] }
+    ]);
+    var main = R.a[0];
+    document.getElementById('hint').innerHTML = '<b>Hint:</b> One answer has ' + main.length + ' letters and starts with <b>' + main[0] + '</b>.';
+    ctx.body.appendChild(TNR.el('p', { class: 'riddle-q', text: R.q }));
+    var input = TNR.el('input', { class: 'txt-in', type: 'text', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'characters', spellcheck: 'false', maxlength: '16', placeholder: 'answer', 'aria-label': 'Your answer' });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('btn-verify').click(); });
+    ctx.body.appendChild(input);
+    ctx.debug = { answer: main };
+    return {
+      check: function () {
+        var v = input.value.toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/^(A|AN|THE)\s+/, '').replace(/\s+/g, '');
+        if (!v) { input.focus(); return 'Type your answer in the box first!'; }
+        if (R.a.indexOf(v) >= 0 || (v.slice(-1) === 'S' && R.a.indexOf(v.slice(0, -1)) >= 0)) return true;
+        ctx.timeout(function () { try { input.focus(); input.select(); } catch (e) {} }, 30);
+        return v === 'ROBOT' ? 'Robot?! That is what a robot would say...' : null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/25-find-verify.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'find-verify', title: 'Where\'s Verify?',
+  instruction: '<small>Someone hid the Verify button among copycats!</small><b>Find the REAL one</b>',
+  hint: 'Read each button letter by letter: V - E - R - I - F - Y.',
+  passMsg: 'Sharp eyes! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var fakes = TNR.shuffle(['VERITY', 'VERTIFY', 'VERLFY', 'VARIFY', 'YERIFY', 'VERFIY', 'VEIRFY', 'VER1FY', 'VERIFV']).slice(0, 5);
+    var all = TNR.shuffle(fakes.concat(['VERIFY']));
+    var grid = TNR.el('div', { class: 'fv-grid' });
+    all.forEach(function (w) {
+      var b = TNR.el('button', { class: 'btn fv', type: 'button', 'data-w': w, text: w });
+      b.style.transform = 'rotate(' + (Math.random() * 10 - 5).toFixed(1) + 'deg)';
+      b.addEventListener('click', function () {
+        if (w === 'VERIFY') { TNR.sfx.pop(); ctx.pass(); }
+        else ctx.fail(TNR.pick(['"' + w + '"? That is a sneaky copycat!', 'Ha! ' + w + ' is an impostor button.', 'Nope, read it again: ' + w.split('').join(' ') + '.']));
+      });
+      grid.appendChild(b);
+    });
+    ctx.body.appendChild(grid);
+    ctx.debug = { fakes: fakes };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/26-whats-missing.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'whats-missing', title: 'What\'s Missing?',
+  instruction: '<small>Look closely and remember...</small><b>Which one disappeared?</b>',
+  hint: 'Try saying the names out loud while you look: "cat, sock, rocket..." Then see which name is missing.',
+  passMsg: 'Memory of an elephant! ✓',
+  setup: function (ctx) {
+    var pool = TNR.shuffle(['cat', 'dog', 'fish', 'frog', 'owl', 'rocket', 'sock', 'hat', 'cupcake', 'apple', 'teddy', 'ball', 'star', 'cookie']);
+    var items = pool.slice(0, 5), gone = TNR.pick(items), phase = 'look', c = null;
+    var box = TNR.el('div', { class: 'wm-box' });
+    var bar = TNR.el('div', { class: 'wm-bar' }, [TNR.el('i')]);
+    ctx.body.appendChild(box); ctx.body.appendChild(bar);
+    function look() {
+      phase = 'look'; ctx.debug.phase = phase; ctx.setVerify({ disabled: true });
+      box.innerHTML = '';
+      items.forEach(function (k) { box.appendChild(TNR.el('span', { class: 'wm-item', 'data-k': k, html: TNR.art[k]() })); });
+      bar.hidden = false; bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run');
+      if (c) { c.el.remove(); c = null; }
+      ctx.timeout(ask, 3200);
+    }
+    function ask() {
+      phase = 'ask'; ctx.debug.phase = phase; ctx.setVerify({ disabled: false });
+      bar.hidden = true; box.innerHTML = '';
+      TNR.shuffle(items.filter(function (k) { return k !== gone; })).forEach(function (k) { box.appendChild(TNR.el('span', { class: 'wm-item', html: TNR.art[k]() })); });
+      box.appendChild(TNR.el('span', { class: 'wm-item q', text: '?' }));
+      var opts = TNR.shuffle([gone].concat(TNR.shuffle(pool.slice(5)).slice(0, 3)));
+      c = TNR.choices(ctx, opts.map(function (k) { return { v: k, label: k, html: TNR.art[k]() }; }), { btnCls: 'pic' });
+    }
+    ctx.debug = { answer: gone, phase: 'look' };
+    look();
+    return {
+      check: function () {
+        if (phase !== 'ask') return 'Still looking! Wait a moment.';
+        var v = c.get();
+        if (v === null) return 'Tap the one that vanished first!';
+        if (v === gone) return true;
+        phase = 'wait'; ctx.debug.phase = phase; ctx.timeout(look, 900);
+        return 'Hmm, that one was never there! Let\u2019s peek again.';
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/27-bubble-bath.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'bubble-bath', title: 'Bubble Bath',
+  instruction: '<small>Pop every bubble...</small><b>but NOT the one with a fish!</b>',
+  hint: 'Look inside each bubble before you pop it. Leave the fish alone!',
+  passMsg: 'Pop pop pop! The fish says thanks. ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var N = 7, fishAt = TNR.rint(0, N - 1), left = N - 1, done = false;
+    var stage = TNR.el('div', { class: 'stage bubbles' });
+    ctx.body.appendChild(stage);
+    var slots = TNR.shuffle([[12, 22], [38, 18], [64, 24], [88, 20], [24, 66], [52, 70], [78, 64], [6, 48], [94, 48]]).slice(0, N);
+    var bubbles = slots.map(function (p, i) {
+      var b = TNR.el('button', { class: 'bubble' + (i === fishAt ? ' has-fish' : ''), type: 'button', 'data-i': String(i), 'aria-label': i === fishAt ? 'bubble with fish' : 'bubble', style: 'left:' + p[0] + '%;top:' + p[1] + '%;animation-delay:-' + (Math.random() * 3).toFixed(2) + 's' });
+      if (i === fishAt) b.innerHTML = '<span class="bfish">' + TNR.art.fish() + '</span>';
+      b.addEventListener('click', function () {
+        if (done || b.classList.contains('gone')) return;
+        if (i === fishAt) { ctx.fail(TNR.pick(['Hey! The fish was napping in there!', 'Not the fish bubble! It is its tiny house.', 'Blub blub! (That means "please don\u2019t" in fish.)'])); return; }
+        b.classList.add('gone'); b.disabled = true; left--; ctx.debug.left = left; TNR.sfx.pop();
+        if (left === 0) { done = true; ctx.timeout(function () { ctx.pass(); }, 300); }
+      });
+      stage.appendChild(b);
+      return b;
+    });
+    ctx.debug = { fish: fishAt, left: left };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/28-fair-share.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'fair-share', title: 'Fair Share',
+  instruction: '', /* set in setup */
+  hint: 'Give one cookie to each friend, then another, round and round, until the jar is empty.',
+  quips: ['Someone is getting more cookies! Not fair!', 'Uh oh, a friend is pouting.', 'Count each pile again!'],
+  passMsg: 'Fair and square! Everybody munches. ✓',
+  setup: function (ctx) {
+    var F = TNR.rint(2, 3), each = TNR.rint(2, F === 2 ? 4 : 3), total = F * each;
+    var who = TNR.shuffle(['cat', 'dog', 'frog', 'owl', 'teddy']).slice(0, F), got = who.map(function () { return 0; });
+    document.getElementById('panel-instr').innerHTML = '<small>' + total + ' cookies, ' + F + ' hungry friends.</small><b>Share them fairly!</b>';
+    var jar = TNR.el('div', { class: 'fs-jar' });
+    var row = TNR.el('div', { class: 'fs-row' });
+    ctx.body.appendChild(jar); ctx.body.appendChild(row);
+    var cols = who.map(function (k, i) {
+      var pile = TNR.el('div', { class: 'fs-pile' });
+      var minus = TNR.el('button', { class: 'btn icon', type: 'button', 'data-f': String(i), 'data-act': 'minus', 'aria-label': 'take back', text: '\u2212' });
+      var plus = TNR.el('button', { class: 'btn icon', type: 'button', 'data-f': String(i), 'data-act': 'plus', 'aria-label': 'give cookie', text: '+' });
+      minus.addEventListener('click', function () { if (got[i] > 0) { got[i]--; TNR.sfx.tap(); render(); } });
+      plus.addEventListener('click', function () { if (left() > 0) { got[i]++; TNR.sfx.pop(); render(); } else ctx.say('The jar is empty!'); });
+      var col = TNR.el('div', { class: 'fs-col' }, [TNR.el('div', { class: 'fs-pal', html: TNR.art[k]() }), pile, TNR.el('div', { class: 'fs-btns' }, [minus, plus])]);
+      row.appendChild(col);
+      return pile;
+    });
+    function left() { return total - got.reduce(function (a, b) { return a + b; }, 0); }
+    function render() {
+      jar.innerHTML = '<span class="fs-label">Jar</span>';
+      for (var j = 0; j < left(); j++) jar.appendChild(TNR.el('span', { class: 'ck', html: TNR.art.cookie() }));
+      cols.forEach(function (p, i) { p.innerHTML = ''; for (var j = 0; j < got[i]; j++) p.appendChild(TNR.el('span', { class: 'ck', html: TNR.art.cookie() })); });
+      ctx.debug.got = got.slice(); ctx.debug.left = left();
+    }
+    ctx.debug = { friends: F, each: each };
+    render();
+    return {
+      check: function () {
+        if (left() > 0) return 'There are still cookies in the jar!';
+        return got.every(function (g) { return g === each; }) ? true : null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/29-clock-reader.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'clock-reader', title: 'Tick Tock',
+  instruction: '<small>Robots read digital clocks only.</small><b>What time is it?</b>',
+  hint: 'The short hand shows the hour. If the long hand points straight down, it is "half past" (:30).',
+  quips: ['Close! Check the short hand.', 'Tick tock... not that time!', 'The clock disagrees politely.'],
+  passMsg: 'Right on time! ✓',
+  setup: function (ctx) {
+    var h = TNR.rint(1, 12), m = TNR.pick([0, 30]);
+    var ans = h + ':' + (m ? '30' : '00');
+    ctx.body.appendChild(TNR.el('div', { class: 'clock-face', html: TNR.art.clock(h, m) }));
+    var set = {}; set[ans] = 1;
+    var wrongs = [(h % 12 + 1) + ':' + (m ? '30' : '00'), h + ':' + (m ? '00' : '30'), ((h + 10) % 12 + 1) + ':' + (m ? '30' : '00'), (m ? h : (h + 10) % 12 + 1) + ':' + (m ? '00' : '30'), ((h + 5) % 12 + 1) + ':00'];
+    var opts = [ans];
+    wrongs.forEach(function (w) { if (!set[w] && opts.length < 4) { set[w] = 1; opts.push(w); } });
+    var c = TNR.choices(ctx, TNR.shuffle(opts).map(function (t) { return { v: t }; }), { btnCls: 'time' });
+    ctx.debug = { answer: ans };
+    return { check: function () { var v = c.get(); if (v === null) return 'Tap a time first!'; return v === ans ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/30-picky-monster.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'picky-monster', title: 'Picky Monster',
+  instruction: '', /* set in setup */
+  hint: 'Read the monster\'s wish again. Then drag that snack right into its mouth.',
+  passMsg: 'NOM NOM! Happy monster. ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var WISH = {
+      apple: 'something round and red that grows on trees',
+      banana: 'something long and yellow that monkeys love',
+      strawberry: 'something red with tiny seeds on the OUTSIDE',
+      orange: 'a round fruit that has the same name as its color',
+      cupcake: 'a little cake with frosting on top'
+    };
+    var snacks = TNR.shuffle(Object.keys(WISH)).slice(0, 4), want = TNR.pick(snacks), done = false;
+    document.getElementById('panel-instr').innerHTML = '<small>The monster only eats ' + WISH[want] + '.</small><b>Drag its snack to its mouth!</b>';
+    var stage = TNR.el('div', { class: 'stage s2 pm-stage' });
+    var mon = TNR.el('div', { class: 'pm-monster', html: TNR.art.monster(false) });
+    stage.appendChild(mon); ctx.body.appendChild(stage);
+    var W = stage.clientWidth, H = stage.clientHeight;
+    var pieces = snacks.map(function (k, i) {
+      var p = TNR.el('div', { class: 'piece pm-snack', 'data-k': k, role: 'button', 'aria-label': k, html: TNR.art[k]() });
+      stage.appendChild(p);
+      var home = function () { p.classList.remove('drag'); TNR.placeIn(stage, p, (W - 64) * (0.62 + 0.38 * (i % 2)), (H - 64) * (i < 2 ? 0.06 : 0.94)); };
+      home();
+      TNR.draggable(ctx, p, stage, {
+        enabled: function () { return !done; },
+        onStart: function () { mon.innerHTML = TNR.art.monster(true); },
+        onDrop: function (pt) {
+          mon.innerHTML = TNR.art.monster(false);
+          if (!TNR.inside(pt, mon, 10)) { return; }
+          if (k === want) { done = true; p.classList.add('eaten'); mon.classList.add('chomp'); TNR.sfx.pop(); ctx.timeout(function () { ctx.pass(); }, 500); }
+          else { home(); ctx.fail(TNR.pick(['Bleh! The monster spits out the ' + k + '. Read the wish again!', 'Monster says: "That is NOT what I asked for!"', 'Yuck face! Wrong snack.'])); }
+        }
+      });
+      return p;
+    });
+    ctx.debug = { want: want };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/31-dusty-window.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'dusty-window', title: 'Dusty Window',
+  instruction: '<small>Wipe the dusty window with your finger or mouse.</small><b>What number is hiding?</b>',
+  hint: 'Rub back and forth across the middle of the window, like cleaning a real one.',
+  quips: ['Hmm, look through the clean part again.', 'Still a bit smudgy? Wipe some more!', 'That is not the secret number.'],
+  passMsg: 'Squeaky clean! ✓',
+  setup: function (ctx) {
+    var n = TNR.rint(12, 98); if (n % 11 === 0) n++;
+    var stage = TNR.el('div', { class: 'stage s2 dw-stage' });
+    stage.appendChild(TNR.el('div', { class: 'dw-num', text: String(n) }));
+    var cv = TNR.el('canvas', { class: 'dw-dust', 'aria-label': 'dusty window' });
+    stage.appendChild(cv); ctx.body.appendChild(stage);
+    var W = stage.clientWidth, H = stage.clientHeight; cv.width = W; cv.height = H;
+    var g = cv.getContext('2d');
+    g.fillStyle = '#b9a98a'; g.fillRect(0, 0, W, H);
+    for (var i = 0; i < 260; i++) { g.fillStyle = 'rgba(' + (120 + Math.random() * 60 | 0) + ',' + (100 + Math.random() * 50 | 0) + ',70,0.35)'; g.beginPath(); g.arc(Math.random() * W, Math.random() * H, 3 + Math.random() * 10, 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(80,60,40,.5)'; g.font = 'bold 18px system-ui,sans-serif'; g.textAlign = 'center'; g.fillText('wipe me', W / 2, H - 14);
+    var GX = 8, GY = 6, cells = {}, cleaned = 0, R = Math.max(22, Math.min(W, H) * 0.11), last = null, ready = false;
+    var nums = [n]; while (nums.length < 4) { var x = TNR.rint(10, 99); if (nums.indexOf(x) < 0 && String(x).split('').reverse().join('') !== String(n)) nums.push(x); }
+    var c = TNR.choices(ctx, TNR.shuffle(nums).map(function (v) { return { v: String(v) }; }));
+    c.disable(true); ctx.setVerify({ disabled: true });
+    function wipe(x, y) {
+      g.globalCompositeOperation = 'destination-out'; g.lineCap = 'round'; g.lineWidth = R * 2;
+      g.beginPath(); g.moveTo(last ? last.x : x, last ? last.y : y); g.lineTo(x, y); g.stroke();
+      g.beginPath(); g.arc(x, y, R, 0, 7); g.fill();
+      last = { x: x, y: y };
+      var cx = Math.floor(x / W * GX), cy = Math.floor(y / H * GY), key = cx + ',' + cy;
+      if (cx >= 0 && cy >= 0 && cx < GX && cy < GY && !cells[key]) { cells[key] = 1; cleaned++; }
+      ctx.debug.cleaned = cleaned;
+      if (!ready && cleaned >= GX * GY * 0.4) { ready = true; c.disable(false); ctx.setVerify({ disabled: false }); TNR.sfx.pop(); ctx.say('Sparkly! Now which number do you see?'); }
+    }
+    var down = false;
+    function pt(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; }
+    cv.addEventListener('pointerdown', function (e) { down = true; last = null; try { cv.setPointerCapture(e.pointerId); } catch (x) {} var p = pt(e); wipe(p.x, p.y); e.preventDefault(); });
+    cv.addEventListener('pointermove', function (e) { if (!down) return; var p = pt(e); wipe(p.x, p.y); });
+    var up = function () { down = false; last = null; };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    ctx.debug = { answer: String(n), cleaned: 0, need: Math.ceil(GX * GY * 0.4) };
+    return { check: function () { var v = c.get(); if (v === null) return 'Tap the number you see!'; return v === String(n) ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/32-stop-green.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'stop-green', title: 'Stop on Green',
+  instruction: '<small>The little light is zooming back and forth.</small><b>Press STOP when it\'s in the green!</b>',
+  hint: 'Watch it go by once or twice. Press STOP just as it enters the green part.',
+  passMsg: 'Perfect timing! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var zw = 0.2, z0 = 0.15 + Math.random() * 0.6, PERIOD = 2600, t0 = performance.now(), pos = 0, frozen = false;
+    var track = TNR.el('div', { class: 'sg-track' });
+    var zone = TNR.el('div', { class: 'sg-zone', style: 'left:' + (z0 * 100) + '%;width:' + (zw * 100) + '%' });
+    var dot = TNR.el('div', { class: 'sg-dot' });
+    track.appendChild(zone); track.appendChild(dot);
+    var stop = TNR.el('button', { class: 'btn primary sg-stop', type: 'button', 'data-act': 'stop', text: 'STOP' });
+    ctx.body.appendChild(track); ctx.body.appendChild(stop);
+    ctx.raf(function (ts) {
+      if (frozen) return;
+      var ph = ((ts - t0) % PERIOD) / PERIOD; pos = ph < 0.5 ? ph * 2 : 2 - ph * 2;
+      dot.style.left = (pos * 100) + '%'; ctx.debug.pos = pos;
+    });
+    stop.addEventListener('pointerdown', function (e) { e.preventDefault(); press(); });
+    stop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); press(); } });
+    function press() {
+      if (frozen) return;
+      frozen = true; dot.classList.add('frozen');
+      var m = 0.015;
+      if (pos >= z0 - m && pos <= z0 + zw + m) { TNR.sfx.pop(); zone.classList.add('hit'); ctx.timeout(function () { ctx.pass(); }, 350); }
+      else {
+        ctx.fail(pos < z0 ? TNR.pick(['A tiny bit too early!', 'Whoa there, speedy! Too soon.']) : TNR.pick(['Just missed it! A bit too late.', 'The light zoomed past! Try again.']));
+        ctx.timeout(function () { frozen = false; dot.classList.remove('frozen'); t0 = performance.now(); }, 700);
+      }
+    }
+    ctx.debug = { zone: [z0, z0 + zw], pos: 0 };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/33-paint-numbers.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'paint-numbers', title: 'Paint by Numbers',
+  instruction: '<small>Pick a paint, then tap the matching numbered space.</small><b>Paint the whole picture!</b>',
+  hint: 'Each number goes with one color in the paint box. Match them up, then press Verify.',
+  quips: ['Hmm, a few spots have the wrong paint.', 'The picture looks a bit silly. Check the numbers!', 'Artistic! But not what the numbers say.'],
+  passMsg: 'Gallery-worthy! ✓',
+  setup: function (ctx) {
+    var PAL = { blue: '#64b5f6', yellow: '#ffd54f', green: '#81c784', red: '#e57373', brown: '#a1887f' };
+    var names = TNR.shuffle(Object.keys(PAL)), regions = ['sky', 'sun', 'grass', 'house', 'roof'];
+    var want = {}; regions.forEach(function (r, i) { want[r] = names[i]; });
+    var nums = TNR.shuffle([1, 2, 3, 4, 5]), numOf = {}, colorOfNum = {};
+    regions.forEach(function (r, i) { numOf[r] = nums[i]; colorOfNum[nums[i]] = want[r]; });
+    var paint = {}, brush = null;
+    var svg = '<svg viewBox="0 0 100 100" class="pn-svg">' +
+      '<rect data-r="sky" x="0" y="0" width="100" height="70"/>' +
+      '<rect data-r="grass" x="0" y="70" width="100" height="30"/>' +
+      '<circle data-r="sun" cx="82" cy="18" r="11"/>' +
+      '<rect data-r="house" x="28" y="50" width="34" height="32"/>' +
+      '<polygon data-r="roof" points="45,28 22,51 68,51"/>' +
+      '<text x="12" y="24">' + numOf.sky + '</text><text x="82" y="22">' + numOf.sun + '</text><text x="84" y="90">' + numOf.grass + '</text>' +
+      '<text x="45" y="71">' + numOf.house + '</text><text x="45" y="47">' + numOf.roof + '</text></svg>';
+    var pic = TNR.el('div', { class: 'pn-pic', html: svg });
+    var key = TNR.el('div', { class: 'pn-key' });
+    nums.slice().sort().forEach(function (n) {
+      var b = TNR.el('button', { class: 'btn choice pn-paint', type: 'button', 'data-c': colorOfNum[n], 'aria-label': n + ' ' + colorOfNum[n], html: '<b>' + n + '</b><i style="background:' + PAL[colorOfNum[n]] + '"></i>' });
+      b.addEventListener('click', function () { brush = colorOfNum[n]; key.querySelectorAll('.pn-paint').forEach(function (x) { x.classList.toggle('sel', x === b); }); TNR.sfx.tap(); });
+      key.appendChild(b);
+    });
+    ctx.body.appendChild(TNR.el('div', { class: 'row pn-row' }, [pic, key]));
+    pic.querySelectorAll('[data-r]').forEach(function (shape) {
+      shape.addEventListener('click', function () {
+        if (!brush) { ctx.say('Pick a paint color first!'); return; }
+        var r = shape.getAttribute('data-r'); paint[r] = brush; shape.style.fill = PAL[brush]; TNR.sfx.pop();
+        ctx.debug.paint = Object.assign({}, paint);
+      });
+    });
+    ctx.debug = { want: want, paint: {} };
+    return {
+      check: function () {
+        var missing = regions.filter(function (r) { return !paint[r]; }).length;
+        if (missing) return missing + ' space' + (missing > 1 ? 's are' : ' is') + ' still blank!';
+        return regions.every(function (r) { return paint[r] === want[r]; }) ? true : null;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/34-balance-scale.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'balance-scale', title: 'Balance Scale',
+  instruction: '', /* set in setup */
+  hint: 'Add up the numbers on the blocks you put on the right. They should equal the number on the left.',
+  quips: ['The scale is still wobbly!', 'Tippy! Not balanced yet.', 'One side is heavier. Try other blocks.'],
+  passMsg: 'Perfectly balanced! ✓',
+  setup: function (ctx) {
+    var W = TNR.rint(6, 9), on = {}, blocks = [1, 2, 3, 4, 5];
+    document.getElementById('panel-instr').innerHTML = '<small>The left side weighs ' + W + '.</small><b>Put blocks on the right to balance it!</b>';
+    var scale = TNR.el('div', { class: 'bs-scale' });
+    var beam = TNR.el('div', { class: 'bs-beam' });
+    var left = TNR.el('div', { class: 'bs-pan l' }, [TNR.el('span', { class: 'bs-blk big', text: String(W) })]);
+    var right = TNR.el('div', { class: 'bs-pan r' });
+    beam.appendChild(left); beam.appendChild(right);
+    scale.appendChild(beam); scale.appendChild(TNR.el('div', { class: 'bs-post' }));
+    ctx.body.appendChild(scale);
+    var row = TNR.el('div', { class: 'choices bs-row' });
+    blocks.forEach(function (b) {
+      var btn = TNR.el('button', { class: 'btn choice bs-pick', type: 'button', 'data-b': String(b), 'aria-pressed': 'false', text: String(b) });
+      btn.addEventListener('click', function () { on[b] = !on[b]; btn.classList.toggle('sel', on[b]); btn.setAttribute('aria-pressed', String(!!on[b])); TNR.sfx.tap(); render(); });
+      row.appendChild(btn);
+    });
+    ctx.body.appendChild(row);
+    function sum() { return blocks.reduce(function (a, b) { return a + (on[b] ? b : 0); }, 0); }
+    function render() {
+      right.innerHTML = '';
+      blocks.forEach(function (b) { if (on[b]) right.appendChild(TNR.el('span', { class: 'bs-blk', text: String(b) })); });
+      var d = TNR.clamp(sum() - W, -6, 6);
+      beam.style.transform = 'rotate(' + (d * 3) + 'deg)';
+      left.style.transform = right.style.transform = 'rotate(' + (-d * 3) + 'deg)';
+      scale.classList.toggle('level', d === 0);
+      ctx.debug.sum = sum();
+    }
+    ctx.debug = { target: W, sum: 0 };
+    render();
+    return {
+      check: function () {
+        var s = sum();
+        if (s === W) return true;
+        if (s === 0) return 'The right side is empty! Tap some blocks.';
+        return s > W ? 'Whoa, the right side is too heavy!' : 'The right side is too light!';
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/35-copycat.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'copycat', title: 'Copycat Lights',
+  instruction: '<small>Watch the lights and listen...</small><b>then copy the tune!</b>',
+  hint: 'Say the colors out loud while they light up, like "green, red, blue". Press Watch again to replay.',
+  passMsg: 'Copycat champion! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var PADS = [{ c: 'green', f: 330 }, { c: 'red', f: 392 }, { c: 'yellow', f: 440 }, { c: 'blue', f: 523 }];
+    var LEN = 3, seq = [], at = 0, phase = 'show', done = false;
+    for (var i = 0; i < LEN; i++) { var p; do { p = TNR.rint(0, 3); } while (i > 0 && p === seq[i - 1]); seq.push(p); }
+    var wrap = TNR.el('div', { class: 'cc-pads' });
+    var pads = PADS.map(function (P, i) {
+      var b = TNR.el('button', { class: 'cc-pad cc-' + P.c, type: 'button', 'data-p': String(i), 'aria-label': P.c });
+      b.addEventListener('click', function () {
+        if (phase !== 'play' || done) return;
+        flash(i);
+        if (i === seq[at]) { at++; ctx.debug.at = at; if (at === LEN) { done = true; ctx.timeout(function () { ctx.pass(); }, 400); } }
+        else { ctx.fail(TNR.pick(['Oops, wrong note! Listen again.', 'That tune went a bit wonky! Here it is again.', 'Close! Let me play it once more.'])); ctx.timeout(show, 900); }
+      });
+      wrap.appendChild(b);
+      return b;
+    });
+    var again = TNR.el('button', { class: 'btn', type: 'button', 'data-act': 'replay', text: '\u25B6 Watch again' });
+    again.addEventListener('click', function () { if (phase === 'play' && !done) show(); });
+    ctx.body.appendChild(wrap); ctx.body.appendChild(again);
+    function flash(i) { pads[i].classList.add('lit'); TNR.sfx.note(PADS[i].f); ctx.timeout(function () { pads[i].classList.remove('lit'); }, 330); }
+    function show() {
+      phase = 'show'; at = 0; ctx.debug.phase = phase; ctx.debug.at = 0; wrap.classList.add('busy');
+      seq.forEach(function (s, k) { ctx.timeout(function () { flash(s); }, 500 + k * 650); });
+      ctx.timeout(function () { phase = 'play'; ctx.debug.phase = phase; wrap.classList.remove('busy'); ctx.say('Your turn!'); }, 500 + LEN * 650);
+    }
+    ctx.debug = { seq: seq, phase: 'show', at: 0 };
+    show();
+    return {};
+  }
+});
+
+})();
+/* ==== levels/36-cup-shuffle.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'cup-shuffle', title: 'Cup Shuffle',
+  instruction: '<small>Keep your eyes on the ball...</small><b>Which cup is it under?</b>',
+  hint: 'Follow just ONE cup with your eyes, the one that has the ball. Don\'t blink!',
+  quips: ['Empty! The ball was hiding elsewhere.', 'Whoosh, nothing there!', 'Those cups are tricky!'],
+  passMsg: 'Eagle eyes! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var stage = TNR.el('div', { class: 'stage s2 cs-stage' });
+    var start = TNR.el('button', { class: 'btn primary', type: 'button', 'data-act': 'shuffle', text: 'Shuffle!' });
+    ctx.body.appendChild(stage); ctx.body.appendChild(start);
+    var slotX = [18, 50, 82], slotOf = [0, 1, 2], ball = TNR.rint(0, 2), phase = 'ready';
+    var ballEl = TNR.el('div', { class: 'cs-ball', html: TNR.art.ball() });
+    stage.appendChild(ballEl);
+    var cups = [0, 1, 2].map(function (c) {
+      var b = TNR.el('button', { class: 'cup', type: 'button', 'data-c': String(c), 'aria-label': 'cup', html: TNR.art.cup() });
+      b.addEventListener('click', function () {
+        if (phase !== 'pick') return;
+        phase = 'reveal'; ctx.debug.phase = phase;
+        place(); cups[ball].classList.add('up'); b.classList.add('up');
+        if (c === ball) { TNR.sfx.pop(); ctx.timeout(function () { ctx.pass(); }, 600); }
+        else { ctx.fail(); ctx.timeout(reset, 1300); }
+      });
+      stage.appendChild(b);
+      return b;
+    });
+    function place() {
+      cups.forEach(function (b, c) { b.style.left = slotX[slotOf[c]] + '%'; });
+      ballEl.style.left = slotX[slotOf[ball]] + '%';
+    }
+    function reset() {
+      cups.forEach(function (b) { b.classList.remove('up'); });
+      ball = TNR.rint(0, 2); ctx.debug.ball = ball; place();
+      cups[ball].classList.add('up'); phase = 'ready'; ctx.debug.phase = phase; start.disabled = false;
+    }
+    start.addEventListener('click', function () {
+      if (phase !== 'ready') return;
+      phase = 'shuffle'; ctx.debug.phase = phase; start.disabled = true;
+      cups[ball].classList.remove('up');
+      ctx.timeout(function () {
+        ballEl.classList.add('hidden');
+        var k = 0, N = 4;
+        (function swap() {
+          if (k === N) { phase = 'pick'; ctx.debug.phase = phase; ballEl.classList.remove('hidden'); ctx.say('Tap a cup!'); return; }
+          var a = TNR.rint(0, 2), b2; do { b2 = TNR.rint(0, 2); } while (b2 === a);
+          var t = slotOf[a]; slotOf[a] = slotOf[b2]; slotOf[b2] = t;
+          cups[a].classList.add('hop'); cups[b2].classList.remove('hop');
+          place(); TNR.sfx.tick(); k++;
+          ctx.timeout(function () { cups[a].classList.remove('hop'); swap(); }, 650);
+        })();
+      }, 500);
+    });
+    ctx.debug = { ball: ball, phase: 'ready' };
+    place(); cups[ball].classList.add('up');
+    return {};
+  }
+});
+
+})();
+/* ==== levels/37-oven-dial.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'oven-dial', title: 'Oven Dial',
+  instruction: '<small>Time to bake! Turn the dial so it points at</small><b>COOKIES</b>',
+  hint: 'Drag the dial around in a circle, or use the arrow buttons, until the little pointer touches "Cookies". Then Verify.',
+  quips: ['Hmm, that setting makes something else!', 'The oven says: "Are you sure about that?"', 'Not quite cookies yet.'],
+  passMsg: 'Mmm, cookies! ✓',
+  setup: function (ctx) {
+    var labels = TNR.shuffle(['Cookies', 'Pizza', 'Socks', 'Toast', 'Ice', 'Pie', 'Robots', 'Bread']);
+    var target = labels.indexOf('Cookies'), step = TNR.rint(0, 7); while (step === target) step = TNR.rint(0, 7);
+    var box = TNR.el('div', { class: 'od-box' });
+    labels.forEach(function (l, i) {
+      var a = i * 45 * Math.PI / 180;
+      box.appendChild(TNR.el('span', { class: 'od-label', text: l, style: 'left:' + (50 + 41 * Math.sin(a)) + '%;top:' + (50 - 41 * Math.cos(a)) + '%' }));
+    });
+    var knob = TNR.el('div', { class: 'od-knob', role: 'slider', 'aria-label': 'oven dial', tabindex: '0', html: '<i></i>' });
+    box.appendChild(knob);
+    var minus = TNR.el('button', { class: 'btn icon', type: 'button', 'data-act': 'ccw', 'aria-label': 'turn left', html: '&#8634;' });
+    var plus = TNR.el('button', { class: 'btn icon', type: 'button', 'data-act': 'cw', 'aria-label': 'turn right', html: '&#8635;' });
+    ctx.body.appendChild(TNR.el('div', { class: 'row od-row' }, [minus, box, plus]));
+    var ang = step * 45;
+    function setStep(s) { step = ((s % 8) + 8) % 8; ang = step * 45; render(); TNR.sfx.tick(); }
+    function render() { knob.style.transform = 'translate(-50%,-50%) rotate(' + ang + 'deg)'; ctx.debug.step = step; ctx.debug.angle = ang; }
+    minus.addEventListener('click', function () { setStep(step - 1); });
+    plus.addEventListener('click', function () { setStep(step + 1); });
+    var drag = false;
+    function angOf(e) { var r = box.getBoundingClientRect(); return Math.atan2(e.clientX - (r.left + r.width / 2), -(e.clientY - (r.top + r.height / 2))) * 180 / Math.PI; }
+    knob.addEventListener('pointerdown', function (e) { drag = true; try { knob.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); });
+    knob.addEventListener('pointermove', function (e) { if (!drag) return; ang = (angOf(e) + 360) % 360; render(); });
+    var up = function () { if (!drag) return; drag = false; setStep(Math.round(ang / 45)); };
+    knob.addEventListener('pointerup', up); knob.addEventListener('pointercancel', up);
+    knob.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowUp') setStep(step + 1); if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') setStep(step - 1); });
+    ctx.debug = { target: target, labels: labels };
+    render();
+    return {
+      check: function () {
+        if (step === target) return true;
+        return 'The oven is set to ' + labels[step].toUpperCase() + '! ' + TNR.pick(['Crunchy... but not cookies.', 'That is not what we want to bake!', 'Hmm, not quite.']);
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/38-spot-difference.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'spot-difference', title: 'Spot the Difference',
+  instruction: '<small>These two boxes are ALMOST the same.</small><b>Tap the one thing that changed</b>',
+  hint: 'Check one square at a time: top-left in both boxes, then the next one, and so on.',
+  passMsg: 'Found it! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var pool = TNR.shuffle(['cat', 'fish', 'frog', 'owl', 'apple', 'banana', 'sock', 'hat', 'rocket', 'cupcake', 'ball', 'teddy', 'leaf', 'sun']);
+    var A = pool.slice(0, 9), d = TNR.rint(0, 8), B = A.slice(); B[d] = pool[9];
+    function grid(arr, side) {
+      var g = TNR.el('div', { class: 'sd-grid' });
+      arr.forEach(function (k, i) {
+        var b = TNR.el('button', { class: 'sd-cell', type: 'button', 'data-side': side, 'data-i': String(i), 'aria-label': k, html: TNR.art[k]() });
+        b.addEventListener('click', function () {
+          if (i === d) { b.classList.add('found'); TNR.sfx.pop(); ctx.pass(); }
+          else { b.classList.add('nope'); ctx.timeout(function () { b.classList.remove('nope'); }, 600); ctx.fail(TNR.pick(['That ' + k + ' is the same in both!', 'Twins! Those two match.', 'Look again, that one did not change.'])); }
+        });
+        g.appendChild(b);
+      });
+      return g;
+    }
+    ctx.body.appendChild(TNR.el('div', { class: 'sd-wrap' }, [grid(A, 'a'), grid(B, 'b')]));
+    ctx.debug = { diff: d };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/39-tidy-up.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'tidy-up', title: 'Tidy Up',
+  instruction: '<small>Bedtime! Put everything away.</small><b>Fruit in the bowl, toys in the box</b>',
+  hint: 'Drag each thing into the right place. Rockets and teddies are toys. Apples and bananas are fruit!',
+  quips: ['Hmm, something is in the wrong place!', 'A banana in the toy box? Silly!', 'Almost tidy... check again.'],
+  passMsg: 'Spotless room! ✓',
+  setup: function (ctx) {
+    var fruit = TNR.shuffle(['apple', 'banana', 'strawberry', 'orange']).slice(0, 2), toys = TNR.shuffle(['rocket', 'robot', 'ball', 'teddy']).slice(0, 2);
+    var items = TNR.shuffle(fruit.concat(toys)), where = {};
+    var stage = TNR.el('div', { class: 'stage s2 tu-stage' });
+    var bowl = TNR.el('div', { class: 'tu-bin bowl', 'data-bin': 'fruit', html: '<span>Fruit Bowl</span>' });
+    var box = TNR.el('div', { class: 'tu-bin box', 'data-bin': 'toy', html: '<span>Toy Box</span>' });
+    stage.appendChild(bowl); stage.appendChild(box); ctx.body.appendChild(stage);
+    var W = stage.clientWidth;
+    var pieces = items.map(function (k, i) {
+      var p = TNR.el('div', { class: 'piece tu-item', 'data-k': k, role: 'button', 'aria-label': k, html: TNR.art[k]() });
+      stage.appendChild(p);
+      var home = function () { where[k] = null; ctx.debug.where = Object.assign({}, where); TNR.placeIn(stage, p, 8 + (W - 16 - 64) * i / 3, 8); };
+      p._home = home; home();
+      TNR.draggable(ctx, p, stage, {
+        onDrop: function (pt) {
+          where[k] = TNR.inside(pt, bowl) ? 'fruit' : TNR.inside(pt, box) ? 'toy' : null;
+          if (!where[k]) home(); else TNR.sfx.pop();
+          ctx.debug.where = Object.assign({}, where);
+        }
+      });
+      return p;
+    });
+    ctx.debug = { fruit: fruit, toys: toys, where: {} };
+    return {
+      check: function () {
+        var out = items.filter(function (k) { return !where[k]; });
+        if (out.length) return out.length + ' thing' + (out.length > 1 ? 's are' : ' is') + ' still on the floor!';
+        var wrong = 0;
+        pieces.forEach(function (p) { var k = p.getAttribute('data-k'), ok = (fruit.indexOf(k) >= 0 ? 'fruit' : 'toy'); if (where[k] !== ok) { wrong++; p._home(); } });
+        return wrong ? null : true;
+      }
+    };
+  }
+});
+
+})();
+/* ==== levels/40-maze-mouse.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'maze-mouse', title: 'Mouse Maze',
+  instruction: '<small>This mouse is very hungry.</small><b>Guide it to the cheese!</b>',
+  hint: 'Use the arrow buttons (or your keyboard arrows). If you hit a wall, just try another way.',
+  quips: ['The mouse hasn\'t reached the cheese yet!', 'Squeak? (Still hungry.)'],
+  passMsg: 'Cheese time! ✓',
+  setup: function (ctx) {
+    var N = 5, walls = [], seen = [];
+    for (var i = 0; i < N * N; i++) { walls.push({ n: 1, e: 1, s: 1, w: 1 }); seen.push(false); }
+    var D = { n: [0, -1, 's'], s: [0, 1, 'n'], e: [1, 0, 'w'], w: [-1, 0, 'e'] };
+    (function carve(x, y) {
+      seen[y * N + x] = true;
+      TNR.shuffle(['n', 's', 'e', 'w']).forEach(function (d) {
+        var nx = x + D[d][0], ny = y + D[d][1];
+        if (nx < 0 || ny < 0 || nx >= N || ny >= N || seen[ny * N + nx]) return;
+        walls[y * N + x][d] = 0; walls[ny * N + nx][D[d][2]] = 0; carve(nx, ny);
+      });
+    })(0, 0);
+    var pos = { x: 0, y: 0 }, goal = { x: N - 1, y: N - 1 }, done = false;
+    var grid = TNR.el('div', { class: 'mz-grid' });
+    walls.forEach(function (w, i) {
+      grid.appendChild(TNR.el('div', { class: 'mz-cell' + (w.n ? ' wn' : '') + (w.e ? ' we' : '') + (w.s ? ' ws' : '') + (w.w ? ' ww' : '') }));
+    });
+    var mouse = TNR.el('div', { class: 'mz-tok mouse', html: TNR.art.mouse() });
+    var cheese = TNR.el('div', { class: 'mz-tok', html: TNR.art.cheese(), style: 'left:' + (goal.x * 20) + '%;top:' + (goal.y * 20) + '%' });
+    grid.appendChild(cheese); grid.appendChild(mouse);
+    var pad = TNR.el('div', { class: 'dpad' });
+    var SYM = { n: '&#9650;', w: '&#9664;', e: '&#9654;', s: '&#9660;' }, NAME = { n: 'up', s: 'down', e: 'right', w: 'left' };
+    ['n', 'w', 'e', 's'].forEach(function (d) {
+      var b = TNR.el('button', { class: 'btn icon dp-' + NAME[d], type: 'button', 'data-dir': d, 'aria-label': NAME[d], html: SYM[d] });
+      b.addEventListener('click', function () { move(d); });
+      pad.appendChild(b);
+    });
+    ctx.body.appendChild(TNR.el('div', { class: 'row mz-row' }, [grid, pad]));
+    ctx.listen(document, 'keydown', function (e) {
+      var k = { ArrowUp: 'n', ArrowDown: 's', ArrowLeft: 'w', ArrowRight: 'e' }[e.key];
+      if (k && !e.repeat) { e.preventDefault(); move(k); }
+    });
+    function render() { mouse.style.left = (pos.x * 20) + '%'; mouse.style.top = (pos.y * 20) + '%'; mouse.classList.toggle('flip', lastDir === 'w'); ctx.debug.pos = [pos.x, pos.y]; }
+    var lastDir = 'e';
+    function move(d) {
+      if (done) return;
+      lastDir = d;
+      if (walls[pos.y * N + pos.x][d]) {
+        mouse.classList.remove('bump'); void mouse.offsetWidth; mouse.classList.add('bump');
+        TNR.sfx.soft(); ctx.say(TNR.pick(['Bonk! A wall.', 'Oof, wall! Try another way.', 'That way is blocked.'])); return;
+      }
+      pos.x += D[d][0]; pos.y += D[d][1]; TNR.sfx.tap(); render();
+      if (pos.x === goal.x && pos.y === goal.y) { done = true; ctx.timeout(function () { ctx.pass(); }, 350); }
+    }
+    ctx.debug = { walls: walls.map(function (w) { return [w.n, w.e, w.s, w.w]; }), n: N, pos: [0, 0] };
+    render();
+    return { check: function () { return done ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/41-firefly-jar.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'firefly-jar', title: 'Firefly Jar',
+  instruction: '<small>Fireflies blink on and off.</small><b>Catch 5 while they\'re GLOWING</b>',
+  hint: 'Wait for a firefly to light up yellow, then tap it quickly. Dark ones are hiding, so leave them be.',
+  passMsg: 'A jar full of glow! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var NEED = 5, caught = 0, done = false, GRACE = 250;
+    var stage = TNR.el('div', { class: 'stage s2 ff-stage' });
+    var jar = TNR.el('div', { class: 'ff-jar', text: '0 / ' + NEED });
+    stage.appendChild(jar); ctx.body.appendChild(stage);
+    var spots = [[14, 22], [40, 14], [68, 24], [86, 50], [20, 64], [52, 56]];
+    var now = function () { return performance.now(); };
+    var flies = spots.map(function (s, i) {
+      var b = TNR.el('button', { class: 'ff', type: 'button', 'data-i': String(i), 'aria-label': 'firefly', html: TNR.art.firefly(), style: 'left:' + s[0] + '%;top:' + s[1] + '%' });
+      var f = { el: b, lit: false, until: 0, darkAt: -1e9, away: false };
+      b.addEventListener('click', function () {
+        if (done || f.away) return;
+        if (f.lit || now() - f.darkAt < GRACE) {
+          f.away = true; f.lit = false; b.classList.remove('lit'); b.classList.add('caught'); caught++;
+          jar.textContent = caught + ' / ' + NEED; jar.classList.remove('pop'); void jar.offsetWidth; jar.classList.add('pop');
+          TNR.sfx.note(440 + caught * 60); ctx.debug.caught = caught;
+          if (caught >= NEED) { done = true; ctx.timeout(function () { ctx.pass(); }, 400); return; }
+          ctx.timeout(function () { f.away = false; b.classList.remove('caught'); f.until = now() + 900 + Math.random() * 1500; }, 1400);
+        } else ctx.fail(TNR.pick(['That one was snoozing in the dark!', 'Shh, that firefly is not glowing yet!', 'Wait for the glow!']));
+      });
+      stage.appendChild(b);
+      f.until = now() + 300 + i * 450 * Math.random();
+      return f;
+    });
+    ctx.raf(function () {
+      var t = now();
+      flies.forEach(function (f) {
+        if (f.away || t < f.until) return;
+        f.lit = !f.lit; f.el.classList.toggle('lit', f.lit);
+        if (f.lit) f.until = t + 1500; else { f.darkAt = t; f.until = t + 900 + Math.random() * 2200; }
+      });
+      ctx.debug.lit = flies.map(function (f) { return f.lit && !f.away ? Math.round(f.until - t) : 0; });
+      ctx.debug.dark = flies.map(function (f) { return !f.lit && !f.away && t - f.darkAt > GRACE && f.until - t > 600 ? 1 : 0; });
+    });
+    ctx.debug = { caught: 0, need: NEED, lit: [], dark: [] };
+    return {};
+  }
+});
+
+})();
+/* ==== levels/42-jigsaw-swap.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'jigsaw-swap', title: 'Jumbled Picture',
+  instruction: '<small>Someone mixed up the picture!</small><b>Tap two pieces to swap them</b>',
+  hint: 'Look at the little picture for help. The sky goes on top, grass on the bottom. Then Verify!',
+  quips: ['The picture still looks jumbled.', 'Hmm, the house looks a bit confused.', 'A few pieces are still wandering.'],
+  passMsg: 'Picture perfect! ✓',
+  setup: function (ctx) {
+    var full = TNR.art.scene();
+    var order = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    var a = TNR.rint(0, 8), b; do { b = TNR.rint(0, 8); } while (b === a);
+    var c, d; do { c = TNR.rint(0, 8); d = TNR.rint(0, 8); } while (c === d || (c === a && d === b) || (c === b && d === a));
+    var sw = function (x, y) { var t = order[x]; order[x] = order[y]; order[y] = t; };
+    sw(a, b); sw(c, d);
+    if (order.every(function (v, i) { return v === i; })) sw(0, 4);
+    var grid = TNR.el('div', { class: 'jg-grid' }), sel = -1;
+    function pieceSvg(p) {
+      var x = (p % 3) * 100 / 3, y = Math.floor(p / 3) * 100 / 3;
+      return full.replace(/viewBox="[^"]*"/, 'viewBox="' + x.toFixed(3) + ' ' + y.toFixed(3) + ' 33.334 33.334" preserveAspectRatio="none"');
+    }
+    var cells = order.map(function (p, i) {
+      var btn = TNR.el('button', { class: 'jg-cell', type: 'button', 'data-i': String(i), 'aria-label': 'piece ' + (i + 1) });
+      btn.addEventListener('click', function () {
+        if (sel < 0) { sel = i; btn.classList.add('sel'); TNR.sfx.tap(); return; }
+        if (sel === i) { sel = -1; btn.classList.remove('sel'); return; }
+        cells[sel].classList.remove('sel'); sw(sel, i); sel = -1; TNR.sfx.pop(); render();
+      });
+      grid.appendChild(btn);
+      return btn;
+    });
+    function render() {
+      cells.forEach(function (btn, i) { btn.innerHTML = pieceSvg(order[i]); btn.classList.toggle('home', order[i] === i); });
+      ctx.debug.order = order.slice();
+    }
+    var peek = TNR.el('div', { class: 'jg-peek', html: full });
+    ctx.body.appendChild(TNR.el('div', { class: 'row jg-row' }, [grid, peek]));
+    ctx.debug = { order: [] };
+    render();
+    return { check: function () { return order.every(function (v, i) { return v === i; }) ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/43-lights-on.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'lights-on', title: 'Lights On!',
+  instruction: '<small>Tapping a window flips it AND its neighbors.</small><b>Turn ALL the lights on</b>',
+  hint: 'Tapping the same window twice undoes it. Try tapping a dark window\'s middle neighbors.',
+  quips: ['Some windows are still dark!', 'Spooky dark windows remain!', 'Almost! A few lights are off.'],
+  passMsg: 'The whole house is glowing! ✓',
+  setup: function (ctx) {
+    var on = [1, 1, 1, 1, 1, 1, 1, 1, 1];
+    function press(i) {
+      var x = i % 3, y = Math.floor(i / 3);
+      [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) {
+        var nx = x + d[0], ny = y + d[1];
+        if (nx >= 0 && ny >= 0 && nx < 3 && ny < 3) on[ny * 3 + nx] ^= 1;
+      });
+    }
+    var first = TNR.rint(0, 8), presses = [first];
+    if (Math.random() < 0.6) { var s; do { s = TNR.rint(0, 8); } while (s === first); presses.push(s); }
+    presses.forEach(press);
+    var house = TNR.el('div', { class: 'lo-house' });
+    house.appendChild(TNR.el('div', { class: 'lo-roof' }));
+    var grid = TNR.el('div', { class: 'lo-grid' });
+    house.appendChild(grid);
+    var reset = TNR.el('button', { class: 'btn', type: 'button', 'data-act': 'reset', text: 'Start over' });
+    var cells = on.map(function (_, i) {
+      var b = TNR.el('button', { class: 'lo-win', type: 'button', 'data-i': String(i), 'aria-label': 'window ' + (i + 1) });
+      b.addEventListener('click', function () { press(i); TNR.sfx.note(on[i] ? 520 : 390); render(); });
+      grid.appendChild(b);
+      return b;
+    });
+    var start = on.slice();
+    reset.addEventListener('click', function () { on = start.slice(); TNR.sfx.tap(); render(); });
+    function render() { cells.forEach(function (b, i) { b.classList.toggle('on', !!on[i]); b.setAttribute('aria-pressed', String(!!on[i])); }); ctx.debug.on = on.slice(); }
+    ctx.body.appendChild(TNR.el('div', { class: 'row lo-row' }, [house, reset]));
+    ctx.debug = { on: [] };
+    render();
+    return { check: function () { return on.every(function (v) { return v; }) ? true : null; } };
+  }
+});
+
+})();
+/* ==== levels/44-star-catcher.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'star-catcher', title: 'Star Catcher',
+  instruction: '<small>Shooting stars! Move the basket under them.</small><b>Catch 3 falling stars</b>',
+  hint: 'Move your mouse or finger left and right (or use the arrow keys). Get under the star before it lands!',
+  passMsg: 'Starry-eyed human! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var NEED = 3, got = 0, done = false, bx = 0.5, BW = 0.2, FALL = 3600;
+    var stage = TNR.el('div', { class: 'stage s2 sc-stage' });
+    var basket = TNR.el('div', { class: 'sc-basket', html: TNR.art.basket() });
+    var star = TNR.el('div', { class: 'sc-star', html: TNR.art.star('#ffd54f') });
+    var pips = TNR.pips(NEED);
+    stage.appendChild(star); stage.appendChild(basket);
+    ctx.body.appendChild(pips.el); ctx.body.appendChild(stage);
+    var sx = 0.5, t0 = 0, gap = 0;
+    function setB(x) { bx = TNR.clamp(x, BW / 2, 1 - BW / 2); basket.style.left = (bx * 100) + '%'; ctx.debug.bx = bx; }
+    function fromEvt(e) { var r = stage.getBoundingClientRect(); setB((e.clientX - r.left) / r.width); }
+    stage.addEventListener('pointermove', fromEvt);
+    stage.addEventListener('pointerdown', function (e) { fromEvt(e); try { stage.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); });
+    ctx.listen(document, 'keydown', function (e) {
+      if (e.key === 'ArrowLeft') { setB(bx - 0.08); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { setB(bx + 0.08); e.preventDefault(); }
+    });
+    function spawn(ts) {
+      var nx; do { nx = 0.08 + Math.random() * 0.84; } while (Math.abs(nx - sx) < 0.25);
+      sx = nx; t0 = ts; ctx.debug.n = (ctx.debug.n || 0) + 1; star.style.left = (sx * 100) + '%'; star.classList.remove('hide', 'caught');
+      ctx.debug.sx = sx;
+    }
+    var first = true;
+    ctx.raf(function (ts) {
+      if (done) return;
+      if (first) { first = false; spawn(ts + 600); }
+      if (gap && ts < gap) return;
+      if (gap) { gap = 0; spawn(ts); }
+      var p = Math.max(0, (ts - t0) / FALL);
+      star.style.top = (p * 82) + '%'; ctx.debug.p = p;
+      if (p >= 1) {
+        if (Math.abs(sx - bx) <= BW / 2 + 0.05) {
+          got++; pips.set(got); ctx.debug.got = got; star.classList.add('caught'); TNR.sfx.note(523 + got * 80);
+          if (got >= NEED) { done = true; ctx.timeout(function () { ctx.pass(); }, 400); return; }
+        } else {
+          star.classList.add('hide');
+          ctx.fail(TNR.pick(['Whoops, it landed in the grass! Here comes another.', 'So close! The star fizzled out.', 'Missed one! No worries, more are coming.']));
+        }
+        gap = ts + 700;
+      }
+    });
+    ctx.debug = { got: 0, need: NEED, sx: 0.5, bx: 0.5, p: 0 };
+    setB(0.5);
+    return {};
+  }
+});
+
+})();
+/* ==== levels/99-boss.js ==== */
+;(function(){
+TNR.registerLevel({
+  id: 'boss', title: 'FINAL BOSS',
+  instruction: '<small>Final boss. One last tiny question...</small><b>Are you SURE you\'re not a robot?</b>',
+  hint: 'Keep pressing the green YES buttons. Never say no!',
+  passMsg: 'HUMAN CONFIRMED! ✓',
+  setup: function (ctx) {
+    ctx.setVerify({ hidden: true });
+    var box = TNR.el('div', { class: 'boss' });
+    ctx.body.appendChild(box);
+    var NO = ['Wait... robots say no!', 'Hmm. That is EXACTLY what a robot would click.', 'Suspicious! But I will allow another try.', 'No?! My circuits... I mean, my feelings!'];
+    var stage = 0;
+    ctx.debug = { stage: 0 };
+    function no(label) {
+      var b = TNR.el('button', { class: 'btn no', type: 'button', text: label || 'No' });
+      b.addEventListener('click', function () { ctx.fail(TNR.pick(NO)); });
+      return b;
+    }
+    function yes(label, onClick) {
+      var b = TNR.el('button', { class: 'btn yes', type: 'button', text: label });
+      b.addEventListener('click', function () { TNR.sfx.pop(); onClick(b); });
+      return b;
+    }
+    function next() { stage++; ctx.debug.stage = stage; render(); }
+    function q(t) { return TNR.el('p', { class: 'boss-q', text: t }); }
+    function render() {
+      box.innerHTML = '';
+      var row = TNR.el('div', { class: 'row' });
+      if (stage === 0) {
+        box.appendChild(q('Are you SURE you\'re not a robot?'));
+        row.appendChild(yes('Yes', next)); row.appendChild(no());
+      } else if (stage === 1) {
+        box.appendChild(q('Are you REALLY sure?'));
+        row.appendChild(yes('Yes', next)); row.appendChild(yes('YES!', next)); row.appendChild(no('Um... no?'));
+      } else if (stage === 2) {
+        box.appendChild(q('Super-duper sure? Click ALL the yeses!'));
+        var left = 3;
+        ['yes', 'YES', 'Yes yes'].forEach(function (t) {
+          row.appendChild(yes(t, function (b) { if (b.classList.contains('done')) return; b.classList.add('done'); b.textContent = '✓ ' + t; if (--left === 0) ctx.timeout(next, 350); }));
+        });
+        row.appendChild(no());
+      } else if (stage === 3) {
+        box.appendChild(q('Pinky promise?'));
+        var tries = 0;
+        var y = yes('Pinky promise!', function () {
+          tries++;
+          if (tries < 3) { ctx.say(tries === 1 ? 'Hmm, I did not feel the pinky. Again!' : 'Pinkier! One more time!'); if (row.firstChild === y) row.appendChild(y); else row.insertBefore(y, row.firstChild); }
+          else next();
+        });
+        row.appendChild(y); row.appendChild(no('Nope'));
+      } else if (stage === 4) {
+        box.appendChild(q('Fill up the Human-o-Meter!'));
+        var meter = TNR.el('div', { class: 'meter', html: '<i></i>' }), n = 0, NEED = 6;
+        box.appendChild(meter);
+        var bb = yes('I AM HUMAN!', function (b) {
+          n++; meter.firstChild.style.width = (n / NEED * 100) + '%';
+          b.style.transform = 'scale(' + (1 + n * 0.06) + ')';
+          if (n >= NEED) ctx.timeout(next, 300);
+        });
+        row.appendChild(bb);
+      } else if (stage === 5) {
+        box.appendChild(q('Final answer?'));
+        var big = yes('YES! VERIFY ME!', function () { ctx.pass('HUMAN CONFIRMED! ✓'); });
+        big.classList.add('huge');
+        box.appendChild(big);
+        row.appendChild(no('No (robot button)'));
+      }
+      box.appendChild(row);
+    }
+    render();
+    return {};
+  }
+});
+
+})();
+/* ==== js/90-game.js ==== */
+;(function(){
+/* Game shell: screens, level runner, save/continue, level select, certificate, debug hook. */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var el = TNR.el, L = TNR.levels;
+  var G = {
+    screen: 'start', index: 0, levelFails: 0, inst: null, ctx: null, busy: false,
+    data: TNR.save.load(), segStart: 0, lastQuip: ''
+  };
+  var GENERIC_QUIPS = [
+    'Beep? I mean... hmm. Try again!',
+    'So close! Even humans need a second go.',
+    'The robot detector raised one eyebrow.',
+    'Not quite! Take a deep human breath.',
+    'Wobble wobble. Have another try!',
+    'My sensors say "almost human". Again!'
+  ];
+  var PASS_QUIPS = ['Human-ish! ✓', 'Very human. ✓', 'Suspiciously human! ✓', 'Human detected. ✓', 'Nice, fleshy job! ✓'];
+
+  function idxOf(id) { for (var i = 0; i < L.length; i++) if (L[i].id === id) return i; return -1; }
+  function isBeaten(id) { return G.data.beaten.indexOf(id) >= 0; }
+  function firstUnbeaten() { for (var i = 0; i < L.length; i++) if (!isBeaten(L[i].id)) return i; return -1; }
+  function persist() {
+    var d = G.data;
+    d.muted = TNR.sfx.isMuted();
+    TNR.save.write(d);
+  }
+  function runMs() { return G.data.elapsedMs + (G.segStart ? Date.now() - G.segStart : 0); }
+  function stopClock() { if (G.segStart) { G.data.elapsedMs += Date.now() - G.segStart; G.segStart = 0; } }
+  function startClock() { if (!G.segStart) G.segStart = Date.now(); }
+
+  function show(name) {
+    G.screen = name;
+    ['start', 'game', 'cert'].forEach(function (s) { $('scr-' + s).hidden = s !== name; });
+    if (name === 'game') startClock(); else stopClock();
+    if (name === 'start') refreshStart();
+  }
+
+  /* ---------- start screen ---------- */
+  function refreshStart() {
+    var cont = $('btn-continue'), sel = $('btn-levels');
+    var ci = continueIndex();
+    cont.hidden = ci < 0;
+    if (ci >= 0) cont.textContent = 'Continue · Level ' + (ci + 1);
+    sel.hidden = G.data.beaten.length === 0;
+    var cb = $('start-check'); cb.classList.remove('spin', 'done'); cb.setAttribute('aria-checked', 'false');
+    $('start-note').textContent = G.data.bestMs ? 'Best time: ' + TNR.fmtTime(G.data.bestMs) : '';
+  }
+  function continueIndex() {
+    /* v2: saves from v1 (15 levels) may be "finished" or parked on the boss while new
+       levels now sit before it. Send players to the first level they haven't beaten. */
+    var fu = firstUnbeaten();
+    if (G.data.finished) return G.data.beaten.length ? fu : -1;
+    var i = G.data.current ? idxOf(G.data.current) : -1;
+    if (G.data.beaten.length && fu >= 0 && (i < 0 || i > fu)) i = fu;
+    return i;
+  }
+  function newGame() {
+    G.data.current = L[0].id; G.data.totalFails = 0; G.data.elapsedMs = 0; G.data.finished = false; G.segStart = 0;
+    persist();
+    startLevel(0);
+  }
+
+  /* ---------- level runner ---------- */
+  function cleanupLevel() {
+    if (G.ctx) { G.ctx._dead = true; G.ctx._cleanups.forEach(function (f) { try { f(); } catch (e) { console.warn(e); } }); }
+    G.ctx = null; G.inst = null;
+    $('panel-body').innerHTML = '';
+  }
+  function makeCtx(def) {
+    var body = $('panel-body');
+    var ctx = {
+      body: body, def: def, _cleanups: [], _dead: false, debug: {},
+      get fails() { return G.levelFails; },
+      onCleanup: function (f) { ctx._cleanups.push(f); },
+      timeout: function (f, ms) { var t = setTimeout(function () { if (!ctx._dead) f(); }, ms); ctx._cleanups.push(function () { clearTimeout(t); }); return t; },
+      interval: function (f, ms) { var t = setInterval(function () { if (!ctx._dead) f(); }, ms); ctx._cleanups.push(function () { clearInterval(t); }); return t; },
+      raf: function (f) { var id, loop = function (ts) { if (ctx._dead) return; f(ts); id = requestAnimationFrame(loop); }; id = requestAnimationFrame(loop); ctx._cleanups.push(function () { cancelAnimationFrame(id); }); },
+      listen: function (t, ev, f, o) { t.addEventListener(ev, f, o); ctx._cleanups.push(function () { t.removeEventListener(ev, f, o); }); },
+      pass: function (msg) { if (!ctx._dead) levelPassed(msg); },
+      fail: function (quip) { if (!ctx._dead) levelFailed(quip); },
+      setVerify: function (o) { var b = $('btn-verify'); if ('hidden' in o) b.hidden = !!o.hidden; if ('label' in o) b.textContent = o.label; if ('disabled' in o) b.disabled = !!o.disabled; },
+      say: function (txt) { showQuip(txt, 'info'); },
+      isTouch: function () { return G.lastPointer === 'touch' || G.lastPointer === 'pen'; }
+    };
+    return ctx;
+  }
+  function startLevel(i, keepFails) {
+    cleanupLevel();
+    G.index = i; G.busy = false;
+    if (!keepFails) G.levelFails = 0;
+    var def = L[i];
+    G.data.current = def.id; persist();
+    show('game');
+    $('lvl-num').textContent = 'Level ' + (i + 1) + ' of ' + L.length;
+    $('lvl-title').textContent = def.title;
+    $('panel-instr').innerHTML = def.instruction;
+    $('panel').setAttribute('data-level', def.id);
+    $('hint').hidden = G.levelFails < 2; $('hint').innerHTML = '<b>Hint:</b> ' + def.hint;
+    hideQuip();
+    $('pass-overlay').hidden = true;
+    var v = $('btn-verify'); v.hidden = false; v.disabled = false; v.textContent = 'Verify';
+    renderDots();
+    G.ctx = makeCtx(def);
+    G.inst = def.setup(G.ctx) || {};
+  }
+  function renderDots() {
+    var d = $('dots'); d.innerHTML = ''; d.style.setProperty('--nd', L.length);
+    L.forEach(function (lv, i) { d.appendChild(el('span', { class: 'dot' + (i === G.index ? ' cur' : isBeaten(lv.id) ? ' done' : '') })); });
+  }
+  function verify() {
+    if (G.busy || !G.inst) return;
+    TNR.sfx.unlock();
+    var r = G.inst.check ? G.inst.check() : false;
+    if (r === true) levelPassed();
+    else levelFailed(typeof r === 'string' ? r : null);
+  }
+  function levelFailed(quip) {
+    G.levelFails++; G.data.totalFails++; persist();
+    TNR.sfx.wobble();
+    var p = $('panel'); p.classList.remove('wobble'); void p.offsetWidth; p.classList.add('wobble');
+    var pool = (G.ctx && G.ctx.def.quips) || GENERIC_QUIPS;
+    var q = quip;
+    if (!q) { var tries = 0; do { q = TNR.pick(Math.random() < 0.5 ? pool : GENERIC_QUIPS); } while (q === G.lastQuip && tries++ < 5); }
+    G.lastQuip = q;
+    showQuip(q, 'oops');
+    if (G.levelFails >= 2) $('hint').hidden = false;
+  }
+  function levelPassed(msg) {
+    if (G.busy) return;
+    G.busy = true;
+    var def = L[G.index];
+    if (!isBeaten(def.id)) G.data.beaten.push(def.id);
+    var next = G.index + 1;
+    G.data.current = next < L.length ? L[next].id : null;
+    persist();
+    TNR.sfx.good();
+    hideQuip();
+    var ov = $('pass-overlay');
+    $('pass-text').textContent = msg || def.passMsg || TNR.pick(PASS_QUIPS);
+    ov.hidden = false;
+    $('btn-verify').disabled = true;
+    G.ctx.timeout(function () {
+      if (next < L.length) startLevel(next);
+      else finish();
+    }, 1300);
+  }
+  var quipTimer = 0;
+  function showQuip(t, kind) {
+    var q = $('quip'); q.textContent = t; q.className = 'quip ' + (kind || ''); q.hidden = false;
+    clearTimeout(quipTimer); quipTimer = setTimeout(hideQuip, 4200);
+  }
+  function hideQuip() { $('quip').hidden = true; }
+
+  /* ---------- certificate ---------- */
+  function finish() {
+    cleanupLevel();
+    stopClock();
+    var ms = G.data.elapsedMs;
+    G.data.finished = true; G.data.current = null;
+    if (!G.data.bestMs || ms < G.data.bestMs) G.data.bestMs = ms;
+    persist();
+    $('cert-time').textContent = TNR.fmtTime(ms);
+    $('cert-fails').textContent = String(G.data.totalFails);
+    var f = G.data.totalFails;
+    $('cert-rating').textContent = f === 0 ? '100% human (suspiciously perfect...)' : f < 6 ? '98% human, 2% snack' : f < 15 ? '93% human, 7% wobbly' : 'Human! Extremely determined human.';
+    $('cert-date').textContent = new Date().toLocaleDateString();
+    $('cert-seal').innerHTML = TNR.art.seal();
+    show('cert');
+    TNR.sfx.fanfare();
+    confetti();
+  }
+  function confetti() {
+    var c = $('confetti'); c.innerHTML = '';
+    var cols = ['#ff7043', '#ffca28', '#66bb6a', '#42a5f5', '#ab47bc', '#ec407a'];
+    for (var i = 0; i < 40; i++) {
+      c.appendChild(el('i', { style: 'left:' + Math.random() * 100 + '%;background:' + TNR.pick(cols) + ';animation-delay:' + (Math.random() * 1.2).toFixed(2) + 's;animation-duration:' + (2 + Math.random() * 2).toFixed(2) + 's' }));
+    }
+  }
+
+  /* ---------- level select ---------- */
+  function openLevels() {
+    var g = $('levels-grid'); g.innerHTML = '';
+    var nxt = firstUnbeaten();
+    L.forEach(function (lv, i) {
+      var ok = isBeaten(lv.id) || i === nxt;
+      var b = el('button', { class: 'lvl-btn' + (isBeaten(lv.id) ? ' beaten' : ''), type: 'button', 'data-id': lv.id },
+        [el('span', { class: 'n', text: String(i + 1) }), el('span', { class: 't', text: ok ? lv.title : 'Locked' })]);
+      if (!ok) { b.disabled = true; b.appendChild(el('span', { class: 'lock', html: '&#128274;' })); }
+      else b.addEventListener('click', function () { closeLevels(); G.data.finished = false; startLevel(i); });
+      g.appendChild(b);
+    });
+    $('levels-modal').hidden = false;
+  }
+  function closeLevels() { $('levels-modal').hidden = true; }
+
+  /* ---------- mute ---------- */
+  function setMuted(m) {
+    TNR.sfx.setMuted(m);
+    document.querySelectorAll('.btn-mute').forEach(function (b) { b.innerHTML = m ? '&#128263;' : '&#128264;'; b.setAttribute('aria-label', m ? 'Unmute' : 'Mute'); b.setAttribute('aria-pressed', m ? 'true' : 'false'); });
+    persist();
+  }
+
+  /* ---------- wiring ---------- */
+  function init() {
+    setMuted(G.data.muted);
+    $('mascot').innerHTML = TNR.art.robot();
+    document.addEventListener('pointerdown', function (e) { G.lastPointer = e.pointerType; TNR.sfx.unlock(); }, true);
+    document.addEventListener('keydown', function () { TNR.sfx.unlock(); }, true);
+    $('start-check').addEventListener('click', function () {
+      var cb = this; if (cb.classList.contains('spin')) return;
+      TNR.sfx.unlock(); TNR.sfx.tap();
+      cb.classList.add('spin'); cb.setAttribute('aria-checked', 'mixed');
+      setTimeout(function () { cb.classList.remove('spin'); cb.classList.add('done'); cb.setAttribute('aria-checked', 'true'); TNR.sfx.pop(); }, 700);
+      setTimeout(newGame, 1300);
+    });
+    $('btn-continue').addEventListener('click', function () { var i = continueIndex(); if (i >= 0) { G.data.finished = false; startLevel(i); } });
+    $('btn-levels').addEventListener('click', openLevels);
+    $('btn-levels-close').addEventListener('click', closeLevels);
+    $('btn-home').addEventListener('click', function () { cleanupLevel(); show('start'); });
+    $('btn-verify').addEventListener('click', verify);
+    $('btn-refresh').addEventListener('click', function () { if (!G.busy) { TNR.sfx.tap(); startLevel(G.index, true); } });
+    document.querySelectorAll('.btn-mute').forEach(function (b) { b.addEventListener('click', function () { setMuted(!TNR.sfx.isMuted()); if (!TNR.sfx.isMuted()) TNR.sfx.tap(); }); });
+    $('btn-again').addEventListener('click', function () { show('start'); });
+    $('btn-cert-levels').addEventListener('click', function () { show('start'); openLevels(); });
+    window.addEventListener('pagehide', function () { stopClock(); persist(); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) { stopClock(); persist(); } else if (G.screen === 'game') startClock(); });
+    show('start');
+  }
+
+  window.__game = {
+    version: TNR.version,
+    levelIds: function () { return L.map(function (l) { return l.id; }); },
+    state: function () {
+      return { screen: G.screen, index: G.index, id: L[G.index] && L[G.index].id, levelFails: G.levelFails, totalFails: G.data.totalFails,
+        beaten: G.data.beaten.slice(), current: G.data.current, finished: G.data.finished, muted: TNR.sfx.isMuted(), busy: G.busy, elapsedMs: runMs() };
+    },
+    debug: function () { return G.ctx ? G.ctx.debug : null; },
+    goto: function (x) { var i = typeof x === 'number' ? x : idxOf(x); if (i >= 0) startLevel(i); return i; },
+    pass: function () { if (G.ctx) G.ctx.pass(); },
+    reset: function () { TNR.save.clear(); G.data = TNR.save.blank(); show('start'); },
+    save: TNR.save
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "not-a-robot";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

@@ -17,39 +17,48 @@
     padding: calc(14px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-right, 0px))
              calc(16px + env(safe-area-inset-bottom, 0px)) calc(18px + env(safe-area-inset-left, 0px));
   }
-  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 auto 14px; max-width: 1200px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 auto 10px; max-width: 1200px; }
   h1 { margin: 0; font-size: 38px; font-weight: 800; letter-spacing: 0.5px; }
   h1 .moon { display: inline-block; width: 26px; height: 26px; border-radius: 50%; margin-right: 12px; vertical-align: -2px;
     box-shadow: inset -8px -3px 0 0 #ffd77a; transform: rotate(-20deg); }
   .note { font-size: 20px; color: #c3cad8; white-space: nowrap; }
   .note b { color: #9fe3b0; font-weight: 700; }
-  main { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; max-width: 1200px; margin: 0 auto; }
+  .group { max-width: 1200px; margin: 18px auto 8px; }
+  .group h2 {
+    margin: 0 0 10px; font-size: 18px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #9aa6bd;
+  }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
   .card {
-    grid-column: span 2; position: relative; display: flex; align-items: center; gap: 16px; min-height: 226px;
+    grid-column: span 2; position: relative; display: flex; align-items: center; gap: 16px; min-height: 196px;
     padding: 18px 20px; border-radius: 24px; text-decoration: none; color: inherit;
     background: #171d2a; border: 2px solid #313a4f; box-shadow: 0 4px 0 #070a10;
     touch-action: manipulation; outline: none; overflow: hidden;
   }
-  .card.wide { grid-column: span 3; min-height: 196px; }
+  .card.wide { grid-column: span 3; }
   .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--c); }
   .card:active, .card.down { transform: translateY(3px); box-shadow: 0 1px 0 #070a10; background: #1d2435; border-color: var(--c); }
   .card:focus-visible { border-color: var(--c); }
-  .card canvas { flex: 0 0 auto; width: 112px; height: 112px; border-radius: 20px; background: #0f141f; }
+  .card canvas, .card .emoji {
+    flex: 0 0 auto; width: 112px; height: 112px; border-radius: 20px; background: #0f141f;
+  }
+  .card .emoji {
+    display: grid; place-items: center; font-size: 64px; line-height: 1;
+  }
   .card .t { min-width: 0; }
-  .card h2 { margin: 0 0 8px; font-size: 28px; line-height: 1.12; font-weight: 800; }
-  .card h2 small { display: block; font-size: 17px; font-weight: 600; color: #aab3c5; margin-top: 4px; }
-  .card p { margin: 0; font-size: 19px; line-height: 1.3; color: #d3d9e5; }
+  .card h3 { margin: 0 0 8px; font-size: 26px; line-height: 1.12; font-weight: 800; }
+  .card h3 small { display: block; font-size: 16px; font-weight: 600; color: #aab3c5; margin-top: 4px; }
+  .card p { margin: 0; font-size: 18px; line-height: 1.3; color: #d3d9e5; }
   @media (max-width: 1000px) {
-    main { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     .card, .card.wide { grid-column: span 1; min-height: 150px; padding: 14px 16px; gap: 14px; }
-    .card:last-child:nth-child(odd) { grid-column: span 2; }
-    .card canvas { width: 92px; height: 92px; }
-    .card h2 { font-size: 24px; }
-    .card p { font-size: 17px; }
+    .card canvas, .card .emoji { width: 92px; height: 92px; font-size: 52px; }
+    .card h3 { font-size: 22px; }
+    .card p { font-size: 16px; }
     h1 { font-size: 32px; }
     .note { font-size: 18px; }
   }
-  @media (max-width: 640px) { main { grid-template-columns: 1fr; } .card:last-child:nth-child(odd) { grid-column: span 1; } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -57,32 +66,113 @@
   <h1><span class="moon" aria-hidden="true"></span>Game Night</h1>
   <div class="note"><b>●</b> Plays while parked.</div>
 </header>
-<main>
-  <a class="card" href="flytrap/" style="--c:#5fd16a">
-    <canvas data-art="flytrap" width="112" height="112" aria-hidden="true"></canvas>
-    <div class="t"><h2>Venus Flytrap 3D</h2><p>Feed Snappy the flytrap, one fly at a time.</p></div>
-  </a>
-  <a class="card" href="snowball-fort/" style="--c:#5aa9ff">
-    <canvas data-art="fort" width="112" height="112" aria-hidden="true"></canvas>
-    <div class="t"><h2>Snowball Fort Together</h2><p>Two players: one rolls, one throws.</p></div>
-  </a>
-  <a class="card" href="hogwarts/" style="--c:#f2c14e">
-    <canvas data-art="hogwarts" width="112" height="112" aria-hidden="true"></canvas>
-    <div class="t"><h2>Battle for Hogwarts</h2><p>Learn spells, then defend the castle.</p></div>
-  </a>
-  <a class="card" href="cheetah/" style="--c:#ff9a1f">
-    <canvas data-art="cheetah" width="112" height="112" aria-hidden="true"></canvas>
-    <div class="t"><h2>Cheetah Cub Dash</h2><p>Run, jump and grow into a big cheetah.</p></div>
-  </a>
-  <a class="card" href="snap-and-sip/" style="--c:#8bd17c">
-    <canvas data-art="snap" width="112" height="112" aria-hidden="true"></canvas>
-    <div class="t"><h2>Snap &amp; Sip<small>the original flytrap</small></h2><p>Two traps to water, sun and feed.</p></div>
-  </a>
-  <a class="card" href="muggle-studies/" style="--c:#b48cff">
-    <canvas data-art="muggle" width="112" height="112" aria-hidden="true"></canvas>
-    <div class="t"><h2>Muggle Studies</h2><p>Short daily quizzes, then off to play.</p></div>
-  </a>
-</main>
+
+<section class="group" aria-labelledby="g-favorites">
+  <h2 id="g-favorites">Favorites</h2>
+  <div class="grid">
+    <a class="card" href="flytrap/" style="--c:#5fd16a">
+      <canvas data-art="flytrap" width="112" height="112" aria-hidden="true"></canvas>
+      <div class="t"><h3>Venus Flytrap 3D</h3><p>Feed Snappy the flytrap, one fly at a time.</p></div>
+    </a>
+    <a class="card" href="snowball-fort/" style="--c:#5aa9ff">
+      <canvas data-art="fort" width="112" height="112" aria-hidden="true"></canvas>
+      <div class="t"><h3>Snowball Fort Together</h3><p>Two players: one rolls, one throws.</p></div>
+    </a>
+    <a class="card" href="hogwarts/" style="--c:#f2c14e">
+      <canvas data-art="hogwarts" width="112" height="112" aria-hidden="true"></canvas>
+      <div class="t"><h3>Battle for Hogwarts</h3><p>Learn spells, then defend the castle.</p></div>
+    </a>
+    <a class="card" href="cheetah/" style="--c:#ff9a1f">
+      <canvas data-art="cheetah" width="112" height="112" aria-hidden="true"></canvas>
+      <div class="t"><h3>Cheetah Cub Dash</h3><p>Run, jump and grow into a big cheetah.</p></div>
+    </a>
+    <a class="card" href="snap-and-sip/" style="--c:#8bd17c">
+      <canvas data-art="snap" width="112" height="112" aria-hidden="true"></canvas>
+      <div class="t"><h3>Snap &amp; Sip<small>the original flytrap</small></h3><p>Two traps to water, sun and feed.</p></div>
+    </a>
+    <a class="card" href="muggle-studies/" style="--c:#b48cff">
+      <canvas data-art="muggle" width="112" height="112" aria-hidden="true"></canvas>
+      <div class="t"><h3>Muggle Studies</h3><p>Short daily quizzes, then off to play.</p></div>
+    </a>
+  </div>
+</section>
+
+<section class="group" aria-labelledby="g-new">
+  <h2 id="g-new">New</h2>
+  <div class="grid">
+    <a class="card" href="ninja-parkour/" style="--c:#7c5cff">
+      <div class="emoji" aria-hidden="true">🥷</div>
+      <div class="t"><h3>Ninja Parkour</h3><p>Rooftop jumps, ropes, and boss chases.</p></div>
+    </a>
+    <a class="card" href="build-a-bot/" style="--c:#4fd1c5">
+      <div class="emoji" aria-hidden="true">🤖</div>
+      <div class="t"><h3>Build-a-Bot Garage</h3><p>Build your robot, then race 50 levels.</p></div>
+    </a>
+    <a class="card" href="build-a-bot-mini/" style="--c:#38b2ac">
+      <div class="emoji" aria-hidden="true">🛠️</div>
+      <div class="t"><h3>Build-a-Bot Mini</h3><p>Quick garage fun — build and go!</p></div>
+    </a>
+    <a class="card" href="map-makers/" style="--c:#63b3ed">
+      <div class="emoji" aria-hidden="true">🗺️</div>
+      <div class="t"><h3>Map Makers<small>one device</small></h3><p>Paint a map, then play it yourself.</p></div>
+    </a>
+    <a class="card" href="dragon-keeper/" style="--c:#ed8936">
+      <div class="emoji" aria-hidden="true">🐉</div>
+      <div class="t"><h3>Dragon Keeper</h3><p>Hatch dragons and race through the sky.</p></div>
+    </a>
+    <a class="card" href="dino-dig/" style="--c:#d69e2e">
+      <div class="emoji" aria-hidden="true">🦴</div>
+      <div class="t"><h3>Dino Dig</h3><p>Dig up fossils and fill your museum.</p></div>
+    </a>
+  </div>
+</section>
+
+<section class="group" aria-labelledby="g-diwali">
+  <h2 id="g-diwali">Diwali</h2>
+  <div class="grid">
+    <a class="card" href="diwali-games/" style="--c:#f6ad55">
+      <div class="emoji" aria-hidden="true">🪔</div>
+      <div class="t"><h3>Diwali Games</h3><p>Rangoli Studio and Diya Path puzzles.</p></div>
+    </a>
+    <a class="card" href="diwali-lotus/" style="--c:#fc8181">
+      <div class="emoji" aria-hidden="true">🪷</div>
+      <div class="t"><h3>Diwali Lotus</h3><p>Festival parkour with lanterns and diyas.</p></div>
+    </a>
+  </div>
+</section>
+
+<section class="group" aria-labelledby="g-racing">
+  <h2 id="g-racing">Racing &amp; Action</h2>
+  <div class="grid">
+    <a class="card" href="f1-champs/" style="--c:#e53e3e">
+      <div class="emoji" aria-hidden="true">🏎️</div>
+      <div class="t"><h3>F1 Champs</h3><p>Pick a team and race a whole season.</p></div>
+    </a>
+    <a class="card" href="rocket-mail/" style="--c:#4299e1">
+      <div class="emoji" aria-hidden="true">🚀</div>
+      <div class="t"><h3>Rocket Mail</h3><p>Slingshot letters to planets and land soft.</p></div>
+    </a>
+    <a class="card" href="pizza-rush/" style="--c:#f56565">
+      <div class="emoji" aria-hidden="true">🍕</div>
+      <div class="t"><h3>Pizza Rush</h3><p>Build, bake, and serve perfect pizzas.</p></div>
+    </a>
+  </div>
+</section>
+
+<section class="group" aria-labelledby="g-puzzles">
+  <h2 id="g-puzzles">Puzzles</h2>
+  <div class="grid">
+    <a class="card" href="not-a-robot/" style="--c:#9f7aea">
+      <div class="emoji" aria-hidden="true">🤖</div>
+      <div class="t"><h3>Totally Not A Robot</h3><p>45 silly challenges to prove you're human.</p></div>
+    </a>
+    <a class="card" href="spooky-merge/" style="--c:#805ad5">
+      <div class="emoji" aria-hidden="true">🎃</div>
+      <div class="t"><h3>Spooky Town Puzzles</h3><p>Match candy, free ghosts, unlock doors.</p></div>
+    </a>
+  </div>
+</section>
+
 <script>
 (function () {
   'use strict';
@@ -158,7 +248,6 @@
     var g = c.getContext('2d'); if (!g) return;
     g.scale(dpr, dpr); draw(g);
   });
-  // instant press feedback on touch screens (there is no hover in the car)
   Array.prototype.forEach.call(document.querySelectorAll('.card'), function (a) {
     a.addEventListener('pointerdown', function () { a.classList.add('down'); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { a.addEventListener(t, function () { a.classList.remove('down'); }); });

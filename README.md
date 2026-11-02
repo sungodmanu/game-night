@@ -1,73 +1,64 @@
 Game Night — offline browser games, car-friendly builds.
 
-A tiny static site (GitHub Pages, `https://sungodmanu.github.io/game-night/`) with a big-card menu
-and car-friendly copies of six offline browser games, tuned for the Tesla in-car browser (Chromium,
+A static site (GitHub Pages, `https://sungodmanu.github.io/game-night/`) with a big-card menu
+and car-friendly copies of offline browser games, tuned for the Tesla in-car browser (Chromium,
 landscape ~1180×600, touch only, plays while parked).
 
 | Path | Game |
 |---|---|
-| `index.html` | **Game Night** menu: six big cards, no external images or fonts |
+| `index.html` | **Game Night** menu (grouped big cards) |
 | `flytrap/` | Venus Flytrap 3D |
-| `snowball-fort/` | Snowball Fort Together (two players, one screen) |
+| `snowball-fort/` | Snowball Fort Together |
 | `hogwarts/` | Battle for Hogwarts |
+| `cheetah/` | Cheetah Cub Dash |
 | `snap-and-sip/` | Snap & Sip — the original flytrap |
-| `muggle-studies/` | Muggle Studies — short daily quizzes, then off to play |
-| `cheetah/` | Cheetah Cub Dash — a cheetah-cub runner for the kindergartner |
+| `muggle-studies/` | Muggle Studies |
+| `ninja-parkour/` | Ninja Parkour |
+| `map-makers/` | Map Makers (one device) |
+| `diwali-games/` | Diwali Games (Rangoli Studio + Diya Path) |
+| `diwali-lotus/` | Diwali Lotus |
+| `not-a-robot/` | Totally Not A Robot (45 levels) |
+| `spooky-merge/` | Spooky Town Puzzles |
+| `rocket-mail/` | Rocket Mail |
+| `f1-champs/` | F1 Champs |
+| `pizza-rush/` | Pizza Rush |
+| `dragon-keeper/` | Dragon Keeper |
+| `dino-dig/` | Dino Dig |
+| `build-a-bot/` | Build-a-Bot Garage |
+| `build-a-bot-mini/` | Build-a-Bot Mini |
 
 Everything is self-contained: no network requests besides same-origin navigation, and every link
 and asset path is relative, so the site works from any sub-path. `.nojekyll` makes Pages serve the
-files as they are.
+files as they are. Public copies never include kids' real names (code names Alpha / Beta, or
+Player 1 / Player 2).
 
 ## Car mode (always on in these copies)
 
 - a big **← Games** button on every game, linking back to `../`
-- every tap target at least 64 px, larger type
-- `devicePixelRatio` and renderer pixel ratio capped at 1
-- on a Tesla (or with `?q=low`): smaller shadow maps, fewer particles, no MSAA; if the frame rate
-  stays under 24 fps the 3D games drop shadows and then render at 0.75× (turn off with `?adaptive=0`)
+- every tap target at least 64 px on the original six (generic back button on newer games)
+- for the WebGL originals: `devicePixelRatio` capped, Tesla low-quality adaptive path
 - no sound until the first tap
 
 The car layer lives in `car/` (`prelude.js` for the WebGL renderer, `core.css`/`core.js` for the
-back button, `car/games/*` per game). The original games are not edited; `build-car.js` copies them
-and injects the layer.
+back button, `car/games/*` per game, plus `generic.js` for newly added single-file games).
+The original game folders are not edited; copies are built into this repo.
 
-## Rebuilding
+## Rebuilding the original six
 
     node build-car.js
 
-Inputs (read only): the five game folders next to this one (`../venus-flytrap-3d`,
-`../snowball-fort`, `../battle-for-hogwarts/release-v2`, `../venus-flytrap`,
-`../cheetah-run/release-v1/index-public.html` (built with the code names: `node build.js --public`); override with
-`FLYTRAP_SRC`, `FORT_SRC`, `HOGWARTS_SRC`, `SNAP_SRC`, `CHEETAH_SRC`), plus a private folder that is never
-committed (`../car-games-private`, override with `CAR_PRIVATE`) holding the Muggle Studies source
-files and `realnames.json`. The build refuses to finish if any real name, external URL or
-root-absolute path survives in the output.
+Inputs (read only): `../venus-flytrap-3d`, `../snowball-fort`,
+`../battle-for-hogwarts/release-v2`, `../venus-flytrap`,
+`../cheetah-run/release-v1/index-public.html`, plus private `../car-games-private`
+(Muggle Studies + `realnames.json`). Newer games were copied from their built `index.html`
+with the generic car back button injected.
 
 ## Code names
 
-The two players are shown on this public site only by code names, kept in one place:
-
     codenames.json   {"older": "Alpha", "younger": "Beta"}
-
-`older` is the 4th grader (the blue thrower in Snowball Fort), `younger` the kindergartner (the red
-roller). To change them, edit `codenames.json` and run `node build-car.js`. The build replaces
-every name in every case form (`Name`, `NAME`, `name`, and identifiers/keys derived from it) in
-whole-word positions only, and derives save keys and Muggle Studies profile ids from the code names.
-Note: renaming changes the Muggle Studies profile ids, so progress saved under the old names is
-left behind — pick the final names before the kids start.
-
-## Saves
-
-Each game keeps its own `localStorage` key: `snappy-flytrap-3d-v1`, `snowball-fort-together-v1`,
-`battle-for-hogwarts-v1`, `snap-and-sip-v1`, `muggle-studies-state-v1`; Cheetah Cub Dash uses the
-`cheetah-run:` prefix (one key per player: `cheetah-run:p1`, `cheetah-run:p2`, ..., plus roster/last-player/settings).
 
 ## Tests
 
-    cd test && npm install   # or point test/node_modules at an existing Playwright install
-    node run.mjs             # CHROME=/path/to/chrome to choose the browser
-
-Serves the repo with `python3 -m http.server`, then drives headless Chrome with the Tesla user agent
-at 1180×600 and 770×600: menu and every card, zero console errors, zero external requests, the back
-button, ≥ 64 px tap targets, nothing covering the back button or cut off, saves surviving a reload,
-Snowball Fort play, and no real names in the DOM. Screenshots go to `_screens/` (gitignored).
+    cd test && npm install && npx playwright install chromium
+    node run.mjs          # deep checks for the original six
+    node smoke-new.mjs    # menu + every game at 1180×600 and 390×844

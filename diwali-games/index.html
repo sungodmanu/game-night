@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a0a2e">
+<title>Diwali Games</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d0618;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
+#app{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 20%,#2a1048 0%,#0d0618 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:transparent}
+#overlay,#hud{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:5}
+#overlay>* ,#hud>*{pointer-events:auto}
+.hidden{display:none!important}
+.icon-btn{position:absolute;top:max(8px,env(safe-area-inset-top));z-index:40;width:48px;height:48px;border:2px solid rgba(255,200,100,.45);border-radius:14px;background:rgba(30,10,50,.75);color:#ffe7a8;font-size:22px;cursor:pointer;backdrop-filter:blur(4px)}
+#muteBtn{right:max(8px,env(safe-area-inset-right))}
+#fsBtn{right:max(64px,calc(env(safe-area-inset-right) + 56px))}
+.icon-btn:active{transform:scale(.94)}
+.toast{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);background:rgba(40,15,60,.92);border:2px solid #f5c542;border-radius:16px;padding:12px 20px;font-size:18px;z-index:50;pointer-events:none;max-width:90%;text-align:center}
+.screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overflow:auto;gap:10px}
+.screen.landscape-tight{justify-content:flex-start}
+.title{font-size:clamp(22px,4.2vw,36px);font-weight:800;letter-spacing:.02em;text-shadow:0 2px 0 #7a2e00,0 0 18px rgba(255,180,40,.5);color:#ffe08a;text-align:center}
+.sub{font-size:clamp(13px,2.4vw,18px);color:#f0d4a8;opacity:.9;text-align:center}
+.profiles{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.profile-card{min-width:min(42vw,220px);min-height:120px;padding:16px 18px;border-radius:20px;border:3px solid #f5c542;background:linear-gradient(160deg,#5a1f8a,#2a0a48);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:20px;font-weight:700;box-shadow:0 8px 0 #3a1058,0 0 24px rgba(255,180,40,.25)}
+.profile-card .emoji{font-size:42px;line-height:1}
+.profile-card .label{font-size:14px;font-weight:500;color:#ffd9a0}
+.profile-card:active{transform:translateY(3px);box-shadow:0 4px 0 #3a1058}
+.hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(960px,100%);margin-top:6px}
+@media (max-width:700px),(max-height:420px){.hub-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+.game-tile{min-height:88px;border-radius:18px;border:3px solid rgba(255,210,120,.55);background:linear-gradient(145deg,#7a2a10,#3a0e28);padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.35);position:relative}
+.game-tile .emoji{font-size:clamp(28px,5vw,40px)}
+.game-tile .name{font-size:clamp(13px,2.2vw,17px);font-weight:700;color:#fff6d8}
+.game-tile .tag{font-size:11px;color:#ffd090}
+.game-tile.soon{opacity:.55;cursor:default;filter:grayscale(.25)}
+.game-tile.soon .badge{position:absolute;top:6px;right:6px;background:#222;color:#ffd070;font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid #886}
+.game-tile.playable{background:linear-gradient(145deg,#c45a12,#6a1a40);border-color:#ffd060;box-shadow:0 6px 0 #4a1020,0 0 20px rgba(255,160,40,.35)}
+.game-tile:not(.soon):active{transform:translateY(2px)}
+.topbar{display:flex;width:100%;max-width:1100px;align-items:center;justify-content:space-between;gap:8px;padding-right:120px}
+.btn{min-height:48px;min-width:48px;padding:10px 16px;border-radius:14px;border:2px solid #f0c050;background:linear-gradient(180deg,#ff9a3c,#d45410);color:#2a1000;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 0 #7a2a00}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #7a2a00}
+.btn.ghost{background:rgba(40,15,60,.7);color:#ffe7a8;border-color:rgba(255,200,100,.5);box-shadow:0 4px 0 #1a0830}
+.btn.big{min-height:56px;font-size:18px;padding:12px 20px}
+.btn.p1{min-height:64px;min-width:64px;font-size:18px;border-radius:18px}
+.btn.danger{background:linear-gradient(180deg,#ff6a6a,#b02020);border-color:#ffaaaa;color:#fff}
+.stickers{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:28px}
+.sticker{font-size:22px;filter:drop-shadow(0 0 4px rgba(255,200,80,.5))}
+.edit-name{margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.edit-name input{min-height:44px;min-width:140px;border-radius:12px;border:2px solid #c8a040;padding:8px 12px;font-size:16px;background:#2a1040;color:#fff}
+.modal{position:absolute;inset:0;background:rgba(10,4,20,.72);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.modal .card{background:linear-gradient(160deg,#4a2068,#1e0a38);border:3px solid #f5c542;border-radius:20px;padding:20px;max-width:420px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px}
+.modal .card h3{font-size:22px;color:#ffe08a}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.rangoli-wrap{display:flex;flex-direction:column;width:100%;height:100%;max-width:1180px;gap:8px}
+.rangoli-main{flex:1;display:flex;gap:8px;min-height:0;width:100%}
+.rangoli-canvas-box{flex:1;min-width:0;min-height:0;border-radius:16px;border:3px solid #e8b040;background:#1a0f08;overflow:hidden;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+.rangoli-canvas-box canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.toolbar{display:flex;flex-direction:column;gap:4px;width:min(168px,28vw);overflow:auto;padding:2px;max-height:100%}
+.toolbar .section{font-size:11px;color:#ffd090;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.swatch,.stamp,.tool{width:100%;min-height:48px;border-radius:12px;border:2px solid rgba(255,220,140,.4);background:rgba(50,20,70,.7);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.p1-mode .swatch,.p1-mode .stamp,.p1-mode .tool{min-height:52px;font-size:15px;border-radius:14px}
+.p1-mode .bottom-bar .btn{min-height:56px}
+.swatch.active,.stamp.active,.tool.active{border-color:#fff;box-shadow:0 0 0 3px #f5c542,0 0 12px rgba(255,180,40,.5)}
+.palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.palette .swatch{min-height:44px}
+.p1-mode .palette .swatch{min-height:48px}
+.bottom-bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;padding-bottom:4px;padding-right:100px}
+.pattern-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;width:min(900px,100%);padding:8px}
+.pattern-card{min-height:100px;border-radius:16px;border:3px solid #e8b040;background:#2a1440;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px}
+.pattern-card .emoji{font-size:36px}
+.pattern-card .name{font-size:13px;font-weight:700;color:#ffe8b0}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;width:min(900px,100%)}
+.gallery-item{aspect-ratio:1;border-radius:12px;border:2px solid #c8a040;background:#1a0f08;overflow:hidden;cursor:pointer}
+.gallery-item img{width:100%;height:100%;object-fit:cover}
+.empty{opacity:.7;font-size:15px;padding:20px;text-align:center}
+.sym-row{display:flex;gap:4px;flex-wrap:nowrap}
+.sym-row .tool{flex:1 1 28px;min-width:28px;width:auto;padding:4px;font-size:15px}
+.stamp-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.stamp-grid .stamp{width:100%;min-height:48px;padding:4px;font-size:20px}
+.p1-mode .stamp-grid .stamp{min-height:56px;font-size:22px}
+@media (max-height:420px){
+  .title{font-size:22px}
+  .game-tile{min-height:72px;padding:8px}
+  .profile-card{min-height:96px;padding:10px}
+  .toolbar{width:min(130px,26vw)}
+}
+
+/* Diya Path */
+.diyapath-screen{max-width:1180px}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;width:min(720px,100%);padding:4px 0 12px}
+.level-card{min-height:72px;min-width:64px;border-radius:16px;border:2px solid #e8b040;background:linear-gradient(160deg,#3a1860,#1a0830);color:#ffe8b0;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 4px 0 #120420}
+.level-card .num{font-size:20px}
+.level-card .meta{font-size:11px;opacity:.8;font-weight:600}
+.level-card .stars{font-size:12px;min-height:16px}
+.level-card.locked{opacity:.45;cursor:default;filter:grayscale(.3)}
+.level-card.p1,.p1-mode .level-card{min-height:80px;min-width:72px;border-radius:18px}
+.diya-board-wrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;width:100%;position:relative;padding:4px}
+.marigold-frame{padding:10px;border-radius:20px;background:linear-gradient(180deg,rgba(255,160,40,.25),rgba(80,30,10,.35));border:3px solid #e8a030;box-shadow:0 0 24px rgba(255,160,40,.2),inset 0 0 20px rgba(0,0,0,.35);max-width:100%;max-height:100%}
+.diya-board{display:grid;grid-template-columns:repeat(var(--cols),minmax(48px,1fr));grid-template-rows:repeat(var(--rows),minmax(48px,1fr));gap:6px;width:min(560px,92vw,78vh);aspect-ratio:var(--cols)/var(--rows);max-height:min(560px,70vh);overflow:auto}
+.diya-cell{appearance:none;-webkit-appearance:none;border:2px solid rgba(255,200,100,.15);border-radius:14px;background:rgba(20,8,30,.55);min-width:48px;min-height:48px;position:relative;cursor:default;padding:0;display:flex;align-items:center;justify-content:center}
+.diya-cell.empty{pointer-events:none}
+.diya-cell.filled{cursor:pointer;background:radial-gradient(circle at 50% 40%,#5a2a10,#2a1008);border-color:#e8a040;box-shadow:0 0 10px rgba(255,140,40,.25)}
+.diya-cell.can-move{box-shadow:0 0 14px rgba(255,200,80,.55),0 0 4px #ffd070}
+.diya-cell.hint{outline:3px solid #ffe08a;outline-offset:1px;animation:hintPulse 1.4s ease-in-out infinite}
+.diya-cell.wobble{animation:wobble .4s ease}
+.diya-cell.p1,.p1-mode .diya-cell.filled{border-radius:16px;border-width:3px;min-width:56px;min-height:56px}
+.p1-mode .diya-cell{min-width:56px;min-height:56px}
+.diya-glyph{font-size:clamp(16px,3.5vw,28px);line-height:1;filter:drop-shadow(0 0 4px rgba(255,180,40,.5))}
+.diya-arrow{position:absolute;bottom:2px;right:3px;font-size:clamp(10px,2.2vw,16px);color:#ffe08a;text-shadow:0 0 4px #000;font-weight:900}
+.lantern-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.diya-bottom{padding-right:100px}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 10px rgba(255,220,100,.4)}50%{box-shadow:0 0 22px rgba(255,220,100,.85)}}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@media (max-height:420px){
+  .diya-board{width:min(420px,58vw,62vh);gap:4px}
+  .level-card{min-height:64px}
+  .marigold-frame{padding:6px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Diwali Games"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="overlay"></div>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Diwali Games — core */
+const DG = window.DG = {
+  VERSION: 1,
+  SAVE_KEY: 'diwali-games-v1',
+  W: 1180, H: 600,
+  profiles: {
+    alpha: { id: 'alpha', defaultName: 'Player 1', label: 'Easy · big taps', emoji: '🪔', easy: true },
+    beta:  { id: 'beta',  defaultName: 'Player 2', label: 'More tools', emoji: '✨', easy: false }
+  },
+  games: [
+    { id: 'rangoli', name: 'Rangoli Studio', emoji: '🎨', tag: 'Color & create', ready: true },
+    { id: 'quiz', name: 'Quiz Quest', emoji: '📖', tag: 'Coming soon', ready: false },
+    { id: 'memory', name: 'Diya Memory', emoji: '🃏', tag: 'Coming soon', ready: false },
+    { id: 'diyapath', name: 'Diya Path', emoji: '🏮', tag: 'Arrow escape', ready: true },
+    { id: 'fireworks', name: 'Phuljhadi Pop', emoji: '🎆', tag: 'Coming soon', ready: false },
+    { id: 'sweets', name: 'Sweet Shop', emoji: '🍬', tag: 'Coming soon', ready: false }
+  ],
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  muted: false,
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  profileId: null,
+  run: null
+};
+
+DG.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+DG.lerp = (a, b, t) => a + (b - a) * t;
+DG.rand = (a, b) => a + Math.random() * (b - a);
+DG.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+DG.now = () => performance.now();
+
+DG.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1500);
+};
+
+DG.isEasy = () => {
+  const p = DG.profiles[DG.profileId || 'alpha'];
+  return !!(p && p.easy);
+};
+
+DG.fitCanvas = () => {
+  const c = DG.canvas;
+  if (!c) return;
+  if (c.width !== DG.W) c.width = DG.W;
+  if (c.height !== DG.H) c.height = DG.H;
+};
+
+DG.clear = (color) => {
+  const ctx = DG.ctx;
+  if (!ctx) return;
+  ctx.fillStyle = color || '#1a0a2e';
+  ctx.fillRect(0, 0, DG.W, DG.H);
+};
+
+DG.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+
+DG.bindTap = (el, fn) => {
+  if (!el) return;
+  let locked = false;
+  const go = (e) => {
+    if (locked) return;
+    locked = true;
+    try { DG.Audio && DG.Audio.unlock(); } catch (_) {}
+    try { fn(e); } catch (err) { console.error(err); }
+    setTimeout(() => { locked = false; }, 180);
+  };
+  el.addEventListener('click', go);
+  el.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'touch') go(e);
+  });
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* Gentle WebAudio — unlock only after first input */
+DG.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = DG.muted ? 0 : 0.32;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (DG.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.16, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      DG.muted = !!m;
+      if (master) master.gain.value = DG.muted ? 0 : 0.32;
+      try { localStorage.setItem('dg-mute', DG.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DG.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { DG.muted = localStorage.getItem('dg-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DG.muted ? '🔇' : '🔊';
+    },
+    click() { tone(340, 0.05, 'triangle', 0.07); },
+    soft() { tone(380, 0.08, 'sine', 0.08); },
+    stamp() { tone(520, 0.09, 'triangle', 0.1); },
+    fill() { tone(280, 0.1, 'sine', 0.09, 200); },
+    win() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.15, 'sine', 0.11), i * 85)); },
+    save() { tone(660, 0.08, 'sine', 0.1); setTimeout(() => tone(880, 0.12, 'sine', 0.1), 70); },
+    blocked() { tone(180, 0.1, 'triangle', 0.08, 120); setTimeout(() => tone(140, 0.12, 'sine', 0.07, 90), 90); },
+    lantern() { tone(440, 0.08, 'sine', 0.09); setTimeout(() => tone(660, 0.14, 'sine', 0.1, 880), 70); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage with try/catch + memory fallback */
+DG.Save = (() => {
+  function blankProfile(id) {
+    const meta = DG.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      stickers: [],
+      badges: [],
+      gallery: [],
+      rangoliClears: 0,
+      playSeconds: 0,
+      diyaPath: { maxCleared: 0, stars: {}, cleared: {} }
+    };
+  }
+
+  function blankState() {
+    return {
+      v: DG.VERSION,
+      lastProfile: null,
+      profiles: {
+        alpha: blankProfile('alpha'),
+        beta: blankProfile('beta')
+      }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(DG.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return DG.memStore;
+  }
+
+  function writeRaw(data) {
+    DG.memStore = data;
+    try {
+      localStorage.setItem(DG.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== DG.VERSION) {
+      DG.state = blankState();
+      save();
+      return DG.state;
+    }
+    for (const id of ['alpha', 'beta']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!Array.isArray(raw.profiles[id].stickers)) raw.profiles[id].stickers = [];
+      if (!Array.isArray(raw.profiles[id].badges)) raw.profiles[id].badges = [];
+      if (!Array.isArray(raw.profiles[id].gallery)) raw.profiles[id].gallery = [];
+      if (!raw.profiles[id].diyaPath) raw.profiles[id].diyaPath = { maxCleared: 0, stars: {}, cleared: {} };
+      if (!raw.profiles[id].diyaPath.stars) raw.profiles[id].diyaPath.stars = {};
+      if (!raw.profiles[id].diyaPath.cleared) raw.profiles[id].diyaPath.cleared = {};
+    }
+    DG.state = raw;
+    return DG.state;
+  }
+
+  function save() {
+    if (!DG.state) return false;
+    return writeRaw(DG.state);
+  }
+
+  function profile(id) {
+    if (!DG.state) load();
+    return DG.state.profiles[id || DG.profileId || DG.state.lastProfile || 'alpha'];
+  }
+
+  function setProfile(id) {
+    DG.profileId = id;
+    DG.state.lastProfile = id;
+    save();
+  }
+
+  function addSticker(emoji) {
+    const p = profile();
+    if (!p.stickers.includes(emoji)) {
+      p.stickers.push(emoji);
+      if (p.stickers.length >= 1 && !p.badges.includes('rangoli') && emoji === '🎨') p.badges.push('rangoli');
+      if (emoji === '🪔' && !p.badges.includes('diyapath')) p.badges.push('diyapath');
+      save();
+    }
+  }
+
+  function pushGallery(dataUrl) {
+    const p = profile();
+    p.gallery.unshift({ t: Date.now(), img: dataUrl });
+    if (p.gallery.length > 12) p.gallery.length = 12;
+    p.rangoliClears = (p.rangoliClears || 0) + 1;
+    addSticker('🎨');
+    if (p.rangoliClears >= 3) addSticker('🪷');
+    save();
+  }
+
+  return { load, save, profile, setProfile, blankProfile, blankState, readRaw, writeRaw, addSticker, pushGallery };
+})();
+
+})();
+/* ==== 30-art.js ==== */
+;(function(){
+/* Canvas art helpers — diyas, marigolds, night sky */
+DG.Art = {
+  drawHubBg(ctx, w, h, t) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#1a0838');
+    g.addColorStop(0.55, '#2a0e48');
+    g.addColorStop(1, '#1a0a18');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    // stars
+    ctx.fillStyle = 'rgba(255,240,200,0.85)';
+    for (let i = 0; i < 60; i++) {
+      const x = ((i * 97) % w);
+      const y = ((i * 53) % (h * 0.55));
+      const tw = 0.5 + 0.5 * Math.sin(t * 0.002 + i);
+      ctx.globalAlpha = 0.35 + 0.55 * tw;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.2 + (i % 3) * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // moon
+    ctx.beginPath();
+    ctx.arc(w * 0.88, h * 0.14, 28, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff4c8';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(w * 0.9, h * 0.12, 24, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a0838';
+    ctx.fill();
+    // marigold garland
+    for (let i = 0; i < 18; i++) {
+      const x = (i / 17) * w;
+      const y = h * 0.78 + Math.sin(i * 0.9 + t * 0.001) * 6;
+      this.marigold(ctx, x, y, 10 + (i % 3));
+    }
+    // diyas along bottom
+    for (let i = 0; i < 7; i++) {
+      const x = w * (0.12 + i * 0.12);
+      this.diya(ctx, x, h * 0.9, 1 + 0.15 * Math.sin(t * 0.004 + i));
+    }
+  },
+
+  marigold(ctx, x, y, r) {
+    ctx.save();
+    ctx.translate(x, y);
+    for (let i = 0; i < 8; i++) {
+      ctx.rotate(Math.PI / 4);
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.55, r * 0.35, r * 0.55, 0, 0, Math.PI * 2);
+      ctx.fillStyle = i % 2 ? '#ff9a1a' : '#ffd24a';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = '#c45a00';
+    ctx.fill();
+    ctx.restore();
+  },
+
+  diya(ctx, x, y, flicker) {
+    ctx.save();
+    ctx.translate(x, y);
+    // bowl
+    ctx.beginPath();
+    ctx.ellipse(0, 4, 22, 10, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#c45a18';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 20, 8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#8a3010';
+    ctx.fill();
+    // flame
+    const fh = 18 * flicker;
+    const grad = ctx.createRadialGradient(0, -fh * 0.4, 1, 0, -fh * 0.2, fh);
+    grad.addColorStop(0, '#fff6c0');
+    grad.addColorStop(0.4, '#ffb020');
+    grad.addColorStop(1, 'rgba(255,80,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(8 * flicker, -fh * 0.5, 0, -fh);
+    ctx.quadraticCurveTo(-8 * flicker, -fh * 0.5, 0, 0);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
+  },
+
+  powderDisc(ctx, x, y, r, color) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    // grain
+    ctx.globalAlpha = 0.35;
+    for (let i = 0; i < 8; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * r * 0.85;
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+};
+
+})();
+/* ==== 40-patterns.js ==== */
+;(function(){
+/* Traditional-style rangoli coloring pages — regions as closed paths */
+DG.Patterns = [
+  {
+    id: 'lotus', name: 'Lotus', emoji: '🪷',
+    regions: [
+      { id: 'c', path: 'M0,-18 C12,-18 18,-8 18,0 C18,8 12,18 0,18 C-12,18 -18,8 -18,0 C-18,-8 -12,-18 0,-18 Z', fillHint: '#ff6b9d' },
+      { id: 'p0', path: 'M0,-18 C8,-40 22,-42 28,-22 C18,-28 8,-28 0,-18 Z', fillHint: '#ff8fb8' },
+      { id: 'p1', path: 'M18,-8 C36,-18 48,-6 40,10 C28,0 22,-4 18,-8 Z', fillHint: '#ff8fb8' },
+      { id: 'p2', path: 'M18,8 C36,18 32,36 12,40 C14,26 14,18 18,8 Z', fillHint: '#ff8fb8' },
+      { id: 'p3', path: 'M0,18 C-8,40 -22,42 -28,22 C-18,28 -8,28 0,18 Z', fillHint: '#ff8fb8' },
+      { id: 'p4', path: 'M-18,8 C-36,18 -48,6 -40,-10 C-28,0 -22,4 -18,8 Z', fillHint: '#ff8fb8' },
+      { id: 'p5', path: 'M-18,-8 C-36,-18 -32,-36 -12,-40 C-14,-26 -14,-18 -18,-8 Z', fillHint: '#ff8fb8' },
+      { id: 'ring', path: 'M0,-48 C26,-48 48,-26 48,0 C48,26 26,48 0,48 C-26,48 -48,26 -48,0 C-48,-26 -26,-48 0,-48 Z M0,-40 C-22,-40 -40,-22 -40,0 C-40,22 -22,40 0,40 C22,40 40,22 40,0 C40,-22 22,-40 0,-40 Z', fillHint: '#ffd24a', hole: true }
+    ]
+  },
+  {
+    id: 'peacock', name: 'Peacock', emoji: '🦚',
+    regions: [
+      { id: 'body', path: 'M-8,-10 C0,-30 18,-28 22,-8 C24,8 10,28 -4,26 C-16,24 -18,6 -8,-10 Z', fillHint: '#2a8a6a' },
+      { id: 'head', path: 'M18,-20 C28,-34 40,-28 36,-14 C34,-6 24,-8 18,-14 Z', fillHint: '#1a6a90' },
+      { id: 'crest', path: 'M28,-32 L32,-48 L30,-32 L38,-44 L32,-30 Z', fillHint: '#f5c542' },
+      { id: 'f0', path: 'M-10,10 C-40,-10 -55,20 -30,40 C-20,28 -12,20 -10,10 Z', fillHint: '#3cb371' },
+      { id: 'f1', path: 'M-4,14 C-20,40 -5,58 16,42 C8,30 0,22 -4,14 Z', fillHint: '#5ad4a0' },
+      { id: 'f2', path: 'M6,12 C24,36 48,28 42,4 C28,8 14,10 6,12 Z', fillHint: '#48b8e0' },
+      { id: 'eye0', path: 'M-36,18 C-40,12 -34,8 -30,14 C-28,18 -32,22 -36,18 Z', fillHint: '#f5c542' },
+      { id: 'eye1', path: 'M2,40 C-2,34 6,30 10,36 C12,40 6,44 2,40 Z', fillHint: '#f5c542' },
+      { id: 'eye2', path: 'M34,12 C30,6 38,2 42,8 C44,12 38,16 34,12 Z', fillHint: '#f5c542' }
+    ]
+  },
+  {
+    id: 'diya', name: 'Diya', emoji: '🪔',
+    regions: [
+      { id: 'bowl', path: 'M-40,10 C-40,28 -20,40 0,40 C20,40 40,28 40,10 C40,4 -40,4 -40,10 Z', fillHint: '#c45a18' },
+      { id: 'rim', path: 'M-42,6 C-42,-2 42,-2 42,6 C42,12 -42,12 -42,6 Z', fillHint: '#8a3010' },
+      { id: 'oil', path: 'M-28,4 C-28,-2 28,-2 28,4 C28,8 -28,8 -28,4 Z', fillHint: '#f0e0a0' },
+      { id: 'flame', path: 'M0,-4 C10,-20 6,-40 0,-52 C-6,-40 -10,-20 0,-4 Z', fillHint: '#ffb020' },
+      { id: 'core', path: 'M0,-10 C4,-22 2,-34 0,-40 C-2,-34 -4,-22 0,-10 Z', fillHint: '#fff6c0' },
+      { id: 'base', path: 'M-16,40 C-16,48 16,48 16,40 L12,40 C12,44 -12,44 -12,40 Z', fillHint: '#a04010' }
+    ]
+  },
+  {
+    id: 'kolam4', name: 'Kolam 4', emoji: '⚪',
+    regions: (function () {
+      const r = [];
+      const dots = [[-30, -30], [0, -30], [30, -30], [-30, 0], [0, 0], [30, 0], [-30, 30], [0, 30], [30, 30]];
+      dots.forEach((d, i) => {
+        r.push({ id: 'd' + i, path: `M${d[0]},${d[1] - 5} A5,5 0 1,0 ${d[0]},${d[1] + 5} A5,5 0 1,0 ${d[0]},${d[1] - 5} Z`, fillHint: '#fff' });
+      });
+      r.push({ id: 'loop0', path: 'M-30,-30 C-10,-50 10,-50 30,-30 C10,-10 -10,-10 -30,-30 Z', fillHint: '#ff6b9d' });
+      r.push({ id: 'loop1', path: 'M30,-30 C50,-10 50,10 30,30 C10,10 10,-10 30,-30 Z', fillHint: '#5ad4a0' });
+      r.push({ id: 'loop2', path: 'M30,30 C10,50 -10,50 -30,30 C-10,10 10,10 30,30 Z', fillHint: '#48b8e0' });
+      r.push({ id: 'loop3', path: 'M-30,30 C-50,10 -50,-10 -30,-30 C-10,-10 -10,10 -30,30 Z', fillHint: '#f5c542' });
+      r.push({ id: 'center', path: 'M0,-18 C10,-18 18,-10 18,0 C18,10 10,18 0,18 C-10,18 -18,10 -18,0 C-18,-10 -10,-18 0,-18 Z', fillHint: '#ff8a3c' });
+      return r;
+    })()
+  },
+  {
+    id: 'kolam6', name: 'Kolam Hex', emoji: '⬡',
+    regions: (function () {
+      const r = [];
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        const x = Math.cos(a) * 32, y = Math.sin(a) * 32;
+        r.push({ id: 'p' + i, path: `M0,0 L${x * 0.3},${y * 0.3} L${x},${y} L${Math.cos(a + 0.5) * 32},${Math.sin(a + 0.5) * 32} Z`, fillHint: ['#ff6b9d', '#f5c542', '#5ad4a0', '#48b8e0', '#ff8a3c', '#c084fc'][i] });
+      }
+      r.push({ id: 'core', path: 'M0,-12 C7,-12 12,-7 12,0 C12,7 7,12 0,12 C-7,12 -12,7 -12,0 C-12,-7 -7,-12 0,-12 Z', fillHint: '#fff6c0' });
+      return r;
+    })()
+  },
+  {
+    id: 'star', name: 'Star Mandala', emoji: '⭐',
+    regions: [
+      { id: 'outer', path: 'M0,-50 L14,-16 L50,-16 L20,6 L32,42 L0,20 L-32,42 L-20,6 L-50,-16 L-14,-16 Z', fillHint: '#f5c542' },
+      { id: 'mid', path: 'M0,-30 L8,-10 L30,-10 L12,4 L18,26 L0,12 L-18,26 L-12,4 L-30,-10 L-8,-10 Z', fillHint: '#ff8a3c' },
+      { id: 'in', path: 'M0,-14 C8,-14 14,-8 14,0 C14,8 8,14 0,14 C-8,14 -14,8 -14,0 C-14,-8 -8,-14 0,-14 Z', fillHint: '#ff6b9d' }
+    ]
+  },
+  {
+    id: 'swastik-flower', name: 'Festival Flower', emoji: '🌸',
+    regions: (function () {
+      const r = [];
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        const x = Math.cos(a) * 28, y = Math.sin(a) * 28;
+        const x2 = Math.cos(a + 0.35) * 18, y2 = Math.sin(a + 0.35) * 18;
+        const x3 = Math.cos(a - 0.35) * 18, y3 = Math.sin(a - 0.35) * 18;
+        r.push({ id: 'pet' + i, path: `M0,0 Q${x3},${y3} ${x},${y} Q${x2},${y2} 0,0 Z`, fillHint: ['#ff6b9d', '#ff8fb8', '#f5c542', '#ffd24a', '#ff6b9d', '#ff8fb8', '#f5c542', '#ffd24a'][i] });
+      }
+      r.push({ id: 'center', path: 'M0,-10 C6,-10 10,-6 10,0 C10,6 6,10 0,10 C-6,10 -10,6 -10,0 C-10,-6 -6,-10 0,-10 Z', fillHint: '#c45a18' });
+      return r;
+    })()
+  },
+  {
+    id: 'kalash', name: 'Kalash', emoji: '🏺',
+    regions: [
+      { id: 'pot', path: 'M-28,10 C-32,40 -20,50 0,50 C20,50 32,40 28,10 C20,18 -20,18 -28,10 Z', fillHint: '#d4a017' },
+      { id: 'neck', path: 'M-14,-5 C-14,12 14,12 14,-5 C14,-12 -14,-12 -14,-5 Z', fillHint: '#f5c542' },
+      { id: 'rim', path: 'M-18,-12 C-18,-20 18,-20 18,-12 C18,-8 -18,-8 -18,-12 Z', fillHint: '#c45a18' },
+      { id: 'mango', path: 'M-8,-20 C-20,-40 0,-55 8,-36 C4,-40 -2,-36 -8,-20 Z', fillHint: '#3cb371' },
+      { id: 'coconut', path: 'M0,-36 C8,-36 12,-28 8,-22 C4,-18 -4,-18 -8,-22 C-12,-28 -8,-36 0,-36 Z', fillHint: '#8a5010' },
+      { id: 'band', path: 'M-26,22 C-26,28 26,28 26,22 C26,18 -26,18 -26,22 Z', fillHint: '#ff6b9d' }
+    ]
+  },
+  {
+    id: 'diwali-gate', name: 'Toran Gate', emoji: '🚪',
+    regions: [
+      { id: 'arch', path: 'M-45,40 L-45,-10 C-45,-45 45,-45 45,-10 L45,40 L35,40 L35,-10 C35,-35 -35,-35 -35,-10 L-35,40 Z', fillHint: '#c45a18' },
+      { id: 'left', path: 'M-45,40 L-35,40 L-35,-10 L-45,-10 Z', fillHint: '#8a3010' },
+      { id: 'right', path: 'M45,40 L35,40 L35,-10 L45,-10 Z', fillHint: '#8a3010' },
+      { id: 'lampL', path: 'M-25,5 C-25,15 -15,18 -15,5 C-15,0 -25,0 -25,5 Z', fillHint: '#f5c542' },
+      { id: 'lampR', path: 'M15,5 C15,15 25,18 25,5 C25,0 15,0 15,5 Z', fillHint: '#f5c542' },
+      { id: 'top', path: 'M-20,-40 C-10,-55 10,-55 20,-40 C10,-45 -10,-45 -20,-40 Z', fillHint: '#ff6b9d' }
+    ]
+  }
+];
+
+})();
+/* ==== 50-diyapath-logic.js ==== */
+;(function(){
+/* Diya Path — arrow-escape logic + solver (shared by game + tests via window) */
+DG.DiyaLogic = (() => {
+  const DIRS = [
+    { id: 0, name: 'U', dr: -1, dc: 0, arrow: '▲' },
+    { id: 1, name: 'R', dr: 0, dc: 1, arrow: '▶' },
+    { id: 2, name: 'D', dr: 1, dc: 0, arrow: '▼' },
+    { id: 3, name: 'L', dr: 0, dc: -1, arrow: '◀' }
+  ];
+  const DIR_FROM = { U: 0, R: 1, D: 2, L: 3, u: 0, r: 1, d: 2, l: 3, N: 0, E: 1, S: 2, W: 3, '^': 0, '>': 1, v: 2, '<': 3, '▲': 0, '▶': 1, '▼': 2, '◀': 3 };
+
+  function parseDir(d) {
+    if (typeof d === 'number') return ((d % 4) + 4) % 4;
+    if (typeof d === 'string') return DIR_FROM[d] != null ? DIR_FROM[d] : 0;
+    return 0;
+  }
+
+  function clonePieces(pieces) {
+    return pieces.map((p) => ({ r: p.r, c: p.c, d: parseDir(p.d), bend: p.bend || null, id: p.id }));
+  }
+
+  function keyOf(p) { return p.r + ',' + p.c; }
+
+  function occupancy(pieces) {
+    const m = Object.create(null);
+    pieces.forEach((p) => { m[keyOf(p)] = p; });
+    return m;
+  }
+
+  /** Escape path cells after the piece (not including start). Empty => clear to edge. */
+  function escapePath(piece, w, h, occ) {
+    const cells = [];
+    let r = piece.r, c = piece.c;
+    let d = parseDir(piece.d);
+    let turned = false;
+    // step off the piece first
+    for (;;) {
+      r += DIRS[d].dr;
+      c += DIRS[d].dc;
+      if (r < 0 || c < 0 || r >= h || c >= w) return { clear: true, cells };
+      const k = r + ',' + c;
+      if (occ[k]) return { clear: false, cells, blocker: occ[k] };
+      cells.push({ r, c });
+      // optional single bend: after first free cell beyond start, turn once
+      if (piece.bend && !turned && cells.length === 1) {
+        if (piece.bend === 'L') d = (d + 3) % 4;
+        else if (piece.bend === 'R') d = (d + 1) % 4;
+        turned = true;
+      }
+    }
+  }
+
+  function canEscape(piece, w, h, pieces) {
+    return escapePath(piece, w, h, occupancy(pieces)).clear;
+  }
+
+  function movable(pieces, w, h) {
+    return pieces.filter((p) => canEscape(p, w, h, pieces));
+  }
+
+  function removePiece(pieces, piece) {
+    return pieces.filter((p) => !(p.r === piece.r && p.c === piece.c));
+  }
+
+  /** DFS solver; returns move sequence (piece snapshots) or null */
+  function solve(level, maxNodes) {
+    const w = level.w, h = level.h;
+    const start = clonePieces(level.pieces);
+    const lim = maxNodes || 200000;
+    let nodes = 0;
+    const seen = new Set();
+
+    function stateKey(pieces) {
+      return pieces.map((p) => p.r + ',' + p.c + ',' + parseDir(p.d) + (p.bend || '')).sort().join('|');
+    }
+
+    function dfs(pieces, path) {
+      if (++nodes > lim) return null;
+      if (!pieces.length) return path;
+      const sk = stateKey(pieces);
+      if (seen.has(sk)) return null;
+      seen.add(sk);
+      const moves = movable(pieces, w, h);
+      if (!moves.length) return null; // deadlock
+      // prefer edge-closer moves for speed
+      moves.sort((a, b) => {
+        const da = Math.min(a.r, a.c, h - 1 - a.r, w - 1 - a.c);
+        const db = Math.min(b.r, b.c, h - 1 - b.r, w - 1 - b.c);
+        return da - db;
+      });
+      for (const m of moves) {
+        const next = removePiece(pieces, m);
+        const got = dfs(next, path.concat([{ r: m.r, c: m.c, d: parseDir(m.d), bend: m.bend || null }]));
+        if (got) return got;
+      }
+      return null;
+    }
+
+    const sol = dfs(start, []);
+    return {
+      solvable: !!sol,
+      solution: sol || [],
+      nodes,
+      startDeadlock: start.length > 0 && movable(start, w, h).length === 0
+    };
+  }
+
+  /** Reverse-construct a solvable level */
+  function generate(w, h, count, rng, opts) {
+    opts = opts || {};
+    const allowBend = !!opts.allowBend;
+    const cells = [];
+    for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) cells.push({ r, c });
+    // shuffle cells
+    for (let i = cells.length - 1; i > 0; i--) {
+      const j = (rng() * (i + 1)) | 0;
+      const t = cells[i]; cells[i] = cells[j]; cells[j] = t;
+    }
+    const pieces = [];
+    const occ = Object.create(null);
+    let placed = 0;
+    for (const cell of cells) {
+      if (placed >= count) break;
+      const k = cell.r + ',' + cell.c;
+      if (occ[k]) continue;
+      // try dirs in random order
+      const order = [0, 1, 2, 3];
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = (rng() * (i + 1)) | 0;
+        const t = order[i]; order[i] = order[j]; order[j] = t;
+      }
+      let chosen = null;
+      for (const d of order) {
+        const bendRoll = allowBend && rng() < 0.22;
+        const bend = bendRoll ? (rng() < 0.5 ? 'L' : 'R') : null;
+        const cand = { r: cell.r, c: cell.c, d, bend };
+        // must be able to escape given current occupancy (pieces already placed)
+        if (canEscape(cand, w, h, pieces)) {
+          chosen = cand;
+          break;
+        }
+        // also try without bend
+        if (bend) {
+          const cand2 = { r: cell.r, c: cell.c, d, bend: null };
+          if (canEscape(cand2, w, h, pieces)) { chosen = cand2; break; }
+        }
+      }
+      if (chosen) {
+        chosen.id = placed;
+        pieces.push(chosen);
+        occ[k] = chosen;
+        placed++;
+      }
+    }
+    // Placement order is solution order (first placed escapes first among those...).
+    // Actually: each was escapable at placement time among pieces placed so far.
+    // Final board solution = reverse placement order.
+    return { w, h, pieces: clonePieces(pieces) };
+  }
+
+  function mulberry32(a) {
+    return function () {
+      let t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function starsFor(moves, optimal, livesLeft, easy) {
+    if (easy) return 3;
+    let s = 1;
+    if (livesLeft >= 2) s++;
+    if (optimal > 0 && moves <= optimal + 2) s++;
+    else if (optimal > 0 && moves <= optimal + 5 && s < 3) { /* keep */ }
+    if (livesLeft === 3 && moves <= optimal) s = 3;
+    return DG.clamp(s, 1, 3);
+  }
+
+  return {
+    DIRS, parseDir, clonePieces, occupancy, escapePath, canEscape, movable,
+    removePiece, solve, generate, mulberry32, starsFor, keyOf
+  };
+})();
+
+})();
+/* ==== 51-diyapath-levels.js ==== */
+;(function(){
+/* Separate Diya Path packs: easy (P1) + challenge (P2) */
+DG.DiyaLevels = (() => {
+  const L = DG.DiyaLogic;
+
+  function handmade(id, pack, w, h, cells, title) {
+    const rows = cells.trim().split('|');
+    const pieces = [];
+    for (let r = 0; r < h; r++) {
+      const row = rows[r] || '';
+      let c = 0;
+      for (let i = 0; i < row.length && c < w; ) {
+        const ch = row[i];
+        if (ch === '.' || ch === ' ') { c++; i++; continue; }
+        const d = L.parseDir(ch);
+        let bend = null;
+        i++;
+        if (row[i] === '>') { bend = 'R'; i++; }
+        else if (row[i] === '<') { bend = 'L'; i++; }
+        pieces.push({ r, c, d, bend, id: pieces.length });
+        c++;
+      }
+    }
+    return { id, pack, w, h, pieces, title: title || ('Level ' + id) };
+  }
+
+  function finalize(lv) {
+    const s = L.solve(lv);
+    lv.optimal = s.solution.length;
+    lv._solvable = s.solvable;
+    lv._deadlock = s.startDeadlock;
+    return s.solvable && !s.startDeadlock;
+  }
+
+  function genOne(rng, spec, packName, id) {
+    for (let t = 0; t < 120; t++) {
+      const level = L.generate(spec.w, spec.h, spec.n, rng, { allowBend: !!spec.bend });
+      if (level.pieces.length < Math.max(2, (spec.n * 0.7) | 0)) continue;
+      const lv = {
+        id,
+        pack: packName,
+        w: level.w,
+        h: level.h,
+        pieces: level.pieces,
+        title: spec.title || ('Level ' + id),
+        bend: !!spec.bend
+      };
+      if (finalize(lv)) return lv;
+    }
+    // guaranteed tiny fallback
+    const fb = handmade(id, packName, 3, 3, 'R..|.R.|..R', 'Level ' + id);
+    finalize(fb);
+    return fb;
+  }
+
+  function buildPack(seed, specs, packName) {
+    const rng = L.mulberry32(seed);
+    return specs.map((spec, i) => genOne(rng, spec, packName, i + 1));
+  }
+
+  // --- Player 1 easy: 12 levels, 3x3–4x4, no bends ---
+  const easySeeds = [
+    handmade(1, 'easy', 3, 3, 'R..|R..|R..', 'Glow Row'),
+    handmade(2, 'easy', 3, 3, '..L|..L|..L', 'Left Parade'),
+    handmade(3, 'easy', 3, 3, 'D..|.D.|..D', 'Step Down'),
+    handmade(4, 'easy', 3, 3, 'U..|.U.|..U', 'Step Up'),
+    handmade(5, 'easy', 3, 3, 'R.L|...|R.L', 'Side Gates'),
+    handmade(6, 'easy', 3, 3, 'R..|...|..L', 'Two Ends'),
+    handmade(7, 'easy', 4, 3, 'R..L|....|R..L', 'Wide Gates'),
+    handmade(8, 'easy', 4, 3, 'DDDD|....|....', 'All Down'),
+    handmade(9, 'easy', 4, 4, 'R..L|R..L|....|....', 'Double Gate'),
+    handmade(10, 'easy', 4, 4, 'R...|R...|R...|R...', 'Four East')
+  ];
+  const easyHand = [];
+  easySeeds.forEach((lv) => { if (finalize(lv)) easyHand.push(lv); });
+
+  const easyNeed = Math.max(0, 12 - easyHand.length);
+  const easySpecs = [];
+  for (let i = 0; i < easyNeed + 6; i++) {
+    const side = i < 3 ? 3 : 4;
+    easySpecs.push({ w: side, h: side, n: 3 + (i % 5), bend: false, title: 'Lantern ' + (easyHand.length + i + 1) });
+  }
+  const easyExtra = buildPack(0xD1A011, easySpecs, 'easy');
+  const easy = easyHand.concat(easyExtra).slice(0, 12);
+  easy.forEach((lv, i) => { lv.id = i + 1; finalize(lv); });
+
+  // --- Player 2 hard: 18+ levels, up to 7x7, bends on later ---
+  const hardSpecs = [];
+  // 18 challenge specs
+  const plan = [
+    [4, 4, 6, false], [4, 4, 8, false], [4, 4, 10, false],
+    [5, 4, 10, false], [5, 5, 12, false], [5, 5, 14, true],
+    [5, 5, 16, true], [6, 5, 14, true], [6, 6, 16, true],
+    [6, 6, 18, true], [6, 6, 20, true], [7, 6, 18, true],
+    [7, 7, 20, true], [7, 7, 22, true], [7, 7, 24, true],
+    [5, 5, 12, true], [6, 6, 15, true], [4, 5, 12, true],
+    [7, 7, 26, true], [6, 7, 22, true]
+  ];
+  plan.forEach((p, i) => {
+    hardSpecs.push({ w: p[0], h: p[1], n: p[2], bend: p[3], title: 'Challenge ' + (i + 1) });
+  });
+  const hard = buildPack(0xD1A022, hardSpecs, 'hard');
+  hard.forEach((lv, i) => { lv.id = i + 1; finalize(lv); });
+
+  function forProfile(easyMode) {
+    return easyMode ? easy : hard;
+  }
+
+  function get(easyMode, id) {
+    const pack = forProfile(easyMode);
+    return pack.find((l) => l.id === id) || pack[0];
+  }
+
+  function validateAll() {
+    const report = { easy: [], hard: [], ok: true };
+    [['easy', easy], ['hard', hard]].forEach(([name, pack]) => {
+      pack.forEach((lv) => {
+        const s = L.solve(lv);
+        const row = {
+          id: lv.id, w: lv.w, h: lv.h, n: lv.pieces.length,
+          solvable: s.solvable, deadlock: s.startDeadlock,
+          optimal: s.solution.length, nodes: s.nodes
+        };
+        report[name].push(row);
+        if (!s.solvable || s.startDeadlock) report.ok = false;
+      });
+    });
+    report.easyCount = easy.length;
+    report.hardCount = hard.length;
+    return report;
+  }
+
+  return { easy, hard, forProfile, get, validateAll };
+})();
+
+})();
+/* ==== 60-ui.js ==== */
+;(function(){
+/* Screens: profiles, hub, confirm */
+DG.UI = (() => {
+  let bgRaf = 0;
+
+  function ov() { return DG.overlay; }
+
+  function startBg() {
+    cancelAnimationFrame(bgRaf);
+    const tick = (t) => {
+      if (DG.screen === 'hub' || DG.screen === 'profiles' || DG.screen === 'diyapath-select') {
+        DG.fitCanvas();
+        DG.Art.drawHubBg(DG.ctx, DG.W, DG.H, t);
+        bgRaf = requestAnimationFrame(tick);
+      }
+    };
+    bgRaf = requestAnimationFrame(tick);
+  }
+
+  function showProfiles() {
+    DG.screen = 'profiles';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const scr = document.createElement('div');
+    scr.className = 'screen';
+    scr.innerHTML = `
+      <div class="title">🪔 Diwali Games</div>
+      <div class="sub">Who is playing?</div>
+      <div class="profiles" id="profiles"></div>
+      <div class="edit-name"><span class="sub">Tap a player, then you can rename them</span></div>`;
+    el.appendChild(scr);
+    const box = scr.querySelector('#profiles');
+    // youngest first: alpha then beta
+    ['alpha', 'beta'].forEach((id) => {
+      const meta = DG.profiles[id];
+      const p = DG.Save.profile(id);
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'profile-card';
+      card.dataset.id = id;
+      card.innerHTML = `<span class="emoji">${meta.emoji}</span><span>${p.name}</span><span class="label">${meta.label}</span>`;
+      DG.bindTap(card, () => {
+        DG.Audio.click();
+        DG.Save.setProfile(id);
+        showHub();
+      });
+      box.appendChild(card);
+    });
+    startBg();
+  }
+
+  function showHub() {
+    DG.screen = 'hub';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const p = DG.Save.profile();
+    const meta = DG.profiles[p.id];
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight';
+    const stickers = (p.stickers || []).map((s) => `<span class="sticker">${s}</span>`).join('') || '<span class="sub">Play to earn stickers!</span>';
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="btnSwitch">👥 Switch</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.5vw,28px)">🪔 Diwali Hub</div>
+          <div class="sub">${p.name} · ${meta.label}</div>
+        </div>
+        <button class="btn ghost" id="btnRename">✏️ Name</button>
+      </div>
+      <div class="stickers">${stickers}</div>
+      <div class="hub-grid" id="grid"></div>`;
+    el.appendChild(scr);
+    const grid = scr.querySelector('#grid');
+    DG.games.forEach((g) => {
+      const tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'game-tile ' + (g.ready ? 'playable' : 'soon');
+      tile.dataset.game = g.id;
+      tile.innerHTML = `${g.ready ? '' : '<span class="badge">Soon</span>'}
+        <span class="emoji">${g.emoji}</span>
+        <span class="name">${g.name}</span>
+        <span class="tag">${g.tag}</span>`;
+      if (g.ready) {
+        DG.bindTap(tile, () => {
+          DG.Audio.click();
+          if (g.id === 'rangoli') DG.Rangoli.open();
+          else if (g.id === 'diyapath') DG.DiyaPath.open();
+        });
+      } else {
+        DG.bindTap(tile, () => {
+          DG.Audio.soft();
+          DG.toast('Coming soon! ✨');
+        });
+      }
+      grid.appendChild(tile);
+    });
+    DG.bindTap(scr.querySelector('#btnSwitch'), () => { DG.Audio.click(); showProfiles(); });
+    DG.bindTap(scr.querySelector('#btnRename'), () => renamePrompt());
+    startBg();
+  }
+
+  function renamePrompt() {
+    const p = DG.Save.profile();
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>Player name</h3>
+      <input id="nameIn" maxlength="16" value="${p.name.replace(/"/g, '&quot;')}" aria-label="Name">
+      <div class="row">
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn" id="ok">Save</button>
+      </div>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    const input = modal.querySelector('#nameIn');
+    setTimeout(() => input.focus(), 50);
+    DG.bindTap(modal.querySelector('#cancel'), () => modal.remove());
+    DG.bindTap(modal.querySelector('#ok'), () => {
+      let n = (input.value || '').trim().slice(0, 16);
+      if (!n) n = DG.profiles[p.id].defaultName;
+      // never allow banned names
+      if (new RegExp('\\b(' + ['R'+'uhi','A'+'man'].join('|') + ')\\b','i').test(n)) n = DG.profiles[p.id].defaultName;
+      p.name = n;
+      DG.Save.save();
+      modal.remove();
+      showHub();
+    });
+  }
+
+  function confirm(title, body, onYes) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>${title}</h3>
+      <div class="sub">${body || ''}</div>
+      <div class="row">
+        <button class="btn ghost" id="no">No</button>
+        <button class="btn danger" id="yes">Yes</button>
+      </div>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    DG.bindTap(modal.querySelector('#no'), () => modal.remove());
+    DG.bindTap(modal.querySelector('#yes'), () => { modal.remove(); onYes && onYes(); });
+  }
+
+  return { showProfiles, showHub, confirm, startBg };
+})();
+
+})();
+/* ==== 70-rangoli.js ==== */
+;(function(){
+/* Rangoli Studio — free-draw symmetry + stamps + coloring pages */
+DG.Rangoli = (() => {
+  const COLORS = [
+    { id: 'red', hex: '#e63946', name: 'Red' },
+    { id: 'orange', hex: '#ff8a3c', name: 'Orange' },
+    { id: 'yellow', hex: '#f5c542', name: 'Yellow' },
+    { id: 'green', hex: '#2a9d6e', name: 'Green' },
+    { id: 'blue', hex: '#3a86ff', name: 'Blue' },
+    { id: 'purple', hex: '#9b5de5', name: 'Purple' },
+    { id: 'pink', hex: '#ff6b9d', name: 'Pink' },
+    { id: 'white', hex: '#fff8e7', name: 'White' },
+    { id: 'brown', hex: '#8a5010', name: 'Brown' },
+    { id: 'teal', hex: '#00b4d8', name: 'Teal' }
+  ];
+
+  let mode = 'draw'; // draw | color | gallery | pick
+  let color = COLORS[2].hex;
+  let brush = 10;
+  let symmetry = 8;
+  let stamp = null; // petal | dot | diya | null
+  let drawing = false;
+  let last = null;
+  let undoStack = [];
+  let canvas, ctx, wrap;
+  let pattern = null;
+  let fills = {};
+  let easyFill = false;
+  const MAX_UNDO = 20;
+
+  function profile() { return DG.Save.profile(); }
+
+  function snapshot() {
+    if (!canvas) return;
+    try {
+      undoStack.push(canvas.toDataURL('image/png'));
+      if (undoStack.length > MAX_UNDO) undoStack.shift();
+    } catch (_) {}
+  }
+
+  function restore() {
+    if (!undoStack.length || !ctx) return;
+    const url = undoStack.pop();
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      paintFloor();
+      ctx.drawImage(img, 0, 0);
+      if (pattern) drawPatternLines();
+    };
+    img.src = url;
+    DG.Audio.soft();
+  }
+
+  function paintFloor() {
+    const g = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 20, canvas.width / 2, canvas.height / 2, canvas.width * 0.7);
+    g.addColorStop(0, '#3a2410');
+    g.addColorStop(1, '#1a0f08');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // subtle grain
+    ctx.globalAlpha = 0.08;
+    for (let i = 0; i < 200; i++) {
+      ctx.fillStyle = i % 2 ? '#fff' : '#000';
+      ctx.fillRect((Math.random() * canvas.width) | 0, (Math.random() * canvas.height) | 0, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function clearCanvas(skipConfirm) {
+    const go = () => {
+      snapshot();
+      paintFloor();
+      fills = {};
+      if (pattern) drawPatternLines();
+      DG.Audio.click();
+    };
+    if (skipConfirm) { go(); return; }
+    DG.UI.confirm('Clear the rangoli?', 'This cannot be undone after you leave.', go);
+  }
+
+  function resizeCanvas() {
+    if (!wrap || !canvas) return;
+    const r = wrap.getBoundingClientRect();
+    const size = Math.max(200, Math.min(r.width, r.height) | 0);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // keep drawing by snapshot-rescale if size changes meaningfully
+    const prev = canvas.toDataURL('image/png');
+    canvas.width = (size * dpr) | 0;
+    canvas.height = (size * dpr) | 0;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    paintFloor();
+    if (prev && prev.length > 100) {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, size, size); if (pattern) drawPatternLines(); };
+      img.src = prev;
+    } else if (pattern) {
+      drawPatternLines();
+    }
+  }
+
+  function pos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches && e.touches[0] ? e.touches[0] : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : e);
+    const x = (src.clientX - rect.left) * (canvas.width / rect.width) / (window.devicePixelRatio > 1 ? Math.min(window.devicePixelRatio, 2) : 1);
+    // Since we set transform to dpr, work in CSS pixel space:
+    const cssX = (src.clientX - rect.left) * (parseFloat(canvas.style.width) / rect.width);
+    const cssY = (src.clientY - rect.top) * (parseFloat(canvas.style.height) / rect.height);
+    // Actually canvas.style width is size; getBoundingClientRect is displayed size.
+    return {
+      x: (src.clientX - rect.left) * (parseFloat(canvas.style.width) || rect.width) / rect.width,
+      y: (src.clientY - rect.top) * (parseFloat(canvas.style.height) || rect.height) / rect.height
+    };
+  }
+
+  function applySymmetry(drawFn) {
+    const cx = parseFloat(canvas.style.width) / 2;
+    const cy = parseFloat(canvas.style.height) / 2;
+    const n = symmetry | 0;
+    for (let i = 0; i < n; i++) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate((Math.PI * 2 * i) / n);
+      ctx.translate(-cx, -cy);
+      drawFn();
+      // mirror for richer rangoli look when even
+      if (n >= 4) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(1, -1);
+        ctx.translate(-cx, -cy);
+        drawFn();
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+  }
+
+  function strokeLine(a, b) {
+    applySymmetry(() => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = brush;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalAlpha = 0.92;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      // powder speckles
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = color;
+      for (let i = 0; i < 3; i++) {
+        const t = Math.random();
+        const x = a.x + (b.x - a.x) * t + (Math.random() - 0.5) * brush;
+        const y = a.y + (b.y - a.y) * t + (Math.random() - 0.5) * brush;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.random() * 1.5 + 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function placeStamp(p) {
+    snapshot();
+    applySymmetry(() => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      if (stamp === 'dot') {
+        DG.Art.powderDisc(ctx, 0, 0, brush * 0.9, color);
+      } else if (stamp === 'petal') {
+        ctx.rotate(-Math.PI / 2);
+        ctx.beginPath();
+        ctx.ellipse(0, -brush, brush * 0.55, brush * 1.1, 0, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.9;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      } else if (stamp === 'diya') {
+        ctx.scale(brush / 14, brush / 14);
+        DG.Art.diya(ctx, 0, 4, 1);
+      }
+      ctx.restore();
+    });
+    DG.Audio.stamp();
+  }
+
+  function drawPatternLines() {
+    if (!pattern || !ctx) return;
+    const cx = parseFloat(canvas.style.width) / 2;
+    const cy = parseFloat(canvas.style.height) / 2;
+    const scale = Math.min(cx, cy) / 60;
+    pattern.regions.forEach((reg) => {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+      const p = new Path2D(reg.path);
+      if (fills[reg.id]) {
+        ctx.fillStyle = fills[reg.id];
+        ctx.fill(p, 'evenodd');
+      }
+      ctx.strokeStyle = 'rgba(255,230,180,0.85)';
+      ctx.lineWidth = 1.2 / scale * 2;
+      ctx.stroke(p);
+      ctx.restore();
+    });
+  }
+
+  function hitRegion(p) {
+    if (!pattern) return null;
+    const cx = parseFloat(canvas.style.width) / 2;
+    const cy = parseFloat(canvas.style.height) / 2;
+    const scale = Math.min(cx, cy) / 60;
+    const lx = (p.x - cx) / scale;
+    const ly = (p.y - cy) / scale;
+    // reverse order for top-most
+    for (let i = pattern.regions.length - 1; i >= 0; i--) {
+      const reg = pattern.regions[i];
+      const path = new Path2D(reg.path);
+      if (ctx.isPointInPath(path, lx, ly, 'evenodd')) return reg;
+    }
+    return null;
+  }
+
+  function fillRegion(reg) {
+    if (!reg) return;
+    snapshot();
+    fills[reg.id] = color;
+    // redraw all
+    paintFloor();
+    drawPatternLines();
+    DG.Audio.fill();
+  }
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    DG.Audio.unlock();
+    const p = pos(e);
+    if (mode === 'color' || (easyFill && pattern)) {
+      const reg = hitRegion(p);
+      if (reg) fillRegion(reg);
+      return;
+    }
+    if (stamp) {
+      placeStamp(p);
+      return;
+    }
+    drawing = true;
+    last = p;
+    snapshot();
+    strokeLine(p, p);
+  }
+
+  function onPointerMove(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = pos(e);
+    if (last) strokeLine(last, p);
+    last = p;
+  }
+
+  function onPointerUp(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    drawing = false;
+    last = null;
+  }
+
+  function saveToGallery() {
+    if (!canvas) return;
+    try {
+      const url = canvas.toDataURL('image/jpeg', 0.72);
+      DG.Save.pushGallery(url);
+      DG.Audio.save();
+      DG.toast('Saved to gallery! 🎨');
+    } catch (err) {
+      DG.toast('Could not save');
+    }
+  }
+
+  function startFree() {
+    mode = 'draw';
+    pattern = null;
+    fills = {};
+    stamp = null;
+    easyFill = DG.isEasy();
+    symmetry = DG.isEasy() ? 6 : 8;
+    renderStudio();
+    setTimeout(() => { resizeCanvas(); paintFloor(); }, 30);
+  }
+
+  function startPattern(pat) {
+    mode = 'color';
+    pattern = pat;
+    fills = {};
+    stamp = null;
+    easyFill = true;
+    renderStudio();
+    setTimeout(() => { resizeCanvas(); paintFloor(); drawPatternLines(); }, 30);
+  }
+
+  function showPicker() {
+    mode = 'pick';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const scr = document.createElement('div');
+    scr.className = 'screen';
+    scr.innerHTML = `<div class="topbar"><button class="btn ghost" id="btnBackHub">← Back</button><div class="title">Rangoli Studio</div><span></span></div>
+      <div class="sub">${DG.isEasy() ? 'Tap a picture to color!' : 'Color a page or free-draw'}</div>
+      <div class="row" style="margin-top:8px"><button class="btn big ${DG.isEasy() ? 'p1' : ''}" id="btnFree">✨ Free Draw</button>
+      <button class="btn big ghost ${DG.isEasy() ? 'p1' : ''}" id="btnGal">🖼️ Gallery</button></div>
+      <div class="pattern-grid" id="pats"></div>`;
+    ov.appendChild(scr);
+    const grid = scr.querySelector('#pats');
+    DG.Patterns.forEach((pat) => {
+      const b = document.createElement('button');
+      b.className = 'pattern-card';
+      b.type = 'button';
+      b.innerHTML = `<span class="emoji">${pat.emoji}</span><span class="name">${pat.name}</span>`;
+      DG.bindTap(b, () => startPattern(pat));
+      grid.appendChild(b);
+    });
+    DG.bindTap(scr.querySelector('#btnBackHub'), () => DG.UI.showHub());
+    DG.bindTap(scr.querySelector('#btnFree'), () => startFree());
+    DG.bindTap(scr.querySelector('#btnGal'), () => showGallery());
+    DG.screen = 'rangoli-pick';
+    drawBgLoop();
+  }
+
+  function showGallery() {
+    mode = 'gallery';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const scr = document.createElement('div');
+    scr.className = 'screen';
+    const items = profile().gallery || [];
+    scr.innerHTML = `<div class="topbar"><button class="btn ghost" id="btnBack">← Back</button><div class="title">Gallery</div><span></span></div>
+      <div class="gallery-grid" id="gal"></div>
+      ${items.length ? '' : '<div class="empty">No saved rangolis yet. Make one!</div>'}`;
+    ov.appendChild(scr);
+    const gal = scr.querySelector('#gal');
+    items.forEach((it) => {
+      const d = document.createElement('div');
+      d.className = 'gallery-item';
+      d.innerHTML = `<img alt="rangoli" src="${it.img}">`;
+      gal.appendChild(d);
+    });
+    DG.bindTap(scr.querySelector('#btnBack'), () => showPicker());
+    DG.screen = 'rangoli-gallery';
+  }
+
+  function renderStudio() {
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const easy = DG.isEasy();
+    const scr = document.createElement('div');
+    scr.className = 'screen rangoli-wrap' + (easy ? ' p1-mode' : '');
+    const symOpts = [4, 6, 8, 12];
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${easy ? 'p1' : ''}" id="btnBack">← Back</button>
+        <div class="title" style="font-size:clamp(16px,3vw,24px)">${pattern ? pattern.emoji + ' ' + pattern.name : '✨ Free Draw'}</div>
+        <span></span>
+      </div>
+      <div class="rangoli-main">
+        <div class="toolbar" id="tools"></div>
+        <div class="rangoli-canvas-box" id="cbox"><canvas id="rangoliCv"></canvas></div>
+      </div>
+      <div class="bottom-bar">
+        <button class="btn ${easy ? 'p1' : ''}" id="btnUndo">↩ Undo</button>
+        <button class="btn danger ${easy ? 'p1' : ''}" id="btnClear">Clear</button>
+        <button class="btn ${easy ? 'p1' : ''}" id="btnSave">💾 Save</button>
+      </div>`;
+    ov.appendChild(scr);
+    wrap = scr.querySelector('#cbox');
+    canvas = scr.querySelector('#rangoliCv');
+    ctx = canvas.getContext('2d');
+    const tools = scr.querySelector('#tools');
+
+    // colors
+    const pal = document.createElement('div');
+    pal.className = 'palette';
+    const lab = document.createElement('div');
+    lab.className = 'section';
+    lab.textContent = 'Powder colors';
+    tools.appendChild(lab);
+    COLORS.forEach((c) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch' + (c.hex === color ? ' active' : '');
+      b.style.background = c.hex;
+      b.style.color = c.id === 'white' || c.id === 'yellow' ? '#333' : '#fff';
+      b.textContent = easy ? '' : '';
+      b.setAttribute('aria-label', c.name);
+      b.dataset.hex = c.hex;
+      DG.bindTap(b, () => {
+        color = c.hex;
+        tools.querySelectorAll('.swatch').forEach((x) => x.classList.toggle('active', x.dataset.hex === color));
+        DG.Audio.click();
+      });
+      pal.appendChild(b);
+    });
+    // defer palette until after symmetry/stamps so they stay on-screen
+    if (!pattern) {
+      const sl = document.createElement('div');
+      sl.className = 'section';
+      sl.textContent = 'Symmetry';
+      tools.appendChild(sl);
+      const row = document.createElement('div');
+      row.className = 'sym-row';
+      symOpts.forEach((n) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'tool' + (symmetry === n ? ' active' : '');
+        b.textContent = n;
+        DG.bindTap(b, () => {
+          symmetry = n;
+          row.querySelectorAll('.tool').forEach((x) => x.classList.toggle('active', +x.textContent === symmetry));
+          DG.Audio.click();
+        });
+        row.appendChild(b);
+      });
+      tools.appendChild(row);
+
+      const st = document.createElement('div');
+      st.className = 'section';
+      st.textContent = 'Stamps';
+      tools.appendChild(st);
+      const stampRow = document.createElement('div');
+      stampRow.className = 'stamp-grid';
+      [['draw', '✏️'], ['petal', '🌸'], ['dot', '⚪'], ['diya', '🪔']].forEach(([id, label]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'stamp' + ((id === 'draw' && !stamp) || stamp === id ? ' active' : '');
+        b.textContent = label;
+        b.title = id;
+        b.dataset.stamp = id;
+        DG.bindTap(b, () => {
+          stamp = id === 'draw' ? null : id;
+          stampRow.querySelectorAll('.stamp').forEach((x) => {
+            const sid = x.dataset.stamp;
+            x.classList.toggle('active', (sid === 'draw' && !stamp) || stamp === sid);
+          });
+          DG.Audio.click();
+        });
+        stampRow.appendChild(b);
+      });
+      tools.appendChild(stampRow);
+
+      tools.appendChild(lab);
+      tools.appendChild(pal);
+
+      if (!easy) {
+        const bl = document.createElement('div');
+        bl.className = 'section';
+        bl.textContent = 'Brush';
+        tools.appendChild(bl);
+        const sizes = [6, 10, 16, 24];
+        sizes.forEach((s) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'tool' + (brush === s ? ' active' : '');
+          b.textContent = s;
+          DG.bindTap(b, () => {
+            brush = s;
+            tools.querySelectorAll('.tool').forEach((x) => {
+              if (/^\d+$/.test(x.textContent) && +x.textContent >= 6) x.classList.toggle('active', +x.textContent === brush);
+            });
+          });
+          tools.appendChild(b);
+        });
+      } else {
+        brush = 14;
+      }
+    } else {
+      tools.appendChild(lab);
+      tools.appendChild(pal);
+      const tip = document.createElement('div');
+      tip.className = 'section';
+      tip.textContent = easy ? 'Tap a shape to fill!' : 'Tap regions to fill';
+      tools.appendChild(tip);
+      if (!easy) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'tool';
+        b.textContent = 'Hint color';
+        DG.bindTap(b, () => {
+          // fill one empty with hint
+          const empty = pattern.regions.find((r) => !fills[r.id]);
+          if (empty) { color = empty.fillHint || color; fillRegion(empty); }
+        });
+        tools.appendChild(b);
+      }
+    }
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('pointerleave', onPointerUp);
+    // touch fallback
+    canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+    canvas.addEventListener('touchmove', onPointerMove, { passive: false });
+    canvas.addEventListener('touchend', onPointerUp, { passive: false });
+
+    DG.bindTap(scr.querySelector('#btnBack'), () => showPicker());
+    DG.bindTap(scr.querySelector('#btnUndo'), () => restore());
+    DG.bindTap(scr.querySelector('#btnClear'), () => clearCanvas(false));
+    DG.bindTap(scr.querySelector('#btnSave'), () => saveToGallery());
+
+    DG.screen = pattern ? 'rangoli-color' : 'rangoli-draw';
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  let raf = 0;
+  function drawBgLoop() {
+    cancelAnimationFrame(raf);
+    const tick = (t) => {
+      if (DG.screen === 'hub' || DG.screen === 'profiles' || DG.screen === 'rangoli-pick' || DG.screen === 'rangoli-gallery') {
+        DG.fitCanvas();
+        DG.Art.drawHubBg(DG.ctx, DG.W, DG.H, t);
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+  }
+
+  function open() {
+    showPicker();
+  }
+
+  /** Test hook: paint something, save, return summary */
+  function autoPlay() {
+    return new Promise((resolve) => {
+      startFree();
+      setTimeout(() => {
+        resizeCanvas();
+        paintFloor();
+        // draw a few strokes via API
+        const w = parseFloat(canvas.style.width) || 300;
+        const h = parseFloat(canvas.style.height) || 300;
+        const cx = w / 2, cy = h / 2;
+        snapshot();
+        for (let a = 0; a < 12; a++) {
+          const ang = (a / 12) * Math.PI * 2;
+          strokeLine(
+            { x: cx + Math.cos(ang) * 20, y: cy + Math.sin(ang) * 20 },
+            { x: cx + Math.cos(ang) * 80, y: cy + Math.sin(ang) * 80 }
+          );
+        }
+        placeStamp({ x: cx + 40, y: cy });
+        saveToGallery();
+        // coloring page win path
+        const pat = DG.Patterns[0];
+        startPattern(pat);
+        setTimeout(() => {
+          pat.regions.forEach((r) => { fills[r.id] = r.fillHint || color; });
+          paintFloor();
+          drawPatternLines();
+          saveToGallery();
+          DG.Audio.win();
+          resolve({
+            ok: true,
+            gallery: profile().gallery.length,
+            stickers: profile().stickers.slice(),
+            pattern: pat.id
+          });
+        }, 40);
+      }, 40);
+    });
+  }
+
+  return {
+    open, startFree, startPattern, showPicker, showGallery,
+    autoPlay, clearCanvas, saveToGallery,
+    getMode: () => mode,
+    getSymmetry: () => symmetry,
+    getColors: () => COLORS,
+    getPatternCount: () => DG.Patterns.length,
+    _test: { resizeCanvas, paintFloor, strokeLine, placeStamp, fillRegion, hitRegion, getCanvas: () => canvas, getFills: () => fills }
+  };
+})();
+
+})();
+/* ==== 71-diyapath.js ==== */
+;(function(){
+/* Diya Path — night glow arrow-escape puzzle */
+DG.DiyaPath = (() => {
+  const L = () => DG.DiyaLogic;
+  const Levels = () => DG.DiyaLevels;
+  const P1_LIVES = Infinity;
+  const P2_LIVES = 3;
+
+  let level = null;
+  let pieces = [];
+  let undoStack = [];
+  let moves = 0;
+  let lives = P2_LIVES;
+  let anims = []; // floating lanterns
+  let wobbleId = null;
+  let raf = 0;
+  let boardEl = null;
+  let won = false;
+
+  function easy() { return DG.isEasy(); }
+  function pack() { return Levels().forProfile(easy()); }
+  function progress() {
+    const p = DG.Save.profile();
+    if (!p.diyaPath) p.diyaPath = { maxCleared: 0, stars: {}, cleared: {} };
+    if (!p.diyaPath.stars) p.diyaPath.stars = {};
+    if (!p.diyaPath.cleared) p.diyaPath.cleared = {};
+    return p.diyaPath;
+  }
+
+  function open() {
+    showSelect();
+  }
+
+  function showSelect() {
+    cancelAnimationFrame(raf);
+    DG.screen = 'diyapath-select';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const list = pack();
+    const prog = progress();
+    const scr = document.createElement('div');
+    scr.className = 'screen diyapath-screen' + (easy() ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${easy() ? 'p1' : ''}" id="btnBack">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.4vw,28px)">🪔 Diya Path</div>
+          <div class="sub">${easy() ? 'Tap a glowing diya — find the order!' : 'Harder paths · 3 lives each level'}</div>
+        </div>
+        <span></span>
+      </div>
+      <div class="level-grid" id="lvls"></div>`;
+    ov.appendChild(scr);
+    const grid = scr.querySelector('#lvls');
+    list.forEach((lv) => {
+      const unlocked = lv.id === 1 || prog.maxCleared >= lv.id - 1 || prog.cleared[lv.id];
+      const stars = prog.stars[lv.id] || 0;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'level-card' + (unlocked ? '' : ' locked') + (easy() ? ' p1' : '');
+      b.dataset.level = lv.id;
+      b.innerHTML = `<span class="num">${lv.id}</span>
+        <span class="meta">${lv.w}×${lv.h}</span>
+        <span class="stars">${unlocked ? '⭐'.repeat(stars) + (stars ? '' : '·') : '🔒'}</span>`;
+      if (unlocked) {
+        DG.bindTap(b, () => startLevel(lv.id));
+      }
+      grid.appendChild(b);
+    });
+    DG.bindTap(scr.querySelector('#btnBack'), () => DG.UI.showHub());
+    paintBg();
+  }
+
+  function startLevel(id) {
+    level = Levels().get(easy(), id);
+    pieces = L().clonePieces(level.pieces);
+    undoStack = [];
+    moves = 0;
+    lives = easy() ? P1_LIVES : P2_LIVES;
+    anims = [];
+    wobbleId = null;
+    won = false;
+    renderPlay();
+  }
+
+  function restartLevelGentle() {
+    DG.toast(easy() ? 'Try again!' : 'Out of lives — gently restarting 🪔');
+    DG.Audio.soft();
+    startLevel(level.id);
+  }
+
+  function renderPlay() {
+    cancelAnimationFrame(raf);
+    DG.screen = 'diyapath-play';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen diyapath-screen diyapath-play' + (isP1 ? ' p1-mode' : '');
+    const lifeTxt = isP1 ? '∞' : ('❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - lives)));
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Levels</button>
+        <div>
+          <div class="title" style="font-size:clamp(16px,3vw,24px)">Level ${level.id}</div>
+          <div class="sub" id="hudLine">Moves ${moves}${isP1 ? '' : ' · ' + lifeTxt}</div>
+        </div>
+        <div class="row">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnUndo" title="Undo">↩</button>
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnReset" title="Reset">↺</button>
+        </div>
+      </div>
+      <div class="diya-board-wrap">
+        <div class="marigold-frame">
+          <div class="diya-board" id="board" style="--cols:${level.w};--rows:${level.h}"></div>
+        </div>
+      </div>
+      <div class="bottom-bar diya-bottom">
+        ${isP1 ? '<div class="sub" id="hintTxt">A diya glows when it can float away</div>' : '<div class="sub">Wrong tap costs a life</div>'}
+      </div>
+      <canvas id="lanternFx" class="lantern-fx"></canvas>`;
+    ov.appendChild(scr);
+    boardEl = scr.querySelector('#board');
+    DG.bindTap(scr.querySelector('#btnBack'), () => showSelect());
+    DG.bindTap(scr.querySelector('#btnUndo'), () => undo());
+    DG.bindTap(scr.querySelector('#btnReset'), () => {
+      if (isP1) startLevel(level.id);
+      else DG.UI.confirm('Reset level?', 'Lives go back to 3.', () => startLevel(level.id));
+    });
+    rebuildBoard();
+    loopFx();
+  }
+
+  function updateHud() {
+    const line = document.getElementById('hudLine');
+    if (!line) return;
+    const isP1 = easy();
+    const lifeTxt = isP1 ? '' : (' · ' + '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - lives)));
+    line.textContent = 'Moves ' + moves + lifeTxt;
+  }
+
+  function rebuildBoard() {
+    if (!boardEl) return;
+    boardEl.innerHTML = '';
+    boardEl.style.setProperty('--cols', level.w);
+    boardEl.style.setProperty('--rows', level.h);
+    const mov = L().movable(pieces, level.w, level.h);
+    const movKeys = new Set(mov.map((p) => L().keyOf(p)));
+    // hint: first movable for P1
+    const hintKey = easy() && mov[0] ? L().keyOf(mov[0]) : null;
+
+    for (let r = 0; r < level.h; r++) {
+      for (let c = 0; c < level.w; c++) {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'diya-cell' + (easy() ? ' p1' : '');
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        const piece = pieces.find((p) => p.r === r && p.c === c);
+        if (piece) {
+          const dir = L().DIRS[L().parseDir(piece.d)];
+          const k = L().keyOf(piece);
+          cell.classList.add('filled');
+          if (movKeys.has(k)) cell.classList.add('can-move');
+          if (hintKey === k) cell.classList.add('hint');
+          if (wobbleId === k) cell.classList.add('wobble');
+          cell.innerHTML = `<span class="diya-glyph" aria-hidden="true">🪔</span>
+            <span class="diya-arrow">${dir.arrow}${piece.bend ? (piece.bend === 'L' ? '↩' : '↪') : ''}</span>`;
+          DG.bindTap(cell, () => onTap(piece));
+        } else {
+          cell.classList.add('empty');
+          cell.tabIndex = -1;
+          cell.setAttribute('aria-hidden', 'true');
+        }
+        boardEl.appendChild(cell);
+      }
+    }
+    updateHud();
+  }
+
+  function snapshot() {
+    return { pieces: L().clonePieces(pieces), moves, lives };
+  }
+
+  function undo() {
+    if (!undoStack.length || won) return;
+    const s = undoStack.pop();
+    pieces = s.pieces;
+    moves = s.moves;
+    lives = s.lives;
+    wobbleId = null;
+    DG.Audio.soft();
+    rebuildBoard();
+  }
+
+  function onTap(piece) {
+    if (won) return;
+    DG.Audio.unlock();
+    const can = L().canEscape(piece, level.w, level.h, pieces);
+    if (!can) {
+      wobbleId = L().keyOf(piece);
+      DG.Audio.blocked && DG.Audio.blocked();
+      if (!DG.Audio.blocked) DG.Audio.soft();
+      rebuildBoard();
+      setTimeout(() => { wobbleId = null; rebuildBoard(); }, 420);
+      if (!easy()) {
+        lives -= 1;
+        updateHud();
+        if (lives <= 0) {
+          setTimeout(() => restartLevelGentle(), 500);
+          return;
+        }
+        DG.toast('Blocked! ❤️ ' + lives + ' left');
+      } else {
+        DG.toast('That path is blocked — try another');
+      }
+      return;
+    }
+    // escape success
+    undoStack.push(snapshot());
+    if (undoStack.length > 60) undoStack.shift();
+    moves++;
+    const dir = L().DIRS[L().parseDir(piece.d)];
+    spawnLantern(piece, dir);
+    pieces = L().removePiece(pieces, piece);
+    DG.Audio.lantern ? DG.Audio.lantern() : DG.Audio.stamp();
+    wobbleId = null;
+    rebuildBoard();
+    if (!pieces.length) onWin();
+  }
+
+  function spawnLantern(piece, dir) {
+    const board = boardEl;
+    if (!board) return;
+    const cell = board.querySelector(`[data-r="${piece.r}"][data-c="${piece.c}"]`);
+    const wrap = document.querySelector('.diya-board-wrap') || board;
+    const br = wrap.getBoundingClientRect();
+    const cr = cell ? cell.getBoundingClientRect() : br;
+    anims.push({
+      x: cr.left + cr.width / 2 - br.left,
+      y: cr.top + cr.height / 2 - br.top,
+      vx: dir.dc * 1.2,
+      vy: dir.dr * 1.2 - 0.8,
+      t: 0,
+      life: 1
+    });
+  }
+
+  function onWin() {
+    won = true;
+    DG.Audio.win();
+    const prog = progress();
+    const stars = L().starsFor(moves, level.optimal || pieces.length, easy() ? 3 : lives, easy());
+    const prev = prog.stars[level.id] || 0;
+    prog.stars[level.id] = Math.max(prev, stars);
+    prog.cleared[level.id] = true;
+    prog.maxCleared = Math.max(prog.maxCleared || 0, level.id);
+    const p = DG.Save.profile();
+    if (!p.badges.includes('diyapath')) p.badges.push('diyapath');
+    DG.Save.addSticker('🪔');
+    if (prog.maxCleared >= 5) DG.Save.addSticker('🏮');
+    DG.Save.save();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>All lit! ✨</h3>
+      <div class="sub">Level ${level.id} · ${'⭐'.repeat(stars)}</div>
+      <div class="row">
+        <button class="btn ghost" id="again">Again</button>
+        <button class="btn" id="next">${level.id < pack().length ? 'Next' : 'Levels'}</button>
+      </div>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    DG.bindTap(modal.querySelector('#again'), () => { modal.remove(); startLevel(level.id); });
+    DG.bindTap(modal.querySelector('#next'), () => {
+      modal.remove();
+      if (level.id < pack().length) startLevel(level.id + 1);
+      else showSelect();
+    });
+  }
+
+  function paintBg() {
+    cancelAnimationFrame(raf);
+    const tick = (t) => {
+      if (DG.screen === 'diyapath-select' || DG.screen === 'diyapath-play') {
+        DG.fitCanvas();
+        DG.Art.drawHubBg(DG.ctx, DG.W, DG.H, t);
+        // extra glow vignette
+        const ctx = DG.ctx;
+        const g = ctx.createRadialGradient(DG.W / 2, DG.H / 2, 40, DG.W / 2, DG.H * 0.45, DG.W * 0.6);
+        g.addColorStop(0, 'rgba(80,40,10,0)');
+        g.addColorStop(1, 'rgba(10,4,20,0.35)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, DG.W, DG.H);
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+  }
+
+  function loopFx() {
+    paintBg();
+    const canvas = document.getElementById('lanternFx');
+    if (!canvas) return;
+    const wrap = document.querySelector('.diya-board-wrap');
+    const tick = () => {
+      if (DG.screen !== 'diyapath-play') return;
+      if (wrap && canvas) {
+        const r = wrap.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.max(1, (r.width * dpr) | 0);
+        canvas.height = Math.max(1, (r.height * dpr) | 0);
+        canvas.style.width = r.width + 'px';
+        canvas.style.height = r.height + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, r.width, r.height);
+        anims = anims.filter((a) => a.life > 0);
+        anims.forEach((a) => {
+          a.t += 1;
+          a.x += a.vx * 2.2;
+          a.y += a.vy * 2.2;
+          a.vy -= 0.04;
+          a.life -= 0.018;
+          const alpha = Math.max(0, a.life);
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, 10, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffb020';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(a.x, a.y - 8, 6, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff6c0';
+          ctx.fill();
+          // soft trail — brightness limited (photosensitivity-safe)
+          ctx.globalAlpha = alpha * 0.35;
+          ctx.beginPath();
+          ctx.arc(a.x - a.vx * 6, a.y - a.vy * 6, 5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ff8a3c';
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  }
+
+  async function autoPlay(levelId) {
+    const id = levelId || 1;
+    startLevel(id);
+    const solved = L().solve({ w: level.w, h: level.h, pieces: L().clonePieces(level.pieces) });
+    if (!solved.solvable) return { ok: false, reason: 'unsolvable' };
+    for (const step of solved.solution) {
+      const piece = pieces.find((p) => p.r === step.r && p.c === step.c);
+      if (!piece) return { ok: false, reason: 'missing-piece', step };
+      // direct apply without waiting UI
+      if (!L().canEscape(piece, level.w, level.h, pieces)) return { ok: false, reason: 'blocked-in-sol', step };
+      pieces = L().removePiece(pieces, piece);
+      moves++;
+    }
+    const cleared = pieces.length === 0;
+    if (cleared) {
+      const prog = progress();
+      prog.cleared[level.id] = true;
+      prog.maxCleared = Math.max(prog.maxCleared || 0, level.id);
+      prog.stars[level.id] = Math.max(prog.stars[level.id] || 0, 3);
+      const p = DG.Save.profile();
+      if (!p.badges.includes('diyapath')) p.badges.push('diyapath');
+      DG.Save.addSticker('🪔');
+      DG.Save.save();
+      won = true;
+    }
+    rebuildBoard();
+    return { ok: cleared, moves, level: level.id, pack: easy() ? 'easy' : 'hard' };
+  }
+
+  return {
+    open, showSelect, startLevel, autoPlay,
+    getLevel: () => level,
+    getPieces: () => pieces,
+    getLives: () => lives,
+    packSize: () => pack().length
+  };
+})();
+
+})();
+/* ==== 90-boot.js ==== */
+;(function(){
+/* Boot, chrome buttons, window.__game hook */
+function boot() {
+  DG.canvas = document.getElementById('game');
+  DG.ctx = DG.canvas.getContext('2d');
+  DG.overlay = document.getElementById('overlay');
+  DG.hud = document.getElementById('hud');
+  DG.fitCanvas();
+  DG.Save.load();
+  DG.Audio.loadMute();
+
+  const mute = document.getElementById('muteBtn');
+  const fs = document.getElementById('fsBtn');
+  DG.bindTap(mute, () => {
+    DG.Audio.unlock();
+    DG.Audio.setMuted(!DG.muted);
+  });
+  DG.bindTap(fs, () => {
+    DG.Audio.unlock();
+    const app = document.getElementById('app');
+    try {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        (app.requestFullscreen || app.webkitRequestFullscreen || (() => {})).call(app);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
+      }
+    } catch (_) { DG.toast('Fullscreen not available'); }
+  });
+
+  // first input unlocks audio globally
+  const unlockOnce = () => { DG.Audio.unlock(); };
+  document.addEventListener('pointerdown', unlockOnce, { once: false });
+  document.addEventListener('keydown', unlockOnce, { once: false });
+
+  window.__game = {
+    DG,
+    screen: () => DG.screen,
+    profile: () => DG.Save.profile(),
+    profiles: () => DG.state && DG.state.profiles,
+    pickProfile: (id) => { DG.Save.setProfile(id); DG.UI.showHub(); },
+    showHub: () => DG.UI.showHub(),
+    showProfiles: () => DG.UI.showProfiles(),
+    openRangoli: () => DG.Rangoli.open(),
+    playRangoli: () => DG.Rangoli.autoPlay(),
+    patternCount: () => DG.Patterns.length,
+    openDiyaPath: () => DG.DiyaPath.open(),
+    playDiyaPath: (id) => DG.DiyaPath.autoPlay(id),
+    diyaValidate: () => DG.DiyaLevels.validateAll(),
+    diyaPackSize: (easy) => DG.DiyaLevels.forProfile(!!easy).length,
+    save: () => DG.Save.save(),
+    load: () => DG.Save.load(),
+    getGallery: () => (DG.Save.profile().gallery || []).length,
+    getStickers: () => (DG.Save.profile().stickers || []).slice(),
+    resetSave: () => {
+      DG.state = DG.Save.blankState();
+      DG.Save.save();
+      return true;
+    },
+    playToWin: async (gameId) => {
+      if (gameId === 'rangoli' || !gameId) return DG.Rangoli.autoPlay();
+      if (gameId === 'diyapath') return DG.DiyaPath.autoPlay(1);
+      return { ok: false, reason: 'coming-soon' };
+    }
+  };
+
+  DG.UI.showProfiles();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "diwali-games";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

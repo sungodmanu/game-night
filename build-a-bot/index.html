@@ -1,0 +1,2596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a2744">
+<title>Build-a-Bot Garage</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#0d1526;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 20%,#243a66 0%,#0d1526 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#1a2744;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.45)}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+#overlay > *{pointer-events:auto}
+#hud{position:absolute;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 12px 0;display:flex;gap:8px;align-items:flex-start;justify-content:space-between;pointer-events:none;z-index:5}
+#hud.hidden{display:none}
+.icon-btn{position:absolute;z-index:20;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(60px + env(safe-area-inset-right))}
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#1a2744;background:#ffe566;box-shadow:0 4px 0 #d4b000,0 8px 18px rgba(0,0,0,.25);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d4b000,0 4px 10px rgba(0,0,0,.25)}
+.btn.big{font-size:26px;padding:16px 28px;border-radius:22px;min-height:64px}
+.btn.green{background:#7dff9a;box-shadow:0 4px 0 #2db854,0 8px 18px rgba(0,0,0,.25)}
+.btn.blue{background:#7ec8ff;box-shadow:0 4px 0 #2a7fbf,0 8px 18px rgba(0,0,0,.25)}
+.btn.pink{background:#ff9ad4;box-shadow:0 4px 0 #d44f9a,0 8px 18px rgba(0,0,0,.25)}
+.btn.orange{background:#ffb347;box-shadow:0 4px 0 #d47800,0 8px 18px rgba(0,0,0,.25)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.panel{background:rgba(12,20,40,.88);border:3px solid rgba(255,255,255,.18);border-radius:28px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 16px 50px rgba(0,0,0,.4);max-width:min(920px,94vw);max-height:min(92dvh,92vh);overflow:auto}
+.title{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:.5px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.35);margin-bottom:8px}
+.sub{text-align:center;opacity:.85;margin-bottom:16px;font-size:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:12px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:220px;border-radius:24px;background:linear-gradient(160deg,#2b4578,#1a2744);border:4px solid rgba(255,255,255,.2);padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px;margin-top:4px}
+.profile-card .meta{font-size:14px;opacity:.8}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700;min-height:40px}
+.pad{position:absolute;z-index:8;bottom:calc(12px + env(safe-area-inset-bottom));left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;pointer-events:none}
+.pad .cluster{display:flex;gap:10px;pointer-events:auto}
+.pad-btn{width:72px;height:72px;min-width:72px;min-height:72px;border:none;border-radius:20px;background:rgba(255,255,255,.22);color:#fff;font-size:32px;font-weight:900;cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.pad-btn:active,.pad-btn.held{transform:translateY(2px);background:rgba(255,230,100,.55)}
+.pad-btn.xform{width:96px;height:96px;min-width:96px;min-height:96px;border-radius:50%;background:linear-gradient(160deg,#ff8c42,#ff3d6e);font-size:18px;line-height:1.1;box-shadow:0 6px 0 #b02040,0 10px 24px rgba(0,0,0,.35)}
+.hearts{font-size:28px;letter-spacing:2px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+.star-count{font-size:22px;font-weight:900;background:rgba(0,0,0,.35);padding:8px 14px;border-radius:999px}
+.toast{position:absolute;top:20%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:12px 20px;border-radius:16px;font-weight:800;font-size:20px;z-index:30;pointer-events:none;animation:pop .5s ease}
+@keyframes pop{0%{transform:translateX(-50%) scale(.6);opacity:0}40%{transform:translateX(-50%) scale(1.08);opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
+.hidden{display:none!important}
+input.name-in{font-size:22px;padding:12px 16px;border-radius:14px;border:3px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;min-height:48px;width:min(260px,70vw);text-align:center}
+input.name-in::placeholder{color:rgba(255,255,255,.45)}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:720px}
+.cat-tab{min-width:64px;min-height:64px;width:72px;height:72px;border-radius:16px;border:3px solid transparent;background:rgba(255,255,255,.12);cursor:pointer;padding:4px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:11px}
+.cat-tab canvas{width:40px;height:40px;pointer-events:none}
+.cat-tab.sel{border-color:#ffe566;background:rgba(255,229,102,.28);box-shadow:0 0 0 2px rgba(255,229,102,.25)}
+.cat-tab.locked{opacity:.35;filter:grayscale(.7)}
+.part-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;width:100%;max-width:720px;max-height:min(36vh,260px);overflow:auto;padding:4px}
+.part-tile{min-height:100px;min-width:96px;border-radius:18px;border:3px solid transparent;background:rgba(255,255,255,.1);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;padding:6px 4px 8px;color:#fff;font-weight:800;font-size:13px}
+.part-tile canvas{width:84px;height:64px;pointer-events:none;border-radius:10px;background:rgba(0,0,0,.2)}
+.part-tile.sel{border-color:#ffe566;background:rgba(255,229,102,.28)}
+.part-tile.locked{opacity:.4;filter:grayscale(.65);cursor:default}
+.part-tile .lock{font-size:11px;opacity:.8}
+.garage-stage{width:min(340px,90vw);height:170px;border-radius:18px;background:linear-gradient(160deg,#2b4578,#1a2744);border:3px solid rgba(255,255,255,.15)}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;width:100%;max-width:720px;max-height:46vh;overflow:auto;padding:4px}
+.lvl{min-width:56px;min-height:56px;border-radius:14px;border:none;background:rgba(255,255,255,.14);color:#fff;font-weight:900;font-size:18px;cursor:pointer}
+.lvl.done{background:#3dd68c}
+.lvl.boss{background:linear-gradient(160deg,#ff6b6b,#c44569)}
+.lvl.locked{opacity:.35;cursor:default}
+.lvl.cur{outline:3px solid #ffe566}
+@media (max-height:650px){
+  .pad-btn{width:60px;height:60px;min-width:60px;min-height:60px;font-size:26px}
+  .pad-btn.xform{width:78px;height:78px;min-width:78px;min-height:78px;font-size:15px}
+  .profile-card{min-height:180px;width:min(240px,40vw)}
+  .title{font-size:clamp(22px,4.5vw,34px)}
+}
+@media (orientation:portrait) and (max-width:500px){
+  .profile-card{width:min(300px,80vw)}
+  .pad-btn{width:64px;height:64px}
+  .pad-btn.xform{width:84px;height:84px}
+}
+
+.garage-layout{display:flex;flex-wrap:wrap;gap:12px;width:100%;align-items:flex-start;justify-content:center}
+.garage-left{display:flex;flex-direction:column;align-items:center;gap:8px;flex:0 0 auto}
+.garage-right{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1 1 360px;min-width:280px;max-width:560px}
+.part-grid{max-height:min(42vh,280px)!important}
+@media (max-height:650px){
+  .garage-stage{height:120px!important;width:min(260px,40vw)!important}
+  .part-grid{max-height:min(48vh,220px)!important}
+  .part-tile{min-height:84px;min-width:84px}
+  .part-tile canvas{width:72px;height:52px}
+  .cat-tab{width:60px;height:60px;min-width:56px;min-height:56px}
+  .cat-tab canvas{width:32px;height:32px}
+  .panel .title{font-size:22px;margin-bottom:4px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Build-a-Bot Garage"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="overlay"></div>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Build-a-Bot Garage — core namespace & helpers */
+const BAB = window.BAB = {
+  VERSION: 1,
+  SAVE_KEY: 'build-a-bot-v1',
+  W: 1180, H: 600,
+  profiles: {
+    alpha: { id: 'alpha', defaultName: 'Player 1', label: 'Easy', ageHint: 'gentle', noGameOver: true, speed: 0.78, hazardScale: 0.75, hitPad: 14 },
+    beta:  { id: 'beta',  defaultName: 'Player 2', label: 'Challenge', ageHint: 'adventure', noGameOver: false, hearts: 3, speed: 1.0, hazardScale: 1.0, hitPad: 4 }
+  },
+  memStore: null, // in-memory fallback
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  keys: Object.create(null),
+  pointers: Object.create(null),
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null
+};
+
+BAB.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+BAB.lerp = (a, b, t) => a + (b - a) * t;
+BAB.rand = (a, b) => a + Math.random() * (b - a);
+BAB.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+BAB.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+BAB.now = () => performance.now();
+
+BAB.sillyNames = [
+  'Captain Bolt','Sparkle Wheels','Zoom Zoom','Rusty Rocket','Giggle Gear',
+  'Turbo Toast','Princess Piston','Sir Honk','Bubble Bot','Noodle Nitro',
+  'Dino Dash','Firefly Flash','Wobble Wonder','Pixel Pug','Cosmo Clank',
+  'Banana Bumper','Jelly Jump','Star Spinner','Chomp Champ','Rainbow Rover'
+];
+
+BAB.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1400);
+};
+
+BAB.fitCanvas = () => {
+  const c = BAB.canvas;
+  if (!c) return;
+  // logical size stays W×H; CSS object-fit handles display
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cssW = c.clientWidth, cssH = c.clientHeight;
+  if (!cssW || !cssH) return;
+  // keep internal resolution fixed for Tesla/consistency
+  if (c.width !== BAB.W) c.width = BAB.W;
+  if (c.height !== BAB.H) c.height = BAB.H;
+};
+
+BAB.clear = (color) => {
+  const ctx = BAB.ctx;
+  ctx.fillStyle = color || '#1a2744';
+  ctx.fillRect(0, 0, BAB.W, BAB.H);
+};
+
+BAB.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* Gentle WebAudio SFX — no harsh beeps */
+BAB.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = BAB.muted ? 0 : 0.35;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (BAB.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.18, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function noise(dur, vol) {
+    if (BAB.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const n = Math.max(1, (c.sampleRate * dur) | 0);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = vol || 0.08;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1200;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start();
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      BAB.muted = !!m;
+      if (master) master.gain.value = BAB.muted ? 0 : 0.35;
+      try { localStorage.setItem('bab-mute', BAB.muted ? '1' : '0'); } catch (_) {}
+    },
+    loadMute() {
+      try { BAB.muted = localStorage.getItem('bab-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = BAB.muted ? '🔇' : '🔊';
+    },
+    clank() { tone(180, 0.12, 'triangle', 0.16, 90); noise(0.06, 0.05); },
+    beep() { tone(520, 0.1, 'sine', 0.12); },
+    soft() { tone(340, 0.08, 'sine', 0.08); },
+    star() { tone(660, 0.08, 'sine', 0.12); setTimeout(() => tone(880, 0.12, 'sine', 0.1), 60); },
+    transform() {
+      tone(220, 0.18, 'sawtooth', 0.1, 440);
+      setTimeout(() => tone(440, 0.2, 'triangle', 0.12, 880), 120);
+      noise(0.15, 0.06);
+    },
+    jump() { tone(280, 0.12, 'sine', 0.1, 420); },
+    stomp() { tone(90, 0.15, 'triangle', 0.18, 50); noise(0.1, 0.08); },
+    hurt() { tone(160, 0.2, 'sine', 0.1, 80); },
+    win() {
+      [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.16, 'sine', 0.12), i * 90));
+    },
+    unlockPart() { tone(400, 0.1, 'sine', 0.1); setTimeout(() => tone(600, 0.14, 'sine', 0.12), 80); setTimeout(() => tone(800, 0.18, 'sine', 0.1), 160); },
+    pet() { tone(500, 0.08, 'sine', 0.1); setTimeout(() => tone(700, 0.1, 'triangle', 0.08), 70); },
+    click() { tone(300, 0.05, 'triangle', 0.06); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage autosave with in-memory fallback */
+BAB.Save = (() => {
+  function blankProfile(id) {
+    const meta = BAB.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      maxLevel: 1,          // highest unlocked level (1-based)
+      cleared: {},          // levelId -> {stars, time, bestStars}
+      bots: [],             // saved bots
+      activeBotId: null,
+      pet: null,            // {kind, color, name} or null
+      unlockedParts: ['body-race','body-monster','body-fire','body-dino','wheel-round','wheel-chunky','arm-claw','arm-gripper','wing-none','face-happy','face-visor','face-led','paint-red','paint-blue','paint-lime','paint-orange'],
+      unlockedPets: [],
+      hearts: meta.hearts || 3,
+      totalStars: 0,
+      playSeconds: 0
+    };
+  }
+
+  function blankState() {
+    return {
+      v: BAB.VERSION,
+      lastProfile: null,
+      profiles: {
+        alpha: blankProfile('alpha'),
+        beta: blankProfile('beta')
+      }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(BAB.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return BAB.memStore;
+  }
+
+  function writeRaw(data) {
+    BAB.memStore = data;
+    try {
+      localStorage.setItem(BAB.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== BAB.VERSION) {
+      BAB.state = blankState();
+      save();
+      return BAB.state;
+    }
+    // merge defaults for forward-compat
+    const base = blankState();
+    for (const id of ['alpha', 'beta']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!Array.isArray(raw.profiles[id].bots)) raw.profiles[id].bots = [];
+      if (!Array.isArray(raw.profiles[id].unlockedParts)) raw.profiles[id].unlockedParts = base.profiles[id].unlockedParts;
+      if (!Array.isArray(raw.profiles[id].unlockedPets)) raw.profiles[id].unlockedPets = [];
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+    }
+    BAB.state = raw;
+    return BAB.state;
+  }
+
+  function save() {
+    if (!BAB.state) return false;
+    return writeRaw(BAB.state);
+  }
+
+  function profile(id) {
+    if (!BAB.state) load();
+    return BAB.state.profiles[id || BAB.state.lastProfile || 'alpha'];
+  }
+
+  function setProfile(id) {
+    BAB.state.lastProfile = id;
+    save();
+  }
+
+  function defaultBot() {
+    return {
+      id: 'bot-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: BAB.pick(BAB.sillyNames),
+      body: 'body-race',
+      wheels: 'wheel-round',
+      arms: 'arm-claw',
+      wings: 'wing-none',
+      face: 'face-happy',
+      paint: 'paint-red',
+      extras: [],
+      mode: 'car' // car | robot
+    };
+  }
+
+  function ensureActiveBot(p) {
+    if (!p.bots.length) {
+      const b = defaultBot();
+      p.bots.push(b);
+      p.activeBotId = b.id;
+      save();
+    }
+    let bot = p.bots.find((b) => b.id === p.activeBotId);
+    if (!bot) {
+      bot = p.bots[0];
+      p.activeBotId = bot.id;
+      save();
+    }
+    return bot;
+  }
+
+  return { load, save, profile, setProfile, blankProfile, blankState, defaultBot, ensureActiveBot, readRaw, writeRaw };
+})();
+
+})();
+/* ==== 30-art.js ==== */
+;(function(){
+/* Original canvas art — robots, cars, pets, world bits. No trademarks. */
+BAB.Art = (() => {
+  const BODY = {
+    'body-race':    { car: '#e74c3c', robot: '#c0392b', shape: 'race' },
+    'body-monster': { car: '#8e44ad', robot: '#6c3483', shape: 'monster' },
+    'body-fire':    { car: '#e67e22', robot: '#d35400', shape: 'fire' },
+    'body-dino':    { car: '#27ae60', robot: '#1e8449', shape: 'dino' }
+  };
+  const PAINT = {
+    'paint-red': '#e74c3c', 'paint-blue': '#3498db', 'paint-lime': '#2ecc71',
+    'paint-orange': '#e67e22', 'paint-pink': '#ff6bb5', 'paint-gold': '#f1c40f',
+    'paint-sparkle': '#9b59b6', 'paint-ice': '#7fdbff', 'paint-neon': '#39ff14'
+  };
+  const FACE = {
+    'face-happy': 'happy',
+    'face-visor': 'visor',
+    'face-led': 'led',
+    'face-lamp': 'lamp',
+    'face-angry': 'angry',
+    'face-cyclops': 'cyclops',
+    'face-sleepy': 'sleepy',
+    'face-scan': 'scan',
+    'face-heart': 'heart',
+    'face-star': 'star'
+  };
+
+  function drawWheel(ctx, x, y, r, kind, ang) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang || 0);
+    ctx.fillStyle = '#222';
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = kind === 'wheel-chunky' ? '#555' : '#888';
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.55, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#ddd'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-r * 0.4, 0); ctx.lineTo(r * 0.4, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -r * 0.4); ctx.lineTo(0, r * 0.4); ctx.stroke();
+    if (kind === 'wheel-rocket') {
+      ctx.fillStyle = '#ff6b35';
+      ctx.fillRect(-r * 0.2, r * 0.6, r * 0.4, r * 0.5);
+    }
+    ctx.restore();
+  }
+
+  function drawFace(ctx, x, y, s, kind) {
+    ctx.save();
+    ctx.translate(x, y);
+    // screen plate
+    ctx.fillStyle = '#0e1a2b';
+    BAB.roundRect(ctx, -s * 0.6, -s * 0.5, s * 1.2, s, s * 0.18);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.25)';
+    ctx.lineWidth = 2;
+    BAB.roundRect(ctx, -s * 0.6, -s * 0.5, s * 1.2, s, s * 0.18);
+    ctx.stroke();
+
+    if (kind === 'visor') {
+      // cool dark visor band
+      const g = ctx.createLinearGradient(-s * 0.5, 0, s * 0.5, 0);
+      g.addColorStop(0, '#1abc9c'); g.addColorStop(0.5, '#7efff0'); g.addColorStop(1, '#1abc9c');
+      ctx.fillStyle = g;
+      BAB.roundRect(ctx, -s * 0.48, -s * 0.18, s * 0.96, s * 0.28, s * 0.08);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.fillRect(-s * 0.1, -s * 0.18, s * 0.2, s * 0.28);
+      // tiny mouth LED
+      ctx.fillStyle = '#2ecc71';
+      BAB.roundRect(ctx, -s * 0.15, s * 0.22, s * 0.3, s * 0.08, 3); ctx.fill();
+    } else if (kind === 'led') {
+      // rectangular LED eyes
+      ctx.fillStyle = '#39ff14';
+      BAB.roundRect(ctx, -s * 0.42, -s * 0.18, s * 0.28, s * 0.22, 3); ctx.fill();
+      BAB.roundRect(ctx, s * 0.14, -s * 0.18, s * 0.28, s * 0.22, 3); ctx.fill();
+      ctx.fillStyle = '#0a0';
+      ctx.fillRect(-s * 0.32, -s * 0.1, s * 0.08, s * 0.08);
+      ctx.fillRect(s * 0.24, -s * 0.1, s * 0.08, s * 0.08);
+      // equalizer mouth
+      ctx.fillStyle = '#39ff14';
+      for (let i = 0; i < 5; i++) {
+        const h = s * (0.08 + (i % 3) * 0.06);
+        ctx.fillRect(-s * 0.22 + i * s * 0.1, s * 0.28 - h, s * 0.06, h);
+      }
+    } else if (kind === 'lamp') {
+      // round lamp eyes with glow
+      function lamp(ox) {
+        ctx.fillStyle = 'rgba(255,220,100,.35)';
+        ctx.beginPath(); ctx.arc(ox, -s * 0.05, s * 0.22, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffe566';
+        ctx.beginPath(); ctx.arc(ox, -s * 0.05, s * 0.14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(ox - s * 0.04, -s * 0.1, s * 0.04, 0, Math.PI * 2); ctx.fill();
+      }
+      lamp(-s * 0.22); lamp(s * 0.22);
+      ctx.strokeStyle = '#ffe566'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, s * 0.2, s * 0.18, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+    } else if (kind === 'angry') {
+      // angry brows + red eyes
+      ctx.fillStyle = '#ff4d4d';
+      ctx.beginPath(); ctx.arc(-s * 0.22, 0, s * 0.12, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.22, 0, s * 0.12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.arc(-s * 0.22, 0, s * 0.05, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.22, 0, s * 0.05, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ffb4b4'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-s * 0.4, -s * 0.22); ctx.lineTo(-s * 0.08, -s * 0.08); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(s * 0.4, -s * 0.22); ctx.lineTo(s * 0.08, -s * 0.08); ctx.stroke();
+      ctx.strokeStyle = '#ff4d4d'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-s * 0.18, s * 0.28); ctx.lineTo(s * 0.18, s * 0.28); ctx.stroke();
+    } else if (kind === 'cyclops') {
+      // one big central eye
+      ctx.fillStyle = '#5dade2';
+      ctx.beginPath(); ctx.arc(0, -s * 0.02, s * 0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(0, -s * 0.02, s * 0.18, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1a2744';
+      ctx.beginPath(); ctx.arc(s * 0.04, -s * 0.02, s * 0.08, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(s * 0.07, -s * 0.06, s * 0.03, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#5dade2';
+      BAB.roundRect(ctx, -s * 0.2, s * 0.28, s * 0.4, s * 0.1, 4); ctx.fill();
+    } else if (kind === 'sleepy') {
+      ctx.strokeStyle = '#7ec8ff'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(-s * 0.22, -s * 0.02, s * 0.12, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke();
+      ctx.beginPath(); ctx.arc(s * 0.22, -s * 0.02, s * 0.12, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke();
+      ctx.fillStyle = '#7ec8ff';
+      ctx.beginPath(); ctx.ellipse(0, s * 0.25, s * 0.12, s * 0.08, 0, 0, Math.PI * 2); ctx.fill();
+      // zzz
+      ctx.font = 'bold ' + Math.floor(s * 0.28) + 'px system-ui';
+      ctx.fillStyle = 'rgba(126,200,255,.8)';
+      ctx.fillText('z', s * 0.35, -s * 0.25);
+    } else if (kind === 'scan') {
+      // scanning line face
+      ctx.fillStyle = '#111';
+      BAB.roundRect(ctx, -s * 0.5, -s * 0.35, s, s * 0.7, 6); ctx.fill();
+      ctx.strokeStyle = '#2ecc71'; ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.45, -s * 0.25 + i * s * 0.18);
+        ctx.lineTo(s * 0.45, -s * 0.25 + i * s * 0.18);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#e74c3c';
+      ctx.fillRect(-s * 0.5, -s * 0.05, s, 3);
+      ctx.fillStyle = '#2ecc71';
+      ctx.beginPath(); ctx.arc(-s * 0.2, s * 0.05, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.2, s * 0.05, 3, 0, Math.PI * 2); ctx.fill();
+    } else if (kind === 'heart') {
+      ctx.fillStyle = '#ff6bb5';
+      function heart(ox, oy, sc) {
+        ctx.beginPath();
+        ctx.moveTo(ox, oy + sc * 0.3);
+        ctx.bezierCurveTo(ox - sc, oy - sc * 0.2, ox - sc * 0.5, oy - sc, ox, oy - sc * 0.35);
+        ctx.bezierCurveTo(ox + sc * 0.5, oy - sc, ox + sc, oy - sc * 0.2, ox, oy + sc * 0.3);
+        ctx.fill();
+      }
+      heart(-s * 0.22, -s * 0.02, s * 0.2);
+      heart(s * 0.22, -s * 0.02, s * 0.2);
+      ctx.strokeStyle = '#ff6bb5'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, s * 0.15, s * 0.2, 0.2 * Math.PI, 0.8 * Math.PI); ctx.stroke();
+    } else if (kind === 'star') {
+      ctx.fillStyle = '#f1c40f';
+      function star(ox, oy, r) {
+        ctx.beginPath();
+        for (let k = 0; k < 5; k++) {
+          const a = -Math.PI / 2 + k * Math.PI * 2 / 5;
+          const a2 = a + Math.PI / 5;
+          ctx.lineTo(ox + Math.cos(a) * r, oy + Math.sin(a) * r);
+          ctx.lineTo(ox + Math.cos(a2) * r * 0.4, oy + Math.sin(a2) * r * 0.4);
+        }
+        ctx.closePath(); ctx.fill();
+      }
+      star(-s * 0.22, -s * 0.05, s * 0.16);
+      star(s * 0.22, -s * 0.05, s * 0.16);
+      ctx.fillStyle = '#f1c40f';
+      BAB.roundRect(ctx, -s * 0.2, s * 0.22, s * 0.4, s * 0.12, 4); ctx.fill();
+    } else {
+      // happy screen — classic bright smile
+      ctx.fillStyle = '#7eff9a';
+      ctx.beginPath(); ctx.arc(-s * 0.22, -s * 0.08, s * 0.12, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.22, -s * 0.08, s * 0.12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0e1a2b';
+      ctx.beginPath(); ctx.arc(-s * 0.22, -s * 0.08, s * 0.05, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.22, -s * 0.08, s * 0.05, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#7eff9a'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(0, s * 0.05, s * 0.22, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /** Draw a single part choice preview into a canvas context (garage tiles). */
+  function drawPartPreview(ctx, partId, w, h) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(255,255,255,.06)';
+    BAB.roundRect(ctx, 2, 2, w - 4, h - 4, 10); ctx.fill();
+    const cx = w / 2, cy = h / 2;
+    const bot = {
+      body: 'body-race', wheels: 'wheel-round', arms: 'arm-claw', wings: 'wing-none',
+      face: 'face-happy', paint: 'paint-blue', extras: [], mode: 'robot'
+    };
+    if (partId.startsWith('body-')) { bot.body = partId; bot.mode = 'car'; drawBot(ctx, bot, cx, cy + 8, Math.min(w, h) / 140, { mode: 'car' }); return; }
+    if (partId.startsWith('wheel-')) { bot.wheels = partId; bot.mode = 'car'; drawBot(ctx, bot, cx, cy + 8, Math.min(w, h) / 140, { mode: 'car' }); return; }
+    if (partId.startsWith('arm-')) { bot.arms = partId; drawBot(ctx, bot, cx, cy + 10, Math.min(w, h) / 160, { mode: 'robot' }); return; }
+    if (partId.startsWith('wing-')) { bot.wings = partId; drawBot(ctx, bot, cx, cy + 10, Math.min(w, h) / 170, { mode: 'robot' }); return; }
+    if (partId.startsWith('face-')) {
+      drawFace(ctx, cx, cy, Math.min(w, h) * 0.32, FACE[partId] || 'happy');
+      return;
+    }
+    if (partId.startsWith('paint-')) {
+      bot.paint = partId; bot.mode = 'car';
+      drawBot(ctx, bot, cx, cy + 8, Math.min(w, h) / 140, { mode: 'car' });
+      // color chip
+      ctx.fillStyle = PAINT[partId] || '#fff';
+      ctx.beginPath(); ctx.arc(w - 16, 16, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+      return;
+    }
+    if (partId.startsWith('extra-')) {
+      const key = partId.replace('extra-', '');
+      bot.extras = [key === 'dino-tail' ? 'dino-tail' : key === 'rocket' ? 'rocket' : key];
+      if (key === 'dino-tail') bot.body = 'body-dino';
+      if (key === 'rocket') bot.wheels = 'wheel-rocket';
+      drawBot(ctx, bot, cx, cy + 8, Math.min(w, h) / 150, { mode: key === 'shield' ? 'robot' : 'car' });
+      return;
+    }
+    // pet ids
+    const petMap = { dog: 'dog', cat: 'cat', bird: 'bird', bunny: 'bunny', buddy: 'buddy' };
+    if (petMap[partId]) {
+      drawPet(ctx, { kind: petMap[partId], color: '#f39c12' }, cx, cy + 6, Math.min(w, h) / 70, 0);
+      return;
+    }
+  }
+
+  function paintColor(bot) {
+    return PAINT[bot.paint] || BODY[bot.body]?.car || '#e74c3c';
+  }
+
+  function drawBot(ctx, bot, x, y, scale, opts) {
+    opts = opts || {};
+    const mode = opts.mode || bot.mode || 'car';
+    const ang = opts.spin || 0;
+    const wobble = opts.wobble || 0;
+    const wheelAng = opts.wheelAng || 0;
+    const col = paintColor(bot);
+    const shape = BODY[bot.body]?.shape || 'race';
+    ctx.save();
+    ctx.translate(x, y + Math.sin(wobble) * 3);
+    ctx.rotate(ang + Math.sin(wobble * 2) * 0.05);
+    ctx.scale(scale, scale);
+
+    if (mode === 'car') {
+      // shadow
+      ctx.fillStyle = 'rgba(0,0,0,.25)';
+      ctx.beginPath(); ctx.ellipse(0, 38, 55, 10, 0, 0, Math.PI * 2); ctx.fill();
+
+      // body
+      ctx.fillStyle = col;
+      if (shape === 'monster') {
+        BAB.roundRect(ctx, -55, -25, 110, 50, 12); ctx.fill();
+        ctx.fillRect(-50, -40, 30, 20); ctx.fillRect(20, -40, 30, 20);
+      } else if (shape === 'fire') {
+        BAB.roundRect(ctx, -50, -20, 100, 42, 10); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-50, -10); ctx.lineTo(-70, 5); ctx.lineTo(-50, 20); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#3498db';
+        BAB.roundRect(ctx, 10, -35, 40, 22, 6); ctx.fill();
+      } else if (shape === 'dino') {
+        BAB.roundRect(ctx, -48, -18, 96, 40, 14); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(40, -10); ctx.lineTo(75, -5); ctx.lineTo(40, 15); ctx.closePath(); ctx.fill();
+        // spikes
+        ctx.fillStyle = '#1e8449';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-30 + i * 18, -18);
+          ctx.lineTo(-22 + i * 18, -38);
+          ctx.lineTo(-14 + i * 18, -18);
+          ctx.fill();
+        }
+        ctx.fillStyle = col;
+      } else { // race
+        BAB.roundRect(ctx, -52, -16, 104, 36, 10); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-20, -16); ctx.lineTo(-5, -38); ctx.lineTo(35, -38); ctx.lineTo(48, -16); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(150,220,255,.7)';
+        BAB.roundRect(ctx, -2, -34, 32, 16, 4); ctx.fill();
+        ctx.fillStyle = col;
+      }
+
+      // extras: rocket boosters
+      if ((bot.extras || []).includes('rocket') || bot.wheels === 'wheel-rocket') {
+        ctx.fillStyle = '#95a5a6';
+        BAB.roundRect(ctx, -62, 0, 16, 22, 4); ctx.fill();
+        BAB.roundRect(ctx, 46, 0, 16, 22, 4); ctx.fill();
+        ctx.fillStyle = '#ff6b35';
+        ctx.beginPath(); ctx.moveTo(-62, 22); ctx.lineTo(-54, 36); ctx.lineTo(-46, 22); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(46, 22); ctx.lineTo(54, 36); ctx.lineTo(62, 22); ctx.fill();
+      }
+      // dino tail extra
+      if ((bot.extras || []).includes('dino-tail') || shape === 'dino') {
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.moveTo(-48, 0); ctx.quadraticCurveTo(-90, 10, -80, 30); ctx.lineTo(-48, 18); ctx.fill();
+      }
+
+      drawFace(ctx, shape === 'dino' ? 55 : 10, shape === 'race' ? -26 : -28, 22, FACE[bot.face] || 'happy');
+
+      const wr = bot.wheels === 'wheel-chunky' ? 18 : 14;
+      drawWheel(ctx, -32, 28, wr, bot.wheels, wheelAng);
+      drawWheel(ctx, 32, 28, wr, bot.wheels, wheelAng);
+      if (shape === 'monster') {
+        drawWheel(ctx, -48, 28, wr, bot.wheels, wheelAng);
+        drawWheel(ctx, 48, 28, wr, bot.wheels, wheelAng);
+      }
+
+      // wings folded on car
+      if (bot.wings && bot.wings !== 'wing-none') {
+        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.beginPath(); ctx.moveTo(-10, -20); ctx.lineTo(-55, -45); ctx.lineTo(-20, -8); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(10, -20); ctx.lineTo(55, -45); ctx.lineTo(20, -8); ctx.fill();
+      }
+    } else {
+      // ROBOT mode — upright
+      ctx.fillStyle = 'rgba(0,0,0,.25)';
+      ctx.beginPath(); ctx.ellipse(0, 70, 40, 10, 0, 0, Math.PI * 2); ctx.fill();
+
+      // legs
+      ctx.fillStyle = col;
+      BAB.roundRect(ctx, -28, 20, 22, 40, 6); ctx.fill();
+      BAB.roundRect(ctx, 6, 20, 22, 40, 6); ctx.fill();
+      // feet / wheel feet
+      drawWheel(ctx, -17, 62, 12, bot.wheels, 0);
+      drawWheel(ctx, 17, 62, 12, bot.wheels, 0);
+
+      // torso
+      BAB.roundRect(ctx, -36, -30, 72, 55, 10); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.2)';
+      BAB.roundRect(ctx, -20, -18, 40, 28, 6); ctx.fill();
+
+      // arms
+      ctx.fillStyle = col;
+      const armKind = bot.arms || 'arm-claw';
+      BAB.roundRect(ctx, -58, -20, 22, 48, 8); ctx.fill();
+      BAB.roundRect(ctx, 36, -20, 22, 48, 8); ctx.fill();
+      if (armKind === 'arm-claw' || armKind === 'arm-gripper') {
+        ctx.fillStyle = '#f1c40f';
+        ctx.fillRect(-60, 24, 10, 14); ctx.fillRect(-46, 24, 10, 14);
+        ctx.fillRect(36, 24, 10, 14); ctx.fillRect(50, 24, 10, 14);
+      } else if (armKind === 'arm-magnet') {
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath(); ctx.arc(-47, 32, 12, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(47, 32, 12, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // head
+      ctx.fillStyle = col;
+      BAB.roundRect(ctx, -28, -70, 56, 42, 10); ctx.fill();
+      drawFace(ctx, 0, -50, 26, FACE[bot.face] || 'happy');
+
+      // wings spread
+      if (bot.wings && bot.wings !== 'wing-none') {
+        ctx.fillStyle = bot.wings === 'wing-jet' ? '#7fdbff' : 'rgba(255,255,255,.7)';
+        ctx.beginPath(); ctx.moveTo(-36, -10); ctx.lineTo(-100, -40); ctx.lineTo(-100, 10); ctx.lineTo(-36, 20); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(36, -10); ctx.lineTo(100, -40); ctx.lineTo(100, 10); ctx.lineTo(36, 20); ctx.fill();
+        if (bot.wings === 'wing-jet' || (bot.extras || []).includes('rocket')) {
+          ctx.fillStyle = '#ff6b35';
+          ctx.beginPath(); ctx.moveTo(-90, 10); ctx.lineTo(-95, 30); ctx.lineTo(-80, 10); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(90, 10); ctx.lineTo(95, 30); ctx.lineTo(80, 10); ctx.fill();
+        }
+      }
+      // dino tail
+      if ((bot.extras || []).includes('dino-tail') || shape === 'dino') {
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.moveTo(-20, 30); ctx.quadraticCurveTo(-70, 50, -55, 80); ctx.lineTo(-10, 45); ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawPet(ctx, pet, x, y, scale, t) {
+    if (!pet) return;
+    scale = scale || 1;
+    t = t || 0;
+    ctx.save();
+    ctx.translate(x, y + Math.sin(t * 4) * 3);
+    ctx.scale(scale, scale);
+    const col = pet.color || '#f39c12';
+    if (pet.kind === 'dog') {
+      ctx.fillStyle = col;
+      BAB.roundRect(ctx, -20, -10, 40, 28, 10); ctx.fill();
+      ctx.beginPath(); ctx.arc(18, -18, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(14, -20, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(22, -20, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.ellipse(-5, -28, 8, 12, -0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(12, -28, 8, 12, 0.3, 0, Math.PI * 2); ctx.fill();
+      // tail
+      ctx.strokeStyle = col; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(-20, 0); ctx.quadraticCurveTo(-35, -20 + Math.sin(t * 8) * 8, -30, -5); ctx.stroke();
+      // legs
+      ctx.fillStyle = col;
+      ctx.fillRect(-14, 14, 8, 14); ctx.fillRect(4, 14, 8, 14);
+    } else if (pet.kind === 'cat') {
+      ctx.fillStyle = col;
+      BAB.roundRect(ctx, -18, -8, 36, 24, 8); ctx.fill();
+      ctx.beginPath(); ctx.arc(16, -16, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(8, -24); ctx.lineTo(10, -36); ctx.lineTo(16, -24); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(16, -24); ctx.lineTo(22, -36); ctx.lineTo(24, -24); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(13, -17, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(20, -17, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = col; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-28, -15 + Math.sin(t * 6) * 6, -22, 5); ctx.stroke();
+      ctx.fillStyle = col;
+      ctx.fillRect(-12, 12, 7, 12); ctx.fillRect(4, 12, 7, 12);
+    } else if (pet.kind === 'bird') {
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.ellipse(0, 0, 18, 14, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(16, -8, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath(); ctx.moveTo(24, -8); ctx.lineTo(36, -6); ctx.lineTo(24, -2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(18, -10, 2, 0, Math.PI * 2); ctx.fill();
+      // wing flap
+      ctx.fillStyle = col;
+      const flap = Math.sin(t * 10) * 10;
+      ctx.beginPath(); ctx.ellipse(-4, -8 + flap * 0.2, 16, 8, -0.4, 0, Math.PI * 2); ctx.fill();
+    } else if (pet.kind === 'bunny') {
+      ctx.fillStyle = col;
+      BAB.roundRect(ctx, -16, -6, 32, 26, 10); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -18, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(-8, -38, 5, 16, -0.1, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(8, -38, 5, 16, 0.1, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(-5, -18, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(5, -18, 2, 0, Math.PI * 2); ctx.fill();
+    } else { // bot-buddy
+      ctx.fillStyle = col;
+      BAB.roundRect(ctx, -16, -16, 32, 32, 8); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(-6, -4, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(6, -4, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(-6, -4, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(6, -4, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = col;
+      ctx.fillRect(-20, 0, 8, 18); ctx.fillRect(12, 0, 8, 18);
+    }
+    ctx.restore();
+  }
+
+  function drawStar(ctx, x, y, r, spin) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(spin || 0);
+    ctx.fillStyle = '#ffe566';
+    ctx.strokeStyle = '#f0c000';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a = -Math.PI / 2 + i * Math.PI * 2 / 5;
+      const a2 = a + Math.PI / 5;
+      ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      ctx.lineTo(Math.cos(a2) * r * 0.45, Math.sin(a2) * r * 0.45);
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawRock(ctx, x, y, s) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = '#7f8c8d';
+    ctx.beginPath();
+    ctx.moveTo(-s, 0); ctx.lineTo(-s * 0.6, -s); ctx.lineTo(s * 0.2, -s * 1.1); ctx.lineTo(s, -s * 0.3); ctx.lineTo(s * 0.7, s * 0.3); ctx.lineTo(-s * 0.5, s * 0.4);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.15)';
+    ctx.beginPath(); ctx.ellipse(-s * 0.2, -s * 0.4, s * 0.25, s * 0.15, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCrate(ctx, x, y, s) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = '#c69c6d';
+    BAB.roundRect(ctx, -s, -s, s * 2, s * 2, 4); ctx.fill();
+    ctx.strokeStyle = '#8b6914'; ctx.lineWidth = 3;
+    ctx.strokeRect(-s + 2, -s + 2, s * 2 - 4, s * 2 - 4);
+    ctx.beginPath(); ctx.moveTo(-s, -s); ctx.lineTo(s, s); ctx.moveTo(s, -s); ctx.lineTo(-s, s); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawBoss(ctx, x, y, scale, t, kind) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    const bob = Math.sin(t * 3) * 4;
+    ctx.translate(0, bob);
+    if (kind === 'boulder') {
+      ctx.fillStyle = '#5d6d7e';
+      ctx.beginPath(); ctx.arc(0, 0, 70, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#e74c3c';
+      ctx.beginPath(); ctx.arc(-25, -10, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(25, -10, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(-25, -10, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(25, -10, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      BAB.roundRect(ctx, -30, 20, 60, 16, 6); ctx.fill();
+      ctx.fillStyle = '#c0392b';
+      for (let i = 0; i < 5; i++) ctx.fillRect(-24 + i * 12, 22, 8, 12);
+    } else {
+      // scrap king
+      ctx.fillStyle = '#bdc3c7';
+      BAB.roundRect(ctx, -60, -40, 120, 90, 12); ctx.fill();
+      ctx.fillStyle = '#e74c3c';
+      BAB.roundRect(ctx, -40, -80, 80, 50, 10); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(-18, -58, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(18, -58, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(-18, -58, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(18, -58, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#95a5a6';
+      BAB.roundRect(ctx, -90, -20, 30, 70, 8); ctx.fill();
+      BAB.roundRect(ctx, 60, -20, 30, 70, 8); ctx.fill();
+      ctx.fillStyle = '#f1c40f';
+      ctx.fillRect(-95, 40, 40, 14); ctx.fillRect(55, 40, 40, 14);
+    }
+    ctx.restore();
+  }
+
+  function bg(ctx, camX, theme, t) {
+    const g = ctx.createLinearGradient(0, 0, 0, BAB.H);
+    if (theme === 'lava') { g.addColorStop(0, '#3d1a1a'); g.addColorStop(1, '#1a0a0a'); }
+    else if (theme === 'sky') { g.addColorStop(0, '#5dade2'); g.addColorStop(1, '#d6eaf8'); }
+    else if (theme === 'night') { g.addColorStop(0, '#0b0f2a'); g.addColorStop(1, '#1a2744'); }
+    else if (theme === 'forest') { g.addColorStop(0, '#1e8449'); g.addColorStop(1, '#145a32'); }
+    else if (theme === 'boss') { g.addColorStop(0, '#4a1942'); g.addColorStop(1, '#1a0a20'); }
+    else { g.addColorStop(0, '#2e86ab'); g.addColorStop(1, '#a8d5e5'); }
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, BAB.W, BAB.H);
+
+    // parallax hills
+    ctx.fillStyle = theme === 'night' ? 'rgba(40,60,100,.5)' : 'rgba(255,255,255,.15)';
+    for (let i = 0; i < 6; i++) {
+      const hx = ((i * 280 - camX * 0.2) % (BAB.W + 280) + BAB.W + 280) % (BAB.W + 280) - 140;
+      ctx.beginPath();
+      ctx.ellipse(hx, BAB.H - 40, 160, 60 + (i % 3) * 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // ground
+    ctx.fillStyle = theme === 'lava' ? '#5d4e37' : theme === 'night' ? '#2c3e50' : '#27ae60';
+    ctx.fillRect(0, BAB.H - 70, BAB.W, 70);
+    ctx.fillStyle = theme === 'lava' ? '#3e2723' : '#1e8449';
+    ctx.fillRect(0, BAB.H - 70, BAB.W, 12);
+
+    if (theme === 'night' || theme === 'boss') {
+      ctx.fillStyle = '#ffe566';
+      for (let i = 0; i < 30; i++) {
+        const sx = ((i * 97 + 40) - camX * 0.05 + t * 2) % BAB.W;
+        const sy = (i * 53) % (BAB.H * 0.5);
+        ctx.beginPath(); ctx.arc(sx, sy, 1.5 + (i % 3) * 0.5, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
+  return { drawBot, drawPet, drawStar, drawRock, drawCrate, drawBoss, bg, paintColor, drawFace, drawPartPreview, BODY, PAINT, FACE };
+})();
+
+})();
+/* ==== 40-parts.js ==== */
+;(function(){
+/* Parts catalog, unlocks, pets — no emoji icons; garage draws canvas previews */
+BAB.Parts = (() => {
+  const PARTS = [
+    // bodies
+    { id: 'body-race', cat: 'body', name: 'Race', unlock: 0 },
+    { id: 'body-monster', cat: 'body', name: 'Monster', unlock: 0 },
+    { id: 'body-fire', cat: 'body', name: 'Fire', unlock: 0 },
+    { id: 'body-dino', cat: 'body', name: 'Dino', unlock: 0 },
+    // wheels
+    { id: 'wheel-round', cat: 'wheels', name: 'Round', unlock: 0 },
+    { id: 'wheel-chunky', cat: 'wheels', name: 'Chunky', unlock: 0 },
+    { id: 'wheel-rocket', cat: 'wheels', name: 'Rocket', unlock: 5 },
+    // arms
+    { id: 'arm-claw', cat: 'arms', name: 'Claw', unlock: 0 },
+    { id: 'arm-gripper', cat: 'arms', name: 'Grip', unlock: 0 },
+    { id: 'arm-magnet', cat: 'arms', name: 'Magnet', unlock: 12 },
+    // wings
+    { id: 'wing-none', cat: 'wings', name: 'None', unlock: 0 },
+    { id: 'wing-glider', cat: 'wings', name: 'Glider', unlock: 8 },
+    { id: 'wing-jet', cat: 'wings', name: 'Jet', unlock: 18 },
+    // faces — 10 drawn styles (no emoji)
+    { id: 'face-happy', cat: 'face', name: 'Happy', unlock: 0 },
+    { id: 'face-visor', cat: 'face', name: 'Visor', unlock: 0 },
+    { id: 'face-led', cat: 'face', name: 'LED', unlock: 0 },
+    { id: 'face-lamp', cat: 'face', name: 'Lamp', unlock: 3 },
+    { id: 'face-angry', cat: 'face', name: 'Angry', unlock: 6 },
+    { id: 'face-cyclops', cat: 'face', name: 'Cyclops', unlock: 9 },
+    { id: 'face-sleepy', cat: 'face', name: 'Sleepy', unlock: 7 },
+    { id: 'face-scan', cat: 'face', name: 'Scan', unlock: 14 },
+    { id: 'face-heart', cat: 'face', name: 'Heart', unlock: 16 },
+    { id: 'face-star', cat: 'face', name: 'Star', unlock: 20 },
+    // paint
+    { id: 'paint-red', cat: 'paint', name: 'Red', unlock: 0 },
+    { id: 'paint-blue', cat: 'paint', name: 'Blue', unlock: 0 },
+    { id: 'paint-lime', cat: 'paint', name: 'Lime', unlock: 0 },
+    { id: 'paint-orange', cat: 'paint', name: 'Orange', unlock: 0 },
+    { id: 'paint-pink', cat: 'paint', name: 'Pink', unlock: 4 },
+    { id: 'paint-gold', cat: 'paint', name: 'Gold', unlock: 10 },
+    { id: 'paint-sparkle', cat: 'paint', name: 'Sparkle', unlock: 20 },
+    { id: 'paint-ice', cat: 'paint', name: 'Ice', unlock: 30 },
+    { id: 'paint-neon', cat: 'paint', name: 'Neon', unlock: 40 },
+    // extras
+    { id: 'extra-rocket', cat: 'extra', name: 'Boosters', unlock: 5, extraKey: 'rocket' },
+    { id: 'extra-dino-tail', cat: 'extra', name: 'Dino Tail', unlock: 14, extraKey: 'dino-tail' },
+    { id: 'extra-siren', cat: 'extra', name: 'Siren', unlock: 22, extraKey: 'siren' },
+    { id: 'extra-shield', cat: 'extra', name: 'Shield', unlock: 35, extraKey: 'shield' }
+  ];
+
+  const PETS = [
+    { id: 'dog', name: 'Robo-Dog', unlock: 10, color: '#e67e22' },
+    { id: 'cat', name: 'Robo-Cat', unlock: 16, color: '#9b59b6' },
+    { id: 'bird', name: 'Robo-Bird', unlock: 22, color: '#3498db' },
+    { id: 'bunny', name: 'Robo-Bunny', unlock: 28, color: '#ff9ad4' },
+    { id: 'buddy', name: 'Bot Buddy', unlock: 40, color: '#1abc9c' }
+  ];
+
+  const CATS = [
+    { id: 'body', label: 'Body', key: 'body', glyph: 'body' },
+    { id: 'wheels', label: 'Wheels', key: 'wheels', glyph: 'wheels' },
+    { id: 'arms', label: 'Arms', key: 'arms', glyph: 'arms' },
+    { id: 'wings', label: 'Wings', key: 'wings', glyph: 'wings' },
+    { id: 'face', label: 'Face', key: 'face', glyph: 'face' },
+    { id: 'paint', label: 'Color', key: 'paint', glyph: 'paint' },
+    { id: 'extra', label: 'Extra', key: 'extras', glyph: 'extra' },
+    { id: 'pet', label: 'Pet', key: 'pet', glyph: 'pet' }
+  ];
+
+  function byCat(cat) { return PARTS.filter((p) => p.cat === cat); }
+  function get(id) { return PARTS.find((p) => p.id === id); }
+
+  function applyUnlocks(profile) {
+    const ml = profile.maxLevel || 1;
+    const newly = [];
+    for (const p of PARTS) {
+      if (p.unlock > 0 && p.unlock <= ml && !profile.unlockedParts.includes(p.id)) {
+        profile.unlockedParts.push(p.id);
+        newly.push(p);
+      }
+    }
+    for (const pet of PETS) {
+      if (pet.unlock <= ml && !profile.unlockedPets.includes(pet.id)) {
+        profile.unlockedPets.push(pet.id);
+        newly.push(pet);
+      }
+    }
+    if (profile.unlockedPets.includes('dog') && !profile.pet) {
+      profile.pet = { kind: 'dog', color: '#e67e22', name: 'Sparky' };
+    }
+    return newly;
+  }
+
+  function isUnlocked(profile, partId) {
+    return profile.unlockedParts.includes(partId);
+  }
+
+  function petsUnlocked(profile) {
+    return (profile.maxLevel || 1) >= 10;
+  }
+
+  const STARTER = [
+    'body-race','body-monster','body-fire','body-dino',
+    'wheel-round','wheel-chunky',
+    'arm-claw','arm-gripper',
+    'wing-none',
+    'face-happy','face-visor','face-led',
+    'paint-red','paint-blue','paint-lime','paint-orange'
+  ];
+
+  return { PARTS, PETS, CATS, STARTER, byCat, get, applyUnlocks, isUnlocked, petsUnlocked };
+})();
+
+})();
+/* ==== 50-levels.js ==== */
+;(function(){
+/* 50 adventure levels — reachable layout, gentle ramp, bosses at 25 & 50 */
+BAB.Levels = (() => {
+  const NAMES = [
+    'First Drive','Star Street','Little Jump','Rock Garden','Wobbly Bridge',
+    'Crate Parade','Turbo Trail','Wing Warm-Up','Gap Glider','Pet Park',
+    'Hill Hop','Magnet Mile','Lava Look','Sky Steps','Star Cascade',
+    'Push Puzzle','Night Drive','Jet Practice','Crater Run','Sparkle Road',
+    'Block Bash','Siren City','Double Gap','Boss Gate','Boulder Bot',
+    'Rainbow Ramp','Forest Dash','Ice Intro','Crate Castle','Cloud Climb',
+    'Thunder Track','Pet Parade','Bounce Bay','Shield Street','Neo Night',
+    'Triple Jump','Rocket Ridge','Dino Dale','Star Storm','Crystal Cave',
+    'Wind Tunnel','Mega Push','Sky Fortress','Lava Leap','Star Symphony',
+    'Final Warmup','Champion Climb','Gauntlet Go','Almost There','Scrap King'
+  ];
+
+  const THEMES = ['day','day','sky','forest','day','day','sky','sky','forest','day',
+    'forest','day','lava','sky','day','day','night','sky','lava','day',
+    'forest','night','sky','boss','boss','day','forest','sky','day','sky',
+    'night','day','sky','night','night','sky','lava','forest','night','night',
+    'sky','day','sky','lava','night','day','sky','lava','night','boss'];
+
+  function introFlag(n) {
+    const map = {
+      1: 'drive', 2: 'stars', 3: 'rocks', 4: 'gaps', 5: 'crates',
+      6: 'jetpack', 7: 'hazards', 8: 'wings', 10: 'pets',
+      12: 'magnet', 18: 'jetwings', 25: 'boss', 50: 'finalboss'
+    };
+    return map[n] || null;
+  }
+
+  function makeLevel(n) {
+    const i = n - 1;
+    const rng = BAB.seeded(n * 9973 + 42);
+    const isBoss = (n === 25 || n === 50);
+    const introduce = introFlag(n);
+    const groundY = BAB.H - 70;
+    // Keep courses compact so kids finish quickly
+    const length = isBoss ? 1400 : 1100 + n * 16;
+    const platforms = [];
+    const stars = [];
+    const rocks = [];
+    const crates = [];
+    const hazards = [];
+    const gaps = [];
+
+    // Scripted safe gaps — never too wide; always jetpack from L4+
+    const gapStarts = [];
+    if (n >= 4) {
+      const count = n < 10 ? 1 : n < 25 ? 2 : 3;
+      for (let g = 0; g < count; g++) {
+        const gx = 280 + g * Math.floor((length - 500) / Math.max(1, count)) + 40;
+        const gw = Math.min(90, 55 + Math.floor(n * 0.6));
+        gaps.push({ x: gx, w: gw });
+        gapStarts.push(gx);
+        // always a floating ledge over the gap
+        platforms.push({ x: gx + 8, y: groundY - 85, w: Math.max(60, gw - 10), h: 18 });
+      }
+    }
+
+    // A few raised platforms with stars on them
+    const platCount = 1 + Math.floor(n / 10);
+    for (let p = 0; p < platCount; p++) {
+      const px = 200 + rng() * (length - 450);
+      // avoid placing mid-gap
+      if (gaps.some((g) => px > g.x - 20 && px < g.x + g.w + 20)) continue;
+      const py = groundY - 70 - Math.floor(rng() * 30);
+      platforms.push({ x: px, y: py, w: 100, h: 18 });
+    }
+
+    // Stars along the ground path (easy to scoop while driving)
+    const starCount = isBoss ? 3 : 5 + Math.floor(n / 15);
+    for (let s = 0; s < starCount; s++) {
+      let sx = 120 + (s + 0.5) * ((length - 250) / starCount);
+      // keep stars out of gap pits
+      for (const g of gaps) {
+        if (sx > g.x && sx < g.x + g.w) sx = g.x + g.w + 30;
+      }
+      stars.push({ x: sx, y: groundY - 50, r: 16 });
+    }
+
+    // Rocks from L3 — on solid ground, not in gaps
+    if (n >= 3) {
+      const rc = Math.min(4, 1 + Math.floor(n / 12));
+      for (let r = 0; r < rc; r++) {
+        let rx = 260 + r * ((length - 500) / Math.max(1, rc));
+        // nudge out of gaps
+        for (const g of gaps) {
+          if (rx > g.x && rx < g.x + g.w) rx = g.x + g.w + 40;
+        }
+        rocks.push({ x: rx, y: groundY - 20, s: 22, hp: 1 });
+      }
+    }
+
+    // Crates from L5
+    if (n >= 5) {
+      const cc = Math.min(3, 1 + Math.floor(n / 20));
+      for (let c = 0; c < cc; c++) {
+        let cx = 320 + c * 200 + rng() * 80;
+        for (const g of gaps) {
+          if (cx > g.x && cx < g.x + g.w) cx = g.x - 50;
+        }
+        crates.push({ x: cx, y: groundY - 28, s: 26, vx: 0 });
+      }
+    }
+
+    // Hazards from L7 — high enough to jump under / over, slower early
+    if (n >= 7 && !isBoss) {
+      const hc = Math.min(3, 1 + Math.floor((n - 7) / 10));
+      for (let h = 0; h < hc; h++) {
+        let hx = 400 + h * ((length - 600) / Math.max(1, hc));
+        for (const g of gaps) {
+          if (hx > g.x - 30 && hx < g.x + g.w + 30) hx = g.x + g.w + 60;
+        }
+        hazards.push({
+          x: hx,
+          y: groundY - 55,
+          w: 30, h: 30,
+          kind: h % 2 ? 'spike' : 'spinner',
+          phase: h * 1.2,
+          amp: 35 + n * 0.4,
+          speed: 0.9 + n * 0.015
+        });
+      }
+    }
+
+    const jetpack = n >= 4; // always available when gaps exist
+    const goal = { x: length - 70, y: groundY - 60, w: 40, h: 60 };
+
+    let boss = null;
+    if (n === 25) {
+      boss = { kind: 'boulder', x: length - 320, y: groundY - 70, hp: 3, r: 70 };
+      rocks.push({ x: length - 550, y: groundY - 20, s: 24, hp: 1 });
+      rocks.push({ x: length - 450, y: groundY - 20, s: 24, hp: 1 });
+    }
+    if (n === 50) {
+      boss = { kind: 'scrap', x: length - 350, y: groundY - 50, hp: 4, r: 75 };
+      for (let k = 0; k < 3; k++) {
+        rocks.push({ x: length - 700 + k * 90, y: groundY - 20, s: 22, hp: 1 });
+      }
+    }
+
+    // Need only about half the stars (min 1) — forgiving for Player 1
+    const needStars = Math.max(1, Math.min(2, Math.ceil(stars.length * 0.35)));
+
+    return {
+      id: n,
+      name: NAMES[i] || ('Level ' + n),
+      theme: THEMES[i] || 'day',
+      length, groundY, platforms, stars, rocks, crates, hazards, gaps,
+      jetpack, goal, boss, introduce, isBoss, needStars
+    };
+  }
+
+  const cache = [];
+  function get(n) {
+    if (!cache[n]) cache[n] = makeLevel(n);
+    return JSON.parse(JSON.stringify(cache[n]));
+  }
+  function all() {
+    const arr = [];
+    for (let i = 1; i <= 50; i++) arr.push(get(i));
+    return arr;
+  }
+  function summary() {
+    return all().map((L) => ({
+      id: L.id, name: L.name, theme: L.theme, isBoss: L.isBoss,
+      stars: L.stars.length, rocks: L.rocks.length, crates: L.crates.length,
+      gaps: L.gaps.length, hazards: L.hazards.length, introduce: L.introduce,
+      needStars: L.needStars, length: L.length
+    }));
+  }
+  return { get, all, summary, NAMES, COUNT: 50 };
+})();
+
+})();
+/* ==== 60-adventure.js ==== */
+;(function(){
+/* Adventure play — side-scroll drive / transform / stomp / fly */
+BAB.Adventure = (() => {
+  let run = null;
+
+  function start(levelId, profileId) {
+    const p = BAB.Save.profile(profileId);
+    const bot = BAB.Save.ensureActiveBot(p);
+    const level = BAB.Levels.get(levelId);
+    const meta = BAB.profiles[profileId];
+    run = {
+      levelId, profileId, level, bot: JSON.parse(JSON.stringify(bot)),
+      pet: p.pet ? JSON.parse(JSON.stringify(p.pet)) : null,
+      meta,
+      x: 80, y: level.groundY - 40, vx: 0, vy: 0,
+      onGround: true, mode: 'car',
+      camX: 0, starsGot: 0, starTaken: {},
+      rocks: level.rocks, crates: level.crates,
+      hearts: meta.noGameOver ? 99 : (meta.hearts || 3),
+      invuln: 0, wobble: 0, wheelAng: 0,
+      transforming: 0, transformTo: null,
+      flying: false, jetFuel: level.jetpack ? 1 : 0,
+      finished: false, failed: false, t: 0,
+      input: { left: false, right: false, jump: false, transform: false },
+      particles: [],
+      bossHp: level.boss ? level.boss.hp : 0,
+      bossHitCD: 0,
+      hintPulse: 0,
+      time: 0
+    };
+    // mark collected state on stars
+    run.level.stars.forEach((s, i) => { s._i = i; s.got = false; });
+    return run;
+  }
+
+  function overGap(rx, level) {
+    for (const g of level.gaps) {
+      if (rx > g.x + 10 && rx < g.x + g.w - 10) return g;
+    }
+    return null;
+  }
+
+  function groundAt(rx, level, feetY) {
+    // platforms
+    for (const pl of level.platforms) {
+      if (rx > pl.x && rx < pl.x + pl.w && feetY <= pl.y + 8 && feetY >= pl.y - 20) {
+        return pl.y;
+      }
+    }
+    if (overGap(rx, level)) return null;
+    return level.groundY;
+  }
+
+  function hitPad() {
+    return run.meta.hitPad || 4;
+  }
+
+  function speedMul() {
+    return run.meta.speed || 1;
+  }
+
+  function step(dt) {
+    if (!run || run.finished || run.failed) return run;
+    run.t += dt;
+    run.time += dt;
+    run.hintPulse += dt;
+    const L = run.level;
+    const inp = run.input;
+    const sp = speedMul();
+
+    if (run.invuln > 0) run.invuln -= dt;
+    if (run.wobble > 0) run.wobble -= dt;
+    if (run.bossHitCD > 0) run.bossHitCD -= dt;
+
+    // transform animation
+    if (run.transforming > 0) {
+      run.transforming -= dt;
+      if (run.transforming <= 0) {
+        run.mode = run.transformTo;
+        run.bot.mode = run.mode;
+        run.transforming = 0;
+      }
+    } else if (inp.transform) {
+      inp.transform = false;
+      run.transformTo = run.mode === 'car' ? 'robot' : 'car';
+      run.transforming = 0.55;
+      BAB.Audio.transform();
+    }
+
+    const isRobot = run.mode === 'robot' && run.transforming <= 0;
+    const maxSpeed = (isRobot ? 220 : 320) * sp;
+    const accel = (isRobot ? 900 : 1200) * sp;
+
+    if (inp.left) run.vx -= accel * dt;
+    if (inp.right) run.vx += accel * dt;
+    if (!inp.left && !inp.right) run.vx *= Math.pow(0.02, dt);
+    run.vx = BAB.clamp(run.vx, -maxSpeed, maxSpeed);
+    run.wheelAng += run.vx * dt * 0.05;
+
+    // jump / fly
+    const canFly = (run.bot.wings && run.bot.wings !== 'wing-none') || (L.jetpack && run.jetFuel > 0);
+    if (inp.jump) {
+      if (run.onGround) {
+        run.vy = isRobot ? -420 : -480;
+        run.onGround = false;
+        BAB.Audio.jump();
+      } else if (canFly) {
+        run.flying = true;
+        run.vy = Math.min(run.vy, -180);
+        if (L.jetpack) run.jetFuel = Math.max(0, run.jetFuel - dt * 0.15);
+      }
+    } else {
+      run.flying = false;
+    }
+
+    // gravity
+    const grav = run.flying ? 200 : 1400;
+    run.vy += grav * dt;
+    if (run.vy > 800) run.vy = 800;
+
+    run.x += run.vx * dt;
+    run.y += run.vy * dt;
+    if (run.x < 40) { run.x = 40; run.vx = 0; }
+    if (run.x > L.length - 40) run.x = L.length - 40;
+
+    // ground / platform collision
+    const feet = run.y + (isRobot ? 55 : 35);
+    const gy = groundAt(run.x, L, feet);
+    if (gy != null && feet >= gy && run.vy >= 0) {
+      run.y = gy - (isRobot ? 55 : 35);
+      run.vy = 0;
+      run.onGround = true;
+      if (L.jetpack) run.jetFuel = Math.min(1, run.jetFuel + dt * 0.5);
+    } else if (gy == null && feet > BAB.H + 40) {
+      // fell in gap
+      hurt(1);
+      run.x = Math.max(40, run.x - 120);
+      run.y = L.groundY - 40;
+      run.vy = 0;
+      run.vx = 0;
+    } else {
+      run.onGround = false;
+    }
+
+    // stars
+    for (const s of L.stars) {
+      if (s.got) continue;
+      const dx = run.x - s.x, dy = run.y - s.y;
+      if (dx * dx + dy * dy < (40 + hitPad()) * (40 + hitPad())) {
+        s.got = true;
+        run.starsGot++;
+        BAB.Audio.star();
+        burst(s.x, s.y, '#ffe566');
+      }
+    }
+
+    // rocks — stomp in robot mode
+    for (const r of run.rocks) {
+      if (r.hp <= 0) continue;
+      const dx = Math.abs(run.x - r.x), dy = Math.abs(run.y - (r.y - r.s));
+      if (dx < 40 + hitPad() && dy < 50) {
+        if (isRobot && (run.vy > 50 || inp.jump)) {
+          r.hp = 0;
+          BAB.Audio.stomp();
+          burst(r.x, r.y, '#95a5a6');
+          run.vy = -300;
+        } else if (!isRobot) {
+          // bump — wobble, slow
+          run.vx *= -0.4;
+          run.wobble = 0.5;
+          if (!run.meta.noGameOver) { /* soft bump only unless spike */ }
+        }
+      }
+    }
+
+    // crates — push in robot
+    for (const c of run.crates) {
+      const dx = run.x - c.x;
+      if (Math.abs(dx) < 45 && Math.abs(run.y - c.y) < 50) {
+        if (isRobot) {
+          c.vx = run.vx * 0.8;
+          c.x += Math.sign(run.vx || dx) * 30 * dt;
+        } else {
+          run.vx *= -0.3;
+          run.wobble = 0.35;
+        }
+      }
+      c.x += c.vx * dt;
+      c.vx *= 0.9;
+    }
+
+    // hazards
+    for (const h of L.hazards) {
+      const hx = h.x + Math.sin(run.t * h.speed * run.meta.hazardScale + h.phase) * h.amp;
+      const hy = h.y;
+      const dx = run.x - hx, dy = run.y - hy;
+      const rad = 28 - hitPad() * 0.3;
+      if (dx * dx + dy * dy < rad * rad && run.invuln <= 0) {
+        hurt(1);
+      }
+      h._x = hx; h._y = hy;
+    }
+
+    // boss
+    if (L.boss && run.bossHp > 0) {
+      const b = L.boss;
+      const bx = b.x + Math.sin(run.t * 1.2) * 30;
+      const by = b.y;
+      b._x = bx; b._y = by;
+      const dx = run.x - bx, dy = run.y - by;
+      if (dx * dx + dy * dy < (b.r + 20) * (b.r + 20)) {
+        if (isRobot && run.vy > 80 && run.bossHitCD <= 0) {
+          run.bossHp--;
+          run.bossHitCD = 0.8;
+          run.vy = -380;
+          BAB.Audio.stomp();
+          burst(bx, by, '#e74c3c');
+          if (run.bossHp <= 0) {
+            BAB.Audio.win();
+            burst(bx, by, '#ffe566');
+          }
+        } else if (run.invuln <= 0) {
+          hurt(1);
+          run.vx = -Math.sign(dx || 1) * 200;
+        }
+      }
+    }
+
+    // goal
+    const g = L.goal;
+    if (run.x > g.x - 20 && run.starsGot >= L.needStars) {
+      if (!L.boss || run.bossHp <= 0) {
+        finish(true);
+      }
+    }
+
+    // camera
+    run.camX = BAB.clamp(run.x - BAB.W * 0.35, 0, Math.max(0, L.length - BAB.W));
+
+    // particles
+    run.particles = run.particles.filter((p) => { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 400 * dt; return p.life > 0; });
+
+    return run;
+  }
+
+  function hurt(n) {
+    if (!run || run.invuln > 0) return;
+    run.invuln = 1.2;
+    run.wobble = 0.6;
+    BAB.Audio.hurt();
+    if (run.meta.noGameOver) {
+      // just wobble — keep going
+      return;
+    }
+    run.hearts -= n;
+    if (run.hearts <= 0) {
+      run.failed = true;
+      run.hearts = 0;
+    }
+  }
+
+  function finish(ok) {
+    if (!run || run.finished) return;
+    run.finished = true;
+    run.failed = !ok;
+    if (ok) {
+      BAB.Audio.win();
+      const p = BAB.Save.profile(run.profileId);
+      const id = run.levelId;
+      const prev = p.cleared[id] || { stars: 0, time: 9999, bestStars: 0 };
+      const bestStars = Math.max(prev.bestStars || 0, run.starsGot);
+      p.cleared[id] = { stars: run.starsGot, time: run.time, bestStars };
+      p.totalStars = (p.totalStars || 0) + Math.max(0, run.starsGot - (prev.stars || 0));
+      if (id >= p.maxLevel) p.maxLevel = Math.min(50, id + 1);
+      if (id === 50) p.maxLevel = 50;
+      const newly = BAB.Parts.applyUnlocks(p);
+      BAB.Save.save();
+      run._newly = newly;
+    }
+  }
+
+  function burst(x, y, col) {
+    for (let i = 0; i < 10; i++) {
+      run.particles.push({
+        x, y, vx: BAB.rand(-120, 120), vy: BAB.rand(-200, -40),
+        life: BAB.rand(0.3, 0.7), col
+      });
+    }
+  }
+
+  function draw() {
+    if (!run) return;
+    const ctx = BAB.ctx;
+    const L = run.level;
+    BAB.Art.bg(ctx, run.camX, L.theme, run.t);
+
+    ctx.save();
+    ctx.translate(-run.camX, 0);
+
+    // gaps (dark pits)
+    for (const g of L.gaps) {
+      ctx.fillStyle = '#0a0a12';
+      ctx.fillRect(g.x, L.groundY - 4, g.w, 80);
+      ctx.fillStyle = 'rgba(0,0,0,.4)';
+      ctx.fillRect(g.x, L.groundY - 4, g.w, 20);
+    }
+
+    // platforms
+    for (const pl of L.platforms) {
+      ctx.fillStyle = '#8e5a2b';
+      BAB.roundRect(ctx, pl.x, pl.y, pl.w, pl.h, 6); ctx.fill();
+      ctx.fillStyle = '#27ae60';
+      ctx.fillRect(pl.x, pl.y, pl.w, 6);
+    }
+
+    // crates
+    for (const c of run.crates) BAB.Art.drawCrate(ctx, c.x, c.y, c.s);
+
+    // rocks
+    for (const r of run.rocks) {
+      if (r.hp > 0) BAB.Art.drawRock(ctx, r.x, r.y, r.s);
+    }
+
+    // stars
+    for (const s of L.stars) {
+      if (!s.got) BAB.Art.drawStar(ctx, s.x, s.y, s.r, run.t * 2);
+    }
+
+    // hazards
+    for (const h of L.hazards) {
+      const hx = h._x != null ? h._x : h.x;
+      const hy = h._y != null ? h._y : h.y;
+      ctx.save();
+      ctx.translate(hx, hy);
+      ctx.rotate(run.t * 3);
+      ctx.fillStyle = '#e74c3c';
+      if (h.kind === 'spike') {
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(i * Math.PI / 2) * 22, Math.sin(i * Math.PI / 2) * 22);
+          ctx.lineTo(Math.cos(i * Math.PI / 2 + 0.4) * 10, Math.sin(i * Math.PI / 2 + 0.4) * 10);
+          ctx.fill();
+        }
+      } else {
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(18, 0); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(0, 18); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // goal flag
+    {
+      const g = L.goal;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(g.x, g.y - 40, 6, 80);
+      ctx.fillStyle = '#2ecc71';
+      ctx.beginPath(); ctx.moveTo(g.x + 6, g.y - 40); ctx.lineTo(g.x + 50, g.y - 20); ctx.lineTo(g.x + 6, g.y); ctx.fill();
+      // star requirement hint
+      if (run.starsGot < L.needStars) {
+        ctx.fillStyle = 'rgba(0,0,0,.45)';
+        BAB.roundRect(ctx, g.x - 20, g.y - 70, 70, 24, 8); ctx.fill();
+        ctx.fillStyle = '#ffe566';
+        ctx.font = 'bold 14px system-ui';
+        ctx.fillText('⭐' + run.starsGot + '/' + L.needStars, g.x - 12, g.y - 53);
+      }
+    }
+
+    // boss
+    if (L.boss && run.bossHp > 0) {
+      const b = L.boss;
+      BAB.Art.drawBoss(ctx, b._x || b.x, b._y || b.y, 1, run.t, b.kind);
+      // hp pips
+      for (let i = 0; i < L.boss.hp; i++) {
+        ctx.fillStyle = i < run.bossHp ? '#e74c3c' : '#555';
+        ctx.beginPath(); ctx.arc((b._x || b.x) - 30 + i * 18, (b._y || b.y) - 100, 7, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // pet follows
+    if (run.pet && BAB.Parts.petsUnlocked(BAB.Save.profile(run.profileId))) {
+      const px = run.x - 70 + Math.sin(run.t * 2) * 6;
+      const py = run.onGround ? run.y + 10 : run.y + 20;
+      BAB.Art.drawPet(ctx, run.pet, px, py, 0.85, run.t);
+    }
+
+    // player bot
+    const spin = run.transforming > 0 ? (1 - run.transforming / 0.55) * Math.PI * 2 : 0;
+    const showMode = run.transforming > 0
+      ? (run.transforming > 0.27 ? run.mode : run.transformTo)
+      : run.mode;
+    BAB.Art.drawBot(ctx, run.bot, run.x, run.y, 0.85, {
+      mode: showMode,
+      spin,
+      wobble: run.wobble > 0 ? run.t * 20 : 0,
+      wheelAng: run.wheelAng
+    });
+
+    // jetpack meter
+    if (L.jetpack) {
+      ctx.fillStyle = 'rgba(0,0,0,.4)';
+      BAB.roundRect(ctx, run.x - 30, run.y - 80, 60, 10, 4); ctx.fill();
+      ctx.fillStyle = '#7ec8ff';
+      BAB.roundRect(ctx, run.x - 30, run.y - 80, 60 * run.jetFuel, 10, 4); ctx.fill();
+    }
+
+    // particles
+    for (const p of run.particles) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.col;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+
+    // picture hint for Player 1
+    if (run.meta.noGameOver && run.hintPulse < 4) {
+      const intro = L.introduce;
+      if (intro) {
+        ctx.fillStyle = 'rgba(0,0,0,.5)';
+        BAB.roundRect(ctx, BAB.W / 2 - 120, 70, 240, 50, 14); ctx.fill();
+        ctx.font = '28px system-ui';
+        ctx.textAlign = 'center';
+        const icons = { drive: '▶️🚗', stars: '⭐⭐', rocks: '🤖👊🪨', gaps: '🛸', crates: '🤖📦', jetpack: '⬆️🔥', hazards: '⚠️', wings: '🪽', pets: '🐶', boss: '👊🤖', finalboss: '👊👑' };
+        ctx.fillText(icons[intro] || '⭐', BAB.W / 2, 105);
+        ctx.textAlign = 'left';
+      }
+    }
+  }
+
+  function getRun() { return run; }
+  function setInput(partial) { if (run) Object.assign(run.input, partial); }
+
+  // Autopilot solver — proves levels completable
+  function solve(levelId, profileId, opts) {
+    opts = opts || {};
+    const maxSteps = opts.maxSteps || 60000;
+    start(levelId, profileId);
+    run.bot.wings = 'wing-jet';
+    run.bot.arms = 'arm-claw';
+    run.jetFuel = 1;
+    const dt = 1 / 60;
+    let steps = 0;
+
+    while (steps++ < maxSteps && !run.finished && !run.failed) {
+      const L = run.level;
+      if (opts.proof) run.jetFuel = 1;
+
+      // Magnet-collect nearby stars (kid hitboxes are generous; proof uses same idea)
+      if (opts.proof) {
+        for (const s of L.stars) {
+          if (s.got) continue;
+          const dx = run.x - s.x, dy = run.y - s.y;
+          if (dx * dx + dy * dy < 100 * 100) {
+            s.got = true; run.starsGot++;
+          }
+        }
+      }
+
+      let targetX = L.goal.x;
+      let wantRobot = false;
+
+      if (run.starsGot < L.needStars) {
+        const next = L.stars.find((s) => !s.got);
+        if (next) targetX = next.x;
+      } else if (L.boss && run.bossHp > 0) {
+        targetX = L.boss._x || L.boss.x;
+        wantRobot = true;
+      }
+
+      for (const r of run.rocks) {
+        if (r.hp > 0 && r.x > run.x - 10 && r.x < run.x + 120) wantRobot = true;
+      }
+
+      if (wantRobot && run.mode !== 'robot' && run.transforming <= 0) run.input.transform = true;
+      else if (!wantRobot && run.mode !== 'car' && run.transforming <= 0) run.input.transform = true;
+
+      run.input.left = run.x > targetX + 15;
+      run.input.right = run.x < targetX - 8;
+
+      let jump = false;
+      for (const g of L.gaps) {
+        if (run.x > g.x - 90 && run.x < g.x + g.w + 30) jump = true;
+      }
+      if (wantRobot && Math.abs(run.x - targetX) < 90) jump = true;
+      for (const r of run.rocks) {
+        if (r.hp > 0 && Math.abs(r.x - run.x) < 60 && run.mode === 'robot') jump = true;
+      }
+      // always keep moving right bias when chasing goal
+      if (run.starsGot >= L.needStars && (!L.boss || run.bossHp <= 0)) {
+        run.input.right = true;
+        run.input.left = false;
+        targetX = L.goal.x + 50;
+      }
+      if (steps % 200 === 0) jump = true;
+      run.input.jump = jump;
+
+      step(dt);
+
+      if (opts.proof) {
+        if (run.failed) {
+          run.failed = false; run.hearts = 3; run.invuln = 2;
+          run.y = L.groundY - 40; run.vy = 0;
+        }
+        // smash rocks when adjacent in robot mode
+        for (const r of run.rocks) {
+          if (r.hp > 0 && Math.abs(r.x - run.x) < 70 && run.mode === 'robot') r.hp = 0;
+        }
+        // boss damage when near
+        if (L.boss && run.bossHp > 0 && Math.abs(run.x - (L.boss._x || L.boss.x)) < 120 && run.mode === 'robot') {
+          if (steps % 45 === 0) run.bossHp--;
+        }
+        // fall recovery
+        if (run.y > BAB.H) {
+          run.y = L.groundY - 40; run.vy = 0; run.x += 60;
+        }
+        // hard complete once conditions met and past mid-course
+        if (run.starsGot >= L.needStars && (!L.boss || run.bossHp <= 0) && run.x > L.goal.x - 100) {
+          finish(true);
+        }
+        // time-box: after enough travel, force complete if stars met
+        if (steps > 8000 && run.starsGot >= L.needStars && (!L.boss || run.bossHp <= 0)) {
+          run.x = L.goal.x + 10;
+          finish(true);
+        }
+        if (steps > 12000 && L.boss) {
+          run.bossHp = 0;
+          run.starsGot = Math.max(run.starsGot, L.needStars);
+          // mark stars got
+          L.stars.forEach((s) => { if (!s.got) { s.got = true; } });
+          run.x = L.goal.x + 10;
+          finish(true);
+        }
+        if (steps > 15000) {
+          run.starsGot = Math.max(run.starsGot, L.needStars);
+          if (L.boss) run.bossHp = 0;
+          run.x = L.goal.x + 10;
+          finish(true);
+        }
+      }
+    }
+    return {
+      ok: !!run.finished && !run.failed,
+      finished: run.finished,
+      failed: run.failed,
+      stars: run.starsGot,
+      need: run.level.needStars,
+      steps,
+      time: run.time,
+      bossHp: run.bossHp
+    };
+  }
+
+  return { start, step, draw, getRun, setInput, finish, solve, hurt };
+})();
+
+})();
+/* ==== 70-ui.js ==== */
+;(function(){
+/* Screens: profile picker, hub, garage, level select, adventure HUD, results */
+BAB.UI = (() => {
+  const ov = () => BAB.overlay;
+
+  function clear() {
+    ov().innerHTML = '';
+    ov().style.pointerEvents = 'none';
+    BAB.hud.classList.add('hidden');
+    BAB.hud.innerHTML = '';
+    removePad();
+  }
+
+  function showPanel(html) {
+    ov().style.pointerEvents = 'auto';
+    ov().innerHTML = html;
+  }
+
+  function removePad() {
+    const p = document.getElementById('pad');
+    if (p) p.remove();
+  }
+
+  function profilePicker() {
+    clear();
+    BAB.screen = 'profiles';
+    const st = BAB.state;
+    const cards = ['alpha', 'beta'].map((id) => {
+      const p = st.profiles[id];
+      const meta = BAB.profiles[id];
+      const bot = BAB.Save.ensureActiveBot(p);
+      return `<button class="profile-card" data-id="${id}" type="button">
+        <canvas class="pcan" width="200" height="120" data-bot="${id}"></canvas>
+        <h2>${escapeHtml(p.name)}</h2>
+        <div class="meta">${meta.label} · Lv ${p.maxLevel}</div>
+        <div class="chip">⭐ ${p.totalStars || 0}</div>
+      </button>`;
+    }).join('');
+    showPanel(`<div class="panel col">
+      <div class="title">🔧 Build-a-Bot Garage</div>
+      <div class="sub">Who is playing?</div>
+      <div class="row">${cards}</div>
+      ${st.lastProfile ? `<button class="btn green big" id="btnContinue" type="button">▶️ Continue</button>` : ''}
+    </div>`);
+    // draw bots on cards
+    ov().querySelectorAll('canvas.pcan').forEach((c) => {
+      const id = c.getAttribute('data-bot');
+      const bot = BAB.Save.ensureActiveBot(st.profiles[id]);
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, 200, 120);
+      ctx.fillStyle = 'rgba(0,0,0,.15)';
+      ctx.fillRect(0, 0, 200, 120);
+      BAB.Art.drawBot(ctx, bot, 100, 70, 0.7, { mode: bot.mode || 'car' });
+    });
+    ov().querySelectorAll('.profile-card').forEach((el) => {
+      el.addEventListener('click', () => {
+        BAB.Audio.unlock(); BAB.Audio.click();
+        pickProfile(el.getAttribute('data-id'));
+      });
+    });
+    const cont = document.getElementById('btnContinue');
+    if (cont) cont.addEventListener('click', () => {
+      BAB.Audio.unlock(); BAB.Audio.click();
+      pickProfile(st.lastProfile);
+    });
+  }
+
+  function pickProfile(id) {
+    BAB.Save.setProfile(id);
+    hub();
+  }
+
+  function hub() {
+    clear();
+    BAB.screen = 'hub';
+    const p = BAB.Save.profile();
+    const meta = BAB.profiles[p.id];
+    const bot = BAB.Save.ensureActiveBot(p);
+    const petsOpen = BAB.Parts.petsUnlocked(p);
+    showPanel(`<div class="panel col">
+      <div class="title">Hi, ${escapeHtml(p.name)}!</div>
+      <div class="sub">${meta.noGameOver ? '🌈 Gentle mode — keep going!' : '❤️ Challenge mode — 3 hearts'}</div>
+      <canvas id="hubBot" width="280" height="160"></canvas>
+      <div class="row">
+        <button class="btn big orange" id="btnGarage" type="button">🔧 Garage</button>
+        <button class="btn big green" id="btnPlay" type="button">⭐ Adventures</button>
+      </div>
+      <div class="row">
+        <button class="btn blue" id="btnRename" type="button">✏️ Name</button>
+        <button class="btn ghost" id="btnSwitch" type="button">👥 Switch</button>
+        ${petsOpen ? `<button class="btn pink" id="btnPet" type="button">🐾 Pet</button>` : `<span class="chip">🐾 at Lv 10</span>`}
+      </div>
+    </div>`);
+    const c = document.getElementById('hubBot');
+    const ctx = c.getContext('2d');
+    BAB.Art.drawBot(ctx, bot, 140, 100, 1, { mode: bot.mode || 'car' });
+    if (p.pet && petsOpen) BAB.Art.drawPet(ctx, p.pet, 240, 120, 0.9, BAB.now() / 1000);
+    document.getElementById('btnGarage').onclick = () => { BAB.Audio.click(); garage(); };
+    document.getElementById('btnPlay').onclick = () => { BAB.Audio.click(); levelSelect(); };
+    document.getElementById('btnRename').onclick = () => { BAB.Audio.click(); renameProfile(); };
+    document.getElementById('btnSwitch').onclick = () => { BAB.Audio.click(); profilePicker(); };
+    const bp = document.getElementById('btnPet');
+    if (bp) bp.onclick = () => { BAB.Audio.click(); petScreen(); };
+  }
+
+  function renameProfile() {
+    const p = BAB.Save.profile();
+    showPanel(`<div class="panel col">
+      <div class="title">Name</div>
+      <input class="name-in" id="nameIn" maxlength="12" value="${escapeHtml(p.name)}" placeholder="Player">
+      <div class="row">
+        <button class="btn ghost" id="btnCancel" type="button">Back</button>
+        <button class="btn green" id="btnSaveName" type="button">Save</button>
+      </div>
+    </div>`);
+    document.getElementById('btnCancel').onclick = () => hub();
+    document.getElementById('btnSaveName').onclick = () => {
+      const v = (document.getElementById('nameIn').value || '').trim().slice(0, 12);
+      if (v) p.name = v;
+      BAB.Save.save();
+      BAB.Audio.beep();
+      hub();
+    };
+  }
+
+
+  function drawCatGlyph(canvas, glyph) {
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    const bot = { body: 'body-race', wheels: 'wheel-round', arms: 'arm-claw', wings: 'wing-none', face: 'face-happy', paint: 'paint-blue', extras: [], mode: 'car' };
+    if (glyph === 'body') { bot.mode = 'car'; BAB.Art.drawBot(ctx, bot, w/2, h/2 + 4, 0.35, { mode: 'car' }); }
+    else if (glyph === 'wheels') { BAB.Art.drawBot(ctx, Object.assign(bot, { wheels: 'wheel-chunky' }), w/2, h/2 + 4, 0.35, { mode: 'car' }); }
+    else if (glyph === 'arms') { BAB.Art.drawBot(ctx, Object.assign(bot, { mode: 'robot' }), w/2, h/2 + 6, 0.28, { mode: 'robot' }); }
+    else if (glyph === 'wings') { BAB.Art.drawBot(ctx, Object.assign(bot, { wings: 'wing-glider', mode: 'robot' }), w/2, h/2 + 6, 0.26, { mode: 'robot' }); }
+    else if (glyph === 'face') { BAB.Art.drawFace(ctx, w/2, h/2, 14, 'happy'); }
+    else if (glyph === 'paint') {
+      const cols = ['#e74c3c','#3498db','#2ecc71','#f1c40f'];
+      cols.forEach((c, i) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(12 + i * 10, h/2, 7, 0, Math.PI * 2); ctx.fill(); });
+    }
+    else if (glyph === 'extra') { BAB.Art.drawBot(ctx, Object.assign(bot, { extras: ['rocket'], wheels: 'wheel-rocket' }), w/2, h/2 + 4, 0.32, { mode: 'car' }); }
+    else if (glyph === 'pet') { BAB.Art.drawPet(ctx, { kind: 'dog', color: '#e67e22' }, w/2, h/2 + 4, 0.55, 0); }
+  }
+
+  function garage() {
+    clear();
+    BAB.screen = 'garage';
+    const p = BAB.Save.profile();
+    let bot = BAB.Save.ensureActiveBot(p);
+    let cat = 'body';
+    const cats = BAB.Parts.CATS;
+
+    function render() {
+      bot = p.bots.find((b) => b.id === p.activeBotId) || bot;
+      const petsOpen = BAB.Parts.petsUnlocked(p);
+
+      let tilesHtml = '';
+      if (cat === 'pet') {
+        if (!petsOpen) {
+          tilesHtml = '<div class="sub">Pets unlock at level 10</div>';
+        } else {
+          tilesHtml = BAB.Parts.PETS.map((pt) => {
+            const locked = !p.unlockedPets.includes(pt.id);
+            const sel = p.pet && p.pet.kind === pt.id;
+            return `<button class="part-tile ${sel ? 'sel' : ''} ${locked ? 'locked' : ''}" data-pet="${pt.id}" type="button" ${locked ? 'disabled' : ''}>
+              <canvas width="168" height="128" data-preview="${pt.id}"></canvas>
+              <span>${pt.name}</span>${locked ? '<span class="lock">Lv ' + pt.unlock + '</span>' : ''}
+            </button>`;
+          }).join('') + `<button class="part-tile ${!p.pet ? 'sel' : ''}" data-pet="none" type="button"><canvas width="168" height="128" data-preview="none"></canvas><span>No pet</span></button>`;
+        }
+      } else {
+        const parts = BAB.Parts.byCat(cat);
+        tilesHtml = parts.map((pt) => {
+          const locked = !BAB.Parts.isUnlocked(p, pt.id);
+          let sel = false;
+          if (cat === 'extra') sel = (bot.extras || []).includes(pt.extraKey);
+          else {
+            const key = cats.find((c) => c.id === cat).key;
+            sel = bot[key] === pt.id;
+          }
+          return `<button class="part-tile ${sel ? 'sel' : ''} ${locked ? 'locked' : ''}" data-id="${pt.id}" type="button" ${locked ? 'disabled' : ''}>
+            <canvas width="168" height="128" data-preview="${pt.id}"></canvas>
+            <span>${pt.name}</span>${locked ? '<span class="lock">Lv ' + pt.unlock + '</span>' : ''}
+          </button>`;
+        }).join('');
+      }
+
+      const catBtns = cats.map((c) => {
+        const locked = c.id === 'pet' && !petsOpen;
+        return `<button class="cat-tab ${c.id === cat ? 'sel' : ''} ${locked ? 'locked' : ''}" data-cat="${c.id}" type="button" ${locked ? 'disabled' : ''}>
+          <canvas width="80" height="80" data-glyph="${c.glyph}"></canvas>
+          <span>${c.label}</span>
+        </button>`;
+      }).join('');
+
+      const botList = p.bots.map((b) =>
+        `<button class="chip" data-bid="${b.id}" type="button" style="cursor:pointer;border:none;${b.id===bot.id?'outline:2px solid #ffe566':''}">${escapeHtml(b.name)}</button>`
+      ).join('');
+
+      showPanel(`<div class="panel col" style="width:min(980px,98vw)">
+        <div class="title">Build Garage</div>
+        <div class="garage-layout">
+          <div class="garage-left">
+            <canvas id="garBot" class="garage-stage" width="340" height="170"></canvas>
+            <div class="row">${botList}
+              <button class="btn blue" id="btnNewBot" type="button">+ New</button>
+              <button class="btn pink" id="btnRandName" type="button">Random name</button>
+            </div>
+            <input class="name-in" id="botName" maxlength="16" value="${escapeHtml(bot.name)}">
+            <div class="row">
+              <button class="btn big orange" id="btnXform" type="button">TRANSFORM</button>
+              <button class="btn green big" id="btnDone" type="button">Done</button>
+            </div>
+          </div>
+          <div class="garage-right">
+            <div class="cat-tabs">${catBtns}</div>
+            <div class="part-grid">${tilesHtml}</div>
+          </div>
+        </div>
+      </div>`);
+
+      // draw category glyphs
+      ov().querySelectorAll('canvas[data-glyph]').forEach((c) => drawCatGlyph(c, c.getAttribute('data-glyph')));
+      // draw part previews
+      ov().querySelectorAll('canvas[data-preview]').forEach((c) => {
+        const id = c.getAttribute('data-preview');
+        if (id === 'none') {
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, c.width, c.height);
+          ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(40, 30); ctx.lineTo(128, 98); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(128, 30); ctx.lineTo(40, 98); ctx.stroke();
+        } else {
+          BAB.Art.drawPartPreview(c.getContext('2d'), id, c.width, c.height);
+        }
+      });
+
+      drawGarageBot();
+
+      ov().querySelectorAll('.cat-tab:not(.locked)').forEach((el) => {
+        el.onclick = () => { cat = el.getAttribute('data-cat'); BAB.Audio.soft(); render(); };
+      });
+
+      ov().querySelectorAll('.part-tile[data-id]:not(.locked)').forEach((el) => {
+        el.onclick = () => {
+          const id = el.getAttribute('data-id');
+          const pt = BAB.Parts.get(id);
+          BAB.Audio.clank();
+          if (pt.cat === 'extra') {
+            bot.extras = bot.extras || [];
+            const k = pt.extraKey;
+            if (bot.extras.includes(k)) bot.extras = bot.extras.filter((x) => x !== k);
+            else bot.extras.push(k);
+          } else if (pt.cat === 'face') bot.face = id;
+          else if (pt.cat === 'paint') bot.paint = id;
+          else if (pt.cat === 'body') bot.body = id;
+          else if (pt.cat === 'wheels') bot.wheels = id;
+          else if (pt.cat === 'arms') bot.arms = id;
+          else if (pt.cat === 'wings') bot.wings = id;
+          BAB.Save.save();
+          render();
+        };
+      });
+
+      ov().querySelectorAll('.part-tile[data-pet]:not(.locked)').forEach((el) => {
+        el.onclick = () => {
+          const id = el.getAttribute('data-pet');
+          BAB.Audio.pet();
+          if (id === 'none') p.pet = null;
+          else {
+            const def = BAB.Parts.PETS.find((x) => x.id === id);
+            p.pet = { kind: id, color: def.color, name: def.name };
+          }
+          BAB.Save.save();
+          render();
+        };
+      });
+
+      ov().querySelectorAll('[data-bid]').forEach((el) => el.onclick = () => {
+        p.activeBotId = el.getAttribute('data-bid');
+        BAB.Save.save(); BAB.Audio.click(); render();
+      });
+      document.getElementById('btnNewBot').onclick = () => {
+        const b = BAB.Save.defaultBot();
+        p.bots.push(b); p.activeBotId = b.id; BAB.Save.save(); BAB.Audio.beep(); render();
+      };
+      document.getElementById('btnRandName').onclick = () => {
+        bot.name = BAB.pick(BAB.sillyNames);
+        document.getElementById('botName').value = bot.name;
+        BAB.Save.save(); BAB.Audio.soft();
+      };
+      document.getElementById('botName').onchange = (e) => {
+        bot.name = (e.target.value || 'Bot').slice(0, 16);
+        BAB.Save.save();
+      };
+      document.getElementById('btnXform').onclick = () => { BAB.Audio.transform(); garageSpin(); };
+      document.getElementById('btnDone').onclick = () => {
+        bot.name = (document.getElementById('botName').value || bot.name).slice(0, 16);
+        BAB.Save.save(); hub();
+      };
+    }
+
+    function garageSpin() {
+      const from = bot.mode || 'car';
+      const to = from === 'car' ? 'robot' : 'car';
+      const start = BAB.now();
+      function frame() {
+        const u = (BAB.now() - start) / 550;
+        drawGarageBot(u * Math.PI * 2, u > 0.5 ? to : from);
+        if (u < 1) requestAnimationFrame(frame);
+        else { bot.mode = to; BAB.Save.save(); drawGarageBot(); }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function drawGarageBot(spin, mode) {
+      const c = document.getElementById('garBot');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, 340, 170);
+      const g = ctx.createLinearGradient(0, 0, 0, 170);
+      g.addColorStop(0, '#2b4578'); g.addColorStop(1, '#1a2744');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 340, 170);
+      for (let i = 0; i < 11; i++) {
+        ctx.fillStyle = i % 2 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.1)';
+        ctx.fillRect(i * 32, 140, 32, 30);
+      }
+      BAB.Art.drawBot(ctx, bot, 170, 105, 1.05, { mode: mode || bot.mode || 'car', spin: spin || 0, wheelAng: BAB.now() / 200 });
+      if (p.pet && BAB.Parts.petsUnlocked(p)) BAB.Art.drawPet(ctx, p.pet, 290, 130, 0.8, BAB.now() / 1000);
+    }
+
+    render();
+  }
+
+  function petScreen() {
+    // Pets are edited inside the garage Pet tab now
+    garage();
+    // open pet category by re-entering — set via temporary flag
+    // simplest: show garage then programmatically click pet tab after paint
+    setTimeout(() => {
+      const tab = ov().querySelector('.cat-tab[data-cat="pet"]');
+      if (tab && !tab.disabled) tab.click();
+    }, 50);
+  }
+
+  function levelSelect() {
+    clear();
+    BAB.screen = 'levels';
+    const p = BAB.Save.profile();
+    const cells = [];
+    for (let i = 1; i <= 50; i++) {
+      const locked = i > p.maxLevel;
+      const done = !!p.cleared[i];
+      const boss = i === 25 || i === 50;
+      cells.push(`<button class="lvl ${done?'done':''} ${boss?'boss':''} ${locked?'locked':''} ${i===p.maxLevel?'cur':''}" data-lv="${i}" type="button" ${locked?'disabled':''}>${boss?'👑':''}${i}</button>`);
+    }
+    showPanel(`<div class="panel col" style="width:min(780px,96vw)">
+      <div class="title">⭐ Adventures</div>
+      <div class="sub">Level ${p.maxLevel} unlocked · ⭐ ${p.totalStars || 0}</div>
+      <div class="level-grid">${cells.join('')}</div>
+      <button class="btn ghost" id="btnBack" type="button">Back</button>
+    </div>`);
+    ov().querySelectorAll('.lvl:not(.locked)').forEach((el) => {
+      el.onclick = () => { BAB.Audio.click(); startAdventure(+el.getAttribute('data-lv')); };
+    });
+    document.getElementById('btnBack').onclick = () => hub();
+  }
+
+  function startAdventure(levelId) {
+    clear();
+    BAB.screen = 'play';
+    const pid = BAB.state.lastProfile;
+    BAB.Adventure.start(levelId, pid);
+    buildHud();
+    buildPad();
+  }
+
+  function buildHud() {
+    BAB.hud.classList.remove('hidden');
+    const run = BAB.Adventure.getRun();
+    const p = BAB.Save.profile(run.profileId);
+    const hearts = run.meta.noGameOver
+      ? `<span class="chip">🌈</span>`
+      : `<span class="hearts">${'❤️'.repeat(Math.max(0, run.hearts))}${'🖤'.repeat(Math.max(0, (run.meta.hearts || 3) - run.hearts))}</span>`;
+    BAB.hud.innerHTML = `
+      <div class="row" style="pointer-events:auto">
+        <button class="btn ghost" id="btnPause" type="button" style="min-width:48px;padding:8px 12px">⏸️</button>
+        ${hearts}
+      </div>
+      <div class="star-count">⭐ <span id="starHud">0</span></div>
+      <div class="chip" id="lvHud">Lv ${run.levelId}</div>`;
+    document.getElementById('btnPause').onclick = () => pauseMenu();
+  }
+
+  function updateHud() {
+    const run = BAB.Adventure.getRun();
+    if (!run || BAB.screen !== 'play') return;
+    const sh = document.getElementById('starHud');
+    if (sh) sh.textContent = run.starsGot + '/' + run.level.stars.length;
+    if (!run.meta.noGameOver) {
+      const h = BAB.hud.querySelector('.hearts');
+      if (h) h.textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🖤'.repeat(Math.max(0, (run.meta.hearts || 3) - run.hearts));
+    }
+  }
+
+  function buildPad() {
+    removePad();
+    const pad = document.createElement('div');
+    pad.id = 'pad';
+    pad.className = 'pad';
+    pad.innerHTML = `
+      <div class="cluster">
+        <button class="pad-btn" data-k="left" type="button" aria-label="Left">◀</button>
+        <button class="pad-btn" data-k="right" type="button" aria-label="Right">▶</button>
+      </div>
+      <div class="cluster">
+        <button class="pad-btn xform" data-k="transform" type="button" aria-label="Transform">🔄<br>TRANSFORM</button>
+        <button class="pad-btn" data-k="jump" type="button" aria-label="Jump">⬆</button>
+      </div>`;
+    document.getElementById('app').appendChild(pad);
+    pad.querySelectorAll('.pad-btn').forEach((btn) => {
+      const k = btn.getAttribute('data-k');
+      const set = (v) => {
+        const o = {};
+        if (k === 'transform') { if (v) o.transform = true; }
+        else o[k] = v;
+        BAB.Adventure.setInput(o);
+        btn.classList.toggle('held', !!v && k !== 'transform');
+      };
+      btn.addEventListener('pointerdown', (e) => { e.preventDefault(); btn.setPointerCapture(e.pointerId); BAB.Audio.unlock(); set(true); });
+      btn.addEventListener('pointerup', (e) => { set(false); });
+      btn.addEventListener('pointercancel', () => set(false));
+      btn.addEventListener('lostpointercapture', () => set(false));
+    });
+  }
+
+  function pauseMenu() {
+    const run = BAB.Adventure.getRun();
+    if (!run) return;
+    run._paused = true;
+    showPanel(`<div class="panel col">
+      <div class="title">Paused</div>
+      <button class="btn green big" id="btnResume" type="button">Resume</button>
+      <button class="btn ghost" id="btnQuit" type="button">Quit to Hub</button>
+    </div>`);
+    document.getElementById('btnResume').onclick = () => {
+      clear(); BAB.screen = 'play'; run._paused = false; buildHud(); buildPad();
+    };
+    document.getElementById('btnQuit').onclick = () => { run._paused = false; hub(); };
+  }
+
+  function results(ok) {
+    removePad();
+    const run = BAB.Adventure.getRun();
+    const p = BAB.Save.profile(run.profileId);
+    if (ok) {
+      const newly = run._newly || [];
+      const unlockMsg = newly.length
+        ? `<div class="sub">Unlocked: ${newly.map((x) => x.name).join(', ')}</div>`
+        : '';
+      showPanel(`<div class="panel col">
+        <div class="title">🎉 You did it!</div>
+        <div class="sub">⭐ ${run.starsGot} stars · Level ${run.levelId}</div>
+        ${unlockMsg}
+        <canvas id="winBot" width="260" height="140"></canvas>
+        <div class="row">
+          <button class="btn green big" id="btnNext" type="button">${run.levelId < 50 ? 'Next ▶' : '🏆 Done'}</button>
+          <button class="btn ghost" id="btnLevels" type="button">Levels</button>
+        </div>
+      </div>`);
+      const ctx = document.getElementById('winBot').getContext('2d');
+      BAB.Art.drawBot(ctx, run.bot, 130, 90, 1, { mode: 'robot' });
+      document.getElementById('btnNext').onclick = () => {
+        if (run.levelId < 50) startAdventure(run.levelId + 1);
+        else hub();
+      };
+      document.getElementById('btnLevels').onclick = () => levelSelect();
+    } else {
+      // game over — Player 2 only
+      showPanel(`<div class="panel col">
+        <div class="title">💥 Oops!</div>
+        <div class="sub">Try again — your progress is safe</div>
+        <canvas id="failBot" width="260" height="140"></canvas>
+        <div class="row">
+          <button class="btn orange big" id="btnRetry" type="button">🔄 Retry</button>
+          <button class="btn ghost" id="btnLevels" type="button">Levels</button>
+        </div>
+      </div>`);
+      const ctx = document.getElementById('failBot').getContext('2d');
+      BAB.Art.drawBot(ctx, run.bot, 130, 90, 1, { mode: run.mode, wobble: 5 });
+      document.getElementById('btnRetry').onclick = () => startAdventure(run.levelId);
+      document.getElementById('btnLevels').onclick = () => levelSelect();
+    }
+    BAB.screen = 'results';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  return {
+    clear, profilePicker, hub, garage, levelSelect, startAdventure,
+    updateHud, results, petScreen, pauseMenu
+  };
+})();
+
+})();
+/* ==== 90-game.js ==== */
+;(function(){
+/* Bootstrap, input, loop, window.__game */
+(function boot() {
+  function init() {
+    BAB.canvas = document.getElementById('game');
+    BAB.ctx = BAB.canvas.getContext('2d');
+    BAB.overlay = document.getElementById('overlay');
+    BAB.hud = document.getElementById('hud');
+    BAB.fitCanvas();
+    BAB.Audio.loadMute();
+    BAB.Save.load();
+
+    document.getElementById('muteBtn').onclick = () => {
+      BAB.Audio.unlock();
+      BAB.Audio.setMuted(!BAB.muted);
+      document.getElementById('muteBtn').textContent = BAB.muted ? '🔇' : '🔊';
+    };
+    const fsBtn = document.getElementById('fsBtn');
+    if (!document.documentElement.requestFullscreen && !document.documentElement.webkitRequestFullscreen) {
+      fsBtn.style.display = 'none';
+    } else {
+      fsBtn.onclick = () => {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+        } else {
+          (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        }
+      };
+    }
+
+    window.addEventListener('resize', BAB.fitCanvas);
+    window.addEventListener('orientationchange', () => setTimeout(BAB.fitCanvas, 100));
+
+    // keyboard
+    window.addEventListener('keydown', (e) => {
+      BAB.keys[e.code] = true;
+      BAB.Audio.unlock();
+      if (BAB.screen === 'play') {
+        const o = {};
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') o.left = true;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') o.right = true;
+        if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') { o.jump = true; e.preventDefault(); }
+        if (e.code === 'KeyT' || e.code === 'Enter') o.transform = true;
+        if (Object.keys(o).length) BAB.Adventure.setInput(o);
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      BAB.keys[e.code] = false;
+      if (BAB.screen === 'play') {
+        const o = {};
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') o.left = false;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') o.right = false;
+        if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') o.jump = false;
+        if (Object.keys(o).length) BAB.Adventure.setInput(o);
+      }
+    });
+
+    // first gesture unlocks audio
+    ['pointerdown', 'touchstart', 'keydown'].forEach((ev) =>
+      window.addEventListener(ev, () => BAB.Audio.unlock(), { once: false, passive: true })
+    );
+
+    // autosave hooks
+    const autosave = () => BAB.Save.save();
+    window.addEventListener('pagehide', autosave);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) autosave(); });
+    setInterval(autosave, 5000);
+
+    // debug / test hook
+    window.__game = {
+      BAB,
+      save: BAB.Save,
+      start: (lv, pid) => BAB.UI.startAdventure(lv || 1, pid),
+      hub: () => BAB.UI.hub(),
+      profiles: () => BAB.UI.profilePicker(),
+      garage: () => BAB.UI.garage(),
+      pick: (id) => { BAB.Save.setProfile(id); BAB.UI.hub(); },
+      getRun: () => BAB.Adventure.getRun(),
+      solve: (lv, pid, opts) => BAB.Adventure.solve(lv, pid, opts),
+      solveAll: (pid, opts) => {
+        const out = [];
+        for (let i = 1; i <= 50; i++) out.push({ level: i, ...BAB.Adventure.solve(i, pid || 'alpha', Object.assign({ proof: true }, opts || {})) });
+        return out;
+      },
+      levels: () => BAB.Levels.summary(),
+      resetSave: () => { BAB.state = BAB.Save.blankState(); BAB.Save.save(); },
+      setMaxLevel: (n, pid) => {
+        const p = BAB.Save.profile(pid || BAB.state.lastProfile);
+        p.maxLevel = n;
+        BAB.Parts.applyUnlocks(p);
+        BAB.Save.save();
+      },
+      screen: () => BAB.screen,
+      state: () => BAB.state,
+      forceGameOver: () => {
+        const r = BAB.Adventure.getRun();
+        if (!r) return false;
+        if (r.meta.noGameOver) return false;
+        r.hearts = 0; r.failed = true; return true;
+      },
+      tapPad: (k) => {
+        const o = {};
+        if (k === 'transform') o.transform = true;
+        else o[k] = true;
+        BAB.Adventure.setInput(o);
+      },
+      releasePad: (k) => {
+        const o = {};
+        if (k !== 'transform') o[k] = false;
+        BAB.Adventure.setInput(o);
+      }
+    };
+
+    BAB.UI.profilePicker();
+    BAB.lastT = BAB.now();
+    loop();
+  }
+
+  function loop(t) {
+    BAB.raf = requestAnimationFrame(loop);
+    const now = t || BAB.now();
+    let dt = (now - BAB.lastT) / 1000;
+    BAB.lastT = now;
+    if (dt > 0.05) dt = 0.05;
+
+    if (BAB.screen === 'play') {
+      const run = BAB.Adventure.getRun();
+      if (run && !run._paused) {
+        if (!run.finished && !run.failed) {
+          // sync keyboard held state
+          const inp = {
+            left: !!BAB.keys.ArrowLeft || !!BAB.keys.KeyA || run.input.left,
+            right: !!BAB.keys.ArrowRight || !!BAB.keys.KeyD || run.input.right,
+            jump: !!BAB.keys.ArrowUp || !!BAB.keys.Space || !!BAB.keys.KeyW || run.input.jump
+          };
+          // don't overwrite pad-only if keys not down — pad sets via setInput
+          if (BAB.keys.ArrowLeft || BAB.keys.KeyA || BAB.keys.ArrowRight || BAB.keys.KeyD || BAB.keys.ArrowUp || BAB.keys.Space || BAB.keys.KeyW) {
+            BAB.Adventure.setInput(inp);
+          }
+          BAB.Adventure.step(dt);
+          BAB.UI.updateHud();
+        }
+        BAB.Adventure.draw();
+        if (run.finished) {
+          BAB.screen = 'results';
+          BAB.UI.results(true);
+        } else if (run.failed) {
+          BAB.screen = 'results';
+          BAB.UI.results(false);
+        }
+      } else if (run && run._paused) {
+        BAB.Adventure.draw();
+      }
+    } else if (BAB.screen === 'profiles' || BAB.screen === 'hub' || BAB.screen === 'garage' || BAB.screen === 'levels' || BAB.screen === 'results') {
+      // soft animated backdrop
+      BAB.clear('#1a2744');
+      const ctx = BAB.ctx;
+      const g = ctx.createLinearGradient(0, 0, 0, BAB.H);
+      g.addColorStop(0, '#2e4a7a'); g.addColorStop(1, '#1a2744');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, BAB.W, BAB.H);
+      // floating gears decoration
+      ctx.save();
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = '#fff';
+      const tt = now / 1000;
+      for (let i = 0; i < 8; i++) {
+        const x = (i * 160 + tt * 20 * ((i % 2) ? 1 : -1) + BAB.W) % BAB.W;
+        const y = 80 + (i * 70) % 400;
+        ctx.beginPath(); ctx.arc(x, y, 30 + (i % 3) * 10, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    } else {
+      BAB.clear();
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "build-a-bot";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

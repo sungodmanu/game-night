@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#3d2a1a">
+<title>Dino Dig</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#1a120c;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 10%,#5a3d28 0%,#1a120c 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#3d2a1a;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.45)}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:10}
+#overlay > *{pointer-events:auto}
+#hud{position:absolute;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 12px 0;display:flex;gap:8px;align-items:flex-start;justify-content:space-between;pointer-events:none;z-index:5}
+#hud.hidden{display:none}
+.icon-btn{position:absolute;z-index:20;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(60px + env(safe-area-inset-right))}
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#2a1a10;background:#ffe566;box-shadow:0 4px 0 #d4b000,0 8px 18px rgba(0,0,0,.25);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d4b000,0 4px 10px rgba(0,0,0,.25)}
+.btn.big{font-size:24px;padding:14px 26px;border-radius:22px;min-height:60px}
+.btn.green{background:#7dff9a;box-shadow:0 4px 0 #2db854,0 8px 18px rgba(0,0,0,.25)}
+.btn.blue{background:#7ec8ff;box-shadow:0 4px 0 #2a7fbf,0 8px 18px rgba(0,0,0,.25)}
+.btn.pink{background:#ff9ad4;box-shadow:0 4px 0 #d44f9a,0 8px 18px rgba(0,0,0,.25)}
+.btn.orange{background:#ffb347;box-shadow:0 4px 0 #d47800,0 8px 18px rgba(0,0,0,.25)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:default}
+.panel{background:rgba(72,48,28,.94);border:3px solid rgba(255,255,255,.22);border-radius:28px;padding:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 16px 50px rgba(0,0,0,.4);max-width:min(980px,96vw);max-height:min(94dvh,94vh);overflow:auto}
+.title{font-size:clamp(26px,5vw,42px);font-weight:900;letter-spacing:.5px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.35);margin-bottom:6px}
+.sub{text-align:center;opacity:.85;margin-bottom:14px;font-size:15px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:200px;border-radius:24px;background:linear-gradient(160deg,#6a4a30,#3d2a1a);border:4px solid rgba(255,255,255,.2);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px}
+.profile-card .meta{font-size:14px;opacity:.85;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700;min-height:40px}
+.toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);max-width:min(520px,70vw);text-align:center;background:rgba(0,0,0,.72);padding:12px 20px;border-radius:16px;font-weight:800;font-size:18px;z-index:30;pointer-events:none;animation:pop .45s ease}
+@keyframes pop{0%{transform:translateX(-50%) scale(.6);opacity:0}40%{transform:translateX(-50%) scale(1.06);opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
+.hidden{display:none!important}
+.site-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;width:100%;max-width:860px;max-height:50vh;overflow:auto;padding:4px}
+.site-card{min-height:110px;border-radius:18px;border:3px solid transparent;background:rgba(255,255,255,.1);cursor:pointer;padding:10px;color:#fff;font-weight:800;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.site-card canvas{width:100px;height:56px;border-radius:10px;background:rgba(0,0,0,.2);pointer-events:none}
+.site-card.done{border-color:#7dff9a;background:rgba(125,255,154,.15)}
+.site-card.locked{opacity:.35;cursor:default}
+.site-card.rare{box-shadow:inset 0 0 0 2px #7ec8ff}
+.site-card.super{box-shadow:inset 0 0 0 2px #ffc94a}
+.era-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px}
+.era-tab{min-height:48px;padding:10px 14px;border-radius:14px;border:3px solid transparent;background:rgba(255,255,255,.12);color:#fff;font-weight:800;cursor:pointer;font-size:14px}
+.era-tab.sel{border-color:#ffe566;background:rgba(255,229,102,.25)}
+.tool-bar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.tool-btn{min-width:72px;min-height:72px;border-radius:18px;border:3px solid transparent;background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px}
+.tool-btn.sel{border-color:#ffe566;background:rgba(255,229,102,.28)}
+.tool-btn canvas{width:40px;height:40px;pointer-events:none}
+.dig-stage{width:min(700px,92vw);height:min(320px,42vh);border-radius:16px;background:#5a4030;border:3px solid rgba(255,255,255,.15);touch-action:none;cursor:crosshair}
+.hint{font-size:14px;opacity:.9;background:rgba(255,229,102,.18);border:2px solid rgba(255,229,102,.35);padding:8px 12px;border-radius:12px;max-width:520px;text-align:center}
+.fact-card{background:rgba(255,255,255,.08);border-radius:18px;padding:14px;max-width:640px;text-align:left;line-height:1.35}
+.fact-card h3{font-size:22px;margin-bottom:4px}
+.fact-card .not-dino{display:inline-block;background:#ff8a5c;color:#2a1a10;font-weight:900;padding:4px 10px;border-radius:999px;margin:4px 0 8px;font-size:13px}
+.museum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;width:100%;max-width:860px;max-height:46vh;overflow:auto}
+.museum-slot{min-height:120px;border-radius:16px;background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;font-size:12px;font-weight:700}
+.museum-slot.filled{border-style:solid;border-color:rgba(255,229,102,.4);background:rgba(255,229,102,.1)}
+.museum-slot canvas{width:96px;height:64px}
+.decor-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.energy{width:min(220px,50vw);height:14px;border-radius:999px;background:rgba(0,0,0,.35);overflow:hidden}
+.energy > i{display:block;height:100%;background:linear-gradient(90deg,#7dff9a,#ffe566)}
+.puzzle-stage{position:relative;width:min(700px,92vw);height:min(340px,46vh);border-radius:16px;background:linear-gradient(180deg,#4a3828,#2a1e14);border:3px solid rgba(255,255,255,.15);overflow:hidden}
+.bone{position:absolute;min-width:48px;min-height:48px;cursor:grab;touch-action:none;border-radius:10px}
+.bone.snapped{cursor:default;opacity:.95}
+.bone-ghost{position:absolute;border:2px dashed rgba(255,229,102,.55);border-radius:10px;pointer-events:none;opacity:.7}
+
+  .profile-card{min-height:160px}
+  .title{font-size:clamp(20px,4.2vw,32px)}
+  .tool-btn{min-width:64px;min-height:64px}
+}
+@media (orientation:portrait) and (max-width:500px){
+  .profile-card{width:min(300px,80vw)}
+  .site-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+}
+
+.dig-hud{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(700px,92vw);margin:10px auto 0;padding:0 4px}
+.dig-hud-spacer{flex:1}
+.dig-quit{position:static!important;margin-left:auto;min-width:96px;flex:0 0 auto}
+.fact-art-row{display:flex;gap:14px;align-items:center;margin-bottom:8px}
+.fact-art-row canvas{width:160px;height:110px;border-radius:14px;background:rgba(0,0,0,.25);flex-shrink:0}
+
+
+@media (max-height:650px){
+  .dig-stage{height:min(220px,34vh)}
+  .profile-card{min-height:160px}
+  .title{font-size:clamp(18px,3.8vw,28px);margin-bottom:2px}
+  .sub{margin-bottom:6px;font-size:13px}
+  .tool-btn{min-width:56px;min-height:56px}
+  .hint{font-size:12px;padding:4px 8px;margin:4px auto}
+  .dig-hud{margin-top:4px}
+  .panel{padding:10px;max-height:min(96dvh,96vh)}
+  .fact-art-row canvas{width:120px;height:82px}
+}
+@media (max-height:420px){
+  .dig-stage{height:min(160px,28vh);width:min(640px,90vw)}
+  .tool-btn{min-width:48px;min-height:48px}
+  .tool-btn canvas{width:28px;height:28px}
+  .hint{display:none}
+  .title{font-size:18px}
+  .dig-hud .chip{min-height:36px;padding:4px 10px;font-size:14px}
+  .dig-quit{min-height:44px;padding:8px 14px;font-size:16px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Dino Dig"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="overlay"></div>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>
+window.__DINO_DATA__ = [{"name":"Tyrannosaurus rex","isDinosaur":true,"group":"theropod","pronunciation":"tie-RAN-oh-SORE-us reks","period":"Late Cretaceous","mya":"68–66","fossilLocations":["Canada","USA"],"diet":"carnivore","lengthFt":"39–43","lengthM":"12–13","rarity":"common","kidFact":"It had the strongest bite of any land animal we know.","deeperFact":"Skin impressions from T. rex and close relatives show scales; feathers are uncertain and would likely have been limited if present at all. Famous specimens Sue and Scotty reached about 13 m and over 8,000 kg.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/tyrannosaurus.html"},{"name":"Triceratops","isDinosaur":true,"group":"ceratopsian","pronunciation":"try-SER-uh-tops","period":"Late Cretaceous","mya":"68–66","fossilLocations":["USA"],"diet":"herbivore","lengthFt":"about 30","lengthM":"about 9","rarity":"common","kidFact":"It had three horns and a big bony neck frill.","deeperFact":"Its skull is among the largest of any land animal. Fossils show healed T. rex bite marks on horns and frills, so some fights were survived.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/triceratops.html"},{"name":"Stegosaurus","isDinosaur":true,"group":"stegosaur","pronunciation":"STEG-oh-SORE-us","period":"Late Jurassic","mya":"152–145","fossilLocations":["USA"],"diet":"herbivore","lengthFt":"about 30","lengthM":"about 9","rarity":"common","kidFact":"It had tall plates on its back and spikes on its tail.","deeperFact":"The plates sat in the skin, not on the skeleton. Scientists still debate whether they helped with display, recognition, or temperature control.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/stegosaurus.html"},{"name":"Brachiosaurus","isDinosaur":true,"group":"sauropod","pronunciation":"BRAK-ee-oh-SORE-us","period":"Late Jurassic","mya":"152–145","fossilLocations":["USA"],"diet":"herbivore","lengthFt":"about 72","lengthM":"about 22","rarity":"common","kidFact":"Its front legs were longer than its back legs, so it stood tall.","deeperFact":"Many full-body reconstructions borrow from the related African sauropod Giraffatitan. It likely browsed high tree leaves and swallowed plants without chewing.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/brachiosaurus.html"},{"name":"Velociraptor","isDinosaur":true,"group":"theropod","pronunciation":"veh-LOSS-ih-rap-tor","period":"Late Cretaceous","mya":"74–70","fossilLocations":["Mongolia"],"diet":"carnivore","lengthFt":"about 6","lengthM":"about 1.8","rarity":"common","kidFact":"Real Velociraptor was about turkey-sized and feathered.","deeperFact":"Movie raptors were sized more like Deinonychus. Quill knobs show Velociraptor had long arm feathers; it could not fly and likely used feathers for warmth, display, or brooding.","sourceUrl":"https://www.nhm.ac.uk/discover/velociraptor-facts.html"},{"name":"Spinosaurus","isDinosaur":true,"group":"theropod","pronunciation":"SPY-no-SORE-us","period":"Late Cretaceous","mya":"99–94","fossilLocations":["Egypt","Morocco"],"diet":"carnivore","lengthFt":"about 46","lengthM":"about 14","rarity":"common","kidFact":"It had a tall sail on its back and ate lots of fish.","deeperFact":"How much it swam and whether it walked mostly on two legs are still debated. Incomplete fossils and lost early bones make size and posture estimates uncertain.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/spinosaurus.html"},{"name":"Ankylosaurus","isDinosaur":true,"group":"ankylosaur","pronunciation":"ang-KYE-loh-SORE-us","period":"Late Cretaceous","mya":"68–66","fossilLocations":["Canada","USA"],"diet":"herbivore","lengthFt":"about 26","lengthM":"about 8","rarity":"common","kidFact":"It wore bony armor and swung a heavy club tail.","deeperFact":"No complete skeleton is known, so the exact armor layout is still uncertain. It likely grazed low plants and used the side-swinging tail club for defense.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/ankylosaurus.html"},{"name":"Parasaurolophus","isDinosaur":true,"group":"hadrosaur","pronunciation":"pair-uh-saw-ROL-uh-fus","period":"Late Cretaceous","mya":"77–73","fossilLocations":["Canada","USA"],"diet":"herbivore","lengthFt":"about 30","lengthM":"about 9","rarity":"common","kidFact":"Its long hollow head crest may have made loud trumpet sounds.","deeperFact":"It could walk on two or four legs. Scientists think the crest helped with calling, recognizing others, or maybe cooling, and different species had different crest shapes.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/parasaurolophus.html"},{"name":"Diplodocus","isDinosaur":true,"group":"sauropod","pronunciation":"dih-PLOD-uh-kus","period":"Late Jurassic","mya":"152–145","fossilLocations":["USA"],"diet":"herbivore","lengthFt":"about 85","lengthM":"about 26","rarity":"common","kidFact":"It had a super-long neck and a whip-like tail.","deeperFact":"Ligaments likely helped hold the long neck roughly horizontal. All known fossils come from the Morrison Formation of the western USA.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/diplodocus.html"},{"name":"Allosaurus","isDinosaur":true,"group":"theropod","pronunciation":"AL-oh-SORE-us","period":"Late Jurassic","mya":"152–145","fossilLocations":["USA"],"diet":"carnivore","lengthFt":"about 32","lengthM":"about 9.7","rarity":"common","kidFact":"It was a big Jurassic hunter with horns above its eyes.","deeperFact":"Bite marks on Stegosaurus and sauropod remains show it hunted or scavenged large plant-eaters. It lived tens of millions of years before T. rex and was not a close relative.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/allosaurus.html"},{"name":"Iguanodon","isDinosaur":true,"group":"ornithopod","pronunciation":"ih-GWAH-nuh-don","period":"Early Cretaceous","mya":"140–110","fossilLocations":["Belgium","England","United Kingdom"],"diet":"herbivore","lengthFt":"about 33","lengthM":"about 10","rarity":"common","kidFact":"It had a big thumb spike that could poke predators.","deeperFact":"One of the first dinosaurs scientifically named. It could walk on two or four legs and used a beak plus cheek teeth for plants.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/iguanodon.html"},{"name":"Dilophosaurus","isDinosaur":true,"group":"theropod","pronunciation":"dy-LOH-fuh-SORE-us","period":"Early Jurassic","mya":"about 184","fossilLocations":["USA"],"diet":"carnivore","lengthFt":"about 23","lengthM":"about 7","rarity":"common","kidFact":"It had two thin crests on its head, not a venom spit.","deeperFact":"The Jurassic Park venom and neck frill are fiction. Real Dilophosaurus was much larger than the movie version and likely an active hunter.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/dilophosaurus.html"},{"name":"Edmontosaurus","isDinosaur":true,"group":"hadrosaur","pronunciation":"ed-MON-toh-SORE-us","period":"Late Cretaceous","mya":"76–66","fossilLocations":["Canada"],"diet":"herbivore","lengthFt":"about 43","lengthM":"about 13","rarity":"common","kidFact":"This duck-billed dinosaur had about a thousand cheek teeth.","deeperFact":"Mummified specimens preserve skin texture. Stomach contents include tough pine needles, cones, and twigs.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/edmontosaurus.html"},{"name":"Pachycephalosaurus","isDinosaur":true,"group":"pachycephalosaur","pronunciation":"pack-ee-SEF-uh-loh-SORE-us","period":"Late Cretaceous","mya":"69–66","fossilLocations":["Canada","USA"],"diet":"herbivore","lengthFt":"about 10","lengthM":"about 3","rarity":"common","kidFact":"It had a thick bony dome on its head.","deeperFact":"Scientists debate whether the dome was for head-butting, display, or both. Many now treat Stygimoloch and Dracorex as younger growth stages of this animal.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/pachycephalosaurus.html"},{"name":"Brontosaurus","isDinosaur":true,"group":"sauropod","pronunciation":"BRON-toh-SORE-us","period":"Late Jurassic","mya":"156–145","fossilLocations":["USA"],"diet":"herbivore","lengthFt":"66–75","lengthM":"20–23","rarity":"common","kidFact":"Its name means thunder lizard, and it had a long neck.","deeperFact":"Brontosaurus was sunk into Apatosaurus for over a century, then reinstated as a separate genus in a 2015 study. Some paleontologists still debate that split.","sourceUrl":"https://www.nhm.ac.uk/discover/brontosaurus-reinstating-a-prehistoric-icon.html"},{"name":"Pteranodon","isDinosaur":false,"group":"pterosaur","pronunciation":"teh-RAN-oh-don","period":"Late Cretaceous","mya":"about 90–85","fossilLocations":["USA (especially Kansas)"],"diet":"carnivore","lengthFt":"wingspan about 20–23","lengthM":"wingspan about 6–7","rarity":"common","kidFact":"Not a dinosaur—it was a flying reptile with no teeth.","deeperFact":"Pterosaurs are archosaurs related to dinosaurs but are not dinosaurs. Pteranodon likely soared over seas and ate fish; hollow bones kept it light.","sourceUrl":"https://www.amnh.org/explore/news-blogs/pteranodon-longiceps"},{"name":"Mosasaurus","isDinosaur":false,"group":"marine reptile","pronunciation":"MOH-zuh-SORE-us","period":"Late Cretaceous","mya":"about 82–66","fossilLocations":["Netherlands","USA","Canada","Morocco","worldwide seas"],"diet":"carnivore","lengthFt":"36–59","lengthM":"11–18","rarity":"common","kidFact":"Not a dinosaur—it was a giant ocean lizard with flippers.","deeperFact":"Mosasaurs are squamates related to lizards and snakes. Length estimates for Mosasaurus hoffmannii range widely because complete skeletons are rare.","sourceUrl":"https://www.nhm.ac.uk/discover/what-is-a-mosasaur.html"},{"name":"Woolly mammoth","isDinosaur":false,"group":"mammal","pronunciation":"WOOL-ee MAM-uth","period":"Pleistocene (not Mesozoic)","mya":"about 0.4–0.004","fossilLocations":["Europe","northern Asia","North America"],"diet":"herbivore","lengthFt":"height about 10–12","lengthM":"height about 3–3.7","rarity":"common","kidFact":"Not a dinosaur—it was a furry Ice Age elephant relative.","deeperFact":"Lived in the Pleistocene ice ages, long after dinosaurs. Thick fur, small ears, and fat stores helped it survive cold steppe-tundra habitats.","sourceUrl":"https://kids.britannica.com/scholars/article/woolly-mammoth/634537"},{"name":"Baryonyx","isDinosaur":true,"group":"theropod","pronunciation":"BAIR-ee-ON-icks","period":"Early Cretaceous","mya":"about 125","fossilLocations":["England","Spain","United Kingdom"],"diet":"carnivore","lengthFt":"about 33","lengthM":"about 10","rarity":"rare","kidFact":"It had a huge claw and crocodile-like jaws for fish.","deeperFact":"A spinosaur relative, it may have hooked fish from riverbanks and also scavenged. Fossils from England include remains with fish and Iguanodon evidence.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/baryonyx.html"},{"name":"Carnotaurus","isDinosaur":true,"group":"theropod","pronunciation":"KAR-noh-TORE-us","period":"Late Cretaceous","mya":"71–69","fossilLocations":["Argentina"],"diet":"carnivore","lengthFt":"about 26","lengthM":"about 8","rarity":"rare","kidFact":"This meat-eater had two horns like a bull and tiny arms.","deeperFact":"Skin impressions show scales, not feathers. Incomplete legs and tail mean full reconstructions lean on related abelisaurs.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/carnotaurus.html"},{"name":"Gallimimus","isDinosaur":true,"group":"theropod","pronunciation":"GAL-ih-MIME-us","period":"Late Cretaceous","mya":"about 70","fossilLocations":["Mongolia"],"diet":"omnivore","lengthFt":"about 20","lengthM":"about 6","rarity":"rare","kidFact":"This ostrich-like dinosaur could run very fast.","deeperFact":"Likely feathered based on close relatives. Its toothless beak suggests mixed plant and small-animal foods, and top speed estimates are roughly 47–55 km/h.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/gallimimus.html"},{"name":"Deinonychus","isDinosaur":true,"group":"theropod","pronunciation":"dy-NON-ih-kus","period":"Early Cretaceous","mya":"115–108","fossilLocations":["USA"],"diet":"carnivore","lengthFt":"about 11","lengthM":"about 3.4","rarity":"rare","kidFact":"It had a big sickle claw and inspired movie raptors.","deeperFact":"John Ostrom’s work on Deinonychus helped start the dinosaur renaissance. Feathers are not directly preserved but are likely based on close relatives.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/deinonychus.html"},{"name":"Oviraptor","isDinosaur":true,"group":"theropod","pronunciation":"OH-vih-RAP-tor","period":"Late Cretaceous","mya":"85–75","fossilLocations":["Mongolia"],"diet":"omnivore","lengthFt":"about 7","lengthM":"about 2","rarity":"rare","kidFact":"Its name means egg thief, but that idea was mostly wrong.","deeperFact":"It had a toothless beak suited to crushing tough food. Later finds of nesting oviraptorosaurs suggest many were caring for their own eggs, not just stealing them.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/oviraptor.html"},{"name":"Coelophysis","isDinosaur":true,"group":"theropod","pronunciation":"SEE-loh-FY-sis","period":"Late Triassic","mya":"225–200","fossilLocations":["USA","South Africa","Zimbabwe"],"diet":"carnivore","lengthFt":"about 7","lengthM":"about 2","rarity":"rare","kidFact":"An early slim dinosaur that chased small prey.","deeperFact":"Hollow bones kept it light and fast. An old cannibalism story was overturned when bones in one ribcage turned out to be a small crocodile, not a baby Coelophysis.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/coelophysis.html"},{"name":"Compsognathus","isDinosaur":true,"group":"theropod","pronunciation":"komp-sog-NATH-us","period":"Late Jurassic","mya":"145–140","fossilLocations":["France","Germany"],"diet":"carnivore","lengthFt":"about 2","lengthM":"about 0.7","rarity":"rare","kidFact":"This tiny hunter was about the size of a chicken.","deeperFact":"Among the smallest known dinosaurs, weighing only a few kilograms. Fossils from European lagoon deposits preserve fine detail.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/compsognathus.html"},{"name":"Kentrosaurus","isDinosaur":true,"group":"stegosaur","pronunciation":"KEN-troh-SORE-us","period":"Late Jurassic","mya":"155–150","fossilLocations":["Tanzania"],"diet":"herbivore","lengthFt":"about 16","lengthM":"about 5","rarity":"rare","kidFact":"A spiky African cousin of Stegosaurus.","deeperFact":"Smaller than Stegosaurus, with plates and sharp spikes along the back and tail. Fossils come from Late Jurassic rocks in Tanzania.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/kentrosaurus.html"},{"name":"Amargasaurus","isDinosaur":true,"group":"sauropod","pronunciation":"uh-MAR-guh-SORE-us","period":"Early Cretaceous","mya":"132–127","fossilLocations":["Argentina"],"diet":"herbivore","lengthFt":"about 39","lengthM":"about 12","rarity":"rare","kidFact":"It had two rows of long spines that may have held a sail.","deeperFact":"A dicraeosaurid sauropod with unusually tall neck spines. Whether skin connected them into twin sails is still discussed.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/amargasaurus.html"},{"name":"Megalosaurus","isDinosaur":true,"group":"theropod","pronunciation":"MEG-uh-loh-SORE-us","period":"Middle Jurassic","mya":"about 166","fossilLocations":["England","United Kingdom"],"diet":"carnivore","lengthFt":"about 20","lengthM":"about 6","rarity":"rare","kidFact":"It was the first dinosaur ever given a scientific name.","deeperFact":"Named in 1824, before the word dinosaur existed. Victorian size guesses were huge; modern estimates are about 6 m.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/megalosaurus.html"},{"name":"Dimetrodon","isDinosaur":false,"group":"synapsid","pronunciation":"dy-MEE-troh-don","period":"Permian (not Mesozoic)","mya":"about 280–265","fossilLocations":["USA (especially Texas)"],"diet":"carnivore","lengthFt":"about 10","lengthM":"about 3","rarity":"rare","kidFact":"Not a dinosaur—it lived before dinosaurs and had a sail back.","deeperFact":"A Permian synapsid more closely related to mammals than to dinosaurs. It lived tens of millions of years before the first dinosaurs.","sourceUrl":"https://www.smithsonianmag.com/science-nature/the-dimetrodon-in-your-family-tree-54302176/"},{"name":"Plesiosaurus","isDinosaur":false,"group":"marine reptile","pronunciation":"PLEE-see-uh-SORE-us","period":"Early Jurassic","mya":"about 200–175","fossilLocations":["England","United Kingdom"],"diet":"carnivore","lengthFt":"about 11.5","lengthM":"about 3.5","rarity":"rare","kidFact":"Not a dinosaur—it was a sea reptile with a long neck.","deeperFact":"Mary Anning found a famous nearly complete skeleton. It used four flippers and likely ate small fish and crustaceans.","sourceUrl":"https://www.nhm.ac.uk/discover/what-is-a-plesiosaur.html"},{"name":"Argentinosaurus","isDinosaur":true,"group":"sauropod","pronunciation":"ar-jen-TEEN-oh-SORE-us","period":"Late Cretaceous","mya":"about 90","fossilLocations":["Argentina"],"diet":"herbivore","lengthFt":"about 115","lengthM":"about 35","rarity":"super rare","kidFact":"One of the biggest land animals that ever lived.","deeperFact":"A titanosaur known from incomplete bones, so length and mass are approximate. Hatchlings would have been easy prey for giant predators for many years.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/argentinosaurus.html"},{"name":"Therizinosaurus","isDinosaur":true,"group":"theropod","pronunciation":"THER-ih-ZEEN-oh-SORE-us","period":"Late Cretaceous","mya":"about 70","fossilLocations":["Mongolia"],"diet":"herbivore","lengthFt":"about 33","lengthM":"about 10","rarity":"super rare","kidFact":"This plant-eater had the longest claws of any land animal.","deeperFact":"Known mainly from arms, legs, and ribs, so body shape is reconstructed from relatives. Claws about 50 cm long may have pulled vegetation or been used for display.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/therizinosaurus.html"},{"name":"Microraptor","isDinosaur":true,"group":"theropod","pronunciation":"MY-kroh-RAP-tor","period":"Early Cretaceous","mya":"about 120","fossilLocations":["China"],"diet":"carnivore","lengthFt":"about 2.5","lengthM":"about 0.8","rarity":"super rare","kidFact":"A crow-sized dinosaur with feathers on arms and legs.","deeperFact":"It could probably fly or glide and had shiny black feathers. Stomach contents include mammals, birds, fish, and even a lizard.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/microraptor.html"},{"name":"Majungasaurus","isDinosaur":true,"group":"theropod","pronunciation":"mah-JOONG-uh-SORE-us","period":"Late Cretaceous","mya":"84–71","fossilLocations":["Madagascar"],"diet":"carnivore","lengthFt":"about 20","lengthM":"about 6","rarity":"super rare","kidFact":"A horned meat-eater from the island of Madagascar.","deeperFact":"An abelisaurid known from a complete skull and partial skeletons. It was a top predator on Late Cretaceous Madagascar.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/majungasaurus.html"},{"name":"Quetzalcoatlus","isDinosaur":false,"group":"pterosaur","pronunciation":"ket-sal-koh-AT-lus","period":"Late Cretaceous","mya":"about 68–66","fossilLocations":["USA"],"diet":"carnivore","lengthFt":"wingspan about 36","lengthM":"wingspan about 11","rarity":"super rare","kidFact":"Not a dinosaur—the biggest flying animal we know.","deeperFact":"An azhdarchid pterosaur about giraffe-tall at the shoulder yet surprisingly light thanks to hollow bones. NHM notes a wingspan around 11 m.","sourceUrl":"https://www.nhm.ac.uk/discover/the-truth-about-pterosaurs.html"},{"name":"Utahraptor","isDinosaur":true,"group":"theropod","pronunciation":"YOO-tah-RAP-tor","period":"Early Cretaceous","mya":"139–135","fossilLocations":["USA"],"diet":"carnivore","lengthFt":"about 18","lengthM":"about 5.5","rarity":"super rare","kidFact":"The biggest known raptor, much larger than Velociraptor.","deeperFact":"A bulky dromaeosaur about 5.5 m long. Direct feather fossils are lacking, but feathers are very likely based on related species.","sourceUrl":"https://www.nhm.ac.uk/discover/dino-directory/utahraptor.html"}];
+"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Dino Dig — core namespace */
+const DD = window.DD = {
+  VERSION: 1,
+  SAVE_KEY: 'dino-dig-v1',
+  W: 1180, H: 600,
+  profiles: {
+    alpha: { id: 'alpha', defaultName: 'Player 1', label: 'Easy', noGameOver: true, infiniteEnergy: true, breakable: false, snapHints: true, brushBonus: 1.4 },
+    beta:  { id: 'beta',  defaultName: 'Player 2', label: 'Challenge', noGameOver: false, infiniteEnergy: false, breakable: true, snapHints: false, brushBonus: 1.0, maxEnergy: 100 }
+  },
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  dig: null,
+  puzzle: null
+};
+
+DD.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+DD.lerp = (a, b, t) => a + (b - a) * t;
+DD.rand = (a, b) => a + Math.random() * (b - a);
+DD.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+DD.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+DD.now = () => performance.now();
+DD.meta = () => DD.profiles[DD.state && DD.state.lastProfile || 'alpha'];
+
+DD.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1400);
+};
+
+DD.fitCanvas = () => {
+  const c = DD.canvas;
+  if (!c) return;
+  if (c.width !== DD.W) c.width = DD.W;
+  if (c.height !== DD.H) c.height = DD.H;
+};
+
+DD.clear = (color) => {
+  DD.ctx.fillStyle = color || '#3d2a1a';
+  DD.ctx.fillRect(0, 0, DD.W, DD.H);
+};
+
+DD.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+DD.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = DD.muted ? 0 : 0.3;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+  function tone(freq, dur, type, vol, slide) {
+    if (DD.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.14, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  function noise(dur, vol, freq) {
+    if (DD.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const n = Math.max(1, (c.sampleRate * dur) | 0);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = vol || 0.06;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = freq || 800;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start();
+  }
+  return {
+    unlock,
+    setMuted(m) {
+      DD.muted = !!m;
+      if (master) master.gain.value = DD.muted ? 0 : 0.3;
+      try { localStorage.setItem('dd-mute', DD.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DD.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { DD.muted = localStorage.getItem('dd-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DD.muted ? '🔇' : '🔊';
+    },
+    click() { tone(300, 0.05, 'triangle', 0.06); },
+    brush() { noise(0.05, 0.04, 1400); },
+    pick() { tone(140, 0.08, 'triangle', 0.1, 80); noise(0.06, 0.05, 600); },
+    drill() { tone(90, 0.12, 'sawtooth', 0.06, 60); noise(0.1, 0.07, 400); },
+    find() { tone(520, 0.1, 'sine', 0.12); setTimeout(() => tone(780, 0.14, 'sine', 0.1), 70); },
+    snap() { tone(440, 0.08, 'sine', 0.1); },
+    break() { tone(100, 0.2, 'sine', 0.1, 50); noise(0.15, 0.08, 500); },
+    win() { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => tone(f, 0.14, 'sine', 0.1), i * 80)); },
+    soft() { tone(360, 0.07, 'sine', 0.07); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+DD.Save = (() => {
+  function blankProfile(id) {
+    const meta = DD.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      maxSite: 1,
+      cleared: {},       // siteId -> {assembled, stars}
+      museum: [],        // animal keys found & assembled
+      decor: [],         // decor item ids placed
+      coins: 15,
+      energy: meta.maxEnergy || 100,
+      playSeconds: 0
+    };
+  }
+  function blankState() {
+    return {
+      v: DD.VERSION,
+      lastProfile: null,
+      profiles: { alpha: blankProfile('alpha'), beta: blankProfile('beta') }
+    };
+  }
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(DD.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return DD.memStore;
+  }
+  function writeRaw(data) {
+    DD.memStore = data;
+    try { localStorage.setItem(DD.SAVE_KEY, JSON.stringify(data)); return true; }
+    catch (_) { return false; }
+  }
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== DD.VERSION) {
+      DD.state = blankState();
+      save();
+      return DD.state;
+    }
+    for (const id of ['alpha', 'beta']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+      if (!Array.isArray(raw.profiles[id].museum)) raw.profiles[id].museum = [];
+      if (!Array.isArray(raw.profiles[id].decor)) raw.profiles[id].decor = [];
+    }
+    DD.state = raw;
+    return DD.state;
+  }
+  function save() {
+    if (!DD.state) return false;
+    return writeRaw(DD.state);
+  }
+  function profile(id) {
+    if (!DD.state) load();
+    return DD.state.profiles[id || DD.state.lastProfile || 'alpha'];
+  }
+  function setProfile(id) {
+    DD.state.lastProfile = id;
+    save();
+  }
+  return { load, save, profile, setProfile, blankProfile, blankState, readRaw, writeRaw };
+})();
+
+})();
+/* ==== 30-art.js ==== */
+;(function(){
+/* Canvas art for dirt, bones, tools, silhouettes — no emoji as main art */
+DD.Art = (() => {
+  function dirtBg(ctx, w, h, seed) {
+    const rng = DD.seeded(seed || 1);
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#8a6238');
+    g.addColorStop(0.5, '#6a4a28');
+    g.addColorStop(1, '#4a3018');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 120; i++) {
+      ctx.fillStyle = `rgba(${40 + rng() * 40},${25 + rng() * 20},${10 + rng() * 10},${0.05 + rng() * 0.1})`;
+      ctx.beginPath();
+      ctx.ellipse(rng() * w, rng() * h, 6 + rng() * 28, 3 + rng() * 14, rng() * 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // speckles
+    for (let i = 0; i < 200; i++) {
+      ctx.fillStyle = rng() > 0.5 ? 'rgba(255,220,160,.08)' : 'rgba(0,0,0,.08)';
+      ctx.fillRect(rng() * w, rng() * h, 2, 2);
+    }
+  }
+
+  function dirtCell(ctx, px, py, tw, th, layer, rock, seed) {
+    const rng = DD.seeded((seed || 1) + (px * 13 + py * 7));
+    if (rock) {
+      const g = ctx.createLinearGradient(px, py, px + tw, py + th);
+      g.addColorStop(0, '#8a8a90');
+      g.addColorStop(1, '#4a4a52');
+      ctx.fillStyle = g;
+      DD.roundRect(ctx, px + 1, py + 1, tw - 2, th - 2, 6); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.18)';
+      ctx.beginPath();
+      ctx.moveTo(px + tw * 0.25, py + th * 0.7);
+      ctx.lineTo(px + tw * 0.45, py + th * 0.22);
+      ctx.lineTo(px + tw * 0.7, py + th * 0.55);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,.25)';
+      ctx.stroke();
+    } else {
+      const shade = 95 - layer * 14;
+      const g = ctx.createLinearGradient(px, py, px, py + th);
+      g.addColorStop(0, `rgb(${shade + 25},${shade - 10},${shade - 35})`);
+      g.addColorStop(1, `rgb(${shade - 10},${shade - 30},${shade - 45})`);
+      ctx.fillStyle = g;
+      DD.roundRect(ctx, px + 1, py + 1, tw - 2, th - 2, 5); ctx.fill();
+      // brush stroke texture
+      ctx.strokeStyle = `rgba(40,25,10,${0.08 + layer * 0.04})`;
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(px + 4, py + 6 + i * (th / 4));
+        ctx.quadraticCurveTo(px + tw / 2, py + 4 + i * (th / 4) + rng() * 4, px + tw - 4, py + 8 + i * (th / 4));
+        ctx.stroke();
+      }
+      // pebbles
+      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      ctx.beginPath(); ctx.arc(px + tw * 0.3, py + th * 0.6, 2 + rng() * 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px + tw * 0.7, py + th * 0.35, 1.5 + rng() * 2, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function boneShape(ctx, x, y, w, h, kind) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = '#f0e4c8';
+    ctx.strokeStyle = 'rgba(80,60,40,.4)';
+    ctx.lineWidth = 2;
+    if (kind === 'skull') {
+      DD.roundRect(ctx, -w / 2, -h / 2, w, h * 0.7, 10); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(w * 0.15, -h * 0.05, w * 0.22, h * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#3d2a1a';
+      ctx.beginPath(); ctx.arc(w * 0.2, -h * 0.08, 4, 0, Math.PI * 2); ctx.fill();
+    } else if (kind === 'wingL' || kind === 'wingR') {
+      ctx.beginPath();
+      ctx.moveTo(-w / 2, 0);
+      ctx.quadraticCurveTo(0, -h * 0.8, w / 2, -h * 0.2);
+      ctx.quadraticCurveTo(0, h * 0.3, -w / 2, h * 0.2);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else if (kind === 'sail') {
+      ctx.beginPath();
+      ctx.moveTo(-w / 2, h / 2);
+      for (let i = 0; i <= 5; i++) {
+        const px = -w / 2 + (w * i) / 5;
+        const py = h / 2 - (i % 2 === 0 ? h : h * 0.55);
+        ctx.lineTo(px, py);
+      }
+      ctx.lineTo(w / 2, h / 2);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else if (kind === 'tusks') {
+      ctx.strokeStyle = '#f0e4c8'; ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.moveTo(-w * 0.3, -h * 0.3); ctx.quadraticCurveTo(0, h * 0.5, w * 0.4, h * 0.3); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-w * 0.1, -h * 0.3); ctx.quadraticCurveTo(w * 0.1, h * 0.4, w * 0.45, h * 0.1); ctx.stroke();
+    } else if (kind === 'tail' || kind === 'neck') {
+      DD.roundRect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fill(); ctx.stroke();
+      // knuckle ends
+      ctx.beginPath(); ctx.arc(-w / 2, 0, h * 0.35, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(w / 2, 0, h * 0.35, 0, Math.PI * 2); ctx.fill();
+    } else if (kind === 'legs' || kind === 'arms' || kind === 'flipper') {
+      for (let i = 0; i < 2; i++) {
+        const ox = i === 0 ? -w * 0.25 : w * 0.15;
+        DD.roundRect(ctx, ox, -h / 2, w * 0.35, h, 8); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(ox + w * 0.175, -h / 2, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(ox + w * 0.175, h / 2, 6, 0, Math.PI * 2); ctx.fill();
+      }
+    } else {
+      DD.roundRect(ctx, -w / 2, -h / 2, w, h, 12); ctx.fill(); ctx.stroke();
+      if (kind === 'ribs') {
+        ctx.strokeStyle = 'rgba(80,60,40,.45)';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-w * 0.3, -h * 0.3 + i * (h * 0.2));
+          ctx.quadraticCurveTo(0, -h * 0.15 + i * (h * 0.2), w * 0.3, -h * 0.3 + i * (h * 0.2));
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  function toolIcon(ctx, kind) {
+    ctx.clearRect(0, 0, 40, 40);
+    ctx.save();
+    ctx.translate(20, 20);
+    if (kind === 'brush') {
+      ctx.fillStyle = '#c4a574';
+      ctx.fillRect(-3, -4, 6, 16);
+      ctx.fillStyle = '#8ec8ff';
+      for (let i = -2; i <= 2; i++) {
+        ctx.fillRect(i * 3 - 1, -14, 2, 10);
+      }
+    } else if (kind === 'pick') {
+      ctx.fillStyle = '#888';
+      ctx.beginPath(); ctx.moveTo(-14, -8); ctx.lineTo(14, -8); ctx.lineTo(0, 2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#a07040';
+      ctx.fillRect(-2, 0, 4, 14);
+    } else {
+      ctx.fillStyle = '#666';
+      ctx.beginPath(); ctx.arc(0, -4, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#aaa';
+      ctx.beginPath(); ctx.arc(0, -4, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#a07040';
+      ctx.fillRect(-3, 4, 6, 12);
+    }
+    ctx.restore();
+  }
+
+  function silhouette(ctx, site, x, y, s) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    ctx.fillStyle = 'rgba(240,228,200,.95)';
+    ctx.strokeStyle = 'rgba(60,40,20,.25)';
+    ctx.lineWidth = 2;
+    let type = (site && site.bodyType) || 'theropod';
+    if ((!site || !site.bodyType) && site && site.animal && DD.Data && DD.Data.bodyType) {
+      type = DD.Data.bodyType(site.animal);
+    }
+    if (type === 'pterosaur') drawPtero(ctx);
+    else if (type === 'mammoth') drawMammoth(ctx);
+    else if (type === 'marine') drawMarine(ctx);
+    else if (type === 'sail') drawSail(ctx);
+    else if (type === 'armored') drawArmored(ctx);
+    else if (type === 'horned') drawHorned(ctx);
+    else if (type === 'sauropod') drawSauropod(ctx);
+    else drawTheropod(ctx);
+    ctx.restore();
+  }
+
+  function drawTheropod(ctx) {
+    // bipedal predator: big head, short arms, long tail
+    ctx.beginPath();
+    ctx.ellipse(-2, 2, 16, 11, 0, 0, Math.PI * 2); ctx.fill(); // body
+    ctx.beginPath();
+    ctx.ellipse(22, -14, 12, 9, 0.25, 0, Math.PI * 2); ctx.fill(); // head
+    ctx.beginPath();
+    ctx.moveTo(30, -12); ctx.lineTo(40, -8); ctx.lineTo(30, -4); ctx.fill(); // snout
+    ctx.beginPath();
+    ctx.moveTo(-14, 4); ctx.quadraticCurveTo(-40, 0, -48, 10); ctx.quadraticCurveTo(-30, 8, -12, 10); ctx.fill(); // tail
+    ctx.fillRect(4, 10, 5, 18); // leg
+    ctx.fillRect(-8, 10, 5, 16);
+    ctx.fillRect(10, 0, 10, 4); // tiny arms
+    // eye
+    ctx.fillStyle = '#3d2a1a';
+    ctx.beginPath(); ctx.arc(26, -16, 2, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function drawSauropod(ctx) {
+    ctx.beginPath(); ctx.ellipse(-4, 8, 22, 14, 0, 0, Math.PI * 2); ctx.fill();
+    // long neck
+    ctx.beginPath();
+    ctx.moveTo(10, 0); ctx.quadraticCurveTo(28, -30, 36, -40); ctx.lineTo(40, -36); ctx.quadraticCurveTo(30, -24, 14, 6); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(40, -40, 8, 6, 0.2, 0, Math.PI * 2); ctx.fill();
+    // tail
+    ctx.beginPath();
+    ctx.moveTo(-24, 8); ctx.quadraticCurveTo(-50, 4, -58, 14); ctx.quadraticCurveTo(-40, 12, -20, 14); ctx.fill();
+    ctx.fillRect(6, 18, 6, 16);
+    ctx.fillRect(-12, 18, 6, 16);
+    ctx.fillRect(14, 18, 5, 14);
+    ctx.fillRect(-18, 18, 5, 14);
+  }
+
+  function drawHorned(ctx) {
+    ctx.beginPath(); ctx.ellipse(-2, 6, 18, 12, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(18, -2, 12, 10, 0.1, 0, Math.PI * 2); ctx.fill();
+    // frill
+    ctx.beginPath();
+    ctx.ellipse(10, -14, 16, 10, -0.2, 0, Math.PI * 2); ctx.fill();
+    // horns
+    ctx.beginPath(); ctx.moveTo(20, -10); ctx.lineTo(18, -28); ctx.lineTo(26, -10); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(28, -6); ctx.lineTo(36, -20); ctx.lineTo(32, -4); ctx.fill();
+    ctx.fillRect(4, 16, 5, 14);
+    ctx.fillRect(-10, 16, 5, 14);
+    ctx.beginPath(); ctx.moveTo(-18, 6); ctx.lineTo(-32, 10); ctx.lineTo(-16, 12); ctx.fill();
+  }
+
+  function drawArmored(ctx) {
+    ctx.beginPath(); ctx.ellipse(0, 6, 24, 12, 0, 0, Math.PI * 2); ctx.fill();
+    // plates
+    for (let i = 0; i < 5; i++) {
+      const px = -16 + i * 8;
+      ctx.beginPath();
+      ctx.moveTo(px, 0); ctx.lineTo(px + 4, -18); ctx.lineTo(px + 8, 0); ctx.fill();
+    }
+    ctx.beginPath(); ctx.ellipse(24, 2, 9, 7, 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-22, 6); ctx.lineTo(-40, 2); ctx.lineTo(-38, 10); ctx.lineTo(-20, 10); ctx.fill();
+    // thagomizer
+    ctx.beginPath(); ctx.moveTo(-40, 0); ctx.lineTo(-48, -8); ctx.lineTo(-36, 4); ctx.fill();
+    ctx.fillRect(8, 16, 5, 12);
+    ctx.fillRect(-8, 16, 5, 12);
+  }
+
+  function drawPtero(ctx) {
+    ctx.beginPath(); ctx.ellipse(0, 2, 12, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16, -2, 9, 6, 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(22, -2); ctx.lineTo(34, -8); ctx.lineTo(24, 2); ctx.fill(); // crest/beak
+    // wings
+    ctx.beginPath();
+    ctx.moveTo(-6, 0); ctx.quadraticCurveTo(-30, -28, -52, -6); ctx.quadraticCurveTo(-30, 4, -8, 8); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(6, 0); ctx.quadraticCurveTo(20, -18, 48, -10); ctx.quadraticCurveTo(22, 6, 8, 8); ctx.fill();
+    ctx.fillRect(-4, 8, 3, 10);
+    ctx.fillRect(4, 8, 3, 10);
+  }
+
+  function drawMarine(ctx) {
+    ctx.beginPath(); ctx.ellipse(0, 0, 26, 12, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(28, -2, 12, 8, 0.1, 0, Math.PI * 2); ctx.fill();
+    // flippers
+    ctx.beginPath(); ctx.ellipse(-4, 12, 10, 5, 0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(10, 12, 10, 5, -0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-26, 0); ctx.quadraticCurveTo(-40, -8, -46, 4); ctx.quadraticCurveTo(-36, 6, -24, 4); ctx.fill();
+  }
+
+  function drawSail(ctx) {
+    ctx.beginPath(); ctx.ellipse(0, 10, 22, 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(22, 4, 10, 8, 0.15, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-16, 4);
+    for (let i = 0; i < 7; i++) ctx.lineTo(-14 + i * 5, -22 + (i % 2) * 5);
+    ctx.lineTo(16, 4); ctx.closePath(); ctx.fill();
+    ctx.fillRect(6, 18, 4, 10);
+    ctx.fillRect(-10, 18, 4, 10);
+    ctx.beginPath(); ctx.moveTo(-20, 10); ctx.lineTo(-34, 14); ctx.lineTo(-18, 14); ctx.fill();
+  }
+
+  function drawMammoth(ctx) {
+    // body
+    ctx.beginPath(); ctx.ellipse(-2, 4, 22, 15, 0, 0, Math.PI * 2); ctx.fill();
+    // head
+    ctx.beginPath(); ctx.ellipse(20, -6, 12, 11, 0, 0, Math.PI * 2); ctx.fill();
+    // dome
+    ctx.beginPath(); ctx.ellipse(18, -14, 10, 7, 0, 0, Math.PI * 2); ctx.fill();
+    // trunk
+    ctx.strokeStyle = 'rgba(240,228,200,.95)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(28, -2); ctx.quadraticCurveTo(36, 12, 24, 22); ctx.stroke();
+    // tusks
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(26, 2); ctx.quadraticCurveTo(34, 14, 40, 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(24, 4); ctx.quadraticCurveTo(30, 16, 38, 12); ctx.stroke();
+    // legs
+    ctx.fillStyle = 'rgba(240,228,200,.95)';
+    ctx.fillRect(6, 16, 7, 16);
+    ctx.fillRect(-6, 16, 7, 16);
+    ctx.fillRect(14, 16, 6, 14);
+    ctx.fillRect(-14, 16, 6, 14);
+    // fur tufts
+    ctx.strokeStyle = 'rgba(200,180,140,.7)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(-16 + i * 6, -8);
+      ctx.lineTo(-18 + i * 6, -16);
+      ctx.stroke();
+    }
+    // eye
+    ctx.fillStyle = '#3d2a1a';
+    ctx.beginPath(); ctx.arc(24, -8, 2, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function museumRoom(ctx, w, h, decor) {
+    ctx.fillStyle = '#4a3828';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#3a2a1c';
+    ctx.fillRect(0, h * 0.72, w, h * 0.28);
+    ctx.fillStyle = '#7ec8ff';
+    ctx.fillRect(w * 0.08, h * 0.12, 60, 50);
+    ctx.fillRect(w * 0.8, h * 0.12, 60, 50);
+    (decor || []).forEach((d, i) => {
+      const x = 80 + (i % 6) * 160;
+      const y = h * 0.78;
+      if (d === 'plant') {
+        ctx.fillStyle = '#5a8a40';
+        ctx.beginPath(); ctx.ellipse(x, y - 20, 14, 22, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#8a6030'; ctx.fillRect(x - 6, y - 5, 12, 18);
+      } else if (d === 'bench') {
+        ctx.fillStyle = '#a07040'; ctx.fillRect(x - 24, y, 48, 10); ctx.fillRect(x - 20, y + 10, 6, 12); ctx.fillRect(x + 14, y + 10, 6, 12);
+      } else if (d === 'sign') {
+        ctx.fillStyle = '#ddd'; ctx.fillRect(x - 16, y - 30, 32, 24); ctx.fillStyle = '#888'; ctx.fillRect(x - 2, y - 6, 4, 28);
+      } else if (d === 'lamp') {
+        ctx.fillStyle = '#ffd24a'; ctx.beginPath(); ctx.arc(x, y - 30, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#666'; ctx.fillRect(x - 2, y - 20, 4, 40);
+      } else if (d === 'rug') {
+        ctx.fillStyle = '#c44569'; ctx.fillRect(x - 40, y + 8, 80, 20);
+      } else if (d === 'case') {
+        ctx.strokeStyle = 'rgba(200,230,255,.6)'; ctx.lineWidth = 3;
+        ctx.strokeRect(x - 28, y - 50, 56, 55);
+      }
+    });
+  }
+
+  function particles(ctx, list, t) {
+    for (const p of list) {
+      const life = 1 - (t - p.t0) / p.life;
+      if (life <= 0) continue;
+      ctx.globalAlpha = life;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x + p.vx * (t - p.t0), p.y + p.vy * (t - p.t0) + 40 * (t - p.t0) * (t - p.t0), p.r * life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  return { dirtBg, dirtCell, boneShape, toolIcon, silhouette, museumRoom, particles };
+})();
+
+})();
+/* ==== 40-data.js ==== */
+;(function(){
+/* Sites & eras from embedded research data */
+DD.Data = (() => {
+  const raw = window.__DINO_DATA__ || [];
+
+  function eraOf(animal) {
+    const p = (animal.period || '').toLowerCase();
+    if (p.includes('permian')) return { id: 'before', name: 'Before the Dinosaurs', order: 0 };
+    if (p.includes('pleistocene') || p.includes('ice')) return { id: 'ice', name: 'Ice Age Bonus', order: 4 };
+    if (p.includes('triassic')) return { id: 'triassic', name: 'Triassic', order: 1 };
+    if (p.includes('jurassic')) return { id: 'jurassic', name: 'Jurassic', order: 2 };
+    if (p.includes('cretaceous')) return { id: 'cretaceous', name: 'Cretaceous', order: 3 };
+    return { id: 'jurassic', name: 'Jurassic', order: 2 };
+  }
+
+  function stripMeasure(s) {
+    return String(s == null ? '' : s)
+      .replace(/^(wingspan|shoulder\s*height|height|length)\s*/i, '')
+      .replace(/\s*(ft|m)\s*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function sizeLabel(animal) {
+    const g = (animal.group || '').toLowerCase();
+    const name = (animal.name || '').toLowerCase();
+    const ftRaw = String(animal.lengthFt || '');
+    const mRaw = String(animal.lengthM || '');
+    const ft = stripMeasure(ftRaw);
+    const m = stripMeasure(mRaw);
+    let label = 'Length';
+    if (g.includes('pterosaur')) label = 'Wingspan';
+    else if (g.includes('mammoth') || name.includes('mammoth')) label = 'Shoulder height';
+    return { label, ft, m, display: label + ': ' + ft + ' ft (' + m + ' m)' };
+  }
+
+  function bodyType(animal) {
+    const g = (animal.group || '').toLowerCase();
+    const n = (animal.name || '').toLowerCase();
+    if (g.includes('pterosaur') || n.includes('ptera') || n.includes('quetzal')) return 'pterosaur';
+    if (g.includes('mammal') || n.includes('mammoth')) return 'mammoth';
+    if (g.includes('marine') || g.includes('mosasaur') || g.includes('plesiosaur') || n.includes('mosasaur') || n.includes('plesio')) return 'marine';
+    if (g.includes('synapsid') || n.includes('dimetrodon')) return 'sail';
+    if (n.includes('stego') || n.includes('ankylo') || n.includes('kentro')) return 'armored';
+    if (n.includes('tricera') || n.includes('styrac') || n.includes('centro') || n.includes('protocerat') || n.includes('torosaur')) return 'horned';
+    if (n.includes('brachios') || n.includes('diplodoc') || n.includes('apatosaur') || n.includes('argentino') || n.includes('sauropod') || n.includes('bronto') || n.includes('mamenchi')) return 'sauropod';
+    if (g.includes('sauropod')) return 'sauropod';
+    if (g.includes('ceratops')) return 'horned';
+    if (g.includes('thyreophor') || g.includes('ankyl') || g.includes('stego')) return 'armored';
+    return 'theropod';
+  }
+
+  function keyOf(animal, i) {
+    return (animal.name || 'dino').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + i;
+  }
+
+  // Bone layouts per body plan (relative puzzle targets)
+  function bonesFor(animal) {
+    const g = (animal.group || '').toLowerCase();
+    if (g.includes('pterosaur')) {
+      return [
+        { id: 'skull', tx: 0.72, ty: 0.35, w: 70, h: 40 },
+        { id: 'body', tx: 0.45, ty: 0.42, w: 90, h: 50 },
+        { id: 'wingL', tx: 0.22, ty: 0.30, w: 110, h: 36 },
+        { id: 'wingR', tx: 0.68, ty: 0.55, w: 110, h: 36 },
+        { id: 'legs', tx: 0.42, ty: 0.68, w: 60, h: 50 }
+      ];
+    }
+    if (g.includes('marine') || g.includes('mosasaur') || g.includes('plesiosaur')) {
+      return [
+        { id: 'skull', tx: 0.78, ty: 0.40, w: 70, h: 40 },
+        { id: 'neck', tx: 0.62, ty: 0.42, w: 80, h: 30 },
+        { id: 'body', tx: 0.40, ty: 0.45, w: 100, h: 55 },
+        { id: 'flipper', tx: 0.38, ty: 0.68, w: 70, h: 30 },
+        { id: 'tail', tx: 0.18, ty: 0.48, w: 80, h: 28 }
+      ];
+    }
+    if (g.includes('synapsid') || (animal.name || '').includes('Dimetrodon')) {
+      return [
+        { id: 'skull', tx: 0.72, ty: 0.48, w: 65, h: 40 },
+        { id: 'body', tx: 0.45, ty: 0.50, w: 90, h: 45 },
+        { id: 'sail', tx: 0.45, ty: 0.22, w: 80, h: 70 },
+        { id: 'legs', tx: 0.42, ty: 0.72, w: 70, h: 40 },
+        { id: 'tail', tx: 0.18, ty: 0.55, w: 70, h: 28 }
+      ];
+    }
+    if (g.includes('mammal') || (animal.name || '').toLowerCase().includes('mammoth')) {
+      return [
+        { id: 'skull', tx: 0.68, ty: 0.32, w: 70, h: 55 },
+        { id: 'tusks', tx: 0.78, ty: 0.55, w: 70, h: 40 },
+        { id: 'body', tx: 0.42, ty: 0.42, w: 110, h: 70 },
+        { id: 'legs', tx: 0.40, ty: 0.72, w: 90, h: 50 },
+        { id: 'tail', tx: 0.18, ty: 0.50, w: 50, h: 24 }
+      ];
+    }
+    // default dinosaur
+    return [
+      { id: 'skull', tx: 0.78, ty: 0.30, w: 60, h: 42 },
+      { id: 'ribs', tx: 0.50, ty: 0.38, w: 90, h: 55 },
+      { id: 'hips', tx: 0.32, ty: 0.45, w: 70, h: 50 },
+      { id: 'legs', tx: 0.38, ty: 0.70, w: 80, h: 55 },
+      { id: 'tail', tx: 0.14, ty: 0.48, w: 90, h: 28 },
+      { id: 'arms', tx: 0.62, ty: 0.55, w: 55, h: 40 }
+    ];
+  }
+
+  const erasMap = {};
+  const sites = raw.map((animal, i) => {
+    const era = eraOf(animal);
+    erasMap[era.id] = era;
+    const rarity = animal.rarity || 'common';
+    return {
+      id: i + 1,
+      key: keyOf(animal, i),
+      animal,
+      era: era.id,
+      eraName: era.name,
+      eraOrder: era.order,
+      rarity,
+      size: sizeLabel(animal),
+      bodyType: bodyType(animal),
+      bones: bonesFor(animal),
+      layers: rarity === 'super rare' ? 4 : rarity === 'rare' ? 3 : 2,
+      rockChance: rarity === 'super rare' ? 0.35 : rarity === 'rare' ? 0.22 : 0.12
+    };
+  });
+
+  // Sort sites: era order then rarity common→rare→super within era, keep stable ids from map order
+  // Unlock order follows array index (1..36) as listed in research file.
+  const eras = Object.values(erasMap).sort((a, b) => a.order - b.order);
+
+  const decorItems = [
+    { id: 'plant', name: 'Fern Planter', cost: 10 },
+    { id: 'bench', name: 'Visitor Bench', cost: 12 },
+    { id: 'sign', name: 'Exhibit Sign', cost: 8 },
+    { id: 'lamp', name: 'Museum Lamp', cost: 15 },
+    { id: 'rug', name: 'Dino Rug', cost: 18 },
+    { id: 'case', name: 'Glass Case', cost: 20 }
+  ];
+
+  return {
+    raw,
+    sites,
+    eras,
+    decorItems,
+    bodyType,
+    site: (n) => sites[n - 1] || null,
+    count: () => sites.length,
+    byEra: (eraId) => sites.filter((s) => s.era === eraId)
+  };
+})();
+
+})();
+/* ==== 60-dig.js ==== */
+;(function(){
+/* Dig site: layered dirt/rock grid, tools, fossil reveal */
+DD.Dig = (() => {
+  const COLS = 14, ROWS = 8;
+  let site = null;
+  let grid = null; // {layer, rock, broken, revealed, boneKind}
+  let fossilCells = null;
+  let tool = 'brush';
+  let energy = 100;
+  let meta = null;
+  let done = false;
+  let failed = false;
+  let found = 0;
+  let need = 0;
+  let seed = 1;
+  let particles = [];
+  let particleT = 0;
+
+  function start(siteId) {
+    site = DD.Data.site(siteId);
+    if (!site) return null;
+    meta = DD.meta();
+    seed = 2000 + siteId * 31;
+    const rng = DD.seeded(seed);
+    const layers = site.layers;
+    grid = [];
+    fossilCells = new Set();
+    particles = [];
+    particleT = 0;
+
+    // Map each bone to a small footprint; P1 keeps 8–14 cells total
+    const boneKinds = [];
+    site.bones.forEach((b) => {
+      const cx = Math.floor(b.tx * (COLS - 1));
+      const cy = Math.floor(b.ty * (ROWS - 1));
+      const span = meta.snapHints ? 0 : (b.w > 80 ? 1 : 0);
+      for (let dy = meta.snapHints ? 0 : -1; dy <= (meta.snapHints ? 0 : 1); dy++) {
+        for (let dx = meta.snapHints ? 0 : -1; dx <= span; dx++) {
+          const x = DD.clamp(cx + dx, 0, COLS - 1);
+          const y = DD.clamp(cy + dy, 0, ROWS - 1);
+          const key = x + ',' + y;
+          if (!fossilCells.has(key)) {
+            fossilCells.add(key);
+            boneKinds.push({ key, kind: b.id || 'ribs' });
+          }
+        }
+      }
+    });
+
+    // P1: ensure 8–14 fossil cells by growing from bone centers if too few,
+    // or trimming farthest from center if too many
+    if (meta.snapHints) {
+      const targetMin = 8, targetMax = 14;
+      const centers = site.bones.map((b) => ({
+        x: Math.floor(b.tx * (COLS - 1)),
+        y: Math.floor(b.ty * (ROWS - 1)),
+        kind: b.id || 'ribs'
+      }));
+      // grow ring until >= targetMin
+      let ring = 1;
+      while (fossilCells.size < targetMin && ring < 4) {
+        for (const c of centers) {
+          for (let dy = -ring; dy <= ring; dy++) {
+            for (let dx = -ring; dx <= ring; dx++) {
+              if (Math.abs(dx) !== ring && Math.abs(dy) !== ring) continue;
+              const x = DD.clamp(c.x + dx, 0, COLS - 1);
+              const y = DD.clamp(c.y + dy, 0, ROWS - 1);
+              const key = x + ',' + y;
+              if (!fossilCells.has(key)) {
+                fossilCells.add(key);
+                boneKinds.push({ key, kind: c.kind });
+                if (fossilCells.size >= targetMin) break;
+              }
+            }
+            if (fossilCells.size >= targetMin) break;
+          }
+          if (fossilCells.size >= targetMin) break;
+        }
+        ring++;
+      }
+      // trim to targetMax: keep cells closest to any bone center
+      if (fossilCells.size > targetMax) {
+        const scored = [...fossilCells].map((key) => {
+          const [x, y] = key.split(',').map(Number);
+          let best = 99;
+          for (const c of centers) best = Math.min(best, Math.hypot(x - c.x, y - c.y));
+          return { key, best };
+        });
+        scored.sort((a, b) => a.best - b.best);
+        fossilCells = new Set(scored.slice(0, targetMax).map((s) => s.key));
+      }
+    }
+
+    const kindMap = {};
+    boneKinds.forEach((bk) => { if (fossilCells.has(bk.key)) kindMap[bk.key] = bk.kind; });
+    // fill missing kinds
+    for (const key of fossilCells) {
+      if (!kindMap[key]) kindMap[key] = site.bones[0] ? site.bones[0].id : 'ribs';
+    }
+
+    need = fossilCells.size;
+    found = 0;
+    done = false;
+    failed = false;
+    energy = meta.infiniteEnergy ? 9999 : (DD.Save.profile().energy || meta.maxEnergy || 100);
+    for (let y = 0; y < ROWS; y++) {
+      grid[y] = [];
+      for (let x = 0; x < COLS; x++) {
+        const key = x + ',' + y;
+        const isFossil = fossilCells.has(key);
+        grid[y][x] = {
+          layer: layers + (isFossil ? 0 : (rng() < 0.3 ? 1 : 0)),
+          rock: rng() < site.rockChance,
+          broken: false,
+          revealed: false,
+          fossil: isFossil,
+          boneKind: kindMap[key] || 'ribs',
+          peak: layers + (isFossil ? 0 : (rng() < 0.3 ? 1 : 0))
+        };
+        grid[y][x].peak = grid[y][x].layer;
+      }
+    }
+    tool = 'brush';
+    DD.dig = getState();
+    return DD.dig;
+  }
+
+  function getState() {
+    return { site, grid, tool, energy, done, failed, found, need, meta, COLS, ROWS, fossilCells };
+  }
+
+  function setTool(t) {
+    if (['brush', 'pick', 'drill'].includes(t)) tool = t;
+  }
+
+  function costFor(cell) {
+    if (tool === 'brush') return cell.rock ? 0 : 2;
+    if (tool === 'pick') return 5;
+    return 8; // drill
+  }
+
+  function canDig(cell) {
+    if (!cell || cell.layer <= 0 && cell.revealed) return false;
+    if (tool === 'brush' && cell.rock) return false;
+    return true;
+  }
+
+  function spawnParticles(cx, cy, canvas, color) {
+    if (!canvas) return;
+    const tw = canvas.width / COLS, th = canvas.height / ROWS;
+    const px = cx * tw + tw / 2;
+    const py = cy * th + th / 2;
+    for (let i = 0; i < 8; i++) {
+      particles.push({
+        x: px, y: py,
+        vx: (Math.random() - 0.5) * 80,
+        vy: -20 - Math.random() * 60,
+        r: 2 + Math.random() * 4,
+        color: color || (Math.random() > 0.5 ? '#c4a070' : '#8a6238'),
+        t0: particleT,
+        life: 0.35 + Math.random() * 0.35
+      });
+    }
+    if (particles.length > 80) particles.splice(0, particles.length - 80);
+  }
+
+  function digAt(cx, cy, canvas) {
+    if (done || failed) return { ok: false };
+    if (cx < 0 || cy < 0 || cx >= COLS || cy >= ROWS) return { ok: false };
+    const cell = grid[cy][cx];
+    if (!canDig(cell)) {
+      if (tool === 'brush' && cell.rock) DD.toast(meta.snapHints ? 'Try the pick on rocks!' : 'Too hard for a brush');
+      return { ok: false, reason: 'blocked' };
+    }
+    const cost = costFor(cell);
+    if (!meta.infiniteEnergy && energy < cost) {
+      failed = true;
+      DD.Audio.break();
+      DD.toast('Out of energy!');
+      DD.dig = getState();
+      return { ok: false, reason: 'energy' };
+    }
+
+    // Careless digging: drill on fossil with high layer can break (P2)
+    if (meta.breakable && tool === 'drill' && cell.fossil && cell.layer <= 2 && cell.rock === false) {
+      if (Math.random() < 0.35) {
+        cell.broken = true;
+        cell.layer = 0;
+        cell.revealed = true;
+        if (!meta.infiniteEnergy) energy -= cost;
+        DD.Audio.break();
+        DD.toast('Oh no! Fossil cracked!');
+        spawnParticles(cx, cy, canvas, '#c45');
+        const broken = countBroken();
+        if (broken >= 3) {
+          failed = true;
+          DD.toast('Too many broken bones!');
+        }
+        DD.dig = getState();
+        return { ok: true, broke: true };
+      }
+    }
+
+    if (!meta.infiniteEnergy) energy -= cost;
+
+    if (tool === 'brush') {
+      cell.layer = Math.max(0, cell.layer - 1);
+      DD.Audio.brush();
+      spawnParticles(cx, cy, canvas, '#c4a070');
+    } else if (tool === 'pick') {
+      cell.layer = Math.max(0, cell.layer - (cell.rock ? 1 : 2));
+      if (cell.rock && cell.layer <= 1) cell.rock = false;
+      DD.Audio.pick();
+      spawnParticles(cx, cy, canvas, cell.rock ? '#aaa' : '#8a6238');
+    } else {
+      cell.layer = Math.max(0, cell.layer - 3);
+      cell.rock = false;
+      DD.Audio.drill();
+      spawnParticles(cx, cy, canvas, '#6a5030');
+    }
+
+    if (cell.layer <= 0 && cell.fossil && !cell.revealed && !cell.broken) {
+      cell.revealed = true;
+      found += 1;
+      DD.Audio.find();
+      spawnParticles(cx, cy, canvas, '#f0e4c8');
+    } else if (cell.layer <= 0) {
+      cell.revealed = true;
+    }
+
+    if (!meta.infiniteEnergy) {
+      const p = DD.Save.profile();
+      p.energy = energy;
+      DD.Save.save();
+    }
+
+    if (found >= need && !failed) {
+      done = true;
+      DD.Audio.win();
+    }
+    DD.dig = getState();
+    return { ok: true, found: cell.fossil && cell.revealed };
+  }
+
+  function countBroken() {
+    let n = 0;
+    for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (grid[y][x].broken) n++;
+    return n;
+  }
+
+  function draw(ctx, canvas, dt) {
+    if (!grid || !site) return;
+    const w = canvas.width, h = canvas.height;
+    const tw = w / COLS, th = h / ROWS;
+    if (dt) particleT += dt;
+    else particleT += 0.016;
+    DD.Art.dirtBg(ctx, w, h, seed);
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        const cell = grid[y][x];
+        const px = x * tw, py = y * th;
+        if (cell.layer > 0) {
+          DD.Art.dirtCell(ctx, px, py, tw, th, cell.layer, cell.rock, seed + x * 17 + y * 31);
+          // partial fossil peek when layer is thin
+          if (cell.fossil && cell.layer <= 1 && !cell.rock) {
+            ctx.globalAlpha = 0.45;
+            DD.Art.boneShape(ctx, px + tw / 2, py + th / 2, tw * 0.55, th * 0.4, cell.boneKind || 'ribs');
+            ctx.globalAlpha = 1;
+          }
+        } else if (cell.fossil && !cell.broken) {
+          ctx.fillStyle = '#3a2a1c';
+          DD.roundRect(ctx, px + 1, py + 1, tw - 2, th - 2, 5); ctx.fill();
+          DD.Art.boneShape(ctx, px + tw / 2, py + th / 2, tw * 0.72, th * 0.55, cell.boneKind || 'ribs');
+        } else if (cell.broken) {
+          ctx.fillStyle = '#2a1810';
+          DD.roundRect(ctx, px + 1, py + 1, tw - 2, th - 2, 5); ctx.fill();
+          ctx.strokeStyle = '#c45';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(px + 6, py + 6); ctx.lineTo(px + tw - 6, py + th - 6);
+          ctx.moveTo(px + tw - 6, py + 6); ctx.lineTo(px + 6, py + th - 6);
+          ctx.stroke();
+        } else {
+          // empty dug pit
+          const g = ctx.createLinearGradient(px, py, px, py + th);
+          g.addColorStop(0, '#3a2818');
+          g.addColorStop(1, '#2a1a10');
+          ctx.fillStyle = g;
+          DD.roundRect(ctx, px + 1, py + 1, tw - 2, th - 2, 5); ctx.fill();
+        }
+      }
+    }
+    // hint glow for P1 on covered fossil cells
+    if (meta && meta.snapHints) {
+      ctx.strokeStyle = 'rgba(255,229,102,.45)';
+      ctx.lineWidth = 2.5;
+      for (const key of fossilCells) {
+        const [x, y] = key.split(',').map(Number);
+        const cell = grid[y][x];
+        if (cell.layer > 0) {
+          DD.roundRect(ctx, x * tw + 3, y * th + 3, tw - 6, th - 6, 6);
+          ctx.stroke();
+        }
+      }
+    }
+    // particles
+    if (DD.Art.particles) DD.Art.particles(ctx, particles, particleT);
+  }
+
+  /** Autoplay: clear all fossil cells with safe tools */
+  function solve(siteId, profileId) {
+    DD.state.lastProfile = profileId;
+    meta = DD.profiles[profileId];
+    start(siteId);
+    energy = meta.infiniteEnergy ? 9999 : 500;
+    const order = [];
+    for (const key of fossilCells) {
+      const [x, y] = key.split(',').map(Number);
+      order.push([x, y]);
+    }
+    for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+      if (grid[y][x].rock && fossilCells.has(x + ',' + y)) order.unshift([x, y]);
+    }
+    let steps = 0;
+    const max = 5000;
+    while (!done && !failed && steps < max) {
+      let progressed = false;
+      for (const [x, y] of order) {
+        const cell = grid[y][x];
+        if (cell.revealed && cell.layer <= 0) continue;
+        if (cell.rock || cell.layer > 2) tool = 'pick';
+        else tool = 'brush';
+        const r = digAt(x, y, null);
+        steps++;
+        if (r.ok) progressed = true;
+        if (done || failed) break;
+      }
+      if (!progressed) {
+        for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+          const cell = grid[y][x];
+          if (cell.fossil && cell.layer > 0) {
+            tool = cell.rock ? 'pick' : 'brush';
+            digAt(x, y, null);
+            steps++;
+            progressed = true;
+          }
+        }
+      }
+      if (!progressed) break;
+    }
+    return {
+      ok: done && !failed,
+      site: siteId,
+      profile: profileId,
+      found, need, steps, done, failed, energy,
+      broken: countBroken()
+    };
+  }
+
+  return { start, digAt, setTool, getState, draw, solve, COLS, ROWS };
+})();
+
+})();
+/* ==== 70-puzzle.js ==== */
+;(function(){
+/* Drag-and-drop skeleton assembly with snap hints for Player 1 */
+DD.Puzzle = (() => {
+  let site = null;
+  let pieces = null;
+  let stageW = 700, stageH = 340;
+  let complete = false;
+  let meta = null;
+
+  function start(siteId) {
+    site = DD.Data.site(siteId);
+    if (!site) return null;
+    meta = DD.meta();
+    complete = false;
+    const rng = DD.seeded(9000 + siteId);
+    pieces = site.bones.map((b, i) => {
+      const tw = b.w, th = b.h;
+      return {
+        id: b.id,
+        kind: b.id,
+        w: tw,
+        h: th,
+        tx: b.tx * stageW - tw / 2,
+        ty: b.ty * stageH - th / 2,
+        x: 20 + rng() * (stageW - tw - 40),
+        y: 20 + rng() * (stageH - th - 40),
+        snapped: false
+      };
+    });
+    // scatter away from targets a bit
+    pieces.forEach((p) => {
+      if (Math.hypot(p.x - p.tx, p.y - p.ty) < 40) {
+        p.x = (p.x + stageW / 2) % (stageW - p.w);
+        p.y = (p.y + 80) % (stageH - p.h);
+      }
+    });
+    DD.puzzle = getState();
+    return DD.puzzle;
+  }
+
+  function getState() {
+    return { site, pieces, complete, meta, stageW, stageH };
+  }
+
+  function moveTo(id, x, y) {
+    const p = pieces.find((q) => q.id === id);
+    if (!p || p.snapped) return;
+    p.x = DD.clamp(x, 0, stageW - p.w);
+    p.y = DD.clamp(y, 0, stageH - p.h);
+    trySnap(p);
+    DD.puzzle = getState();
+  }
+
+  function trySnap(p) {
+    const thresh = meta && meta.snapHints ? 48 : 28;
+    const dx = p.x - p.tx, dy = p.y - p.ty;
+    if (Math.hypot(dx, dy) <= thresh) {
+      p.x = p.tx; p.y = p.ty; p.snapped = true;
+      DD.Audio.snap();
+      if (pieces.every((q) => q.snapped)) {
+        complete = true;
+        onComplete();
+      }
+    }
+  }
+
+  function onComplete() {
+    DD.Audio.win();
+    const p = DD.Save.profile();
+    const id = site.id;
+    p.cleared[id] = Object.assign({}, p.cleared[id], { assembled: true, stars: 3 });
+    if (!p.museum.includes(site.key)) p.museum.push(site.key);
+    p.coins = (p.coins || 0) + (site.rarity === 'super rare' ? 25 : site.rarity === 'rare' ? 15 : 10);
+    if (id >= p.maxSite) p.maxSite = Math.min(DD.Data.count(), id + 1);
+    // refill some energy for P2
+    if (!DD.meta().infiniteEnergy) p.energy = Math.min(DD.meta().maxEnergy || 100, (p.energy || 0) + 30);
+    DD.Save.save();
+  }
+
+  /** Solver: snap every piece to target */
+  function solve(siteId, profileId) {
+    DD.state.lastProfile = profileId;
+    start(siteId);
+    pieces.forEach((p) => {
+      p.x = p.tx; p.y = p.ty; p.snapped = true;
+    });
+    complete = true;
+    onComplete();
+    return { ok: true, site: siteId, profile: profileId, pieces: pieces.length };
+  }
+
+  return { start, moveTo, getState, solve, trySnap };
+})();
+
+})();
+/* ==== 80-ui.js ==== */
+;(function(){
+DD.UI = (() => {
+  const ov = () => DD.overlay;
+
+  function clear() {
+    ov().innerHTML = '';
+    ov().style.pointerEvents = 'none';
+    const hud = document.getElementById('hud');
+    hud.classList.add('hidden');
+    hud.innerHTML = '';
+  }
+
+  function showPanel(html) {
+    ov().style.pointerEvents = 'auto';
+    ov().innerHTML = '<div class="panel">' + html + '</div>';
+  }
+
+  function profiles() {
+    DD.screen = 'profiles';
+    clear();
+    const st = DD.state;
+    const a = st.profiles.alpha, b = st.profiles.beta;
+    const canContinue = !!st.lastProfile;
+    showPanel(`
+      <div class="title">Dino Dig</div>
+      <div class="sub">Brush away dirt, find fossils, build skeletons, fill your museum!</div>
+      <div class="row">
+        <button class="profile-card" type="button" data-id="alpha">
+          <canvas width="120" height="70" id="prevA"></canvas>
+          <h2>Player 1</h2>
+          <div class="meta">Easy · snap hints · fossils don't break<br>Site ${a.maxSite} · ${a.museum.length} exhibits</div>
+        </button>
+        <button class="profile-card" type="button" data-id="beta">
+          <canvas width="120" height="70" id="prevB"></canvas>
+          <h2>Player 2</h2>
+          <div class="meta">Challenge · tool energy · careful digging<br>Site ${b.maxSite} · ${b.museum.length} exhibits</div>
+        </button>
+      </div>
+      <div class="row" style="margin-top:14px">
+        ${canContinue ? '<button class="btn green big" type="button" id="btnContinue">Continue</button>' : ''}
+      </div>
+    `);
+    const s1 = DD.Data.site(1), s2 = DD.Data.site(Math.min(5, DD.Data.count()));
+    if (s1) DD.Art.silhouette(document.getElementById('prevA').getContext('2d'), s1, 60, 40, 1.4);
+    if (s2) DD.Art.silhouette(document.getElementById('prevB').getContext('2d'), s2, 60, 40, 1.4);
+    ov().querySelectorAll('.profile-card').forEach((btn) => {
+      btn.onclick = () => { DD.Audio.unlock(); DD.Audio.click(); pick(btn.getAttribute('data-id')); };
+    });
+    const c = document.getElementById('btnContinue');
+    if (c) c.onclick = () => { DD.Audio.unlock(); DD.Audio.click(); pick(st.lastProfile); };
+  }
+
+  function pick(id) {
+    DD.Save.setProfile(id);
+    hub();
+  }
+
+  function hub() {
+    DD.screen = 'hub';
+    clear();
+    const p = DD.Save.profile();
+    const meta = DD.meta();
+    showPanel(`
+      <div class="title">Dig Camp</div>
+      <div class="sub">${meta.defaultName}
+        <span class="chip">Coins ${p.coins}</span>
+        <span class="chip">Exhibits ${p.museum.length}/${DD.Data.count()}</span>
+        ${meta.infiniteEnergy ? '' : `<span class="chip">Energy ${p.energy|0}</span>`}
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn orange big" type="button" id="btnSites">Dig Sites</button>
+        <button class="btn blue big" type="button" id="btnMuseum">Museum</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" type="button" id="btnSwitch">Switch Player</button>
+      </div>
+      ${meta.snapHints ? '<div class="hint" style="margin-top:12px">Tip: Yellow outlines show where bones hide. Soft brush first!</div>' : ''}
+    `);
+    document.getElementById('btnSites').onclick = () => { DD.Audio.click(); sites(); };
+    document.getElementById('btnMuseum').onclick = () => { DD.Audio.click(); museum(); };
+    document.getElementById('btnSwitch').onclick = () => { DD.Audio.click(); profiles(); };
+  }
+
+  function sites() {
+    DD.screen = 'sites';
+    clear();
+    const p = DD.Save.profile();
+    let era = DD.Data.eras[0].id;
+    // pick era containing maxSite
+    const cur = DD.Data.site(p.maxSite);
+    if (cur) era = cur.era;
+    render(era);
+
+    function render(eraId) {
+      era = eraId;
+      showPanel(`
+        <div class="title">Dig Sites</div>
+        <div class="sub">${DD.Data.count()} sites across the ages · Unlocked to #${p.maxSite}</div>
+        <div class="era-tabs">${DD.Data.eras.map((e) =>
+          `<button class="era-tab ${e.id===era?'sel':''}" data-e="${e.id}" type="button">${e.name}</button>`
+        ).join('')}</div>
+        <div class="site-grid" id="siteGrid"></div>
+        <div class="row" style="margin-top:12px"><button class="btn ghost" type="button" id="btnBack">Back</button></div>
+      `);
+      const grid = document.getElementById('siteGrid');
+      DD.Data.byEra(era).forEach((s) => {
+        const locked = s.id > p.maxSite;
+        const done = !!(p.cleared[s.id] && p.cleared[s.id].assembled);
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'site-card' + (locked ? ' locked' : '') + (done ? ' done' : '') +
+          (s.rarity === 'rare' ? ' rare' : '') + (s.rarity === 'super rare' ? ' super' : '');
+        card.innerHTML = `<canvas width="100" height="56"></canvas><strong>${esc(shortName(s.animal.name))}</strong>
+          <span>${s.rarity}</span>`;
+        DD.Art.silhouette(card.querySelector('canvas').getContext('2d'), s, 50, 32, 1.1);
+        if (!locked) card.onclick = () => startDig(s.id);
+        grid.appendChild(card);
+      });
+      ov().querySelectorAll('.era-tab').forEach((t) => {
+        t.onclick = () => { DD.Audio.click(); render(t.getAttribute('data-e')); };
+      });
+      document.getElementById('btnBack').onclick = hub;
+    }
+  }
+
+  function shortName(n) {
+    return n.replace('Tyrannosaurus rex', 'T. rex').replace('Woolly mammoth', 'Mammoth');
+  }
+
+  function startDig(id) {
+    DD.Audio.click();
+    DD.screen = 'dig';
+    clear();
+    const site = DD.Data.site(id);
+    DD.Dig.start(id);
+    const meta = DD.meta();
+    const p = DD.Save.profile();
+    showPanel(`
+      <div class="title">${esc(site.animal.name)}</div>
+      <div class="sub">${site.eraName} · ${site.rarity}
+        ${meta.infiniteEnergy ? '' : ` · Energy <span id="enLbl">${p.energy|0}</span>`}
+      </div>
+      <div class="tool-bar">
+        <button class="tool-btn sel" data-tool="brush" type="button"><canvas width="40" height="40"></canvas>Brush</button>
+        <button class="tool-btn" data-tool="pick" type="button"><canvas width="40" height="40"></canvas>Pick</button>
+        <button class="tool-btn" data-tool="drill" type="button"><canvas width="40" height="40"></canvas>Drill</button>
+      </div>
+      ${meta.snapHints ? '<div class="hint">Yellow boxes mark fossils. Brush soft dirt; pick rocks.</div>' : '<div class="hint">Careful: drilling near bones can crack them!</div>'}
+      <canvas class="dig-stage" id="digCanvas" width="700" height="320"></canvas>
+      <div class="dig-hud">
+        <span class="chip" id="findChip">Bones 0/${DD.dig.need}</span>
+        <span class="dig-hud-spacer"></span>
+        <button class="btn ghost dig-quit" type="button" id="btnQuit">Quit</button>
+      </div>
+    `);
+    ov().querySelectorAll('.tool-btn').forEach((btn) => {
+      DD.Art.toolIcon(btn.querySelector('canvas').getContext('2d'), btn.getAttribute('data-tool'));
+      btn.onclick = () => {
+        DD.Audio.click();
+        DD.Dig.setTool(btn.getAttribute('data-tool'));
+        ov().querySelectorAll('.tool-btn').forEach((b) => b.classList.toggle('sel', b === btn));
+      };
+    });
+    const canvas = document.getElementById('digCanvas');
+    const ctx = canvas.getContext('2d');
+    function redraw() {
+      DD.Dig.draw(ctx, canvas);
+      const st = DD.Dig.getState();
+      document.getElementById('findChip').textContent = `Bones ${st.found}/${st.need}`;
+      const en = document.getElementById('enLbl');
+      if (en) en.textContent = String(st.energy | 0);
+    }
+    redraw();
+    function pointerDig(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
+      const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+      const cx = Math.floor(x / (canvas.width / DD.Dig.COLS));
+      const cy = Math.floor(y / (canvas.height / DD.Dig.ROWS));
+      DD.Dig.digAt(cx, cy, canvas);
+      redraw();
+      const st = DD.Dig.getState();
+      if (st.done) setTimeout(() => factThenPuzzle(id), 500);
+      else if (st.failed) setTimeout(() => digFail(id), 400);
+    }
+    let digging = false;
+    canvas.addEventListener('pointerdown', (e) => { digging = true; canvas.setPointerCapture(e.pointerId); pointerDig(e); });
+    canvas.addEventListener('pointermove', (e) => { if (digging) pointerDig(e); });
+    canvas.addEventListener('pointerup', () => { digging = false; });
+    document.getElementById('btnQuit').onclick = sites;
+  }
+
+  function digFail(id) {
+    showPanel(`
+      <div class="title">Dig Failed</div>
+      <div class="sub">Energy ran out or fossils broke. Try again with a softer touch!</div>
+      <div class="row">
+        <button class="btn orange big" type="button" id="btnRetry">Retry</button>
+        <button class="btn ghost" type="button" id="btnBack">Sites</button>
+      </div>
+    `);
+    // refill a bit of energy
+    const p = DD.Save.profile();
+    p.energy = Math.max(p.energy || 0, 40);
+    DD.Save.save();
+    document.getElementById('btnRetry').onclick = () => startDig(id);
+    document.getElementById('btnBack').onclick = sites;
+  }
+
+  function factThenPuzzle(id) {
+    const site = DD.Data.site(id);
+    const a = site.animal;
+    const size = site.size;
+    DD.screen = 'fact';
+    showPanel(`
+      <div class="fact-card">
+        <div class="fact-art-row">
+          <canvas id="factSil" width="160" height="110"></canvas>
+          <div>
+            <h3>${esc(a.name)}</h3>
+            <div class="sub" style="text-align:left;margin:0">${esc(a.pronunciation || '')}</div>
+            ${a.isDinosaur ? '' : `<div class="not-dino">Not a dinosaur! · ${esc(a.group)}</div>`}
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-start;margin:8px 0">
+          <span class="chip">${esc(a.period)}</span>
+          <span class="chip">${esc(a.mya)} mya</span>
+          <span class="chip">${esc(a.diet)}</span>
+          <span class="chip">${esc(size.display)}</span>
+        </div>
+        <p style="margin:8px 0;font-size:17px"><strong>Kid fact:</strong> ${esc(a.kidFact)}</p>
+        <p style="margin:8px 0;font-size:14px;opacity:.85"><strong>More:</strong> ${esc(a.deeperFact)}</p>
+        <p style="font-size:12px;opacity:.55">Source on file (offline game — URL stored in data)</p>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn green big" type="button" id="btnAssemble">Assemble Skeleton</button>
+      </div>
+    `);
+        const fs = document.getElementById('factSil');
+    if (fs) { const c = fs.getContext('2d'); c.clearRect(0,0,160,110); DD.Art.silhouette(c, site, 80, 62, 1.35); }
+    document.getElementById('btnAssemble').onclick = () => puzzle(id);
+  }
+
+  function puzzle(id) {
+    DD.screen = 'puzzle';
+    clear();
+    const site = DD.Data.site(id);
+    DD.Puzzle.start(id);
+    const st = DD.Puzzle.getState();
+    const meta = DD.meta();
+    showPanel(`
+      <div class="title">Assemble · ${esc(shortName(site.animal.name))}</div>
+      <div class="sub">${meta.snapHints ? 'Ghost outlines show where bones go — drag to snap!' : 'Drag bones into place'}</div>
+      <div class="puzzle-stage" id="puzzleStage" style="width:${st.stageW}px;max-width:92vw;height:${st.stageH}px"></div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost" type="button" id="btnQuit">Quit</button></div>
+    `);
+    const stage = document.getElementById('puzzleStage');
+    // scale stage via CSS width; keep internal coords
+    stage.style.height = Math.min(st.stageH, window.innerHeight * 0.46) + 'px';
+
+    function render() {
+      stage.innerHTML = '';
+      const cur = DD.Puzzle.getState();
+      // ghosts for P1
+      if (meta.snapHints) {
+        cur.pieces.forEach((p) => {
+          if (p.snapped) return;
+          const g = document.createElement('div');
+          g.className = 'bone-ghost';
+          g.style.left = p.tx + 'px'; g.style.top = p.ty + 'px';
+          g.style.width = p.w + 'px'; g.style.height = p.h + 'px';
+          stage.appendChild(g);
+        });
+      }
+      cur.pieces.forEach((p) => {
+        const el = document.createElement('canvas');
+        el.className = 'bone' + (p.snapped ? ' snapped' : '');
+        el.width = p.w; el.height = p.h;
+        el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+        el.style.width = p.w + 'px'; el.style.height = p.h + 'px';
+        el.dataset.id = p.id;
+        DD.Art.boneShape(el.getContext('2d'), p.w / 2, p.h / 2, p.w * 0.9, p.h * 0.85, p.kind);
+        if (!p.snapped) bindDrag(el, p);
+        stage.appendChild(el);
+      });
+      if (cur.complete) setTimeout(() => puzzleDone(id), 400);
+    }
+
+    function bindDrag(el, piece) {
+      let ox = 0, oy = 0;
+      el.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        el.setPointerCapture(e.pointerId);
+        const rect = stage.getBoundingClientRect();
+        const sx = rect.width / st.stageW, sy = rect.height / st.stageH;
+        ox = e.clientX / sx - piece.x;
+        oy = e.clientY / sy - piece.y;
+        const move = (ev) => {
+          const x = ev.clientX / sx - ox;
+          const y = ev.clientY / sy - oy;
+          DD.Puzzle.moveTo(piece.id, x, y);
+          const np = DD.Puzzle.getState().pieces.find((q) => q.id === piece.id);
+          el.style.left = np.x + 'px'; el.style.top = np.y + 'px';
+          if (np.snapped) { el.classList.add('snapped'); render(); }
+        };
+        const up = () => {
+          el.removeEventListener('pointermove', move);
+          el.removeEventListener('pointerup', up);
+          render();
+        };
+        el.addEventListener('pointermove', move);
+        el.addEventListener('pointerup', up);
+      });
+    }
+
+    render();
+    document.getElementById('btnQuit').onclick = sites;
+  }
+
+  function puzzleDone(id) {
+    const site = DD.Data.site(id);
+    showPanel(`
+      <div class="title">Exhibit Ready!</div>
+      <div class="sub">${esc(site.animal.name)} joins your museum.</div>
+      <canvas id="doneSil" width="200" height="100" style="background:rgba(0,0,0,.2);border-radius:12px"></canvas>
+      <div class="row" style="margin-top:14px">
+        <button class="btn green big" type="button" id="btnMus">See Museum</button>
+        <button class="btn orange big" type="button" id="btnNext">Next Site</button>
+        <button class="btn ghost" type="button" id="btnSites">Sites</button>
+      </div>
+    `);
+    DD.Art.silhouette(document.getElementById('doneSil').getContext('2d'), site, 100, 55, 2);
+    document.getElementById('btnMus').onclick = museum;
+    document.getElementById('btnNext').onclick = () => {
+      const n = Math.min(DD.Data.count(), id + 1);
+      startDig(n);
+    };
+    document.getElementById('btnSites').onclick = sites;
+  }
+
+  function museum() {
+    DD.screen = 'museum';
+    clear();
+    const p = DD.Save.profile();
+    showPanel(`
+      <div class="title">Your Museum</div>
+      <div class="sub">${p.museum.length} exhibits · Coins ${p.coins}</div>
+      <canvas id="museumBg" width="640" height="160" style="width:min(640px,90vw);border-radius:12px;background:#4a3828"></canvas>
+      <div class="decor-bar" style="margin:10px 0" id="decorBar"></div>
+      <div class="museum-grid" id="musGrid"></div>
+      <div class="row" style="margin-top:12px"><button class="btn ghost" type="button" id="btnBack">Back</button></div>
+    `);
+    DD.Art.museumRoom(document.getElementById('museumBg').getContext('2d'), 640, 160, p.decor);
+    const bar = document.getElementById('decorBar');
+    DD.Data.decorItems.forEach((d) => {
+      const owned = p.decor.includes(d.id);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn' + (owned ? ' green' : '');
+      btn.textContent = owned ? d.name + ' ✓' : d.name + ' (' + d.cost + ')';
+      btn.disabled = owned || p.coins < d.cost;
+      btn.onclick = () => {
+        if (p.decor.includes(d.id) || p.coins < d.cost) return;
+        p.coins -= d.cost;
+        p.decor.push(d.id);
+        DD.Save.save();
+        DD.Audio.click();
+        museum();
+      };
+      bar.appendChild(btn);
+    });
+    const grid = document.getElementById('musGrid');
+    DD.Data.sites.forEach((s) => {
+      const slot = document.createElement('div');
+      const filled = p.museum.includes(s.key);
+      slot.className = 'museum-slot' + (filled ? ' filled' : '');
+      if (filled) {
+        slot.innerHTML = `<canvas width="96" height="64"></canvas><span>${esc(shortName(s.animal.name))}</span>`;
+        DD.Art.silhouette(slot.querySelector('canvas').getContext('2d'), s, 48, 36, 1);
+        slot.onclick = () => showFactOnly(s.id);
+        slot.style.cursor = 'pointer';
+      } else {
+        slot.textContent = 'Empty';
+      }
+      grid.appendChild(slot);
+    });
+    document.getElementById('btnBack').onclick = hub;
+  }
+
+  function showFactOnly(id) {
+    const site = DD.Data.site(id);
+    const a = site.animal;
+    const size = site.size;
+    showPanel(`
+      <div class="fact-card">
+        <div class="fact-art-row">
+          <canvas id="factSil2" width="160" height="110"></canvas>
+          <div>
+            <h3>${esc(a.name)}</h3>
+            ${a.isDinosaur ? '' : `<div class="not-dino">Not a dinosaur! · ${esc(a.group)}</div>`}
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-start;margin:8px 0">
+          <span class="chip">${esc(a.period)}</span>
+          <span class="chip">${esc(size.display)}</span>
+        </div>
+        <p>${esc(a.kidFact)}</p>
+        <p style="opacity:.85;font-size:14px">${esc(a.deeperFact)}</p>
+      </div>
+      <div class="row" style="margin-top:12px"><button class="btn" type="button" id="btnBack">Back</button></div>
+    `);
+    const fs = document.getElementById('factSil2');
+    if (fs) { const c = fs.getContext('2d'); c.clearRect(0,0,160,110); DD.Art.silhouette(c, site, 80, 62, 1.35); }
+    document.getElementById('btnBack').onclick = museum;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"'`]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+  }
+
+  return { profiles, pick, hub, sites, startDig, museum, factThenPuzzle, puzzle, clear };
+})();
+
+})();
+/* ==== 90-game.js ==== */
+;(function(){
+(function boot() {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  DD.canvas = canvas;
+  DD.ctx = ctx;
+  DD.overlay = document.getElementById('overlay');
+  DD.hud = document.getElementById('hud');
+  DD.Save.load();
+  DD.Audio.loadMute();
+  DD.fitCanvas();
+
+  document.getElementById('muteBtn').addEventListener('click', () => {
+    DD.Audio.unlock();
+    DD.Audio.setMuted(!DD.muted);
+  });
+  document.getElementById('fsBtn').addEventListener('click', () => {
+    const app = document.getElementById('app');
+    if (!document.fullscreenElement) app.requestFullscreen?.() || app.webkitRequestFullscreen?.();
+    else document.exitFullscreen?.();
+  });
+  window.addEventListener('resize', () => DD.fitCanvas());
+  ['pointerdown', 'keydown'].forEach((ev) => {
+    window.addEventListener(ev, () => DD.Audio.unlock(), { passive: true });
+  });
+
+  function frame(t) {
+    DD.raf = requestAnimationFrame(frame);
+    DD.lastT = t;
+    // background art when overlays show
+    DD.clear('#3d2a1a');
+    const g = ctx.createLinearGradient(0, 0, 0, DD.H);
+    g.addColorStop(0, '#6a4a30');
+    g.addColorStop(1, '#2a1a10');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, DD.W, DD.H);
+    // decorative hills
+    ctx.fillStyle = 'rgba(0,0,0,.15)';
+    ctx.beginPath();
+    ctx.moveTo(0, DD.H);
+    for (let i = 0; i <= 10; i++) {
+      ctx.lineTo(i * (DD.W / 9), DD.H - 60 - Math.sin(i + t / 3000) * 20);
+    }
+    ctx.lineTo(DD.W, DD.H);
+    ctx.fill();
+    if (DD.Data.sites[0]) {
+      DD.Art.silhouette(ctx, DD.Data.sites[0], 200, 400, 2.2);
+      DD.Art.silhouette(ctx, DD.Data.sites[Math.min(3, DD.Data.count() - 1)], 900, 380, 1.8);
+    }
+  }
+
+  window.__game = {
+    DD,
+    screen: () => DD.screen,
+    save: DD.Save,
+    pick: (id) => DD.UI.pick(id),
+    setMaxSite: (n, pid) => {
+      const p = DD.Save.profile(pid || DD.state.lastProfile);
+      p.maxSite = n;
+      DD.Save.save();
+    },
+    siteCount: () => DD.Data.count(),
+    solveDig: (id, pid) => DD.Dig.solve(id, pid),
+    solvePuzzle: (id, pid) => DD.Puzzle.solve(id, pid),
+    solve: (id, pid, opts) => {
+      const dig = DD.Dig.solve(id, pid);
+      if (!dig.ok) return Object.assign({ phase: 'dig' }, dig);
+      const puzz = DD.Puzzle.solve(id, pid);
+      return { ok: dig.ok && puzz.ok, dig, puzz, site: id, profile: pid, proof: !!(opts && opts.proof) };
+    },
+    hub: () => DD.UI.hub(),
+    sites: () => DD.UI.sites(),
+    museum: () => DD.UI.museum(),
+    profiles: () => DD.UI.profiles(),
+    startDig: (id) => DD.UI.startDig(id),
+    meta: () => DD.meta(),
+    data: () => DD.Data
+  };
+
+  DD.UI.profiles();
+  requestAnimationFrame(frame);
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "dino-dig";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

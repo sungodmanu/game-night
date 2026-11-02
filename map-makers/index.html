@@ -1,0 +1,2755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#5b4bdb">
+<title>Map Makers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#2a2560;font-family:ui-rounded,"SF Pro Rounded","Nunito","Trebuchet MS",system-ui,sans-serif;color:#222;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+input,select,textarea{font:inherit;-webkit-user-select:text;user-select:text}
+.hidden{display:none!important}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.grow{flex:1}
+button{font:inherit;cursor:pointer;border:none}
+.btn{background:#fff;color:#2a2560;border-radius:12px;padding:7px 12px;font-weight:700;font-size:15px;box-shadow:0 3px 0 rgba(0,0,0,.18);white-space:nowrap}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.btn.small{padding:4px 10px;font-size:13px;vertical-align:middle}
+.btn.go{background:#3ccf6e;color:#fff}.btn.play{background:#ff8a3d;color:#fff}.btn.shop{background:#ffd23f;color:#5a3b00}
+.btn.danger{background:#ff5f6d;color:#fff}.btn.ghost{background:#eceaf8}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 60px 8px 10px;background:#5b4bdb;color:#fff;flex-wrap:wrap;min-height:52px}
+.bar h2{margin:0 6px;font-size:20px}
+/* home */
+#home{align-items:center;justify-content:center;background:linear-gradient(160deg,#6a5cff,#ff7eb6 60%,#ffd23f)}
+.home-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.22) 2px,transparent 3px);background-size:34px 34px;pointer-events:none}
+.home-card{position:relative;background:rgba(255,255,255,.95);border-radius:28px;padding:22px 34px 16px;text-align:center;box-shadow:0 12px 40px rgba(40,20,90,.35);width:min(420px,92vw)}
+.logo{font-size:54px;line-height:1;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-4deg)}}
+h1{margin:4px 0 2px;font-size:42px;color:#5b4bdb;letter-spacing:.5px;text-shadow:0 3px 0 #ffd23f}
+.tag{margin:0 0 14px;color:#665;font-size:16px}
+.big{display:block;width:100%;margin:10px 0;padding:14px;border-radius:18px;font-size:22px;font-weight:800;color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.b-play{background:#3ccf6e}.b-build{background:#ff8a3d}.b-cont{background:#4a7dff}
+.b-cont:disabled{background:#b9bfd6;box-shadow:none}
+.hint{color:#888;font-size:12px;margin:10px 0 0}
+@media (max-height:520px){.logo{display:none}.home-card{padding:12px 24px}h1{font-size:30px}.big{padding:9px;margin:7px 0;font-size:19px}.tag{margin-bottom:6px}}
+/* maps */
+#maps{background:#efeefe}
+.scroll{flex:1;overflow:auto;padding:8px 14px 30px;-webkit-overflow-scrolling:touch}
+.scroll h3{color:#2a2560;margin:14px 0 8px}
+.packrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lbl{font-weight:700;color:#2a2560}
+.packs{display:flex;gap:6px;flex-wrap:wrap}
+.pack{background:#fff;border-radius:14px;padding:6px 12px;font-weight:700;color:#2a2560;border:3px solid transparent;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.pack.on{border-color:#5b4bdb;background:#e5e1ff}
+.pack small{display:block;font-weight:500;font-size:11px;color:#667}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.card{background:#fff;border-radius:16px;padding:8px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;flex-direction:column;gap:6px}
+.card canvas{width:100%;aspect-ratio:3/2;border-radius:10px;display:block;cursor:pointer}
+.card .t{font-weight:800;color:#2a2560;font-size:16px}
+.card .m{font-size:13px;color:#556}
+.card .row{display:flex;gap:6px;flex-wrap:wrap}
+.card .row .btn{font-size:13px;padding:5px 9px}
+.empty{color:#667;background:#fff;border-radius:14px;padding:16px;border:2px dashed #c9c4f2}
+/* editor */
+#editor{background:#d9d5f7}
+.ed-bar input#edName{width:150px;border-radius:10px;border:none;padding:7px 9px;font-weight:700}
+.ed-bar select{border-radius:10px;border:none;padding:7px 6px;font-weight:700;background:#fff}
+.numwrap{display:flex;align-items:center;gap:4px;font-size:13px}
+.numwrap input{width:56px;border:none;border-radius:10px;padding:7px 5px;font-weight:700}
+.ed-body{flex:1;display:flex;min-height:0}
+#palette{width:168px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:4px;background:#ebe8ff}
+.pal{display:flex;align-items:center;gap:7px;background:#fff;border-radius:10px;padding:3px 6px;font-weight:700;font-size:13px;color:#2a2560;border:3px solid transparent;text-align:left;min-height:34px}
+.pal canvas{width:26px;height:26px;border-radius:5px;flex:none}
+.pal.on{border-color:#ff8a3d;background:#fff4ea}
+.pal.tool{background:#f1efff}.pal.tool .ic{font-size:18px;width:26px;text-align:center}
+.palsep{height:1px;background:#c9c4f2;margin:3px 0}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;position:relative}
+.stage canvas{border-radius:10px;box-shadow:0 6px 18px rgba(30,20,80,.25);touch-action:none;display:block}
+#edCanvas{cursor:crosshair}
+.edmsg{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);max-width:92vw;background:rgba(42,37,96,.92);color:#fff;border-radius:12px;padding:6px 12px;font-size:14px;pointer-events:none;opacity:0;transition:opacity .3s}
+.edmsg.show{opacity:1}
+@media (max-width:760px),(max-aspect-ratio:1/1){.ed-body{flex-direction:column-reverse}#palette{width:auto;flex-direction:row;overflow-x:auto;overflow-y:hidden;flex:none}.pal{flex:none;flex-direction:column;gap:1px;font-size:10px;padding:3px 5px;min-width:56px;text-align:center}.palsep{width:1px;height:auto;margin:0 2px}}
+@media (max-width:1250px){.ed-bar{gap:5px;padding-right:56px}.ed-bar .btn{padding:6px 8px;font-size:14px}.ed-bar input#edName{width:120px}}
+/* play */
+#play{background:#2a2560}
+.hud .chip{background:rgba(255,255,255,.95);color:#2a2560;border-radius:12px;padding:5px 10px;font-weight:800;font-size:16px;white-space:nowrap}
+.hud .chip.cash{color:#1a7a3a}
+.hud .chip:empty{display:none}
+.chip.flash{animation:flash .5s}
+@keyframes flash{30%{transform:scale(1.18);background:#fff5b0}}
+#joy{position:fixed;left:calc(18px + env(safe-area-inset-left));bottom:calc(18px + env(safe-area-inset-bottom));width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.22);border:3px solid rgba(255,255,255,.5);touch-action:none;z-index:5}
+#joyKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 3px 8px rgba(0,0,0,.3)}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,15,50,.55);display:flex;align-items:center;justify-content:center;z-index:20;padding:10px}
+.modal-card{background:#fff;border-radius:22px;padding:16px 18px;width:min(520px,96vw);max-height:94vh;overflow:auto;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.35);animation:pop .22s ease-out}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.modal-card h2{margin:4px 0 8px;color:#2a2560}
+.modal-card p{margin:6px 0;color:#445}
+.qvis{font-size:30px;line-height:1.25;margin:4px 0;word-break:break-all}
+.qtext{font-size:24px;font-weight:800;color:#2a2560;margin:6px 0 10px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{background:#eef0ff;border-radius:14px;padding:12px 8px;font-size:22px;font-weight:800;color:#2a2560;box-shadow:0 4px 0 #c9c4f2}
+.choice.right{background:#3ccf6e;color:#fff;box-shadow:0 4px 0 #23964c}
+.choice.wrong{background:#ffe1e1;color:#b55;box-shadow:none;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.qfoot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px}
+.qmsg{font-weight:700;color:#7a5cff;min-height:1.3em}
+.shoplist{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
+.item{background:#f5f3ff;border-radius:14px;padding:8px 10px;display:flex;gap:8px;align-items:center}
+.item .e{font-size:28px}.item .n{font-weight:800;color:#2a2560}.item .d{font-size:12px;color:#556}
+.item .btn{margin-left:auto;font-size:14px}
+.stars{font-size:46px;letter-spacing:6px;margin:4px 0}
+.stars .off{filter:grayscale(1);opacity:.3}
+.stars span{display:inline-block;animation:pop .4s ease-out backwards}
+.stars span:nth-child(2){animation-delay:.2s}.stars span:nth-child(3){animation-delay:.4s}
+.mrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.mrow .btn{font-size:16px;padding:9px 14px}
+.modal-card textarea{width:100%;height:84px;border-radius:12px;border:2px solid #c9c4f2;padding:8px;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}
+.modal-card input.txt{width:100%;font-size:18px;padding:8px 10px;border-radius:12px;border:2px solid #c9c4f2}
+.probs{text-align:left;color:#a33;margin:6px 0 0;padding-left:20px}
+.toast{position:fixed;left:50%;top:64px;transform:translate(-50%,-20px);background:#2a2560;color:#fff;padding:8px 16px;border-radius:14px;font-weight:700;opacity:0;transition:all .25s;pointer-events:none;z-index:30;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.mute{position:fixed;top:calc(8px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));z-index:25;width:40px;height:38px;border-radius:12px;background:rgba(255,255,255,.9);font-size:18px;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+@media (max-width:500px){.hud .chip{font-size:13px;padding:4px 7px}.bar{gap:5px;padding-left:6px}.qtext{font-size:20px}.choice{font-size:19px;padding:10px 6px}.shoplist{grid-template-columns:1fr}.bar h2{font-size:17px}}
+
+.storenote{background:#fff4d6;color:#7a5a00;border-radius:12px;padding:8px 12px;font-size:14px;margin:8px 0;max-width:420px}
+
+/* ---- Builder vs Runner ---- */
+.b-duel{background:#b04be0}
+.play-body{flex:1;display:flex;min-height:0;min-width:0;gap:8px}
+#play.duel .play-body{padding:0 8px 8px}
+.duel-panel{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;background:rgba(255,255,255,.1);border-radius:14px;padding:6px;gap:5px}
+.dq-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dq-title{color:#fff;font-weight:800;font-size:16px}
+.dq-count{background:#fff;color:#2a2560;border-radius:12px;padding:4px 10px;font-weight:800;font-size:14px}
+.dq-count:not([data-n="0"]){background:#ffe3c9;color:#a04a00}
+.dq-budget{background:#e5e1ff;color:#2a2560;border-radius:12px;padding:4px 10px;font-weight:800;font-size:14px}
+.dq-budget[data-n="0"]{background:#ffd6dc;color:#b0102a}
+#dqUndo{padding:4px 10px;font-size:14px}
+#dqUndo:disabled{opacity:.45}
+.dq-warn{background:#ffd6dc;color:#9a0b22;border-radius:10px;padding:4px 10px;font-weight:700;font-size:13px}
+.dpal-row{display:flex;gap:4px;overflow-x:auto;flex:none}
+.dpal{flex:none;background:#fff;border-radius:10px;padding:2px;border:3px solid transparent;line-height:0}
+.dpal canvas{width:30px;height:30px;border-radius:6px}
+.dpal.on{border-color:#ff8a3d}
+.dmsg{color:#fff;font-weight:700;font-size:13px;min-height:18px;opacity:0;transition:opacity .2s}
+.dmsg.show{opacity:1}.dmsg.warn{color:#ffd0d6}
+.duel-banner{position:absolute;left:50%;top:14px;transform:translate(-50%,-30px);opacity:0;pointer-events:none;background:#ffd23f;color:#3a2a00;font-weight:900;font-size:24px;padding:8px 20px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:opacity .25s,transform .25s;white-space:nowrap;z-index:3}
+.duel-banner small{display:block;font-size:12px;font-weight:700;text-align:center}
+.duel-banner.show{opacity:1;transform:translate(-50%,0)}
+.hud .chip.duelchip{color:#7a2fa8}
+.duel-tabs{display:flex;gap:6px;padding:0 8px 6px}
+.duel-tabs button{flex:1;padding:8px;border-radius:12px;font-weight:800;font-size:16px;background:rgba(255,255,255,.2);color:#fff}
+.duel-tabs button.on{background:#fff;color:#2a2560}
+.dintro{font-size:15px}
+.dmode{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.dlist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;text-align:left}
+.ditem{background:#f3f1ff;border-radius:12px;padding:8px 12px;text-align:left;color:#2a2560;font-size:16px}
+.ditem small{display:block;font-size:12px;color:#556;margin-top:2px}
+.dtag{background:#b04be0;color:#fff;border-radius:8px;padding:1px 6px;font-size:11px;font-weight:700}
+.dwarn{color:#b0102a;font-weight:700}
+.dnote{font-size:12px;color:#556;background:#fff6dd;border-radius:10px;padding:6px 10px}
+/* wide: runner left, builder right. Portrait/square: builder on top. Phones: tabs (turn swap) */
+@media (max-aspect-ratio:1/1){#play.duel .play-body{flex-direction:column-reverse}}
+@media (min-width:561px){#play .duel-tabs{display:none}}
+@media (max-width:560px){
+  #play.duel.tab-run #duelPanel{display:none}
+  #play.duel.tab-build #playStage{display:none}
+  #play.duel.tab-build #joy{display:none}
+  #play.duel .hud .chip.duelchip{display:none}
+}
+@media (max-height:520px){.duel-banner{font-size:18px;top:6px}.dpal canvas{width:24px;height:24px}.dq-count,.dq-budget{font-size:12px;padding:3px 7px}}
+/* ---- fizzle cue (edit could not land): puff on the grid + token flies back to the budget ---- */
+.dtoken{position:fixed;z-index:40;font-size:22px;margin:-14px 0 0 -14px;pointer-events:none;transition:transform .7s cubic-bezier(.3,-0.3,.4,1),opacity .7s;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.dq-budget.bump{animation:dbump .45s ease-out}
+@keyframes dbump{0%{transform:scale(1)}40%{transform:scale(1.35);background:#c9ffd9;color:#0a6b2c}100%{transform:scale(1)}}
+/* ---- Mode 2: two devices ---- */
+.big small{display:block;font-size:13px;font-weight:600;opacity:.9}
+.b-net{background:#5b4bdb}.b-run{background:#3ccf6e}
+.big:disabled{background:#c5c8d8;box-shadow:none;opacity:.7}
+#play.net-builder #playStage,#play.net-builder #plShop,#play.net-builder #joy{display:none!important}
+#play.net-builder #duelPanel{display:flex!important;flex:1}
+#play.net-runner #duelPanel,#play.net-runner #duelTabs,#play.net-builder #duelTabs{display:none!important}
+#play.net-builder .play-body{flex-direction:row}
+.netchip{position:fixed;right:calc(8px + env(safe-area-inset-right));bottom:calc(8px + env(safe-area-inset-bottom));z-index:26;background:rgba(255,255,255,.95);color:#2a2560;font-weight:800;font-size:13px;padding:5px 10px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.18);cursor:pointer;max-width:80vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.netchip.bad{background:#ffd6dc;color:#9a0b22}.netchip.wait{background:#fff3c4;color:#6b4b00}
+.net-overlay{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(30,25,80,.6);color:#fff;text-align:center}
+.net-overlay>div{background:#2a2560;padding:18px 24px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.net-overlay b{display:block;font-size:26px}.net-overlay small{display:block;font-size:14px;opacity:.9;margin:6px 0 10px}
+.big-emoji{font-size:54px;line-height:1.1;margin:4px 0}
+.big-emoji.spin{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.nlobby .nsub{font-size:17px}
+.ncode{font-size:84px;font-weight:900;letter-spacing:14px;color:#2a2560;line-height:1;margin:6px 0;font-variant-numeric:tabular-nums}
+.nqr{width:200px;height:200px;image-rendering:pixelated;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.nwait{font-weight:700;color:#6b4b00}
+.nerr{background:#ffd6dc;color:#9a0b22;border-radius:12px;padding:6px 10px;font-weight:700}
+.nrole{font-size:26px;padding:20px}
+.nkeys-show{display:flex;justify-content:center;gap:10px;margin:8px 0}
+.nkeys-show span{width:56px;height:68px;border-radius:14px;background:#f3f1ff;border:3px solid #c9c4f2;font-size:44px;font-weight:900;color:#2a2560;display:flex;align-items:center;justify-content:center}
+.nkeys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:8px auto}
+.nkeys button{font-size:30px;font-weight:900;padding:12px 0;border-radius:16px;background:#e5e1ff;color:#2a2560;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.nkeys button.go{background:#3ccf6e;color:#fff}
+.nkeys button:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.nsteps{text-align:left;font-size:16px;color:#334;margin:6px 0 6px 18px}
+@media (max-height:560px){.ncode{font-size:56px}.nqr{width:150px;height:150px}.nkeys button{padding:7px 0;font-size:24px}.nkeys-show span{height:52px;font-size:34px}}
+.nsub b{white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="app">
+  <section id="home" class="screen">
+    <div class="home-bg" aria-hidden="true"></div>
+    <div class="home-card">
+      <div class="logo">🗺️</div>
+      <h1>Map Makers</h1>
+      <p class="tag">Build a map. Play it. Beat your best time!</p>
+      <button class="big b-play" id="btnPlay">▶️ Play a Map</button>
+      <button class="big b-build" id="btnBuild">🛠️ Build a Map</button>
+      <button class="big b-duel" id="btnDuel">⚔️ Builder vs Runner</button>
+      <button class="big b-cont" id="btnContinue">⏯️ Continue</button>
+      <p class="storenote hidden" id="storeNote">⚠️ This browser is blocking saves, so maps last until you close this page. Use 🔗 Share code to keep a map.</p>
+      <p class="hint">Keys: WASD or arrows to move • B for shop • Esc to pause</p>
+    </div>
+  </section>
+
+  <section id="maps" class="screen hidden">
+    <header class="bar">
+      <button class="btn back" data-go="home">← Home</button>
+      <h2>Pick a Map</h2>
+      <span class="grow"></span>
+      <button class="btn" id="btnImport">📥 Import code</button>
+    </header>
+    <div class="scroll">
+      <div class="packrow"><span class="lbl">Questions:</span><div id="packPicker" class="packs"></div></div>
+      <h3>⭐ Fun Maps</h3>
+      <div id="premadeList" class="cards"></div>
+      <h3>🛠️ My Maps <button class="btn small" id="btnNewMap">＋ New map</button></h3>
+      <div id="myList" class="cards"></div>
+    </div>
+  </section>
+
+  <section id="editor" class="screen hidden">
+    <header class="bar ed-bar">
+      <button class="btn back" id="edBack">←</button>
+      <input id="edName" maxlength="30" placeholder="Map name" aria-label="Map name">
+      <select id="edTheme" aria-label="Theme"></select>
+      <select id="edGoal" aria-label="Goal"></select>
+      <label id="edGoalNumWrap" class="numwrap"><input id="edGoalNum" type="number" min="1" max="200" aria-label="Goal amount"><span id="edGoalUnit">coins</span></label>
+      <button class="btn" id="edUndo" title="Undo (Ctrl+Z)">↩️</button>
+      <button class="btn" id="edRedo" title="Redo (Ctrl+Shift+Z)">↪️</button>
+      <button class="btn" id="edClear" title="Clear map">🧹</button>
+      <button class="btn" id="edShare" title="Share code">🔗</button>
+      <button class="btn go" id="edSave">💾 Save</button>
+      <button class="btn play" id="edTest">▶️ Play</button>
+    </header>
+    <div class="ed-body">
+      <div id="palette"></div>
+      <div class="stage" id="edStage"><canvas id="edCanvas"></canvas></div>
+    </div>
+    <div id="edMsg" class="edmsg"></div>
+  </section>
+
+  <section id="play" class="screen hidden">
+    <header class="bar hud">
+      <button class="btn back" id="plExit" title="Pause (Esc)">⏸️</button>
+      <span class="chip cash" id="hudCash">💵 $0</span>
+      <span class="chip" id="hudTime">⏱️ 0:00.0</span>
+      <span class="chip" id="hudGoal">🏁</span>
+      <span class="chip" id="hudItems"></span>
+      <span class="chip duelchip hidden" id="hudDuel"></span>
+      <span class="grow"></span>
+      <button class="btn shop" id="plShop">🛒 Shop</button>
+    </header>
+ <div id="duelTabs" class="duel-tabs hidden"><button data-tab="run" class="on">🏃 Runner</button><button data-tab="build">🛠️ Builder</button></div>
+    <div class="play-body">
+      <div class="stage" id="playStage"><canvas id="playCanvas"></canvas><div id="duelBanner" class="duel-banner" aria-live="polite"></div></div>
+      <aside id="duelPanel" class="duel-panel hidden" aria-label="Builder">
+        <div class="dq-head"><span class="dq-title">🛠️ Builder</span><span id="dqCount" class="dq-count" data-n="0">✅ No edits waiting</span><span id="dqBudget" class="dq-budget" data-n="3">✏️ 3 left</span><button class="btn ghost" id="dqUndo" title="Undo last waiting edit (Ctrl+Z) — refunds it">↩️ Undo</button></div>
+        <div id="dqWarn" class="dq-warn hidden"></div>
+        <div id="dPal" class="dpal-row"></div>
+        <div class="stage" id="dStage"><canvas id="dCanvas"></canvas></div>
+        <div id="dMsg" class="dmsg"></div>
+      </aside>
+    </div>
+    <div id="joy" class="hidden"><div id="joyKnob"></div></div>
+  </section>
+
+  <div id="modal" class="modal hidden"><div class="modal-card" id="modalCard"></div></div>
+  <div id="toast" class="toast"></div>
+  <button id="muteBtn" class="mute" title="Sound on/off">🔊</button>
+</div>
+<script>"use strict";
+// ===== src/core.js =====
+// core.js - namespace, constants, tile definitions, helpers, storage.
+var MM = window.MM = {};
+MM.W = 24; MM.H = 16;
+MM.VERSION = 1;
+
+// Tile chars -> definitions. solid: blocks movement. pick: collected on touch.
+MM.TILES = {
+  '.': { name: 'Floor', icon: '⬜' },
+  '#': { name: 'Wall', icon: '🧱', solid: true },
+  '~': { name: 'Water', icon: '🌊', solid: true },
+  'c': { name: 'Coin', icon: '🪙' },
+  '?': { name: 'Question', icon: '❓' },
+  '^': { name: 'Spikes', icon: '🔺' },
+  '>': { name: 'Speed Pad', icon: '⏩' },
+  'A': { name: 'Portal A', icon: '🌀' },
+  'B': { name: 'Portal B', icon: '🟠' },
+  'D': { name: 'Locked Door', icon: '🚪', solid: true },
+  'k': { name: 'Key', icon: '🔑' },
+  'P': { name: 'Checkpoint', icon: '🚩' },
+  'S': { name: 'Start', icon: '🟢' },
+  'F': { name: 'Finish Flag', icon: '🏁' }
+};
+MM.PALETTE = ['.', '#', '~', 'c', '?', '^', '>', 'A', 'B', 'k', 'D', 'P', 'S', 'F'];
+MM.SINGLE = { S: 1, F: 1, A: 1, B: 1 }; // only one of each per map
+
+MM.THEMES = {
+  grass:  { label: 'Grass',  emoji: '🌳', floorA: '#a8e07a', floorB: '#9bd86e', wall: '#4f8a3a', wallTop: '#6cae4f', water: '#5ab8ee', bg: '#cdeeb0', text: '#24421a' },
+  snow:   { label: 'Snow',   emoji: '❄️', floorA: '#f2f8ff', floorB: '#e3eefb', wall: '#8fb4d9', wallTop: '#c3dcf2', water: '#6fc3e8', bg: '#dceaf8', text: '#21405e' },
+  space:  { label: 'Space',  emoji: '🚀', floorA: '#2e3366', floorB: '#292d5c', wall: '#6c6f9e', wallTop: '#9599c7', water: '#7a4fd6', bg: '#14163a', text: '#f0f0ff' },
+  spooky: { label: 'Spooky', emoji: '🎃', floorA: '#4a3a5e', floorB: '#433553', wall: '#2a2236', wallTop: '#5b4a73', water: '#3fae6a', bg: '#221a2e', text: '#ffe9c7' }
+};
+
+MM.GOALS = {
+  flag:    { label: 'Reach the flag', emoji: '🏁' },
+  coins:   { label: 'Collect coins', emoji: '🪙' },
+  survive: { label: 'Survive the timer', emoji: '⏳' }
+};
+
+MM.CONF = {
+  speed: 4.6,          // tiles per second
+  radius: 0.32,        // player collision radius (tiles)
+  coinValue: 10,
+  questionValue: 25,
+  padBoost: 1.8, padTime: 1.1,
+  stationCooldown: 12,
+  shop: {
+    speed:  { name: 'Speedy Shoes', emoji: '👟', desc: 'Move 20% faster (up to 3)', cost: [30, 50, 80], max: 3 },
+    magnet: { name: 'Coin Magnet', emoji: '🧲', desc: 'Pull in nearby coins', cost: [40, 70], max: 2 },
+    rewind: { name: 'Clock Rewind', emoji: '⏱️', desc: '10 seconds off the clock', cost: [35], max: 99 },
+    shield: { name: 'Bubble Shield', emoji: '🫧', desc: 'Blocks one trap bump', cost: [25], max: 99 },
+    double: { name: 'Double Cash', emoji: '💰', desc: '2x cash for 30 seconds', cost: [50], max: 99 }
+  }
+};
+
+// ONE passability rule shared by play-mode physics and the map checker, so they can never disagree.
+// Walls, water and off-map are solid. A locked door is solid until opened with a key. Everything else
+// (floor, coin, question, spikes, speed pad, portals, key, checkpoint, start, flag) can be walked on.
+MM.passable = function (ch, doorOpen) {
+  if (ch === undefined || ch === '#' || ch === '~') return false;
+  if (ch === 'D') return !!doorOpen;
+  return true;
+};
+// Spikes pop up and down so they are a hazard you can time, never a wall.
+MM.SPIKE = { cycle: 2.6, up: 1.3 };
+MM.spikesUp = function (t) { return (t % MM.SPIKE.cycle) < MM.SPIKE.up; };
+MM.idx = function (x, y) { return y * MM.W + x; };
+MM.inb = function (x, y) { return x >= 0 && y >= 0 && x < MM.W && y < MM.H; };
+MM.clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+MM.uid = function () { return 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); };
+MM.fmtTime = function (s) {
+  s = Math.max(0, s); var m = Math.floor(s / 60), r = s - m * 60;
+  return m + ':' + (r < 10 ? '0' : '') + r.toFixed(1);
+};
+MM.esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+MM.$ = function (s, r) { return (r || document).querySelector(s); };
+MM.$$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+// ---- storage ----
+// Every read/write is wrapped. Values are kept in an in-memory mirror too, so if the browser blocks
+// localStorage (sandboxed frame, strict privacy settings, some file:// setups) the game keeps working
+// for this visit and the player is told honestly what happened (never a fake "storage full").
+MM.store = (function () {
+  var P = 'mm.v1.', KNOWN = { settings: 1, myMaps: 1, best: 1, session: 1 }, mem = {};
+  var st = { mode: 'local', lastError: null, lastKind: null, warned: false };
+  function ls() { return window.localStorage; } // may throw SecurityError
+  function kind(e) {
+    var n = e && e.name, c = e && e.code;
+    if (n === 'QuotaExceededError' || n === 'NS_ERROR_DOM_QUOTA_REACHED' || c === 22 || c === 1014) return 'full';
+    return 'blocked'; // SecurityError, missing localStorage, anything else
+  }
+  // Remove stale keys of ours (old versions, junk). withSession also drops the resumable session.
+  function cleanup(withSession) {
+    var n = 0;
+    try {
+      var s = ls(), del = [];
+      for (var i = 0; i < s.length; i++) { var k = s.key(i); if (k && k.indexOf('mm.') === 0 && !(k.indexOf(P) === 0 && KNOWN[k.slice(P.length)])) del.push(k); }
+      if (withSession) del.push(P + 'session');
+      del.forEach(function (k) { s.removeItem(k); n++; });
+    } catch (e) {}
+    return n;
+  }
+  function probe() {
+    try { var s = ls(); s.setItem(P + '_probe', '1'); s.removeItem(P + '_probe'); st.mode = 'local'; return true; }
+    catch (e) { st.lastError = (e && e.name) || String(e); st.lastKind = kind(e); if (st.lastKind === 'blocked') st.mode = 'memory'; return false; }
+  }
+  function ourBytes() { var n = 0; try { var s = ls(); for (var i = 0; i < s.length; i++) { var k = s.key(i); if (k && k.indexOf('mm.') === 0) n += k.length + (s.getItem(k) || '').length; } } catch (e) {} return n; }
+  probe(); cleanup(false);
+  if (st.lastKind === 'full' && ourBytes() < 200000) { st.lastKind = 'blocked'; st.mode = 'memory'; } // zero-quota browsers (private mode)
+  return {
+    get state() { return st; },
+    get: function (k, def) {
+      if (Object.prototype.hasOwnProperty.call(mem, k)) return mem[k] == null ? def : JSON.parse(mem[k]);
+      try { var v = ls().getItem(P + k); return v == null ? def : JSON.parse(v); } catch (e) { return def; }
+    },
+    // returns true if written to real storage; false = kept in memory only (see state.lastKind)
+    set: function (k, v) {
+      var str = JSON.stringify(v);
+      mem[k] = str;
+      if (st.mode === 'memory') return false;
+      try { ls().setItem(P + k, str); delete mem[k]; st.lastKind = null; return true; }
+      catch (e) {
+        var kd = kind(e);
+        if (kd === 'full') { cleanup(true); try { ls().setItem(P + k, str); delete mem[k]; st.lastKind = null; return true; } catch (e2) { kd = kind(e2); e = e2; } }
+        // A 'quota' error while our own data is tiny means the browser gives us no room at all (e.g. private mode): call it blocked.
+        if (kd === 'full' && ourBytes() < 200000) kd = 'blocked';
+        st.lastError = (e && e.name) || String(e); st.lastKind = kd; if (kd === 'blocked') st.mode = 'memory';
+        return false;
+      }
+    },
+    del: function (k) { mem[k] = null; try { ls().removeItem(P + k); delete mem[k]; } catch (e) {} },
+    bytes: function () { var n = 0; try { var s = ls(); for (var i = 0; i < s.length; i++) { var k = s.key(i); n += k.length + (s.getItem(k) || '').length; } } catch (e) {} for (var m in mem) n += (mem[m] || '').length; return n; },
+    cleanup: cleanup
+  };
+})();
+MM.settings = MM.store.get('settings', { mute: false, pack: 'easy' });
+MM.saveSettings = function () { MM.store.set('settings', MM.settings); };
+// My Maps are stored compactly: tiles run-length encoded ("d"), no thumbnails or undo history.
+MM.rle = function (t) { var o = '', i = 0; while (i < t.length) { var c = t[i], n = 1; while (t[i + n] === c) n++; o += (n > 1 ? n : '') + c; i += n; } return o; };
+MM.unrle = function (s) { var o = '', m, re = /(\d*)(\D)/g; while ((m = re.exec(s))) o += Array((m[1] ? +m[1] : 1) + 1).join(m[2]); return o; };
+MM.packMap = function (m) { return { id: m.id, name: m.name, theme: m.theme, goal: m.goal, d: MM.rle(m.tiles) }; };
+MM.unpackMap = function (o) {
+  if (!o || typeof o !== 'object') return null;
+  var t = typeof o.tiles === 'string' ? o.tiles : MM.unrle(String(o.d || ''));
+  if (t.length !== MM.W * MM.H) return null;
+  return { id: o.id || MM.uid(), name: String(o.name || 'My Map'), theme: MM.THEMES[o.theme] ? o.theme : 'grass', goal: o.goal || { type: 'flag', coins: 10, time: 60 }, tiles: t };
+};
+MM.myMaps = function () { var m = MM.store.get('myMaps', []); return Array.isArray(m) ? m.map(MM.unpackMap).filter(Boolean) : []; };
+MM.setMyMaps = function (arr) { return MM.store.set('myMaps', arr.map(MM.packMap)); };
+// Human message for a failed write (after the value was kept in memory).
+MM.storageProblem = function (kind) {
+  var k = kind || MM.store.state.lastKind;
+  if (k === 'full') return { kind: 'full', title: 'Storage is full', text: 'This browser\'s storage for the game is really full. Your map is kept while this page stays open — copy the code below to keep it safe.' };
+  return { kind: 'blocked', title: 'Saving is blocked here', text: 'This browser isn\'t letting the game save to disk (this can happen with private windows or when the file is opened in a locked-down viewer). Your map is kept while this page stays open — copy the code below to keep it safe forever.' };
+};
+MM.best = function () { return MM.store.get('best', {}) || {}; };
+
+// ===== src/audio.js =====
+// audio.js - soft WebAudio sound effects; context is created on first user input.
+MM.audio = (function () {
+  var ctx = null, master = null;
+  function unlock() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.18; master.connect(ctx.destination);
+    } catch (e) { ctx = null; }
+  }
+  // one gentle note: sine/triangle with soft attack + exponential release
+  function note(freq, start, dur, type, vol, slideTo) {
+    if (!ctx || MM.settings.mute) return;
+    var t = ctx.currentTime + (start || 0);
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.5, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  }
+  var S = {
+    click: function () { note(660, 0, 0.08, 'triangle', 0.25); },
+    paint: function () { note(520 + Math.random() * 80, 0, 0.05, 'sine', 0.12); },
+    coin: function () { note(988, 0, 0.09, 'triangle', 0.35); note(1319, 0.07, 0.16, 'triangle', 0.3); },
+    key: function () { note(784, 0, 0.1, 'triangle', 0.3); note(1047, 0.08, 0.1, 'triangle', 0.3); note(1568, 0.16, 0.2, 'sine', 0.25); },
+    door: function () { note(220, 0, 0.25, 'triangle', 0.35, 330); },
+    right: function () { [523, 659, 784, 1047].forEach(function (f, i) { note(f, i * 0.07, 0.18, 'triangle', 0.32); }); },
+    wrong: function () { note(330, 0, 0.18, 'sine', 0.25, 294); note(294, 0.14, 0.22, 'sine', 0.2, 262); },
+    buy: function () { note(1175, 0, 0.08, 'triangle', 0.3); note(1568, 0.06, 0.08, 'triangle', 0.3); note(2093, 0.12, 0.2, 'sine', 0.22); },
+    nope: function () { note(262, 0, 0.15, 'sine', 0.2); },
+    trap: function () { note(600, 0, 0.3, 'sine', 0.3, 200); },
+    shield: function () { note(880, 0, 0.25, 'sine', 0.25, 440); },
+    pad: function () { note(400, 0, 0.18, 'triangle', 0.25, 900); },
+    teleport: function () { note(300, 0, 0.3, 'sine', 0.28, 1200); note(1200, 0.2, 0.2, 'sine', 0.18, 600); },
+    checkpoint: function () { note(698, 0, 0.12, 'triangle', 0.3); note(880, 0.1, 0.18, 'triangle', 0.3); },
+    win: function () { [523, 659, 784, 659, 784, 1047].forEach(function (f, i) { note(f, i * 0.12, 0.25, 'triangle', 0.35); }); },
+    update: function () { note(587, 0, 0.16, 'sine', 0.22); note(880, 0.09, 0.2, 'sine', 0.2); note(1175, 0.19, 0.28, 'sine', 0.16); },
+    fizzle: function () { note(520, 0, 0.22, 'sine', 0.16, 180); note(1400, 0.16, 0.1, 'triangle', 0.12); },
+    save: function () { note(784, 0, 0.1, 'sine', 0.3); note(1175, 0.08, 0.18, 'sine', 0.25); }
+  };
+  function play(name) { try { if (S[name]) S[name](); } catch (e) {} }
+  return { unlock: unlock, play: play, get ctx() { return ctx; } };
+})();
+
+// ===== src/questions.js =====
+// questions.js - three built-in question packs. Math packs are generated; facts are a fixed list.
+MM.questions = (function () {
+  function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  // build a question from a correct answer + candidate wrong answers
+  function make(q, right, wrongs, n, extra) {
+    var seen = {}; seen[String(right)] = 1; var opts = [];
+    for (var i = 0; i < wrongs.length && opts.length < n - 1; i++) {
+      var w = wrongs[i]; if (w === undefined || w === null || seen[String(w)]) continue; seen[String(w)] = 1; opts.push(String(w));
+    }
+    var choices = shuffle(opts.concat([String(right)]));
+    var o = { q: q, choices: choices, answer: choices.indexOf(String(right)) };
+    if (extra) for (var k in extra) o[k] = extra[k];
+    if (!o.speak) o.speak = q;
+    return o;
+  }
+  function near(n, lo, hi) {
+    var c = []; for (var d = 1; d <= 4; d++) { if (n + d <= hi) c.push(n + d); if (n - d >= lo) c.push(n - d); }
+    return shuffle(c);
+  }
+  var THINGS = ['🍎', '🐞', '⭐', '🐟', '🌸', '🚗', '🍪', '🐥', '🎈', '🍓'];
+  var THING_NAMES = { '🍎': 'apples', '🐞': 'ladybugs', '⭐': 'stars', '🐟': 'fish', '🌸': 'flowers', '🚗': 'cars', '🍪': 'cookies', '🐥': 'chicks', '🎈': 'balloons', '🍓': 'strawberries' };
+  function rep(s, n) { var o = ''; for (var i = 0; i < n; i++) o += s; return o; }
+
+  var easy = [
+    function () { var n = ri(1, 10), t = pick(THINGS); return make('How many?', n, near(n, 1, 10), 3, { visual: rep(t, n), speak: 'How many ' + THING_NAMES[t] + '?' }); },
+    function () { var a = ri(0, 5), b = ri(1, 5), t = pick(THINGS); return make(a + ' + ' + b + ' = ?', a + b, near(a + b, 0, 10), 3, { visual: rep(t, a) + ' ➕ ' + rep(t, b), speak: a + ' plus ' + b + ' equals what?' }); },
+    function () { var s = ri(2, 10), a = ri(1, s - 1); return make(a + ' + ' + (s - a) + ' = ?', s, near(s, 0, 10), 3, { speak: a + ' plus ' + (s - a) + ' equals what?' }); },
+    function () { var a = ri(0, 10), b; do { b = ri(0, 10); } while (b === a); return make('Which number is bigger?', Math.max(a, b), [Math.min(a, b)], 2, { speak: 'Which number is bigger, ' + a + ' or ' + b + '?' }); },
+    function () { var a = ri(3, 10), b = ri(1, a - 1), t = pick(THINGS); return make(a + ' take away ' + b + ' = ?', a - b, near(a - b, 0, 10), 3, { visual: rep(t, a), speak: a + ' take away ' + b + ' equals what?' }); },
+    function () { var n = ri(1, 9); return make('What comes after ' + n + '?', n + 1, near(n + 1, 0, 10).filter(function (x) { return x !== n + 1; }), 3); }
+  ];
+
+  var g4 = [
+    function () { var a = ri(2, 12), b = ri(2, 12); return make(a + ' × ' + b + ' = ?', a * b, [a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, a * b + 2, a + b], 4, { speak: a + ' times ' + b + ' equals what?' }); },
+    function () { var a = ri(2, 10), b = ri(2, 10); return make((a * b) + ' ÷ ' + a + ' = ?', b, [b + 1, b - 1, b + 2, a], 4, { speak: (a * b) + ' divided by ' + a + ' equals what?' }); },
+    function () { var a = ri(2, 8), b; do { b = ri(2, 8); } while (b === a); var big = Math.min(a, b), sm = Math.max(a, b); return make('Which fraction is bigger?', '1/' + big, ['1/' + sm], 2, { speak: 'Which fraction is bigger, one ' + ordinal(a) + ' or one ' + ordinal(b) + '?' }); },
+    function () { var d = pick([4, 5, 6, 8, 10, 12]), a = ri(1, d - 2), b = ri(1, d - 1 - a); return make(a + '/' + d + ' + ' + b + '/' + d + ' = ?', (a + b) + '/' + d, [(a + b) + '/' + (d * 2), (a + b + 1) + '/' + d, (a + b - 1 || a + b + 2) + '/' + d, a * b + '/' + d], 4); },
+    function () { var d = pick([2, 3, 4]), m = pick([2, 3, 4]), n = ri(1, d - 1); return make(n + '/' + d + ' = ?/' + (d * m), n * m, [n * m + 1, n * m - 1, n + m, n * m + 2], 4); },
+    function () { var d = pick([2, 3, 4, 5]), k = ri(2, 6), tot = d * k; return make('What is 1/' + d + ' of ' + tot + '?', k, [k + 1, k - 1, tot - k, k * 2], 4); },
+    function () { var s = pick([8, 6, 4, 10]), e = ri(1, s - 1); return make('A pizza has ' + s + ' slices. You eat ' + e + '. What fraction did you eat?', e + '/' + s, [(s - e) + '/' + s, s + '/' + e, e + '/' + (s + e)], 4, { visual: rep('🍕', e) + rep('⚪', s - e) }); }
+  ];
+  function ordinal(n) { return ({ 2: 'half', 3: 'third', 4: 'fourth', 5: 'fifth', 6: 'sixth', 7: 'seventh', 8: 'eighth' })[n] || n + 'th'; }
+
+  // Fun facts & animals: [question, right, wrong, wrong, (wrong), emoji]
+  var FACTS = [
+    ['Which animal is the biggest that has ever lived?', 'Blue whale', 'Elephant', 'Giraffe', 'T. rex', '🐋'],
+    ['How many legs does a spider have?', '8', '6', '10', '4', '🕷️'],
+    ['How many legs does an insect have?', '6', '8', '4', '10', '🐜'],
+    ['Which animal is the tallest?', 'Giraffe', 'Elephant', 'Horse', 'Camel', '🦒'],
+    ['What do bees make?', 'Honey', 'Milk', 'Silk', 'Butter', '🐝'],
+    ['Which bird can NOT fly?', 'Penguin', 'Eagle', 'Parrot', 'Owl', '🐧'],
+    ['What is a baby frog called?', 'Tadpole', 'Kitten', 'Cub', 'Chick', '🐸'],
+    ['What is a baby cat called?', 'Kitten', 'Puppy', 'Calf', 'Foal', '🐱'],
+    ['What is a baby kangaroo called?', 'Joey', 'Cub', 'Kid', 'Pup', '🦘'],
+    ['Which animal is the fastest runner on land?', 'Cheetah', 'Horse', 'Rabbit', 'Lion', '🐆'],
+    ['Where do polar bears live?', 'The Arctic', 'The desert', 'The jungle', 'Australia', '🐻‍❄️'],
+    ['What do caterpillars turn into?', 'Butterflies', 'Spiders', 'Worms', 'Bees', '🦋'],
+    ['Which planet do we live on?', 'Earth', 'Mars', 'Jupiter', 'Venus', '🌍'],
+    ['Which planet is the biggest?', 'Jupiter', 'Earth', 'Mars', 'Mercury', '🪐'],
+    ['What is the closest star to Earth?', 'The Sun', 'The Moon', 'Mars', 'Polaris', '☀️'],
+    ['How many days are in a week?', '7', '5', '10', '6', '📅'],
+    ['What color do you get when you mix blue and yellow?', 'Green', 'Purple', 'Orange', 'Pink', '🎨'],
+    ['What color do you get when you mix red and yellow?', 'Orange', 'Green', 'Blue', 'Brown', '🎨'],
+    ['Which animal has a trunk?', 'Elephant', 'Hippo', 'Rhino', 'Zebra', '🐘'],
+    ['What do pandas mostly eat?', 'Bamboo', 'Fish', 'Bananas', 'Grass', '🐼'],
+    ['Which of these is a mammal?', 'Dolphin', 'Shark', 'Salmon', 'Octopus', '🐬'],
+    ['How many arms does an octopus have?', '8', '6', '10', '4', '🐙'],
+    ['What do plants need from the sky to grow?', 'Sunlight', 'Moonlight', 'Wind only', 'Snow', '🌱'],
+    ['Which animal sleeps hanging upside down?', 'Bat', 'Dog', 'Horse', 'Duck', '🦇'],
+    ['What is frozen water called?', 'Ice', 'Steam', 'Sand', 'Glass', '🧊'],
+    ['How many continents are there?', '7', '5', '9', '3', '🗺️'],
+    ['Which ocean is the biggest?', 'Pacific', 'Atlantic', 'Indian', 'Arctic', '🌊'],
+    ['Which animal is known for changing color?', 'Chameleon', 'Cow', 'Pigeon', 'Goat', '🦎'],
+    ['What do you call an animal that eats only plants?', 'Herbivore', 'Carnivore', 'Volcano', 'Dinosaur', '🥕'],
+    ['Which animal carries its house on its back?', 'Snail', 'Mouse', 'Fox', 'Parrot', '🐌'],
+    ['How many hearts does an octopus have?', '3', '1', '2', '5', '🐙'],
+    ['Which is the largest land animal?', 'African elephant', 'Hippo', 'Giraffe', 'Bear', '🐘'],
+    ['What gas do we breathe in to live?', 'Oxygen', 'Smoke', 'Helium', 'Steam', '💨'],
+    ['Which season comes after winter?', 'Spring', 'Summer', 'Fall', 'Winter again', '🌷'],
+    ['How many sides does a triangle have?', '3', '4', '5', '6', '🔺'],
+    ['What is a group of fish swimming together called?', 'A school', 'A class', 'A team', 'A herd', '🐠'],
+    ['Which bird is a symbol of wisdom in many stories and hunts at night?', 'Owl', 'Chicken', 'Duck', 'Flamingo', '🦉'],
+    ['Why are flamingos pink?', 'Their food', 'Paint', 'The sun', 'They are cold', '🦩'],
+    ['What do you call a scientist who studies dinosaur fossils?', 'Paleontologist', 'Chef', 'Astronaut', 'Plumber', '🦕'],
+    ['Which animal can live both in water and on land?', 'Frog', 'Goldfish', 'Lion', 'Eagle', '🐸']
+  ];
+  var factBag = [];
+  function fact() {
+    if (!factBag.length) factBag = shuffle(FACTS.slice());
+    var f = factBag.pop();
+    return make(f[0], f[1], f.slice(2, f.length - 1), 4, { visual: f[f.length - 1] });
+  }
+  var PACKS = {
+    easy:  { label: 'Easy Math', emoji: '🍎', sub: 'counting & adding to 10', gen: function () { return pick(easy)(); } },
+    g4:    { label: '4th Grade Math', emoji: '✖️', sub: 'times tables & fractions', gen: function () { return pick(g4)(); } },
+    facts: { label: 'Fun Facts', emoji: '🦁', sub: 'animals & the world', gen: fact }
+  };
+  return { PACKS: PACKS, next: function (pack) { return (PACKS[pack] || PACKS.easy).gen(); }, FACTS: FACTS };
+})();
+
+// ===== src/maps.js =====
+// maps.js - map model, validation (start + reachable goal), path finding, share codes, premade maps.
+MM.maps = (function () {
+  var W = MM.W, H = MM.H;
+  function blank(name) {
+    var t = '';
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) t += (x === 0 || y === 0 || x === W - 1 || y === H - 1) ? '#' : '.';
+    return { id: null, name: name || 'My Map', theme: 'grass', goal: { type: 'flag', coins: 10, time: 60 }, tiles: t };
+  }
+  function clone(m) { return JSON.parse(JSON.stringify(m)); }
+  function find(tiles, ch) { var out = []; for (var i = 0; i < tiles.length; i++) if (tiles[i] === ch) out.push({ x: i % W, y: (i / W) | 0 }); return out; }
+  function count(tiles, ch) { var n = 0; for (var i = 0; i < tiles.length; i++) if (tiles[i] === ch) n++; return n; }
+  // BFS over tiles; entering a portal moves you to its partner. Returns {dist, prev}.
+  function bfs(tiles, sx, sy, opts) {
+    var dist = new Int32Array(W * H).fill(-1), prev = new Int32Array(W * H).fill(-1);
+    var A = tiles.indexOf('A'), B = tiles.indexOf('B');
+    var q = [MM.idx(sx, sy)]; dist[q[0]] = 0;
+    for (var h = 0; h < q.length; h++) {
+      var c = q[h], cx = c % W, cy = (c / W) | 0;
+      var nb = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      for (var k = 0; k < 4; k++) {
+        var nx = cx + nb[k][0], ny = cy + nb[k][1]; if (!MM.inb(nx, ny)) continue;
+        var ni = MM.idx(nx, ny), ch = tiles[ni];
+        var doorOpen = !!(opts && opts.doorsOpen && (!opts.openSet || opts.openSet[ni]));
+        if (!MM.passable(ch, doorOpen)) continue; // same rule as play mode (4-way grid, 1-tile gaps fit the player)
+        if ((ch === 'A' && B >= 0) || (ch === 'B' && A >= 0)) {
+          // portal: mark tile itself, then land on partner
+          if (dist[ni] < 0) { dist[ni] = dist[c] + 1; prev[ni] = c; }
+          var pi = ch === 'A' ? B : A;
+          if (dist[pi] < 0) { dist[pi] = dist[c] + 1; prev[pi] = ni; q.push(pi); }
+          continue;
+        }
+        if (dist[ni] >= 0) continue;
+        dist[ni] = dist[c] + 1; prev[ni] = c; q.push(ni);
+      }
+    }
+    return { dist: dist, prev: prev };
+  }
+  // Reachability with keys: repeatedly open doors adjacent to reach while keys remain.
+  // extra = keys already in the pocket; from = start tile index (default: the Start tile)
+  function reach(tiles, extra, from) {
+    var s = from >= 0 ? from : tiles.indexOf('S'); if (s < 0) return null; extra = extra || 0;
+    var open = {}, opened = 0, r;
+    for (var guard = 0; guard < 50; guard++) {
+      r = bfs(tiles, s % W, (s / W) | 0, { doorsOpen: true, openSet: open });
+      var keys = 0, i; for (i = 0; i < tiles.length; i++) if (tiles[i] === 'k' && r.dist[i] >= 0) keys++;
+      keys += extra; if (keys <= opened) break;
+      var cand = [];
+      for (i = 0; i < tiles.length; i++) {
+        if (tiles[i] !== 'D' || open[i]) continue;
+        var x = i % W, y = (i / W) | 0, adj = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(function (d) { var nx = x + d[0], ny = y + d[1]; return MM.inb(nx, ny) && r.dist[MM.idx(nx, ny)] >= 0; });
+        if (adj) cand.push(i);
+      }
+      if (!cand.length) break;
+      while (cand.length && opened < keys) { open[cand.shift()] = 1; opened++; }
+    }
+    return r.dist;
+  }
+  function validate(m) {
+    var t = m.tiles, problems = [];
+    if (!t || t.length !== W * H) return { ok: false, problems: ['Map data is broken.'] };
+    var s = count(t, 'S');
+    if (s === 0) problems.push('Add a Start 🟢 tile so the player knows where to begin.');
+    var dist = s ? reach(t) : null;
+    var g = m.goal || { type: 'flag' };
+    if (g.type === 'flag') {
+      var f = t.indexOf('F');
+      if (f < 0) problems.push('Add a Finish Flag 🏁 — the goal is "reach the flag".');
+      else if (dist && dist[f] < 0) problems.push('I can\'t find a way from the Start 🟢 to the Finish Flag 🏁 yet. Walls 🧱, water 🌊 and locked doors 🚪 (without a key 🔑) block the way.');
+    } else if (g.type === 'coins') {
+      var reachable = 0; for (var i = 0; i < t.length; i++) if (t[i] === 'c' && dist && dist[i] >= 0) reachable++;
+      var need = g.coins | 0;
+      if (need < 1) problems.push('Set how many coins to collect.');
+      else if (reachable < need) problems.push('The goal needs ' + need + ' coins but only ' + reachable + ' can be reached. Add coins or lower the number.');
+    } else if (g.type === 'survive') {
+      if ((g.time | 0) < 10) problems.push('Survive time should be at least 10 seconds.');
+    }
+    if (count(t, 'A') + count(t, 'B') === 1) problems.push('Portals come in pairs — add both 🌀 A and 🟠 B (or remove the lonely one).');
+    return { ok: problems.length === 0, problems: problems, canPlay: s > 0 && (g.type !== 'flag' || t.indexOf('F') >= 0) };
+  }
+  // shortest tile path from (sx,sy) to any tile matching test; returns array of tile indices (excluding start)
+  function pathTo(tiles, sx, sy, test, opts) {
+    var r = bfs(tiles, sx, sy, opts), best = -1;
+    for (var i = 0; i < tiles.length; i++) if (r.dist[i] > 0 && test(i, tiles[i]) && (best < 0 || r.dist[i] < r.dist[best])) best = i;
+    if (best < 0) return null;
+    var p = []; for (var c = best; c >= 0 && c !== MM.idx(sx, sy); c = r.prev[c]) p.unshift(c);
+    return p;
+  }
+  // par time for 3 stars (seconds)
+  function par(m) {
+    var t = m.tiles, s = t.indexOf('S'); if (s < 0) return 60;
+    var g = m.goal || {};
+    if (g.type === 'survive') return g.time || 60;
+    if (g.type === 'coins') return Math.round(8 + (g.coins || 5) * 2.2);
+    var d = bfs(t, s % W, (s / W) | 0, { doorsOpen: true }).dist[t.indexOf('F')];
+    return Math.round(10 + Math.max(0, d) / MM.CONF.speed * 1.6 + count(t, 'k') * 6);
+  }
+
+  // ---- share codes: MM1-<base64url(json with run-length tiles)> ----
+  function rle(t) { var o = '', i = 0; while (i < t.length) { var c = t[i], n = 1; while (t[i + n] === c) n++; o += (n > 1 ? n : '') + c; i += n; } return o; }
+  function unrle(s) { var o = '', m, re = /(\d*)(\D)/g; while ((m = re.exec(s))) o += Array((m[1] ? +m[1] : 1) + 1).join(m[2]); return o; }
+  function b64e(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function b64d(str) { str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return decodeURIComponent(escape(atob(str))); }
+  function toCode(m) { return 'MM1-' + b64e(JSON.stringify({ n: m.name, t: m.theme, g: m.goal, d: rle(m.tiles) })); }
+  function fromCode(code) {
+    try {
+      code = String(code || '').replace(/\s+/g, '');
+      if (code.indexOf('MM1-') !== 0) return null;
+      var o = JSON.parse(b64d(code.slice(4))), tiles = unrle(o.d || '');
+      if (tiles.length !== W * H) return null;
+      for (var i = 0; i < tiles.length; i++) if (!MM.TILES[tiles[i]]) return null;
+      var g = o.g || {}; if (!MM.GOALS[g.type]) g = { type: 'flag' };
+      return { id: null, name: String(o.n || 'Shared Map').slice(0, 30), theme: MM.THEMES[o.t] ? o.t : 'grass', goal: { type: g.type, coins: g.coins | 0 || 10, time: g.time | 0 || 60 }, tiles: tiles };
+    } catch (e) { return null; }
+  }
+
+  // ---- premade maps (24x16 each) ----
+  function P(id, name, theme, goal, rows, blurb) {
+    var t = rows.join(''); if (t.length !== W * H) throw new Error('bad premade ' + id + ' len ' + t.length);
+    return { id: id, name: name, theme: theme, goal: goal, tiles: t, premade: true, blurb: blurb };
+  }
+  var PREMADE = [
+    P('p_maze', 'Hedge Maze Dash', 'grass', { type: 'flag' }, [
+      '########################',
+      '#S..c#.....?#....c.....#',
+      '#.##.#.###.##.####.###.#',
+      '#.#..#...#....#..#...#.#',
+      '#.#.####.######.##.#.#.#',
+      '#.#....#......#....#.#c#',
+      '#.####.######.####.#.#.#',
+      '#.c..#..>...#....#.#...#',
+      '####.#.####.####.#.###.#',
+      '#....#.#c.#....#.#...#.#',
+      '#.####.#.##.##.#.###.#.#',
+      '#.#..?.#....#..#...#.#.#',
+      '#.#.####.####.####.#.#.#',
+      '#...#c....^.....c#.#...#',
+      '#.c.#..........#...#..F#',
+      '########################'
+    ], 'Find your way through the hedges to the flag!'),
+    P('p_coins', 'Candy Coin Rush', 'grass', { type: 'coins', coins: 20 }, [
+      '########################',
+      '#c.c.c.c.~~~~~~.c.c.c.c#',
+      '#.......~~~~~~~~.......#',
+      '#c.##...~~cccc~~...##.c#',
+      '#..##.....cccc.....##..#',
+      '#c.......>....>.......c#',
+      '#...c..?........?..c...#',
+      '#.......#..S...#.......#',
+      '#...c...#......#...c...#',
+      '#c......####.###......c#',
+      '#..##...........^..##..#',
+      '#c.##..c.c.c.c.c...##.c#',
+      '#..........?...........#',
+      '#c.c.c.~~~~~~~~~~.c.c.c#',
+      '#.....................c#',
+      '########################'
+    ], 'Grab 20 coins as fast as you can!'),
+    P('p_spooky', 'Spooky Key Hunt', 'spooky', { type: 'flag' }, [
+      '########################',
+      '#S....#.....c.....#..k.#',
+      '#.##..#.#########.#.##.#',
+      '#.#c..#.#...?...#.#....#',
+      '#.#####.#.#####.#.####.#',
+      '#.......#.#...#.#....#.#',
+      '#######.#.#.F.#.####.#.#',
+      '#c....#.#.#...#....#.#.#',
+      '#.##..#.#.##D##.##.#.#.#',
+      '#.#^..#.#.......#..#.#.#',
+      '#.#...#.#########.##.#.#',
+      '#.#.?...........#.c..#.#',
+      '#.#########.###.######.#',
+      '#.....c.....#c..^......#',
+      '#.k..~~~~...#..........#',
+      '########################'
+    ], 'The flag is locked in the crypt. Find a key 🔑!'),
+    P('p_ice', 'Icy Zoom Course', 'snow', { type: 'flag' }, [
+      '########################',
+      '#S>>>>......^......c...#',
+      '#######.##########.###.#',
+      '#c....#.#....?...#.#...#',
+      '#.###.#.#.######.#.#.###',
+      '#.#...>.#.#....#.#.#...#',
+      '#.#.#####.#.##.#.#.###.#',
+      '#.#.......#..#.#...#...#',
+      '#.##########.#.#####.###',
+      '#....c.......#.......#.#',
+      '######.#######.#####.#.#',
+      '#....^.#.....#.#...#...#',
+      '#.####.#.###.#.#.#.###.#',
+      '#.c..>>>>>.#...#.#.....#',
+      '#..........#..?..#....F#',
+      '########################'
+    ], 'Zoom over the speed pads to the finish!'),
+    P('p_space', 'Portal Station', 'space', { type: 'flag' }, [
+      '########################',
+      '#S....c.#..............#',
+      '#.......#..c.......c...#',
+      '#...?...#......~~~.....#',
+      '#.......#..~~~~~~~~....#',
+      '#..c....#..~..F...~..c.#',
+      '#.......#..~......~....#',
+      '#...A...#..~~~~D~~~..k.#',
+      '#.......#..............#',
+      '#########..c.....?.....#',
+      '#c....^....~~~~..~~....#',
+      '#..........~......~....#',
+      '#....c.....~..c...~.B..#',
+      '#..........~......~....#',
+      '#c.........~~~~~~~~...c#',
+      '########################'
+    ], 'Use the portal 🌀, grab the key, unlock the star dome!')
+  ];
+  // ---- Builder vs Runner maps: long lanes with room to build, one checkpoint halfway (~18s stretches) ----
+  function Dm(id, name, theme, rows, blurb) { var m = P(id, name, theme, { type: 'flag' }, rows, blurb); m.duelMap = true; return m; }
+  var DUEL = [
+    Dm('d_zigzag', 'Zigzag Showdown', 'grass', [
+      '########################',
+      '#S...c....#.....?....c.#',
+      '#......................#',
+      '####################...#',
+      '#..c.......^......c....#',
+      '#....?..#.....#........#',
+      '#..#####################',
+      '#.....>>......#.....?..#',
+      '#.......c..#.P.....c...#',
+      '#####################..#',
+      '#...c....^.....#...^...#',
+      '#..........?.......c...#',
+      '#..#####################',
+      '#.......c..#.......^...#',
+      '#..^...?.......c......F#',
+      '########################'
+    ], 'Wide zigzag lanes: lots of room for the builder to make mischief.'),
+    Dm('d_lanes', 'Snowy Switchbacks', 'snow', [
+      '########################',
+      '#S.#.....#.....#.....#F#',
+      '#..#.....#..P..#.c...#.#',
+      '#..#..#..#>.#?.#..#..#.#',
+      '#..#.c#..#..#..#..#..#.#',
+      '#..#..#..#.c#..#..#..#.#',
+      '#c.#..#..#..#..#..#.?#.#',
+      '#..#..#.c#..#..#..#..#.#',
+      '#..#..#..#..#..#^.#..#.#',
+      '#..#?.#..#..#..#..#..#^#',
+      '#.c#..#..#^.#..#..#c.#.#',
+      '#..#..#..#..#.c#..#..#.#',
+      '#..#..#^.#..#..#>.#..#c#',
+      '#.....#.....#.....#....#',
+      '#.....#.....#.....#....#',
+      '########################'
+    ], 'Up and down the snowy lanes. The builder can squeeze them shut — but never block the way!')
+  ];
+  return { blank: blank, clone: clone, find: find, count: count, validate: validate, bfs: bfs, reach: reach, pathTo: pathTo, par: par, toCode: toCode, fromCode: fromCode, PREMADE: PREMADE, DUEL: DUEL };
+})();
+
+// ===== src/render.js =====
+// render.js - canvas 2D top-down drawing of tiles, player, critters and effects.
+MM.render = (function () {
+  var W = MM.W, H = MM.H;
+  function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function circ(ctx, x, y, r, fill) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill(); }
+  // deterministic sparkle positions for space theme
+  var STARS = []; for (var i = 0; i < 90; i++) STARS.push([(i * 73.13) % 1, (i * 37.77 + 0.3) % 1, (i % 3) + 1]);
+
+  function floor(ctx, th, x, y, s) {
+    ctx.fillStyle = ((x + y) & 1) ? th.floorB : th.floorA; ctx.fillRect(x * s, y * s, s + 0.5, s + 0.5);
+  }
+  function tile(ctx, ch, x, y, s, th, theme, t, st) {
+    var px = x * s, py = y * s, cx = px + s / 2, cy = py + s / 2;
+    switch (ch) {
+      case '#':
+        ctx.fillStyle = th.wall; rr(ctx, px + 1, py + 1, s - 2, s - 2, s * 0.18); ctx.fill();
+        ctx.fillStyle = th.wallTop; rr(ctx, px + 2, py + 2, s - 4, s * 0.62, s * 0.16); ctx.fill();
+        if (theme === 'grass') { circ(ctx, px + s * 0.3, py + s * 0.3, s * 0.1, '#86c766'); circ(ctx, px + s * 0.68, py + s * 0.42, s * 0.08, '#86c766'); }
+        if (theme === 'spooky') { ctx.fillStyle = '#7a6795'; ctx.fillRect(px + s * 0.45, py + s * 0.18, s * 0.1, s * 0.4); ctx.fillRect(px + s * 0.33, py + s * 0.28, s * 0.34, s * 0.09); }
+        if (theme === 'snow') { ctx.fillStyle = 'rgba(255,255,255,.8)'; rr(ctx, px + 2, py + 2, s - 4, s * 0.22, s * 0.1); ctx.fill(); }
+        if (theme === 'space') { circ(ctx, px + s * 0.25, py + s * 0.25, s * 0.05, '#c9ccf0'); circ(ctx, px + s * 0.75, py + s * 0.25, s * 0.05, '#c9ccf0'); }
+        break;
+      case '~':
+        ctx.fillStyle = th.water; ctx.fillRect(px, py, s + 0.5, s + 0.5);
+        ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = Math.max(1, s * 0.06);
+        for (var k = 0; k < 2; k++) {
+          var wy = py + s * (0.35 + k * 0.35), off = Math.sin(t * 2 + x + k) * s * 0.08;
+          ctx.beginPath(); ctx.moveTo(px + s * 0.15 + off, wy); ctx.quadraticCurveTo(px + s * 0.3 + off, wy - s * 0.1, px + s * 0.45 + off, wy); ctx.quadraticCurveTo(px + s * 0.6 + off, wy + s * 0.1, px + s * 0.75 + off, wy); ctx.stroke();
+        }
+        break;
+      case 'c':
+        var bob = Math.sin(t * 4 + x * 0.7 + y) * s * 0.05, sq = Math.abs(Math.cos(t * 2.5 + x));
+        ctx.save(); ctx.translate(cx, cy + bob); ctx.scale(0.4 + sq * 0.6, 1);
+        circ(ctx, 0, 0, s * 0.3, '#e9a500'); circ(ctx, 0, 0, s * 0.24, '#ffd23f');
+        ctx.fillStyle = '#e9a500'; ctx.font = 'bold ' + Math.round(s * 0.32) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('$', 0, s * 0.02);
+        ctx.restore(); break;
+      case '?':
+        var ready = !st || st.ready;
+        ctx.fillStyle = ready ? '#3d7bf2' : '#9aa6bd'; rr(ctx, px + s * 0.1, py + s * 0.1, s * 0.8, s * 0.8, s * 0.2); ctx.fill();
+        ctx.fillStyle = ready ? '#6ea0ff' : '#b8c2d6'; rr(ctx, px + s * 0.16, py + s * 0.14, s * 0.68, s * 0.4, s * 0.15); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = 'bold ' + Math.round(s * 0.55) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('?', cx, cy + s * 0.03 + (ready ? Math.sin(t * 3 + x) * s * 0.04 : 0));
+        if (st && !st.ready) { ctx.strokeStyle = '#fff'; ctx.lineWidth = s * 0.07; ctx.beginPath(); ctx.arc(cx, cy, s * 0.42, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - st.frac)); ctx.stroke(); }
+        break;
+      case '^':
+        ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fillRect(px + s * 0.08, py + s * 0.08, s * 0.84, s * 0.84);
+        if (st && st.down) { // retracted: little holes (wobble just before popping up)
+          var wob = st.warn ? Math.sin(t * 40) * s * 0.03 : 0;
+          for (var a2 = 0; a2 < 2; a2++) for (var b2 = 0; b2 < 2; b2++) { ctx.fillStyle = st.warn ? '#ff8f8f' : 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.arc(px + s * (0.3 + a2 * 0.4) + wob, py + s * (0.3 + b2 * 0.4), s * 0.07, 0, 6.29); ctx.fill(); }
+          break;
+        }
+        for (var a = 0; a < 2; a++) for (var b = 0; b < 2; b++) {
+          var sx = px + s * (0.12 + a * 0.4), sy = py + s * (0.12 + b * 0.4);
+          ctx.fillStyle = '#c8ced8'; ctx.beginPath(); ctx.moveTo(sx, sy + s * 0.36); ctx.lineTo(sx + s * 0.18, sy); ctx.lineTo(sx + s * 0.36, sy + s * 0.36); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#ff6b6b'; ctx.beginPath(); ctx.moveTo(sx + s * 0.12, sy + s * 0.12); ctx.lineTo(sx + s * 0.18, sy); ctx.lineTo(sx + s * 0.24, sy + s * 0.12); ctx.closePath(); ctx.fill();
+        }
+        break;
+      case '>':
+        ctx.fillStyle = '#ffb84d'; rr(ctx, px + s * 0.08, py + s * 0.08, s * 0.84, s * 0.84, s * 0.15); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = s * 0.1; ctx.lineCap = 'round';
+        var sh = ((t * 2) % 1) * s * 0.15;
+        for (var c2 = 0; c2 < 2; c2++) { var ax = px + s * (0.28 + c2 * 0.25) + sh; ctx.beginPath(); ctx.moveTo(ax, py + s * 0.3); ctx.lineTo(ax + s * 0.15, cy); ctx.lineTo(ax, py + s * 0.7); ctx.stroke(); }
+        break;
+      case 'A': case 'B':
+        var col = ch === 'A' ? ['#8a5cff', '#c7b0ff'] : ['#ff8a3d', '#ffd0a8'];
+        circ(ctx, cx, cy, s * 0.42, col[0]); circ(ctx, cx, cy, s * 0.3, col[1]);
+        ctx.strokeStyle = col[0]; ctx.lineWidth = s * 0.07;
+        for (var r = 0; r < 3; r++) { ctx.beginPath(); ctx.arc(cx, cy, s * (0.08 + r * 0.07), t * 3 + r * 2, t * 3 + r * 2 + 3.5); ctx.stroke(); }
+        ctx.fillStyle = '#fff'; ctx.font = 'bold ' + Math.round(s * 0.26) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        if (st && st.editor) ctx.fillText(ch, cx + s * 0.3, cy - s * 0.3);
+        break;
+      case 'D':
+        ctx.fillStyle = '#8b5a2b'; rr(ctx, px + s * 0.06, py + s * 0.04, s * 0.88, s * 0.92, s * 0.12); ctx.fill();
+        ctx.strokeStyle = '#6b4220'; ctx.lineWidth = s * 0.05; ctx.beginPath(); ctx.moveTo(px + s * 0.35, py + s * 0.08); ctx.lineTo(px + s * 0.35, py + s * 0.92); ctx.moveTo(px + s * 0.65, py + s * 0.08); ctx.lineTo(px + s * 0.65, py + s * 0.92); ctx.stroke();
+        circ(ctx, cx, cy, s * 0.17, '#ffd23f'); ctx.fillStyle = '#6b4220'; ctx.fillRect(cx - s * 0.03, cy - s * 0.04, s * 0.06, s * 0.14); circ(ctx, cx, cy - s * 0.04, s * 0.05, '#6b4220');
+        break;
+      case 'k': drawKey(ctx, cx, cy + Math.sin(t * 3 + x) * s * 0.05, s); break;
+      case 'P':
+        ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.beginPath(); ctx.ellipse(cx, py + s * 0.82, s * 0.3, s * 0.1, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#7a7a7a'; ctx.fillRect(px + s * 0.3, py + s * 0.15, s * 0.07, s * 0.68);
+        ctx.fillStyle = (st && st.active) ? '#3ccf6e' : '#4aa3ff'; ctx.beginPath(); ctx.moveTo(px + s * 0.37, py + s * 0.15); ctx.lineTo(px + s * 0.78, py + s * 0.28 + Math.sin(t * 4) * s * 0.03); ctx.lineTo(px + s * 0.37, py + s * 0.42); ctx.closePath(); ctx.fill();
+        break;
+      case 'S':
+        ctx.fillStyle = '#3ccf6e'; rr(ctx, px + s * 0.1, py + s * 0.1, s * 0.8, s * 0.8, s * 0.4); ctx.fill();
+        ctx.fillStyle = '#e6ffe9'; ctx.font = 'bold ' + Math.round(s * 0.3) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('GO', cx, cy + 1);
+        break;
+      case 'F':
+        ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.ellipse(cx, py + s * 0.86, s * 0.32, s * 0.1, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#555'; ctx.fillRect(px + s * 0.26, py + s * 0.08, s * 0.08, s * 0.8);
+        var wv = Math.sin(t * 5) * s * 0.04;
+        for (var fy = 0; fy < 3; fy++) for (var fx = 0; fx < 4; fx++) {
+          ctx.fillStyle = ((fx + fy) & 1) ? '#222' : '#fff';
+          ctx.fillRect(px + s * (0.34 + fx * 0.12), py + s * (0.1 + fy * 0.1) + (fx % 2 ? wv : 0), s * 0.12 + 0.5, s * 0.1 + 0.5);
+        }
+        break;
+    }
+  }
+  function drawKey(ctx, cx, cy, s) {
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(-0.6);
+    ctx.fillStyle = '#ffc928'; ctx.strokeStyle = '#c99400'; ctx.lineWidth = s * 0.04;
+    ctx.beginPath(); ctx.arc(-s * 0.15, 0, s * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillRect(-s * 0.02, -s * 0.05, s * 0.34, s * 0.1); ctx.fillRect(s * 0.2, 0, s * 0.06, s * 0.12); ctx.fillRect(s * 0.1, 0, s * 0.06, s * 0.09);
+    circ(ctx, -s * 0.15, 0, s * 0.06, '#fff3c4');
+    ctx.restore();
+  }
+  // full map draw. opts: {t, stations:{idx:state}, editor:bool, checkpoint:idx}
+  function map(ctx, tiles, theme, s, opts) {
+    opts = opts || {}; var th = MM.THEMES[theme] || MM.THEMES.grass, t = opts.t || 0;
+    ctx.fillStyle = th.bg; ctx.fillRect(0, 0, W * s, H * s);
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) floor(ctx, th, x, y, s);
+    if (theme === 'space') STARS.forEach(function (p) { ctx.fillStyle = 'rgba(255,255,255,' + (0.35 + 0.3 * Math.sin(t * 2 + p[0] * 20)) + ')'; ctx.fillRect(p[0] * W * s, p[1] * H * s, p[2], p[2]); });
+    if (theme === 'snow') { ctx.fillStyle = 'rgba(160,190,230,.35)'; for (var i = 0; i < 40; i++) circ(ctx, ((i * 97.3) % (W * s)), ((i * 53.1) % (H * s)), 2, ctx.fillStyle); }
+    for (y = 0; y < H; y++) for (x = 0; x < W; x++) {
+      var i2 = y * W + x, ch = tiles[i2]; if (ch === '.') continue;
+      var st = opts.editor ? { editor: true } : (opts.stations && opts.stations[i2]);
+      if (ch === 'P' && opts.checkpoint === i2) st = { active: true };
+      if (ch === '^' && opts.spikeT !== undefined) { var ph = opts.spikeT % MM.SPIKE.cycle; st = { down: ph >= MM.SPIKE.up, warn: ph >= MM.SPIKE.cycle - 0.35 }; }
+      tile(ctx, ch, x, y, s, th, theme, t, st);
+    }
+    if (opts.editor) {
+      ctx.strokeStyle = theme === 'space' || theme === 'spooky' ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.08)'; ctx.lineWidth = 1;
+      ctx.beginPath(); for (x = 1; x < W; x++) { ctx.moveTo(x * s + 0.5, 0); ctx.lineTo(x * s + 0.5, H * s); } for (y = 1; y < H; y++) { ctx.moveTo(0, y * s + 0.5); ctx.lineTo(W * s, y * s + 0.5); } ctx.stroke();
+    }
+  }
+  // the hero: a round little blob with a face and a hat
+  function player(ctx, p, s, t) {
+    var x = p.x * s, y = p.y * s, r = s * MM.CONF.radius * 1.15, moving = p.moving;
+    var bounce = moving ? Math.abs(Math.sin(t * 12)) * s * 0.06 : Math.sin(t * 3) * s * 0.02;
+    ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x, y + r * 0.9, r * 0.9, r * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+    if (p.shield > 0) { ctx.strokeStyle = 'rgba(120,220,255,.85)'; ctx.lineWidth = s * 0.06; ctx.beginPath(); ctx.arc(x, y - bounce, r * 1.45, 0, Math.PI * 2); ctx.stroke(); ctx.fillStyle = 'rgba(160,230,255,.18)'; ctx.fill(); }
+    if (p.blink > 0 && Math.floor(t * 12) % 2) return;
+    y -= bounce;
+    circ(ctx, x, y, r, '#ff7eb6'); circ(ctx, x - r * 0.3, y - r * 0.35, r * 0.35, 'rgba(255,255,255,.35)');
+    var fx = p.fx || 0, fy = p.fy || 1, ex = fx * r * 0.25, ey = fy * r * 0.2;
+    circ(ctx, x - r * 0.33 + ex, y - r * 0.1 + ey, r * 0.22, '#fff'); circ(ctx, x + r * 0.33 + ex, y - r * 0.1 + ey, r * 0.22, '#fff');
+    circ(ctx, x - r * 0.33 + ex * 1.4, y - r * 0.08 + ey * 1.4, r * 0.11, '#2b2b3a'); circ(ctx, x + r * 0.33 + ex * 1.4, y - r * 0.08 + ey * 1.4, r * 0.11, '#2b2b3a');
+    circ(ctx, x - r * 0.6, y + r * 0.3, r * 0.12, 'rgba(255,90,140,.6)'); circ(ctx, x + r * 0.6, y + r * 0.3, r * 0.12, 'rgba(255,90,140,.6)');
+    ctx.fillStyle = '#4a7dff'; ctx.beginPath(); ctx.ellipse(x, y - r * 0.82, r * 0.75, r * 0.28, 0, Math.PI, 0); ctx.fill(); circ(ctx, x, y - r * 1.08, r * 0.15, '#ffd23f');
+    if (p.boost > 0) { ctx.strokeStyle = 'rgba(255,184,77,.8)'; ctx.lineWidth = s * 0.05; for (var i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(x - fx * r * (1.3 + i * 0.25) - fy * r * (i - 1) * 0.5, y - fy * r * (1.3 + i * 0.25) + fx * r * (i - 1) * 0.5); ctx.lineTo(x - fx * r * (1.9 + i * 0.25) - fy * r * (i - 1) * 0.5, y - fy * r * (1.9 + i * 0.25) + fx * r * (i - 1) * 0.5); ctx.stroke(); } }
+  }
+  function critter(ctx, c, s, t) {
+    var x = c.x * s, y = c.y * s, r = s * 0.3, wob = Math.sin(t * 8 + c.seed) * s * 0.03;
+    ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x, y + r * 0.9, r, r * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = c.color; ctx.beginPath(); ctx.ellipse(x, y + wob, r * 1.1, r * (0.95 - wob / s), 0, 0, Math.PI * 2); ctx.fill();
+    circ(ctx, x - r * 0.35, y - r * 0.1, r * 0.25, '#fff'); circ(ctx, x + r * 0.35, y - r * 0.1, r * 0.25, '#fff');
+    circ(ctx, x - r * 0.35 + c.vx * r * 0.06, y - r * 0.1 + c.vy * r * 0.06, r * 0.12, '#222'); circ(ctx, x + r * 0.35 + c.vx * r * 0.06, y - r * 0.1 + c.vy * r * 0.06, r * 0.12, '#222');
+  }
+  function particles(ctx, list, s) {
+    list.forEach(function (p) {
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      if (p.text) { ctx.fillStyle = p.color; ctx.font = 'bold ' + Math.round(s * 0.45) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 3; ctx.strokeText(p.text, p.x * s, p.y * s); ctx.fillText(p.text, p.x * s, p.y * s); }
+      else circ(ctx, p.x * s, p.y * s, p.r * s, p.color);
+    });
+    ctx.globalAlpha = 1;
+  }
+  return { map: map, tile: tile, player: player, critter: critter, particles: particles, rr: rr, drawKey: drawKey };
+})();
+
+// ===== src/ui.js =====
+// ui.js - screens, modals (confirm/prompt/info), toasts, the map picker.
+MM.ui = (function () {
+  var $ = MM.$, cur = 'home';
+  function show(id) {
+    ['home', 'maps', 'editor', 'play'].forEach(function (s) { $('#' + s).classList.toggle('hidden', s !== id); });
+    cur = id; closeModal();
+    if (id === 'maps') renderMaps();
+    if (id === 'home') refreshHome();
+    if (MM.onScreen) MM.onScreen(id);
+  }
+  function refreshHome() { $('#btnContinue').disabled = !MM.store.get('session', null); $('#storeNote').classList.toggle('hidden', MM.store.state.mode !== 'memory'); }
+  // ---- modal ----
+  var modalClose = null;
+  function modal(html, onClose) { $('#modalCard').innerHTML = html; $('#modal').classList.remove('hidden'); modalClose = onClose || null; return $('#modalCard'); }
+  function closeModal() { var f = modalClose; modalClose = null; $('#modal').classList.add('hidden'); $('#modalCard').innerHTML = ''; if (f) f(); }
+  function isOpen() { return !$('#modal').classList.contains('hidden'); }
+  function confirmBox(title, msg, yesLabel, cb) {
+    var c = modal('<h2>' + title + '</h2><p>' + msg + '</p><div class="mrow"><button class="btn ghost" id="cNo">Cancel</button><button class="btn danger" id="cYes">' + yesLabel + '</button></div>');
+    $('#cNo', c).onclick = function () { MM.audio.play('click'); closeModal(); };
+    $('#cYes', c).onclick = function () { MM.audio.play('click'); closeModal(); cb(); };
+  }
+  function promptBox(title, value, cb) {
+    var c = modal('<h2>' + title + '</h2><input class="txt" id="pIn" maxlength="30"><div class="mrow"><button class="btn ghost" id="pNo">Cancel</button><button class="btn go" id="pYes">OK</button></div>');
+    var inp = $('#pIn', c); inp.value = value || ''; setTimeout(function () { inp.focus(); inp.select(); }, 30);
+    function ok() { var v = inp.value.trim(); if (!v) return; closeModal(); cb(v); }
+    $('#pYes', c).onclick = ok; $('#pNo', c).onclick = closeModal;
+    inp.onkeydown = function (e) { if (e.key === 'Enter') ok(); e.stopPropagation(); };
+  }
+  function toast(msg, ms) { var t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, ms || 1800); }
+  // Shown when a write could not reach real storage. The data is still kept in memory for this visit.
+  function storageWarn(m, kind) {
+    var pr = MM.storageProblem(kind), code = m ? MM.maps.toCode(m) : '';
+    var c = modal('<h2 id="stTitle" data-kind="' + pr.kind + '">⚠️ ' + pr.title + '</h2><p>' + pr.text + '</p>' + (m ? '<textarea id="stCode" readonly></textarea>' : '') +
+      '<p style="font-size:13px;color:#889">Later, use <b>📥 Import code</b> to bring it back.</p><div class="mrow">' + (m ? '<button class="btn go" id="stCopy">📋 Copy code</button>' : '') + '<button class="btn ghost" id="stOk">OK</button></div>');
+    if (m) {
+      var ta = $('#stCode', c); ta.value = code;
+      $('#stCopy', c).onclick = function () { ta.focus(); ta.select(); try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(function () { toast('Code copied!'); }, function () { try { document.execCommand('copy'); toast('Code copied!'); } catch (e) {} }); else { document.execCommand('copy'); toast('Code copied!'); } } catch (e) {} };
+    }
+    $('#stOk', c).onclick = closeModal;
+  }
+  // write My Maps; if storage refuses, explain once per visit (maps still live in memory)
+  function writeMaps(arr, m) {
+    if (MM.setMyMaps(arr)) return true;
+    var kind = MM.store.state.lastKind;
+    if (!MM.store.state.warned) { MM.store.state.warned = true; storageWarn(m, kind); } else toast('Kept for this visit (saving is blocked here)', 2600);
+    return false;
+  }
+  function shareBox(m) {
+    var code = MM.maps.toCode(m);
+    var c = modal('<h2>🔗 Share "' + MM.esc(m.name) + '"</h2><p>Copy this code and paste it with <b>Import code</b> on another device.</p><textarea id="shCode" readonly></textarea><div class="mrow"><button class="btn go" id="shCopy">📋 Copy</button><button class="btn ghost" id="shClose">Close</button></div>');
+    var ta = $('#shCode', c); ta.value = code;
+    $('#shCopy', c).onclick = function () {
+      ta.focus(); ta.select();
+      var done = function () { toast('Code copied!'); };
+      try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, function () { try { document.execCommand('copy'); done(); } catch (e) {} }); else { document.execCommand('copy'); done(); } } catch (e) {}
+    };
+    $('#shClose', c).onclick = closeModal;
+  }
+  function importBox() {
+    var c = modal('<h2>📥 Import a map</h2><p>Paste a map code (it starts with MM1-).</p><textarea id="imCode" placeholder="MM1-..."></textarea><p id="imErr" class="probs"></p><div class="mrow"><button class="btn ghost" id="imNo">Cancel</button><button class="btn go" id="imYes">Add to My Maps</button></div>');
+    $('#imCode', c).onkeydown = function (e) { e.stopPropagation(); };
+    $('#imNo', c).onclick = closeModal;
+    $('#imYes', c).onclick = function () {
+      var m = MM.maps.fromCode($('#imCode', c).value);
+      if (!m) { $('#imErr', c).textContent = 'Hmm, that code did not work. Check it was copied fully.'; MM.audio.play('nope'); return; }
+      m.id = MM.uid(); var arr = MM.myMaps(); arr.unshift(m); closeModal(); var okW = writeMaps(arr, m); MM.audio.play('save'); if (okW) toast('Added "' + m.name + '" to My Maps!'); renderMaps();
+    };
+  }
+  // ---- thumbnails ----
+  function thumb(m) {
+    var cv = document.createElement('canvas'), s = 10; cv.width = MM.W * s; cv.height = MM.H * s;
+    MM.render.map(cv.getContext('2d'), m.tiles, m.theme, s, { t: 0.4 }); return cv;
+  }
+  function goalText(m) {
+    var g = m.goal || {};
+    if (g.type === 'coins') return '🪙 Collect ' + g.coins + ' coins';
+    if (g.type === 'survive') return '⏳ Survive ' + g.time + 's';
+    return '🏁 Reach the flag';
+  }
+  function bestText(id) {
+    var b = MM.best()[id]; if (!b) return 'Not played yet';
+    return '★'.repeat(b.stars) + '☆'.repeat(3 - b.stars) + ' best ' + MM.fmtTime(b.time);
+  }
+  function renderPacks() {
+    var el = $('#packPicker'); el.innerHTML = '';
+    Object.keys(MM.questions.PACKS).forEach(function (k) {
+      var p = MM.questions.PACKS[k], b = document.createElement('button');
+      b.className = 'pack' + (MM.settings.pack === k ? ' on' : ''); b.dataset.pack = k;
+      b.innerHTML = p.emoji + ' ' + p.label + '<small>' + p.sub + '</small>';
+      b.onclick = function () { MM.settings.pack = k; MM.saveSettings(); MM.audio.play('click'); renderPacks(); };
+      el.appendChild(b);
+    });
+  }
+  function renderMaps() {
+    renderPacks();
+    var pl = $('#premadeList'); pl.innerHTML = '';
+    MM.maps.PREMADE.forEach(function (m) {
+      var c = document.createElement('div'); c.className = 'card'; c.dataset.id = m.id;
+      var cv = thumb(m); c.appendChild(cv);
+      c.insertAdjacentHTML('beforeend', '<div class="t">' + MM.THEMES[m.theme].emoji + ' ' + MM.esc(m.name) + '</div><div class="m">' + goalText(m) + ' — ' + MM.esc(m.blurb || '') + '</div><div class="m">' + bestText(m.id) + '</div><div class="row"><button class="btn go" data-act="play">▶️ Play</button><button class="btn" data-act="remix">🛠️ Remix</button></div>');
+      cv.onclick = function () { MM.play.start(m); };
+      c.querySelector('[data-act=play]').onclick = function () { MM.audio.play('click'); MM.play.start(m); };
+      c.querySelector('[data-act=remix]').onclick = function () { MM.audio.play('click'); var n = MM.maps.clone(m); n.id = null; n.premade = false; n.name = (m.name + ' Remix').slice(0, 30); delete n.blurb; MM.editor.open(n); };
+      pl.appendChild(c);
+    });
+    var ml = $('#myList'), mine = MM.myMaps(); ml.innerHTML = '';
+    if (!mine.length) ml.innerHTML = '<div class="empty">No maps yet! Tap <b>＋ New map</b> or <b>Build a Map</b> on the home screen to make your first one.</div>';
+    mine.forEach(function (m) {
+      var c = document.createElement('div'); c.className = 'card'; c.dataset.id = m.id;
+      var cv = thumb(m); c.appendChild(cv);
+      c.insertAdjacentHTML('beforeend', '<div class="t">' + (MM.THEMES[m.theme] || MM.THEMES.grass).emoji + ' ' + MM.esc(m.name) + '</div><div class="m">' + goalText(m) + '</div><div class="m">' + bestText(m.id) + '</div>' +
+        '<div class="row"><button class="btn go" data-act="play">▶️ Play</button><button class="btn" data-act="edit">✏️ Edit</button><button class="btn" data-act="rename">🏷️</button><button class="btn" data-act="dup">📄</button><button class="btn" data-act="share">🔗</button><button class="btn danger" data-act="del">🗑️</button></div>');
+      cv.onclick = function () { tryPlayMine(m); };
+      c.querySelector('[data-act=play]').onclick = function () { MM.audio.play('click'); tryPlayMine(m); };
+      c.querySelector('[data-act=edit]').onclick = function () { MM.audio.play('click'); MM.editor.open(MM.maps.clone(m)); };
+      c.querySelector('[data-act=rename]').onclick = function () { promptBox('🏷️ Rename map', m.name, function (v) { var a = MM.myMaps(); a.forEach(function (x) { if (x.id === m.id) x.name = v.slice(0, 30); }); renderMaps(); if (writeMaps(a)) toast('Renamed!'); }); };
+      c.querySelector('[data-act=dup]').onclick = function () { var a = MM.myMaps(), n = MM.maps.clone(m); n.id = MM.uid(); n.name = ('Copy of ' + m.name).slice(0, 30); a.splice(a.findIndex(function (x) { return x.id === m.id; }) + 1, 0, n); var okW = writeMaps(a, n); MM.audio.play('save'); renderMaps(); if (okW) toast('Made a copy!'); };
+      c.querySelector('[data-act=share]').onclick = function () { shareBox(m); };
+      c.querySelector('[data-act=del]').onclick = function () { confirmBox('🗑️ Delete map?', 'Delete "<b>' + MM.esc(m.name) + '</b>" forever? This can\'t be undone.', 'Delete', function () { writeMaps(MM.myMaps().filter(function (x) { return x.id !== m.id; })); renderMaps(); toast('Map deleted'); }); };
+      ml.appendChild(c);
+    });
+  }
+  function tryPlayMine(m) {
+    var v = MM.maps.validate(m);
+    if (!v.ok) { modal('<h2>🛠️ Not ready yet</h2><ul class="probs"><li>' + v.problems.join('</li><li>') + '</li></ul><div class="mrow"><button class="btn" id="vEdit">✏️ Fix it</button></div>'); $('#vEdit').onclick = function () { MM.editor.open(MM.maps.clone(m)); }; return; }
+    MM.play.start(m);
+  }
+  return { show: show, modal: modal, closeModal: closeModal, isOpen: isOpen, confirm: confirmBox, prompt: promptBox, toast: toast, storageWarn: storageWarn, writeMaps: writeMaps, share: shareBox, importBox: importBox, renderMaps: renderMaps, refreshHome: refreshHome, get screen() { return cur; }, goalText: goalText };
+})();
+
+// ===== src/editor.js =====
+// editor.js - Build mode: paint tiles on a 24x16 grid, tools, undo/redo, save to My Maps.
+MM.editor = (function () {
+  var $ = MM.$, W = MM.W, H = MM.H;
+  var map = null, tool = 'paint', brush = '#', undo = [], redo = [], savedTiles = null, savedMeta = null;
+  var cv, ctx, ts = 30, dpr = 1, stroke = null, hover = null, active = false, msgT = 0;
+
+  function init() {
+    cv = $('#edCanvas'); ctx = cv.getContext('2d');
+    var th = $('#edTheme'); Object.keys(MM.THEMES).forEach(function (k) { th.insertAdjacentHTML('beforeend', '<option value="' + k + '">' + MM.THEMES[k].emoji + ' ' + MM.THEMES[k].label + '</option>'); });
+    var gl = $('#edGoal'); Object.keys(MM.GOALS).forEach(function (k) { gl.insertAdjacentHTML('beforeend', '<option value="' + k + '">' + MM.GOALS[k].emoji + ' ' + MM.GOALS[k].label + '</option>'); });
+    th.onchange = function () { map.theme = th.value; buildPalette(); changed(); };
+    gl.onchange = function () { map.goal.type = gl.value; syncGoal(); changed(); };
+    $('#edGoalNum').onchange = $('#edGoalNum').oninput = function () {
+      var v = MM.clamp(parseInt($('#edGoalNum').value, 10) || 1, 1, 300);
+      if (map.goal.type === 'coins') map.goal.coins = v; else map.goal.time = v; changed();
+    };
+    $('#edName').oninput = function () { map.name = $('#edName').value.slice(0, 30); changed(); };
+    ['edName', 'edGoalNum'].forEach(function (id) { $('#' + id).addEventListener('keydown', function (e) { e.stopPropagation(); }); });
+    $('#edUndo').onclick = doUndo; $('#edRedo').onclick = doRedo;
+    $('#edClear').onclick = function () { MM.ui.confirm('🧹 Clear the map?', 'This wipes every tile (you can still Undo).', 'Clear', function () { push(); map.tiles = MM.maps.blank().tiles; changed(); msg('Fresh start!'); }); };
+    $('#edSave').onclick = function () { save(true); };
+    $('#edShare').onclick = function () { MM.ui.share(map); };
+    $('#edTest').onclick = testPlay;
+    $('#edBack').onclick = back;
+    cv.addEventListener('pointerdown', down); cv.addEventListener('pointermove', move);
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('pointerleave', function () { hover = null; });
+    cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    window.addEventListener('keydown', key);
+  }
+  function syncGoal() {
+    var g = map.goal, w = $('#edGoalNumWrap');
+    w.classList.toggle('hidden', g.type === 'flag');
+    $('#edGoalNum').value = g.type === 'coins' ? (g.coins || 10) : (g.time || 60);
+    $('#edGoalUnit').textContent = g.type === 'coins' ? 'coins' : 'sec';
+  }
+  function buildPalette() {
+    var p = $('#palette'); p.innerHTML = '';
+    [['paint', '✏️', 'Paint'], ['erase', '🧽', 'Eraser'], ['fill', '🪣', 'Fill']].forEach(function (t) {
+      var b = document.createElement('button'); b.className = 'pal tool' + (tool === t[0] ? ' on' : ''); b.dataset.tool = t[0];
+      b.innerHTML = '<span class="ic">' + t[1] + '</span>' + t[2];
+      b.onclick = function () { setTool(t[0]); }; p.appendChild(b);
+    });
+    p.insertAdjacentHTML('beforeend', '<div class="palsep"></div>');
+    MM.PALETTE.forEach(function (ch) {
+      var b = document.createElement('button'); b.className = 'pal' + (brush === ch && tool !== 'erase' ? ' on' : ''); b.dataset.tile = ch;
+      var c = document.createElement('canvas'); c.width = c.height = 52; var x = c.getContext('2d');
+      var th = MM.THEMES[map.theme]; x.fillStyle = th.floorA; x.fillRect(0, 0, 52, 52);
+      MM.render.tile(x, ch, 0, 0, 52, th, map.theme, 0.5, { editor: true });
+      b.appendChild(c); b.appendChild(document.createTextNode(MM.TILES[ch].name));
+      b.onclick = function () { brush = ch; if (tool === 'erase') tool = 'paint'; MM.audio.play('click'); buildPalette(); };
+      p.appendChild(b);
+    });
+  }
+  function setTool(t) { tool = t; MM.audio.play('click'); buildPalette(); msg(t === 'fill' ? 'Fill: click an area to fill it with ' + MM.TILES[brush].name : t === 'erase' ? 'Eraser: click or drag to erase (right-click erases too)' : 'Paint: click or drag'); }
+  function open(m) {
+    map = MM.maps.clone(m || MM.maps.blank());
+    map.goal = map.goal || { type: 'flag' }; if (!map.goal.coins) map.goal.coins = 10; if (!map.goal.time) map.goal.time = 60;
+    undo = []; redo = []; savedTiles = m && m.id ? map.tiles : null; savedMeta = m && m.id ? meta() : null;
+    $('#edName').value = map.name; $('#edTheme').value = map.theme; $('#edGoal').value = map.goal.type; syncGoal();
+    tool = 'paint'; brush = '#';
+    MM.ui.show('editor'); buildPalette(); resize(); persist();
+    msg(map.id ? 'Editing "' + map.name + '"' : 'Pick a tile on the left, then click or drag on the grid!');
+  }
+  function meta() { return JSON.stringify([map.name, map.theme, map.goal]); }
+  function dirty() { return map.tiles !== savedTiles || meta() !== savedMeta; }
+  function resize() {
+    if (!cv) return;
+    var st = $('#edStage'), r = st.getBoundingClientRect();
+    ts = Math.max(8, Math.floor(Math.min((r.width - 12) / W, (r.height - 12) / H)));
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.style.width = ts * W + 'px'; cv.style.height = ts * H + 'px';
+    cv.width = ts * W * dpr; cv.height = ts * H * dpr;
+  }
+  function cellAt(e) {
+    var r = cv.getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / (r.width / W)), y = Math.floor((e.clientY - r.top) / (r.height / H));
+    return MM.inb(x, y) ? { x: x, y: y } : null;
+  }
+  function push() { undo.push(map.tiles); if (undo.length > 150) undo.shift(); redo = []; }
+  function setTile(x, y, ch) {
+    var i = MM.idx(x, y), t = map.tiles; if (t[i] === ch) return false;
+    var arr = t.split('');
+    if (MM.SINGLE[ch]) for (var k = 0; k < arr.length; k++) if (arr[k] === ch) arr[k] = '.';
+    arr[i] = ch; map.tiles = arr.join(''); return true;
+  }
+  function fill(x, y, ch) {
+    var arr = map.tiles.split(''), from = arr[MM.idx(x, y)]; if (from === ch) return false;
+    if (MM.SINGLE[ch]) return setTile(x, y, ch);
+    var q = [[x, y]], n = 0;
+    while (q.length) { var p = q.pop(), i = MM.idx(p[0], p[1]); if (!MM.inb(p[0], p[1]) || arr[i] !== from) continue; arr[i] = ch; n++; q.push([p[0] + 1, p[1]], [p[0] - 1, p[1]], [p[0], p[1] + 1], [p[0], p[1] - 1]); }
+    map.tiles = arr.join(''); return n > 0;
+  }
+  function down(e) {
+    MM.audio.unlock(); e.preventDefault();
+    var c = cellAt(e); if (!c) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+    var erase = e.button === 2 || tool === 'erase', ch = erase ? '.' : brush;
+    var before = map.tiles;
+    if (tool === 'fill' && e.button !== 2) { if (fill(c.x, c.y, ch)) { undo.push(before); redo = []; MM.audio.play('paint'); changed(); } return; }
+    stroke = { ch: ch, before: before, last: null }; paintAt(c);
+  }
+  function paintAt(c) {
+    if (!stroke || (stroke.last && stroke.last.x === c.x && stroke.last.y === c.y)) return;
+    // fill in gaps for fast drags (line between cells)
+    var pts = [c];
+    if (stroke.last) { pts = []; var dx = c.x - stroke.last.x, dy = c.y - stroke.last.y, n = Math.max(Math.abs(dx), Math.abs(dy)); for (var i = 1; i <= n; i++) pts.push({ x: Math.round(stroke.last.x + dx * i / n), y: Math.round(stroke.last.y + dy * i / n) }); }
+    var any = false; pts.forEach(function (p) { if (setTile(p.x, p.y, stroke.ch)) any = true; });
+    stroke.last = c; if (any) { MM.audio.play('paint'); changed(true); }
+  }
+  function move(e) { var c = cellAt(e); hover = c; if (stroke && c) paintAt(c); }
+  function up() {
+    if (!stroke) return;
+    if (map.tiles !== stroke.before) { undo.push(stroke.before); if (undo.length > 150) undo.shift(); redo = []; changed(); }
+    stroke = null;
+  }
+  function doUndo() { if (!undo.length) { MM.audio.play('nope'); return; } redo.push(map.tiles); map.tiles = undo.pop(); MM.audio.play('click'); changed(); }
+  function doRedo() { if (!redo.length) { MM.audio.play('nope'); return; } undo.push(map.tiles); map.tiles = redo.pop(); MM.audio.play('click'); changed(); }
+  var persistT = 0;
+  function changed(quick) { $('#edUndo').disabled = !undo.length; $('#edRedo').disabled = !redo.length; if (quick) return; clearTimeout(persistT); persistT = setTimeout(persist, 250); }
+  function persist() { if (map && MM.ui.screen === 'editor') MM.store.set('session', { mode: 'build', map: map, savedTiles: savedTiles, savedMeta: savedMeta }); }
+  // Auto-name unnamed maps "My Map 1", "My Map 2", ...
+  function autoName(arr) {
+    var used = {}; arr.forEach(function (x) { if (x.id !== map.id) used[x.name] = 1; });
+    for (var n = 1; ; n++) if (!used['My Map ' + n]) return 'My Map ' + n;
+  }
+  // Saving is NEVER blocked by the map check: a map is a draft. Returns { v, stored }.
+  function save(announce) {
+    var v = MM.maps.validate(map), arr = MM.myMaps();
+    var nm = String(map.name || '').trim();
+    if (!nm || nm === 'My Map') { map.name = autoName(arr); $('#edName').value = map.name; } else map.name = nm.slice(0, 30);
+    if (!map.id) map.id = MM.uid();
+    var i = arr.findIndex(function (x) { return x.id === map.id; }), copy = MM.maps.clone(map);
+    if (i >= 0) arr[i] = copy; else arr.unshift(copy);
+    var stored = MM.setMyMaps(arr), failKind = stored ? null : MM.store.state.lastKind; // kept in memory even if the browser refuses
+    savedTiles = map.tiles; savedMeta = meta(); persist();
+    lastSave = { ok: v.ok, stored: stored, kind: failKind, problems: v.problems };
+    if (announce) {
+      MM.audio.play('save');
+      if (!stored && !MM.store.state.warned) { MM.store.state.warned = true; MM.ui.storageWarn(map, failKind); }
+      else if (!stored) MM.ui.toast('💾 Kept "' + map.name + '" for this visit (saving is blocked here — use 🔗 to keep a code)', 3800);
+      else if (v.ok) MM.ui.toast('💾 Saved "' + map.name + '" to My Maps!');
+      else { MM.ui.toast('💾 Saved! Heads up: ' + hint(v), 4200); msg('Tip: ' + v.problems[0]); }
+    }
+    return { v: v, stored: stored, kind: failKind, ok: v.ok, problems: v.problems };
+  }
+  var lastSave = null;
+  function hint(v) {
+    var p = v.problems[0] || '';
+    if (/Start/.test(p) && /Add/.test(p)) return 'add a Start 🟢 before playing.';
+    if (/Finish Flag/.test(p) && /Add/.test(p)) return 'add a Finish Flag 🏁 before playing.';
+    if (/way from the Start/.test(p)) return 'I can\'t find a way to the goal yet.';
+    return 'the map isn\'t quite ready to play yet.';
+  }
+  function testPlay() {
+    var r = save(false), v = r.v;
+    if (!r.stored && !MM.store.state.warned) { MM.store.state.warned = true; MM.ui.storageWarn(map, r.kind); return; }
+    if (v.ok) { MM.play.start(MM.maps.clone(map), { fromEditor: true }); return; }
+    MM.audio.play('nope');
+    var c = MM.ui.modal('<h2>🛠️ Almost ready!</h2><p>Your map is saved. Before playing, here\'s what I noticed:</p><ul class="probs"><li>' + v.problems.join('</li><li>') + '</li></ul><div class="mrow"><button class="btn ghost" id="vOk">Keep building</button>' +
+      (v.canPlay ? '<button class="btn go" id="vAnyway">▶️ Play anyway</button>' : '') + '</div>');
+    $('#vOk', c).onclick = MM.ui.closeModal;
+    if (v.canPlay) $('#vAnyway', c).onclick = function () { MM.ui.closeModal(); MM.play.start(MM.maps.clone(map), { fromEditor: true }); };
+  }
+  function back() {
+    if (dirty()) MM.ui.confirm('Leave the editor?', 'You have unsaved changes. Save first with 💾, or leave anyway?', 'Leave', leave);
+    else leave();
+  }
+  function leave() { MM.store.del('session'); MM.ui.show('maps'); }
+  function key(e) {
+    if (MM.ui.screen !== 'editor' || MM.ui.isOpen()) return;
+    var k = e.key.toLowerCase();
+    if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); }
+    else if ((e.metaKey || e.ctrlKey) && k === 'y') { e.preventDefault(); doRedo(); }
+    else if ((e.metaKey || e.ctrlKey) && k === 's') { e.preventDefault(); save(true); }
+    else if (!e.metaKey && !e.ctrlKey) { if (k === 'e') setTool('erase'); else if (k === 'f') setTool('fill'); else if (k === 'p') setTool('paint'); }
+  }
+  function frame(t) {
+    if (!active) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    MM.render.map(ctx, map.tiles, map.theme, ts, { t: t, editor: true });
+    if (hover) { ctx.strokeStyle = tool === 'erase' ? '#ff5f6d' : '#ff8a3d'; ctx.lineWidth = 3; MM.render.rr(ctx, hover.x * ts + 1.5, hover.y * ts + 1.5, ts - 3, ts - 3, 4); ctx.stroke(); }
+  }
+  function msg(s) { var m = $('#edMsg'); m.textContent = s; m.classList.add('show'); clearTimeout(msgT); msgT = setTimeout(function () { m.classList.remove('show'); }, 3200); }
+  return {
+    init: init, open: open, resize: resize, frame: frame, save: save, persist: persist,
+    restore: function (s) { open(s.map); savedTiles = s.savedTiles; savedMeta = s.savedMeta; },
+    setActive: function (a) { active = a; },
+    get map() { return map; }, get lastSave() { return lastSave; }, get tool() { return tool; }, get brush() { return brush; }, get undoCount() { return undo.length; }
+  };
+})();
+
+// ===== src/play.js =====
+// play.js - Play mode: movement, coins, keys/doors, portals, pads, traps, question stations, shop, goals, stars.
+MM.play = (function () {
+  var $ = MM.$, W = MM.W, H = MM.H, C = MM.CONF;
+  var run = null, cv, ctx, ts = 30, dpr = 1, active = false;
+  var keys = {}, joy = { x: 0, y: 0, id: null }, auto = false, autoPlan = null, lastSave = 0, hudCache = {};
+  var COLORS = ['#7ad7f0', '#b28dff', '#ff9aa2', '#ffd27f', '#9be3a1'];
+
+  function init() {
+    cv = $('#playCanvas'); ctx = cv.getContext('2d');
+    window.addEventListener('keydown', function (e) {
+      var k = e.key;
+      if (MM.ui.screen !== 'play') return;
+      if (MM.ui.isOpen()) { // number keys answer questions
+        if (/^[1-4]$/.test(k)) { var b = MM.$$('.choice')[+k - 1]; if (b && !b.disabled) b.click(); }
+        if ((k === 'Escape' || k === 'b' || k === 'B') && run && run.modal === 'shop') closeShop();
+        else if (k === 'Escape' && run && run.modal === 'pause') resume();
+        else if ((k === 'Enter' || k === ' ') && run && run.modal === 'intro') { e.preventDefault(); MM.audio.unlock(); resume(); }
+        return;
+      }
+      if (/^(Arrow|w|a|s|d|W|A|S|D| )/.test(k) && k.length <= 10) e.preventDefault();
+      keys[k.toLowerCase()] = true;
+      if (k === 'Escape' || k === 'p' || k === 'P') pause();
+      if (k === 'b' || k === 'B') openShop();
+    });
+    window.addEventListener('keyup', function (e) { keys[e.key.toLowerCase()] = false; });
+    window.addEventListener('blur', function () { keys = {}; });
+    $('#plExit').onclick = function () { MM.audio.play('click'); pause(); };
+    $('#plShop').onclick = function () { openShop(); };
+    // joystick
+    var jz = $('#joy'), knob = $('#joyKnob');
+    function jset(e) {
+      var r = jz.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2;
+      var dx = (e.clientX - cx) / R, dy = (e.clientY - cy) / R, m = Math.hypot(dx, dy);
+      if (m > 1) { dx /= m; dy /= m; }
+      joy.x = Math.abs(dx) < 0.15 ? 0 : dx; joy.y = Math.abs(dy) < 0.15 ? 0 : dy;
+      knob.style.transform = 'translate(' + dx * R * 0.6 + 'px,' + dy * R * 0.6 + 'px)';
+    }
+    jz.addEventListener('pointerdown', function (e) { e.preventDefault(); MM.audio.unlock(); joy.id = e.pointerId; try { jz.setPointerCapture(e.pointerId); } catch (er) {} jset(e); });
+    jz.addEventListener('pointermove', function (e) { if (joy.id === e.pointerId) jset(e); });
+    function jend(e) { if (joy.id !== e.pointerId) return; joy.id = null; joy.x = joy.y = 0; knob.style.transform = ''; }
+    jz.addEventListener('pointerup', jend); jz.addEventListener('pointercancel', jend);
+    var coarse = false; try { coarse = window.matchMedia('(pointer: coarse)').matches; } catch (e) {}
+    if (coarse || 'ontouchstart' in window || navigator.maxTouchPoints > 1) showJoy();
+    window.addEventListener('touchstart', showJoy, { passive: true });
+  }
+  function showJoy() { MM.touch = true; $('#joy').classList.remove('hidden'); }
+
+  // ---- run lifecycle ----
+  function start(map, opt) {
+    opt = opt || {};
+    var m = MM.maps.clone(map), s = m.tiles.indexOf('S');
+    var sx = s % W + 0.5, sy = ((s / W) | 0) + 0.5;
+    run = {
+      map: m, tiles: m.tiles.split(''), p: { x: sx, y: sy, fx: 0, fy: 1, moving: false, boost: 0, blink: 0, shield: 0 },
+      cash: 0, coins: 0, keys: 0, elapsed: 0, rewind: 0, hits: 0, up: { speed: 0, magnet: 0 }, doubleT: 0,
+      checkpoint: s, stations: {}, stationLock: -1, portalLock: -1, padLock: -1, critters: [], fx: [], done: false,
+      pack: opt.pack || MM.settings.pack || 'easy', fromEditor: !!opt.fromEditor, modal: null, par: MM.maps.par(m), questions: 0
+    };
+    var r = opt.resume;
+    if (r) {
+      run.tiles = r.tiles.split(''); ['cash', 'coins', 'keys', 'elapsed', 'rewind', 'hits', 'doubleT', 'checkpoint', 'pack', 'questions'].forEach(function (k) { if (r[k] !== undefined) run[k] = r[k]; });
+      run.p.x = r.px; run.p.y = r.py; run.p.shield = r.shield || 0; run.up = r.up || run.up;
+    }
+    if (m.goal.type === 'survive') spawnCritters();
+    autoPlan = null; keys = {}; hudCache = {};
+    MM.duel.attach(run, opt); // Builder vs Runner (no-op for normal runs)
+    MM.ui.show('play'); resize(); MM.duel.resize(); hud(true); save(true);
+    if (opt.net === 'builder') { MM.ui.closeModal(); if (opt.keep) MM.ui.toast('🔄 Fresh run — your changes stay!'); return; } // builder device: no intro, the runner presses Go
+    if (opt.net === 'runner' && opt.keep) { MM.ui.closeModal(); MM.ui.toast('🔄 Fresh run — the builder\'s changes stay!'); return; }
+    if (opt.duel && opt.keep) { MM.ui.closeModal(); MM.ui.toast('🔄 Fresh run — the builder\'s changes stay!'); return; }
+    if (!r) intro(); else MM.ui.toast('Welcome back! Keep going!');
+  }
+  function intro() {
+    var g = run.map.goal, txt = g.type === 'coins' ? 'Collect <b>' + g.coins + '</b> coins!' : g.type === 'survive' ? 'Survive <b>' + g.time + '</b> seconds — dodge the bouncy blobs!' : 'Reach the <b>finish flag</b> 🏁!';
+    run.modal = 'intro';
+    var c = MM.ui.modal('<h2>' + MM.esc(run.map.name) + '</h2><p style="font-size:20px">' + txt + '</p><p>💵 Coins and ❓ question stations earn cash. Spend it in the 🛒 Shop!</p><p style="font-size:13px;color:#889">' + (MM.touch ? 'Use the joystick to move.' : 'Move with WASD or arrow keys. B = shop, Esc = pause.') + (run.net === 'runner' ? '</p><p style="font-size:15px">🛠️ The <b>Builder</b> is changing this map from their device! Changes land at 🚩 checkpoints' + (MM.duel.state.mode === 'live' ? ' — ⚡ Live chaos is on: they land right away!' : ' — dotted tiles show what\'s coming.') + '</p><p style="font-size:13px;color:#889">' : run.duel ? '</p><p style="font-size:15px">🛠️ <b>Builder:</b> tap the builder grid to change the map. Changes land when the runner reaches a 🚩 checkpoint' + (MM.duel.state && MM.duel.state.mode === 'live' ? ' — or right away in ⚡ Live chaos!' : '.') + '</p><p style="font-size:13px;color:#889">' : '') + ' Questions: ' + MM.questions.PACKS[run.pack].emoji + ' ' + MM.questions.PACKS[run.pack].label + '</p><div class="mrow"><button class="btn go" id="goBtn" style="font-size:22px;padding:10px 30px">Go! 🚀</button></div>');
+    $('#goBtn', c).onclick = function () { MM.audio.unlock(); MM.audio.play('click'); resume(); };
+  }
+  function spawnCritters() {
+    var t = run.map.tiles, s = t.indexOf('S'), d = MM.maps.bfs(t, s % W, (s / W) | 0, { spikesOk: true, doorsOpen: false }).dist, spots = [];
+    for (var i = 0; i < t.length; i++) if (d[i] >= 6 && t[i] === '.') spots.push(i);
+    if (!spots.length) for (i = 0; i < t.length; i++) if (d[i] >= 3 && t[i] === '.') spots.push(i);
+    var n = Math.min(5, 2 + Math.floor((run.map.goal.time || 60) / 30));
+    for (var k = 0; k < n && spots.length; k++) {
+      var j = spots.splice(Math.floor(Math.random() * spots.length), 1)[0], a = Math.random() * Math.PI * 2;
+      run.critters.push({ x: j % W + 0.5, y: ((j / W) | 0) + 0.5, vx: Math.cos(a) * 2.2, vy: Math.sin(a) * 2.2, color: COLORS[k % COLORS.length], seed: k * 1.7 });
+    }
+  }
+  function resume() { if (!run) return; run.modal = null; MM.ui.closeModal(); keys = {}; }
+  function paused() { return !run || run.done || run.modal || run.hold || MM.ui.isOpen(); }
+
+  // ---- physics ----
+  function solidAt(tx, ty, opening) {
+    if (!MM.inb(tx, ty)) return true;
+    var ch = run.tiles[MM.idx(tx, ty)];
+    if (ch === 'D' && opening && run.keys > 0) { run.keys--; run.tiles[MM.idx(tx, ty)] = '.'; MM.audio.play('door'); burst(tx + 0.5, ty + 0.5, '#c58b4f', 12); MM.ui.toast('🔓 Door unlocked!'); return false; }
+    return !MM.passable(ch, false); // shared rule with the map checker
+  }
+  function blocked(x, y, r, opening) {
+    var x0 = Math.floor(x - r), x1 = Math.floor(x + r - 1e-6), y0 = Math.floor(y - r), y1 = Math.floor(y + r - 1e-6);
+    for (var ty = y0; ty <= y1; ty++) for (var tx = x0; tx <= x1; tx++) if (solidAt(tx, ty, opening)) return true;
+    return false;
+  }
+  function moveAxis(p, dx, dy) {
+    var r = C.radius, nx = p.x + dx, ny = p.y + dy;
+    if (!blocked(nx, ny, r, true)) { p.x = nx; p.y = ny; return; }
+    // slide: clamp to tile edge
+    if (dx > 0) p.x = Math.floor(p.x + r + dx) - r - 1e-4; else if (dx < 0) p.x = Math.ceil(p.x - r + dx) + r + 1e-4;
+    if (dy > 0) p.y = Math.floor(p.y + r + dy) - r - 1e-4; else if (dy < 0) p.y = Math.ceil(p.y - r + dy) + r + 1e-4;
+  }
+  function inputVec(dt, sp) {
+    if (auto) return autopilot(dt, sp);
+    var x = 0, y = 0;
+    if (keys.arrowleft || keys.a) x -= 1; if (keys.arrowright || keys.d) x += 1;
+    if (keys.arrowup || keys.w) y -= 1; if (keys.arrowdown || keys.s) y += 1;
+    if (x || y) { var m = Math.hypot(x, y); return { x: x / m, y: y / m }; }
+    return { x: joy.x, y: joy.y };
+  }
+  function speed() { return C.speed * (1 + 0.2 * run.up.speed) * (run.p.boost > 0 ? C.padBoost : 1); }
+
+  function update(dt) {
+    if (paused()) return;
+    var p = run.p, sp = speed();
+    run.elapsed += dt;
+    if (p.boost > 0) p.boost -= dt; if (p.blink > 0) p.blink -= dt; if (run.doubleT > 0) run.doubleT -= dt;
+    for (var k in run.stations) { run.stations[k] -= dt; if (run.stations[k] <= 0) delete run.stations[k]; }
+    var v = inputVec(dt, sp);
+    p.moving = !!(v.x || v.y);
+    if (p.moving) {
+      var m = Math.hypot(v.x, v.y); p.fx = v.x / m; p.fy = v.y / m;
+      var steps = Math.ceil(sp * dt / 0.2);
+      for (var i = 0; i < steps; i++) { moveAxis(p, v.x * sp * dt / steps, 0); moveAxis(p, 0, v.y * sp * dt / steps); }
+    }
+    tileEffects();
+    if (run.done || run.modal) return;
+    // critters
+    run.critters.forEach(function (c) {
+      var nx = c.x + c.vx * dt, ny = c.y + c.vy * dt;
+      if (blocked(nx, c.y, 0.3, false)) c.vx = -c.vx; else c.x = nx;
+      if (blocked(c.x, ny, 0.3, false)) c.vy = -c.vy; else c.y = ny;
+      if (p.blink <= 0 && Math.hypot(c.x - p.x, c.y - p.y) < 0.6) ouch('blob');
+    });
+    // goals
+    var g = run.map.goal;
+    if (g.type === 'coins' && run.coins >= g.coins) win();
+    if (g.type === 'survive' && remaining() <= 0) win();
+    if (performance.now() - lastSave > 1500) save();
+  }
+  function remaining() { return (run.map.goal.time || 60) - run.elapsed - run.rewind; }
+  function clockTime() { return Math.max(0, run.elapsed - run.rewind); }
+  function cashMul() { return run.doubleT > 0 ? 2 : 1; }
+  function earn(n, x, y) { var v = n * cashMul(); run.cash += v; float('+$' + v, x, y, run.doubleT > 0 ? '#ffd23f' : '#3ccf6e'); flash('#hudCash'); }
+  function tileEffects() {
+    var p = run.p, tx = Math.floor(p.x), ty = Math.floor(p.y), i = MM.idx(tx, ty), ch = run.tiles[i];
+    // coins: own tile + magnet radius
+    var R = run.up.magnet ? (run.up.magnet === 1 ? 1.8 : 2.8) : 0.55;
+    var y0 = Math.max(0, Math.floor(p.y - R)), y1 = Math.min(H - 1, Math.floor(p.y + R)), x0 = Math.max(0, Math.floor(p.x - R)), x1 = Math.min(W - 1, Math.floor(p.x + R));
+    for (var yy = y0; yy <= y1; yy++) for (var xx = x0; xx <= x1; xx++) {
+      var j = MM.idx(xx, yy); if (run.tiles[j] !== 'c') continue;
+      if (j === i || Math.hypot(xx + 0.5 - p.x, yy + 0.5 - p.y) <= R) { run.tiles[j] = '.'; run.coins++; earn(C.coinValue, xx + 0.5, yy + 0.3); MM.audio.play('coin'); burst(xx + 0.5, yy + 0.5, '#ffd23f', 6); }
+    }
+    if (run.portalLock >= 0 && run.portalLock !== i) run.portalLock = -1;
+    if (run.padLock >= 0 && run.padLock !== i) run.padLock = -1;
+    if (run.stationLock >= 0 && run.stationLock !== i) run.stationLock = -1;
+    switch (ch) {
+      case 'k': run.tiles[i] = '.'; run.keys++; MM.audio.play('key'); burst(tx + 0.5, ty + 0.5, '#ffc928', 10); MM.ui.toast('🔑 Got a key! Find a locked door.'); break;
+      case '^':
+        if (p.blink > 0 || !MM.spikesUp(run.elapsed)) break; // spikes are down: safe to cross
+        if (Math.hypot(tx + 0.5 - p.x, ty + 0.5 - p.y) > 0.62) break; // must really step on it
+        ouch('spikes'); break;
+      case '>': if (run.padLock !== i) { run.padLock = i; p.boost = C.padTime; MM.audio.play('pad'); } else p.boost = Math.max(p.boost, 0.3); break;
+      case 'A': case 'B':
+        if (run.portalLock === i) break;
+        var other = run.tiles.indexOf(ch === 'A' ? 'B' : 'A'); if (other < 0) break;
+        burst(p.x, p.y, '#b28dff', 10); p.x = other % W + 0.5; p.y = ((other / W) | 0) + 0.5; run.portalLock = other; autoPlan = null;
+        MM.audio.play('teleport'); burst(p.x, p.y, '#ff8a3d', 10); break;
+      case 'P': if (run.checkpoint !== i) { run.checkpoint = i; MM.audio.play('checkpoint'); float('Checkpoint!', tx + 0.5, ty, '#4aa3ff'); if (run.duel) MM.duel.onCheckpoint(); } break;
+      case '?': if (!run.stations[i] && run.stationLock !== i) { run.stationLock = i; ask(i); } break;
+      case 'F': if (run.map.goal.type === 'flag') win(); break;
+    }
+  }
+  function ouch(what) {
+    var p = run.p;
+    if (p.shield > 0) { p.shield--; p.blink = 1.2; MM.audio.play('shield'); float('Shield!', p.x, p.y - 0.6, '#7ad7f0'); return; }
+    run.hits++; MM.audio.play('trap'); burst(p.x, p.y, '#ff6b6b', 14);
+    var c = run.checkpoint; p.x = c % W + 0.5; p.y = ((c / W) | 0) + 0.5; p.blink = 1.5; p.boost = 0; autoPlan = null;
+    MM.ui.toast(what === 'blob' ? '💥 Boing! Back to your checkpoint.' : '🔺 Ouch, spikes! Back to your checkpoint.');
+    if (run.duel) MM.duel.onDeath();
+  }
+  // restart: a Builder-vs-Runner run keeps the builder's landed changes (waiting ones land now)
+  function restart() {
+    if (run.net === 'runner') { MM.ui.closeModal(); run.modal = null; run.hold = true; MM.ui.toast('🔄 Asking the builder for a fresh run…'); MM.net.send({ t: 'restart' }); return; }
+    if (run.net === 'builder') { var kb = MM.duel.keepForRestart(); start(kb.map, { duel: true, keep: kb.keep, net: 'builder' }); return; }
+    if (run.duel) { var k = MM.duel.keepForRestart(); start(k.map, { duel: true, keep: k.keep }); } else start(run.map, { fromEditor: run.fromEditor }); }
+
+  // ---- questions ----
+  function ask(idx) {
+    run.modal = 'question'; var q = MM.questions.next(run.pack); run.q = q; keys = {};
+    var val = C.questionValue * cashMul();
+    var html = '<h2>❓ Question! <span style="color:#3ccf6e">+$' + val + '</span></h2>' + (q.visual ? '<div class="qvis">' + q.visual + '</div>' : '') + '<div class="qtext">' + MM.esc(q.q) + '</div><div class="choices">' +
+      q.choices.map(function (c, n) { return '<button class="choice" data-n="' + n + '">' + MM.esc(c) + '</button>'; }).join('') +
+      '</div><div class="qfoot"><button class="btn ghost" id="qSpeak">🔊 Read it</button><span class="qmsg" id="qMsg"></span><button class="btn ghost" id="qSkip">Skip ⏭️</button></div>';
+    var card = MM.ui.modal(html);
+    MM.$$('.choice', card).forEach(function (b) { b.onclick = function () { answer(+b.dataset.n, idx); }; });
+    $('#qSkip', card).onclick = function () { MM.audio.play('click'); run.stations[idx] = 3; done(); };
+    $('#qSpeak', card).onclick = function () { speak(q.speak + ' ' + q.choices.join(', or ')); };
+    function done() { try { speechSynthesis.cancel(); } catch (e) {} resume(); }
+    run.qDone = done;
+  }
+  function speak(text) {
+    try { var u = new SpeechSynthesisUtterance(text); u.rate = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+  }
+  function answer(n, idx) {
+    var q = run.q; if (!q || run.modal !== 'question') return;
+    var btns = MM.$$('.choice'), msg = $('#qMsg');
+    if (n === q.answer) {
+      btns.forEach(function (b) { b.disabled = true; }); btns[n].classList.add('right');
+      MM.audio.play('right'); msg.textContent = pick(['Awesome!', 'You got it!', 'Super smart!', 'Nice one!', 'Brilliant!']);
+      run.questions++; var p = run.p; earn(C.questionValue, p.x, p.y - 0.6);
+      run.stations[idx] = C.stationCooldown; run.q = null;
+      setTimeout(function () { if (run && run.modal === 'question') run.qDone(); }, 750);
+    } else {
+      MM.audio.play('wrong'); btns[n].classList.add('wrong'); btns[n].disabled = true;
+      msg.textContent = 'Not quite — try again!';
+      btns.forEach(function (b) { if (!b.classList.contains('wrong')) { b.disabled = true; setTimeout(function () { b.disabled = false; }, 900); } });
+    }
+  }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  // ---- shop ----
+  function openShop() {
+    if (run && run.remote) return;
+    if (!run || run.done || (run.modal && run.modal !== 'shop')) return;
+    MM.audio.unlock(); MM.audio.play('click'); run.modal = 'shop'; keys = {}; renderShop();
+  }
+  function itemState(k) {
+    var it = C.shop[k], lvl = k === 'speed' || k === 'magnet' ? run.up[k] : 0;
+    var maxed = lvl >= it.max || (k === 'shield' && run.p.shield >= 3);
+    var cost = it.cost[Math.min(lvl, it.cost.length - 1)];
+    return { it: it, lvl: lvl, maxed: maxed, cost: cost };
+  }
+  function renderShop() {
+    var html = '<h2>🛒 Shop <span style="color:#1a7a3a">💵 $' + run.cash + '</span></h2><div class="shoplist">';
+    Object.keys(C.shop).forEach(function (k) {
+      var s = itemState(k), extra = (k === 'speed' || k === 'magnet') ? ' (Lv ' + s.lvl + '/' + s.it.max + ')' : k === 'shield' ? ' (have ' + run.p.shield + ')' : k === 'double' && run.doubleT > 0 ? ' (' + Math.ceil(run.doubleT) + 's left)' : '';
+      html += '<div class="item" data-item="' + k + '"><span class="e">' + s.it.emoji + '</span><div><div class="n">' + s.it.name + extra + '</div><div class="d">' + s.it.desc + '</div></div><button class="btn ' + (s.maxed ? '' : 'go') + '" data-buy="' + k + '"' + (s.maxed || run.cash < s.cost ? ' disabled' : '') + '>' + (s.maxed ? 'MAX' : '$' + s.cost) + '</button></div>';
+    });
+    html += '</div><p style="font-size:13px">Earn more cash from 🪙 coins and ❓ questions.</p><div class="mrow"><button class="btn play" id="shopClose">Back to the map ▶️</button></div>';
+    var c = MM.ui.modal(html);
+    MM.$$('[data-buy]', c).forEach(function (b) { b.onclick = function () { buy(b.dataset.buy); }; });
+    $('#shopClose', c).onclick = closeShop;
+  }
+  function buy(k) {
+    var s = itemState(k);
+    if (s.maxed || run.cash < s.cost) { MM.audio.play('nope'); return false; }
+    run.cash -= s.cost; MM.audio.play('buy');
+    if (k === 'speed' || k === 'magnet') run.up[k]++;
+    else if (k === 'shield') run.p.shield++;
+    else if (k === 'rewind') run.rewind += 10;
+    else if (k === 'double') run.doubleT = Math.max(0, run.doubleT) + 30;
+    MM.ui.toast(s.it.emoji + ' ' + s.it.name + '!'); renderShop(); save(true); return true;
+  }
+  function closeShop() { MM.audio.play('click'); resume(); }
+  function pause() {
+    if (!run || run.done || run.modal) return;
+    run.modal = 'pause'; keys = {};
+    var c = MM.ui.modal('<h2>⏸️ Paused</h2><p>' + MM.esc(run.map.name) + '</p><div class="mrow"><button class="btn go" id="pRes">▶️ Resume</button><button class="btn" id="pRestart">🔄 Restart</button>' + (run.fromEditor ? '<button class="btn" id="pEdit">🛠️ Back to editor</button>' : '') + '<button class="btn ghost" id="pExit">🗺️ Maps</button><button class="btn ghost" id="pHome">🏠 Home</button></div><p style="font-size:12px">' + (run.net ? '📡 Two-device game — 🗺️ Maps or 🏠 Home ends it for both players.' : run.duel ? 'Builder vs Runner runs aren\'t saved for Continue.' : 'Your run is saved — use Continue on the home screen to come back.') + '</p>');
+    $('#pRes', c).onclick = function () { MM.audio.play('click'); resume(); };
+    $('#pRestart', c).onclick = function () { MM.audio.play('click'); restart(); };
+    if (run.fromEditor) $('#pEdit', c).onclick = function () { var m = run.map; save(true); run = null; MM.editor.open(m); };
+    $('#pExit', c).onclick = function () { save(true); MM.ui.show('maps'); };
+    $('#pHome', c).onclick = function () { save(true); MM.ui.show('home'); };
+  }
+
+  // ---- win ----
+  function win() {
+    if (run.done) return;
+    run.done = true; MM.audio.play('win'); keys = {};
+    var g = run.map.goal, time = g.type === 'survive' ? (g.time || 60) : clockTime(), stars;
+    if (g.type === 'survive') stars = run.hits === 0 ? 3 : run.hits <= 2 ? 2 : 1;
+    else stars = time <= run.par ? 3 : time <= run.par * 1.6 ? 2 : 1;
+    var id = run.map.id, best = MM.best(), prev = id ? best[id] : null, isNew = false;
+    if (run.duel) id = null; // duel maps change mid-game: no best times
+    if (id && (!prev || stars > prev.stars || (stars === prev.stars && time < prev.time))) { best[id] = { time: time, stars: stars }; MM.store.set('best', best); isNew = true; }
+    if (!run.duel) MM.store.del('session');
+    for (var i = 0; i < 60; i++) run.fx.push({ x: Math.random() * W, y: -Math.random() * 3, vx: (Math.random() - 0.5) * 2, vy: 3 + Math.random() * 4, life: 3, max: 3, r: 0.12, color: COLORS[i % 5], g: 2 });
+    run.result = { time: time, stars: stars, cash: run.cash, isNew: isNew };
+    if (run.net === 'runner') MM.duel.onWin(run.result);
+    setTimeout(function () {
+      if (!run || !run.done) return;
+      var st = ''; for (var s = 0; s < 3; s++) st += '<span class="' + (s < stars ? '' : 'off') + '">⭐</span>';
+      var bestNow = id ? MM.best()[id] : null;
+      var c = MM.ui.modal('<h2>' + (g.type === 'survive' ? '🎉 You survived!' : '🎉 You did it!') + '</h2><div class="stars" id="endStars" data-stars="' + stars + '">' + st + '</div>' +
+        '<p style="font-size:20px"><b>' + (g.type === 'survive' ? 'Bumps: ' + run.hits : '⏱️ ' + MM.fmtTime(time)) + '</b> &nbsp; 💵 $' + run.cash + ' &nbsp; ❓ ' + run.questions + '</p>' +
+        (isNew ? '<p style="color:#e07b00;font-weight:800">🏆 New best!</p>' : bestNow ? '<p>Best: ' + MM.fmtTime(bestNow.time) + ' ' + '★'.repeat(bestNow.stars) + '</p>' : '') +
+        (g.type !== 'survive' && stars < 3 ? '<p style="font-size:13px">3 stars: finish in ' + MM.fmtTime(run.par) + ' or less (⏱️ Clock Rewind helps!)</p>' : '') +
+        '<div class="mrow"><button class="btn go" id="eAgain">🔄 Play again</button>' + (run.duel ? '<p>🛠️ Builder changes landed: <b>' + MM.duel.state.stats.applied + '</b></p>' : '') + (run.fromEditor ? '<button class="btn" id="eEdit">🛠️ Back to editor</button>' : '') + '<button class="btn" id="eMaps">🗺️ More maps</button></div>');
+      $('#eAgain', c).onclick = function () { MM.audio.play('click'); restart(); };
+      if (run.fromEditor) $('#eEdit', c).onclick = function () { var m = run.map; run = null; MM.editor.open(m); };
+      $('#eMaps', c).onclick = function () { MM.audio.play('click'); MM.ui.show('maps'); };
+    }, 900);
+  }
+
+  // ---- autopilot (test/debug helper: steers like a joystick along a BFS path) ----
+  function autopilot(dt, sp) {
+    var p = run.p, here = MM.idx(Math.floor(p.x), Math.floor(p.y));
+    if (!autoPlan || !autoPlan.length) {
+      var t = run.tiles.join(''), g = run.map.goal, opts = { doorsOpen: run.keys > 0 }, tx = Math.floor(p.x), ty = Math.floor(p.y);
+      var want = g.type === 'flag' ? 'F' : g.type === 'coins' ? 'c' : null;
+      if (!want) return { x: 0, y: 0 };
+      autoPlan = MM.maps.pathTo(t, tx, ty, function (i, ch) { return ch === want; }, opts);
+      var doors = autoPlan ? autoPlan.filter(function (i) { return t[i] === 'D'; }).length : 0;
+      if (!autoPlan || doors > run.keys) autoPlan = MM.maps.pathTo(t, tx, ty, function (i, ch) { return ch === 'k'; }, opts) || autoPlan;
+      if (!autoPlan) return { x: 0, y: 0 };
+    }
+    var nx = autoPlan[0] % W + 0.5, ny = ((autoPlan[0] / W) | 0) + 0.5, dx = nx - p.x, dy = ny - p.y, d = Math.hypot(dx, dy);
+    if (d > 2.5 || (run.tiles[autoPlan[0]] === 'D' && run.keys < 1)) { autoPlan = null; return { x: 0, y: 0 }; } // teleported / knocked back / shut door: replan
+    // wait for spikes to drop before stepping onto them
+    if (run.tiles[autoPlan[0]] === '^' && run.tiles[here] !== '^') {
+      var n = 0; while (n < autoPlan.length && run.tiles[autoPlan[n]] === '^') n++;
+      var ph = run.elapsed % MM.SPIKE.cycle, downLeft = ph < MM.SPIKE.up ? 0 : MM.SPIKE.cycle - ph;
+      if (downLeft < Math.min(n, 3) / sp + 0.45) { var hx = Math.floor(p.x) + 0.5 - p.x, hy = Math.floor(p.y) + 0.5 - p.y, hd = Math.hypot(hx, hy); return hd > 0.05 ? { x: hx / hd * 0.5, y: hy / hd * 0.5 } : { x: 0, y: 0 }; }
+    }
+    if (d < 0.06) { autoPlan.shift(); return { x: 0, y: 0 }; }
+    var k = Math.min(1, d / (sp * dt)); return { x: dx / d * k, y: dy / d * k };
+  }
+
+  // ---- fx ----
+  function burst(x, y, color, n) { for (var i = 0; i < n; i++) { var a = Math.random() * 6.28, s = 1 + Math.random() * 2.5; run.fx.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0.5, max: 0.5, r: 0.07, color: color }); } }
+  function float(text, x, y, color) { run.fx.push({ x: x, y: y, vx: 0, vy: -1.2, life: 0.9, max: 0.9, text: text, color: color }); }
+  function flash(sel) { var e = $(sel); e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); }
+
+  // ---- hud + draw ----
+  function hud(force) {
+    var g = run.map.goal, vals = {
+      cash: '💵 $' + run.cash + (run.doubleT > 0 ? ' ×2' : ''),
+      time: g.type === 'survive' ? '⏳ ' + MM.fmtTime(Math.max(0, remaining())) : '⏱️ ' + MM.fmtTime(clockTime()),
+      goal: g.type === 'coins' ? '🪙 ' + Math.min(run.coins, g.coins) + '/' + g.coins : g.type === 'survive' ? '🫠 Bumps ' + run.hits : '🏁 Find the flag',
+      items: (run.keys ? '🔑×' + run.keys + ' ' : '') + (run.p.shield ? '🫧×' + run.p.shield + ' ' : '') + (run.up.speed ? '👟' + run.up.speed + ' ' : '') + (run.up.magnet ? '🧲 ' : '')
+    };
+    if (force || vals.cash !== hudCache.cash) $('#hudCash').textContent = vals.cash;
+    if (force || vals.time !== hudCache.time) $('#hudTime').textContent = vals.time;
+    if (force || vals.goal !== hudCache.goal) $('#hudGoal').textContent = vals.goal;
+    if (force || vals.items !== hudCache.items) $('#hudItems').textContent = vals.items.trim();
+    vals.duel = hudCache.duel; hudCache = vals;
+  }
+  function resize() {
+    if (!cv) return;
+    var r = $('#playStage').getBoundingClientRect();
+    ts = Math.max(8, Math.floor(Math.min((r.width - 8) / W, (r.height - 8) / H)));
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.style.width = ts * W + 'px'; cv.style.height = ts * H + 'px'; cv.width = ts * W * dpr; cv.height = ts * H * dpr;
+  }
+  function frame(t, dt) {
+    if (!active || !run) return;
+    for (var n = 0; n < (MM.timeScale || 1) && run; n++) update(dt);
+    if (!run) return;
+    run.fx = run.fx.filter(function (f) { f.life -= dt; f.x += f.vx * dt; f.y += f.vy * dt; if (f.g) f.vy += f.g * dt; return f.life > 0; });
+    var st = {}; for (var k in run.stations) st[k] = { ready: false, frac: run.stations[k] / C.stationCooldown };
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    MM.render.map(ctx, run.tiles.join(''), run.map.theme, ts, { t: t, stations: st, checkpoint: run.checkpoint, spikeT: run.elapsed });
+    if (run.up.magnet) { ctx.strokeStyle = 'rgba(255,90,90,.25)'; ctx.setLineDash([4, 6]); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(run.p.x * ts, run.p.y * ts, (run.up.magnet === 1 ? 1.8 : 2.8) * ts, 0, 6.29); ctx.stroke(); ctx.setLineDash([]); }
+    run.critters.forEach(function (c) { MM.render.critter(ctx, c, ts, t); });
+    MM.render.player(ctx, run.p, ts, t);
+    MM.render.particles(ctx, run.fx, ts);
+    if (run.duel) MM.duel.drawRunner(ctx, ts);
+    if (run.doubleT > 0) { ctx.strokeStyle = 'rgba(255,210,63,' + (0.5 + 0.3 * Math.sin(t * 6)) + ')'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, ts * W - 6, ts * H - 6); }
+    hud();
+    if (run.duel) { var dh = MM.duel.hudText(); if (dh !== hudCache.duel) $('#hudDuel').textContent = hudCache.duel = dh; MM.duel.frame(t, dt * (MM.timeScale || 1)); }
+  }
+  function save(force) {
+    if (!run || run.done || run.duel) return; lastSave = performance.now();
+    MM.store.set('session', { mode: 'play', map: run.map, fromEditor: run.fromEditor, run: { tiles: run.tiles.join(''), px: run.p.x, py: run.p.y, shield: run.p.shield, cash: run.cash, coins: run.coins, keys: run.keys, elapsed: run.elapsed, rewind: run.rewind, hits: run.hits, up: run.up, doubleT: run.doubleT, checkpoint: run.checkpoint, pack: run.pack, questions: run.questions } });
+  }
+  return {
+    init: init, start: start, frame: frame, resize: resize, save: save, buy: buy, openShop: openShop, closeShop: closeShop, answer: function (n) { if (run && run.q) answer(n, run.stationLock); }, pause: pause, resume: resume,
+    setActive: function (a) { active = a; if (!a) keys = {}; },
+    setAuto: function (a) { auto = !!a; autoPlan = null; },
+    replan: function () { autoPlan = null; }, ouch: function (w) { if (run && !run.done) ouch(w || 'spikes'); }, restart: function () { if (run) restart(); },
+    get run() { return run; }, get ts() { return ts; }
+  };
+})();
+
+// ===== src/qr.js =====
+// qr.js - tiny inline QR code maker (byte mode, error correction level M, versions 1-10). No network, no library.
+// Written from the public QR Code spec (ISO/IEC 18004). MM.qr.make(text) -> { size, get(x, y) }; MM.qr.draw(canvas, text, px).
+MM.qr = (function () {
+  var ECC = [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26];   // EC codewords per block, level M
+  var BLOCKS = [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5];           // number of blocks, level M
+  function rawModules(v) {
+    var r = (16 * v + 128) * v + 64;
+    if (v >= 2) { var n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; }
+    return r;
+  }
+  function dataCodewords(v) { return Math.floor(rawModules(v) / 8) - ECC[v] * BLOCKS[v]; }
+  // Reed-Solomon over GF(256), polynomial 0x11D
+  function mul(x, y) { var z = 0; for (var i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z & 255; }
+  function divisor(deg) {
+    var r = []; for (var i = 0; i < deg - 1; i++) r.push(0); r.push(1);
+    var root = 1;
+    for (i = 0; i < deg; i++) {
+      for (var j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; }
+      root = mul(root, 2);
+    }
+    return r;
+  }
+  function remainder(data, div) {
+    var r = div.map(function () { return 0; });
+    data.forEach(function (b) { var f = b ^ r.shift(); r.push(0); div.forEach(function (c, i) { r[i] ^= mul(c, f); }); });
+    return r;
+  }
+  function utf8(s) { var out = [], e = unescape(encodeURIComponent(s)); for (var i = 0; i < e.length; i++) out.push(e.charCodeAt(i)); return out; }
+  function alignPos(v) {
+    if (v === 1) return [];
+    var n = Math.floor(v / 7) + 2, step = Math.floor((v * 8 + n * 3 + 5) / (n * 4 - 4)) * 2, out = [6];
+    for (var p = v * 4 + 10; out.length < n; p -= step) out.splice(1, 0, p);
+    return out;
+  }
+  function make(text) {
+    var bytes = utf8(text), v;
+    for (v = 1; v <= 10; v++) if (4 + (v < 10 ? 8 : 16) + bytes.length * 8 <= dataCodewords(v) * 8) break;
+    if (v > 10) throw new Error('QR text too long');
+    // --- bit stream ---
+    var bits = [];
+    function put(val, len) { for (var i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); }
+    put(4, 4); put(bytes.length, v < 10 ? 8 : 16); bytes.forEach(function (b) { put(b, 8); });
+    var cap = dataCodewords(v) * 8;
+    put(0, Math.min(4, cap - bits.length)); put(0, (8 - bits.length % 8) % 8);
+    for (var pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
+    var data = []; for (var i = 0; i < bits.length; i += 8) { var b = 0; for (var j = 0; j < 8; j++) b = (b << 1) | bits[i + j]; data.push(b); }
+    // --- blocks + error correction, interleaved ---
+    var nb = BLOCKS[v], ecl = ECC[v], raw = Math.floor(rawModules(v) / 8), nShort = nb - raw % nb, shortLen = Math.floor(raw / nb);
+    var div = divisor(ecl), blocks = [], k = 0;
+    for (i = 0; i < nb; i++) {
+      var d = data.slice(k, k + shortLen - ecl + (i < nShort ? 0 : 1)); k += d.length;
+      var ec = remainder(d, div); if (i < nShort) d.push(0);
+      blocks.push(d.concat(ec));
+    }
+    var all = [];
+    for (i = 0; i < blocks[0].length; i++) blocks.forEach(function (bl, j) { if (i !== shortLen - ecl || j >= nShort) all.push(bl[i]); });
+    // --- matrix ---
+    var size = v * 4 + 17, mod = [], fn = [];
+    for (i = 0; i < size; i++) { mod.push(new Array(size).fill(false)); fn.push(new Array(size).fill(false)); }
+    function set(x, y, on) { mod[y][x] = on; fn[y][x] = true; }
+    for (i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    function finder(cx, cy) {
+      for (var dy = -4; dy <= 4; dy++) for (var dx = -4; dx <= 4; dx++) {
+        var dist = Math.max(Math.abs(dx), Math.abs(dy)), x = cx + dx, y = cy + dy;
+        if (x >= 0 && x < size && y >= 0 && y < size) set(x, y, dist !== 2 && dist !== 4);
+      }
+    }
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    var ap = alignPos(v);
+    ap.forEach(function (ay, a) { ap.forEach(function (ax, b) {
+      if ((a === 0 && b === 0) || (a === 0 && b === ap.length - 1) || (a === ap.length - 1 && b === 0)) return;
+      for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) set(ax + dx, ay + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+    }); });
+    function format(mask) {
+      var dat = (0 << 3) | mask, rem = dat; // level M = 0b00
+      for (var i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+      var f = ((dat << 10) | rem) ^ 0x5412;
+      for (i = 0; i <= 5; i++) set(8, i, ((f >>> i) & 1) === 1);
+      set(8, 7, ((f >>> 6) & 1) === 1); set(8, 8, ((f >>> 7) & 1) === 1); set(7, 8, ((f >>> 8) & 1) === 1);
+      for (i = 9; i < 15; i++) set(14 - i, 8, ((f >>> i) & 1) === 1);
+      for (i = 0; i < 8; i++) set(size - 1 - i, 8, ((f >>> i) & 1) === 1);
+      for (i = 8; i < 15; i++) set(8, size - 15 + i, ((f >>> i) & 1) === 1);
+      set(8, size - 8, true);
+    }
+    format(0);
+    if (v >= 7) {
+      var rem = v; for (i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25);
+      var vb = (v << 12) | rem;
+      for (i = 0; i < 18; i++) { var bit = ((vb >>> i) & 1) === 1, a = size - 11 + i % 3, c = Math.floor(i / 3); set(a, c, bit); set(c, a, bit); }
+    }
+    // data placement (zigzag)
+    var bi = 0;
+    for (var right = size - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (var vert = 0; vert < size; vert++) for (j = 0; j < 2; j++) {
+        var x = right - j, up = ((right + 1) & 2) === 0, y = up ? size - 1 - vert : vert;
+        if (!fn[y][x] && bi < all.length * 8) { mod[y][x] = ((all[bi >>> 3] >>> (7 - (bi & 7))) & 1) === 1; bi++; }
+      }
+    }
+    function maskBit(m, x, y) {
+      switch (m) {
+        case 0: return (x + y) % 2 === 0; case 1: return y % 2 === 0; case 2: return x % 3 === 0; case 3: return (x + y) % 3 === 0;
+        case 4: return (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; case 5: return x * y % 2 + x * y % 3 === 0;
+        case 6: return (x * y % 2 + x * y % 3) % 2 === 0; default: return ((x + y) % 2 + x * y % 3) % 2 === 0;
+      }
+    }
+    function applyMask(m) { for (var y = 0; y < size; y++) for (var x = 0; x < size; x++) if (!fn[y][x] && maskBit(m, x, y)) mod[y][x] = !mod[y][x]; }
+    function penalty() {
+      var p = 0, x, y, dark = 0;
+      for (var pass = 0; pass < 2; pass++) for (y = 0; y < size; y++) {
+        var run = 0, prev = null, hist = [];
+        for (x = 0; x < size; x++) {
+          var c = pass ? mod[x][y] : mod[y][x];
+          if (c === prev) { run++; if (run === 5) p += 3; else if (run > 5) p++; } else { run = 1; prev = c; }
+        }
+      }
+      for (y = 0; y < size - 1; y++) for (x = 0; x < size - 1; x++) { var c0 = mod[y][x]; if (c0 === mod[y][x + 1] && c0 === mod[y + 1][x] && c0 === mod[y + 1][x + 1]) p += 3; }
+      var pat = [true, false, true, true, true, false, true];
+      for (pass = 0; pass < 2; pass++) for (y = 0; y < size; y++) for (x = 0; x + 7 <= size; x++) {
+        var hit = true; for (var q = 0; q < 7 && hit; q++) if ((pass ? mod[x + q][y] : mod[y][x + q]) !== pat[q]) hit = false;
+        if (!hit) continue;
+        var before = true, after = true;
+        for (q = 1; q <= 4; q++) { var bx = x - q, ax = x + 6 + q;
+          if (bx >= 0 && (pass ? mod[bx][y] : mod[y][bx])) before = false;
+          if (ax < size && (pass ? mod[ax][y] : mod[y][ax])) after = false; }
+        if (before || after) p += 40;
+      }
+      for (y = 0; y < size; y++) for (x = 0; x < size; x++) if (mod[y][x]) dark++;
+      p += Math.floor(Math.abs(dark * 20 - size * size * 10) / (size * size)) * 10;
+      return p;
+    }
+    var best = 0, bestP = Infinity;
+    for (var m = 0; m < 8; m++) { applyMask(m); format(m); var pp = penalty(); if (pp < bestP) { bestP = pp; best = m; } applyMask(m); }
+    applyMask(best); format(best);
+    return { size: size, version: v, mask: best, get: function (x, y) { return x >= 0 && y >= 0 && x < size && y < size && mod[y][x]; } };
+  }
+  // draws the code with a 4-module quiet zone, fitted into px x px CSS pixels
+  function draw(cv, text, px) {
+    var q = make(text), n = q.size + 8, scale = Math.max(1, Math.floor(px / n)), dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = cv.height = n * scale * dpr; cv.style.width = cv.style.height = n * scale + 'px';
+    var c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.fillStyle = '#fff'; c.fillRect(0, 0, n * scale, n * scale); c.fillStyle = '#111';
+    for (var y = 0; y < q.size; y++) for (var x = 0; x < q.size; x++) if (q.get(x, y)) c.fillRect((x + 4) * scale, (y + 4) * scale, scale, scale);
+    cv.dataset.qr = text; return q;
+  }
+  return { make: make, draw: draw };
+})();
+
+// ===== src/duel.js =====
+// duel.js - "Builder vs Runner". Mode 1: ONE device (runner plays with keys/joystick, builder taps a second grid).
+// Mode 2: TWO devices through the Map Makers host (see net.js + host/). The same rules run in both modes;
+// in Mode 2 the Builder's device is the boss of the map and the Runner's device sends position + events.
+//
+// SYNC RULES (Checkpoint mode, the default):
+//  * Edits never touch the live map mid-run. The queue lands when the runner (a) reaches a NEW checkpoint,
+//    (b) gets bumped back to their checkpoint (spikes/critter), or (c) restarts.
+//  * Safety on landing: an edit FIZZLES (puff + its edit token flies back to the budget) if it touches a tile the
+//    runner is standing on, the checkpoint they respawn at, the Start, the Finish or a portal, or if it would cut
+//    the runner off from the goal. While it waits, an edit that would cut the way off shows as a red ghost.
+//  * Editing the same cell again just updates the waiting edit (free). Painting it back to what it is now cancels it.
+//  * Budget: 3 edits per checkpoint stretch, refilled at every checkpoint. Unused edits bank, max 5.
+//    At most 5 edits can wait at once. Undo of a waiting edit is free (refund).
+//  * "Live chaos" (optional toggle): edits land right away, with the same safety rules and budget.
+MM.DUEL = {
+  budget: 3,        // edits added each time the runner reaches a new checkpoint (and at the start)
+  bankMax: 5,       // most edits the builder can hold (banking cap)
+  queueMax: 5,      // most edits waiting at once
+  bannerMs: 1700,   // "Map updated!" banner time
+  flashS: 1.4,      // changed tiles flash for this many seconds
+  fizzleS: 0.9,     // fizzle puff time on the builder grid
+  pace: 1.5,        // stretch estimate: shortest path / run speed x pace (kids steer slower than the shortest path)
+  stretchMin: 15, stretchMax: 25, stretchWarn: 35, // seconds per checkpoint stretch: target range and "too long" warning
+  posHz: 10,        // Mode 2: runner position updates per second
+  tiles: ['.', '#', '~', 'c', '?', '^', '>', 'k', 'D', 'P'] // builder palette (Start, Finish and portals stay put)
+};
+MM.duel = (function () {
+  var $ = MM.$, W = MM.W, H = MM.H, X = MM.DUEL;
+  var D = null, cv, ctx, ts = 20, dpr = 1, brush = '#', hover = null, painting = null, bannerT = 0, narrowMQ = null;
+
+  function init() {
+    cv = $('#dCanvas'); ctx = cv.getContext('2d');
+    cv.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); MM.audio.unlock(); var c = cellAt(e); if (!c) return;
+      try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+      painting = { id: e.pointerId, last: null, ch: e.button === 2 ? '.' : brush }; paint(c);
+    });
+    cv.addEventListener('pointermove', function (e) { var c = cellAt(e); hover = c; if (painting && painting.id === e.pointerId && c) paint(c); });
+    function end(e) { if (painting && painting.id === e.pointerId) painting = null; }
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+    cv.addEventListener('pointerleave', function () { hover = null; });
+    cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    $('#dqUndo').onclick = function () { undo(); };
+    MM.$$('#duelTabs [data-tab]').forEach(function (b) { b.onclick = function () { MM.audio.play('click'); setTab(b.dataset.tab); }; });
+    window.addEventListener('keydown', function (e) {
+      if (!D || MM.ui.screen !== 'play' || MM.ui.isOpen()) return;
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+    });
+    try { narrowMQ = window.matchMedia('(max-width: 560px)'); } catch (e) {}
+  }
+  function cellAt(e) {
+    var r = cv.getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / (r.width / W)), y = Math.floor((e.clientY - r.top) / (r.height / H));
+    return MM.inb(x, y) ? { x: x, y: y } : null;
+  }
+  function paint(c) {
+    if (painting.last && painting.last.x === c.x && painting.last.y === c.y) return;
+    painting.last = c; queueEdit(MM.idx(c.x, c.y), painting.ch);
+  }
+  function buildPalette() {
+    var p = $('#dPal'); p.innerHTML = '';
+    var th = MM.THEMES[D.run.map.theme] || MM.THEMES.grass;
+    X.tiles.forEach(function (ch) {
+      var b = document.createElement('button'); b.className = 'dpal' + (brush === ch ? ' on' : ''); b.dataset.dtile = ch; b.title = ch === '.' ? 'Eraser (floor)' : MM.TILES[ch].name;
+      var c = document.createElement('canvas'); c.width = c.height = 40; var x = c.getContext('2d');
+      x.fillStyle = th.floorA; x.fillRect(0, 0, 40, 40); if (ch !== '.') MM.render.tile(x, ch, 0, 0, 40, th, D.run.map.theme, 0.5, { editor: true }); else { x.font = '26px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('🧽', 20, 22); }
+      b.appendChild(c);
+      b.onclick = function () { brush = ch; MM.audio.play('click'); buildPalette(); };
+      p.appendChild(b);
+    });
+  }
+
+  // ---- lifecycle (called by MM.play.start) ----
+  // opt.net: 'builder' (this device builds, the run is a mirror of the other device) or 'runner' (this device runs)
+  function attach(run, opt) {
+    var on = !!(opt && opt.duel), net = on && opt.net || null, play = $('#play');
+    play.classList.toggle('duel', on); play.classList.toggle('net-builder', net === 'builder'); play.classList.toggle('net-runner', net === 'runner');
+    $('#duelPanel').classList.toggle('hidden', !on || net === 'runner'); $('#duelTabs').classList.toggle('hidden', !on || !!net);
+    $('#hudDuel').classList.toggle('hidden', !on);
+    if (!on) { D = null; play.classList.remove('tab-run', 'tab-build'); return; }
+    var keep = opt.keep;
+    D = {
+      run: run, net: net, mode: keep ? keep.mode : (opt.mode === 'live' ? 'live' : 'checkpoint'), queue: [], tokens: X.budget,
+      base: run.tiles.slice(), flash: {}, fizz: [], fizzles: keep && keep.fizzles || 0, stats: keep ? keep.stats : { applied: 0, skipped: 0, updates: 0 }, stretchT: 0, warn: {}, tab: net === 'builder' ? 'build' : net === 'runner' ? 'run' : keep ? keep.tab : 'run',
+      gid: opt.gid || (keep && keep.gid) || null, cpSeq: 0, seq: 0, pending: {}, remotePaused: true, lastSent: null, posT: 0
+    };
+    run.duel = true; run.net = net; brush = brush || '#';
+    if (net === 'builder') { run.remote = true; run.hold = true; if (!opt.gid) D.gid = Math.random().toString(36).slice(2, 10); }
+    if (net === 'runner') { run.gid = D.gid; D.lastSent = run.tiles.join(''); }
+    if (net !== 'runner') buildPalette();
+    setTab(D.tab); refresh();
+    if (net === 'builder') { if (opt.adopt) { run.tiles = opt.adopt.tiles.split(''); mirror(opt.adopt); D.cpSeq = opt.adopt.cpSeq || 0; r0done(opt.adopt); sendState([]); } else MM.net.send({ t: 'start', gid: D.gid, map: run.map, mode: D.mode, restart: !!keep }); }
+    if (keep && keep.queue && keep.queue.length && net !== 'runner') { D.queue = keep.queue; land('restart'); }
+  }
+  function r0done(m) { if (m.done) D.run.done = true; }
+  // phone layout: one panel at a time (turn swap). Builder tab pauses the runner.
+  function narrow() { return !!(narrowMQ && narrowMQ.matches); }
+  function setTab(t) {
+    if (!D) return; D.tab = t === 'build' ? 'build' : 'run';
+    var p = $('#play'); p.classList.toggle('tab-build', D.tab === 'build'); p.classList.toggle('tab-run', D.tab === 'run');
+    MM.$$('#duelTabs [data-tab]').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === D.tab); });
+    if (D.net === 'builder') D.run.hold = true; else if (!D.net) D.run.hold = narrow() && D.tab === 'build';
+    requestAnimationFrame(function () { MM.play.resize(); resize(); });
+  }
+
+  // ---- queue ----
+  function liveCh(i) { return D.run.tiles[i]; }
+  function queueEdit(i, ch) {
+    if (!D || D.run.done || D.net === 'runner') return { ok: false, why: 'over' };
+    var cur = liveCh(i), q = D.queue, k = findQ(i);
+    if (cur === 'S' || cur === 'F' || cur === 'A' || cur === 'B') return nope('The Start, Finish and portals stay put.', 'fixed');
+    if (k >= 0) { // coalesce: same cell edited again
+      if (ch === cur) { q.splice(k, 1); D.tokens++; MM.audio.play('click'); }
+      else if (q[k].ch !== ch) { q[k].ch = ch; MM.audio.play('paint'); }
+      afterChange(); return { ok: true, coalesced: true };
+    }
+    if (ch === cur) return { ok: false, why: 'same' };
+    if (q.length >= X.queueMax) return nope('Only ' + X.queueMax + ' edits can wait at once.', 'queue');
+    if (D.tokens <= 0) return nope('Out of edits — they refill when the runner reaches a checkpoint 🚩', 'budget');
+    q.push({ i: i, ch: ch }); D.tokens--; MM.audio.play('paint');
+    afterChange();
+    if (D.mode === 'live') land('live');
+    return { ok: true };
+  }
+  function findQ(i) { for (var k = 0; k < D.queue.length; k++) if (D.queue[k].i === i) return k; return -1; }
+  function nope(msg, why) { MM.audio.play('nope'); note(msg, true); return { ok: false, why: why }; }
+  function undo() {
+    if (!D || D.net === 'runner' || !D.queue.length) { MM.audio.play('nope'); return false; }
+    D.queue.pop(); D.tokens = Math.min(D.tokens + 1, X.bankMax + X.queueMax); MM.audio.play('click'); afterChange(); return true;
+  }
+  function afterChange() { preview(); refresh(); sendQueue(); }
+
+  // ---- safety ----
+  function guarded() { // tiles that must not change right now
+    var r = D.run, p = r.p, g = {}, rad = MM.CONF.radius;
+    g[r.checkpoint] = 'respawn';
+    for (var y = Math.floor(p.y - rad); y <= Math.floor(p.y + rad - 1e-6); y++) for (var x = Math.floor(p.x - rad); x <= Math.floor(p.x + rad - 1e-6); x++) if (MM.inb(x, y)) g[MM.idx(x, y)] = g[MM.idx(x, y)] || 'runner';
+    return g;
+  }
+  // can the runner still win from the respawn point and from where they stand?
+  function goalOK(arr) {
+    var r = D.run, g = r.map.goal || { type: 'flag' }, t = arr.join('');
+    if (g.type === 'survive') return true;
+    var from = [r.checkpoint, MM.idx(Math.floor(r.p.x), Math.floor(r.p.y))];
+    for (var n = 0; n < from.length; n++) {
+      var dist = MM.maps.reach(t, r.keys, from[n]); if (!dist) return false;
+      if (g.type === 'flag') { var f = t.indexOf('F'); if (f < 0 || dist[f] < 0) return false; }
+      else if (g.type === 'coins') { var c = 0; for (var i = 0; i < t.length; i++) if (t[i] === 'c' && dist[i] >= 0) c++; if (c + r.coins < g.coins) return false; }
+    }
+    return true;
+  }
+  // simulate landing the queue now: returns per-edit verdicts
+  function plan(queue) {
+    var arr = D.run.tiles.slice(), gd = guarded(), out = [];
+    queue.forEach(function (e) {
+      if (gd[e.i]) { out.push({ e: e, ok: false, why: gd[e.i] }); return; }
+      var cur = arr[e.i]; if (cur === 'S' || cur === 'F' || cur === 'A' || cur === 'B') { out.push({ e: e, ok: false, why: 'fixed' }); return; }
+      if (cur === e.ch) { out.push({ e: e, ok: false, why: 'same' }); return; }
+      arr[e.i] = e.ch;
+      if (!goalOK(arr)) { arr[e.i] = cur; out.push({ e: e, ok: false, why: 'blocks' }); return; }
+      out.push({ e: e, ok: true });
+    });
+    return out;
+  }
+  function preview() { D.warn = {}; if (D.net === 'runner') return; plan(D.queue).forEach(function (v) { if (!v.ok && v.why === 'blocks') D.warn[v.e.i] = 1; }); }
+
+  // ---- landing the queue ----
+  function land(reason) {
+    if (!D || D.net === 'runner') return null;
+    if (D.net === 'builder' && reason === 'live' && !MM.net.peerOnline()) { refresh(); return null; } // runner away: wait
+    var res = plan(D.queue), applied = [], edits = [], skipped = [], r = D.run, now = performance.now() / 1000;
+    res.forEach(function (v) {
+      if (v.ok) { edits.push({ i: v.e.i, ch: v.e.ch, prev: r.tiles[v.e.i] }); r.tiles[v.e.i] = v.e.ch; D.base[v.e.i] = v.e.ch; applied.push(v.e.i); D.flash[v.e.i] = now; }
+      else if (v.why !== 'same') { skipped.push(v); D.tokens++; }
+    });
+    D.queue = [];
+    if (reason === 'checkpoint') { D.tokens = Math.min(X.bankMax, D.tokens + X.budget); D.stretchT = 0; }
+    D.tokens = Math.min(D.tokens, X.bankMax);
+    D.stats.applied += applied.length; D.stats.skipped += skipped.length;
+    if (applied.length) { D.stats.updates++; MM.audio.play('update'); if (!D.net) { banner(applied.length, reason); MM.play.replan(); } }
+    skipped.forEach(function (v) { fizzle(v.e.i); });
+    if (D.net === 'builder') {
+      var seq = ++D.seq; if (edits.length) D.pending[seq] = edits;
+      MM.net.send({ t: 'apply', gid: D.gid, seq: seq, reason: reason, edits: edits, queue: [], mode: D.mode });
+    }
+    D.lastLand = { reason: reason, applied: applied.length, skipped: skipped.length, why: skipped.map(function (v) { return v.why; }) };
+    preview(); refresh();
+    return D.lastLand;
+  }
+  function banner(n, reason) {
+    var b = $('#duelBanner');
+    b.innerHTML = '✨ Map updated! <small>' + n + ' change' + (n > 1 ? 's' : '') + (reason === 'checkpoint' ? ' at your checkpoint' : reason === 'death' ? ' while you respawned' : reason === 'restart' ? ' for the restart' : '') + '</small>';
+    b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+    clearTimeout(bannerT); bannerT = setTimeout(function () { b.classList.remove('show'); }, X.bannerMs);
+  }
+  // no-reading cue for an edit that could not land: a puff on the tile + its ✏️ token flies home to the budget
+  function fizzle(i) {
+    if (!D) return;
+    D.fizzles++; D.fizz.push({ i: i, t0: performance.now() / 1000 }); MM.audio.play('fizzle');
+    var bud = $('#dqBudget'); bud.dataset.fizz = D.fizzles;
+    var cr = cv.getBoundingClientRect(), br = bud.getBoundingClientRect();
+    function bump() { bud.classList.remove('bump'); void bud.offsetWidth; bud.classList.add('bump'); }
+    if (!cr.width || !br.width) { bump(); return; }
+    var x = cr.left + ((i % W) + 0.5) * (cr.width / W), y = cr.top + (((i / W) | 0) + 0.5) * (cr.height / H);
+    var tk = document.createElement('div'); tk.className = 'dtoken'; tk.textContent = '✏️';
+    tk.style.left = x + 'px'; tk.style.top = y + 'px'; document.body.appendChild(tk);
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      tk.style.transform = 'translate(' + (br.left + br.width / 2 - x) + 'px,' + (br.top + br.height / 2 - y) + 'px) scale(.7)'; tk.style.opacity = '0.4';
+    }); });
+    setTimeout(function () { if (tk.parentNode) tk.parentNode.removeChild(tk); bump(); }, 750);
+  }
+  // hooks from play.js
+  function onCheckpoint() {
+    if (!D) return;
+    if (D.net === 'runner') { D.stretchT = 0; D.cpSeq++; MM.net.send(posMsg('checkpoint')); return; }
+    land('checkpoint');
+  }
+  function onDeath() {
+    if (!D) return;
+    if (D.net === 'runner') { MM.net.send(posMsg('death')); return; }
+    land('death');
+  }
+  function keepForRestart() { // restart: the map keeps every landed edit; waiting edits land on the fresh run
+    if (!D) return null;
+    var m = MM.maps.clone(D.run.map); m.tiles = D.base.join('');
+    return { map: m, keep: { mode: D.mode, stats: D.stats, queue: D.queue.slice(), tab: D.tab, fizzles: D.fizzles } };
+  }
+
+  // ---- Mode 2 (two devices): messages ----
+  function posMsg(t) {
+    var r = D.run, cur = r.tiles.join(''), ch = [], last = D.lastSent || cur;
+    for (var i = 0; i < cur.length; i++) if (cur[i] !== last[i]) ch.push([i, cur[i]]);
+    D.lastSent = cur;
+    return { t: t || 'pos', gid: D.gid, x: +r.p.x.toFixed(3), y: +r.p.y.toFixed(3), cp: r.checkpoint, keys: r.keys, coins: r.coins, cash: r.cash, el: +r.elapsed.toFixed(2), rw: r.rewind, hits: r.hits,
+      paused: !!(r.modal || MM.ui.isOpen() || r.hold), done: !!r.done, cpSeq: D.cpSeq, ch: ch };
+  }
+  function netTick(dt) { // runner device: stream position to the builder
+    if (!D || D.net !== 'runner') return;
+    D.posT += dt; if (D.posT < 1 / X.posHz) return; D.posT = 0;
+    if (MM.net.peerOnline()) MM.net.send(posMsg('pos'));
+  }
+  function sendQueue() { if (D && D.net === 'builder') MM.net.send({ t: 'queue', gid: D.gid, queue: D.queue.map(function (e) { return { i: e.i, ch: e.ch }; }), mode: D.mode, tokens: D.tokens }); }
+  function mirror(m) { // builder device: copy the runner's state into the mirror run
+    var r = D.run; if (!r || m.gid !== D.gid) return false;
+    r.p.x = m.x; r.p.y = m.y; r.checkpoint = m.cp; r.keys = m.keys; r.coins = m.coins; r.cash = m.cash; r.elapsed = m.el; r.rewind = m.rw; r.hits = m.hits;
+    D.remotePaused = !!m.paused;
+    var pend = pendingCells();
+    (m.ch || []).forEach(function (c) { if (!pend[c[0]]) r.tiles[c[0]] = c[1]; });
+    if (D.queue.length) preview();
+    return true;
+  }
+  function pendingCells() { var o = {}; for (var s in D.pending) D.pending[s].forEach(function (e) { o[e.i] = e; }); return o; }
+  // full resync after a reconnect: the runner's tiles win (pickups) except edits the runner never confirmed
+  function sendState(changed) {
+    var pend = pendingCells(); changed = changed || [];
+    for (var i in pend) if (changed.indexOf(+i) < 0) changed.push(+i);
+    D.pending = {};
+    MM.net.send({ t: 'state', gid: D.gid, map: D.run.map, tiles: D.run.tiles.join(''), queue: D.queue.map(function (e) { return { i: e.i, ch: e.ch }; }), mode: D.mode, tokens: D.tokens, changed: changed, cpSeq: D.cpSeq });
+  }
+  function netMsg(m) {
+    if (!D) return false;
+    var r = D.run;
+    if (D.net === 'builder') {
+      switch (m.t) {
+        case 'pos': mirror(m); return true;
+        case 'checkpoint': if (mirror(m)) { D.cpSeq = m.cpSeq; land('checkpoint'); } return true;
+        case 'death': if (mirror(m)) land('death'); return true;
+        case 'applied': // runner confirmed; edits it refused (it stood there by then) fizzle and refund
+          var ed = D.pending[m.seq] || []; delete D.pending[m.seq];
+          (m.rejected || []).forEach(function (i) {
+            var e = ed.filter(function (x) { return x.i === i; })[0]; if (!e) return;
+            r.tiles[i] = e.prev; D.base[i] = e.prev; D.tokens = Math.min(X.bankMax, D.tokens + 1); D.stats.applied--; D.stats.skipped++; fizzle(i);
+          });
+          if (m.rejected && m.rejected.length) { D.lastLand = { reason: 'runner', applied: ed.length - m.rejected.length, skipped: m.rejected.length, why: m.rejected.map(function () { return 'runner'; }) }; preview(); refresh(); sendQueue(); }
+          return true;
+        case 'status': return builderStatus(m);
+        case 'restart': MM.play.restart(); return true;
+        case 'win': mirror(m); r.done = true; r.result = m.result; MM.net.builderWin(m.result, D.stats.applied); return true;
+      }
+    } else if (D.net === 'runner') {
+      switch (m.t) {
+        case 'queue': if (m.gid !== D.gid) return true; D.queue = m.queue || []; D.mode = m.mode || D.mode; D.tokens = m.tokens; return true;
+        case 'apply': if (m.gid !== D.gid) return true; runnerApply(m); return true;
+        case 'state': if (m.gid !== D.gid) return false; runnerState(m); return true;
+      }
+    }
+    return false;
+  }
+  function runnerApply(m) {
+    var r = D.run, gd = guarded(), rejected = [], applied = 0, now = performance.now() / 1000, last = (D.lastSent || r.tiles.join('')).split('');
+    (m.edits || []).forEach(function (e) {
+      if (gd[e.i]) { rejected.push(e.i); return; } // moved onto it since the builder checked: refuse (fizzles on the builder)
+      r.tiles[e.i] = e.ch; last[e.i] = e.ch; D.flash[e.i] = now; applied++;
+    });
+    D.lastSent = last.join(''); D.queue = m.queue || []; if (m.mode) D.mode = m.mode;
+    D.stats.applied += applied;
+    if (applied) { D.stats.updates++; banner(applied, m.reason); MM.audio.play('update'); MM.play.replan(); }
+    D.lastLand = { reason: m.reason, applied: applied, skipped: rejected.length, why: rejected.map(function () { return 'runner'; }) };
+    MM.net.send({ t: 'applied', gid: D.gid, seq: m.seq, rejected: rejected });
+  }
+  function runnerState(m) {
+    var r = D.run, now = performance.now() / 1000;
+    var gd = guarded(), nt = m.tiles.split('');
+    for (var i in gd) nt[i] = r.tiles[i]; // never drop a tile change on the runner's head; the next pos diff tells the builder
+    r.tiles = nt; D.lastSent = m.tiles; D.queue = m.queue || []; D.mode = m.mode || D.mode; D.tokens = m.tokens;
+    (m.changed || []).forEach(function (i) { D.flash[i] = now; });
+    if ((m.changed || []).length) { banner(m.changed.length, 'sync'); MM.audio.play('update'); }
+    MM.play.replan(); MM.net.resynced();
+  }
+  // builder device: the runner (re)connected and told us where it is
+  function builderStatus(m) {
+    var r = D.run;
+    if (!m.hasRun || m.gid !== D.gid) { // runner has no game (reloaded) or an old one: start fresh, keeping the builder's changes
+      MM.play.restart(); return true;
+    }
+    // merge: runner's tiles win (coins/keys/doors) except edits the runner never confirmed
+    var pend = pendingCells(), t = m.tiles.split(''), changed = [];
+    for (var i = 0; i < t.length; i++) { if (pend[i]) { t[i] = pend[i].ch; changed.push(i); } }
+    r.tiles = t; mirror(m);
+    var cpBefore = D.cpSeq; D.cpSeq = m.cpSeq;
+    sendState(changed);
+    if (m.done) { r.done = true; }
+    else if (m.cpSeq > cpBefore) land('checkpoint'); // a checkpoint was reached while we were cut off
+    else if (D.mode === 'live' && D.queue.length) land('live');
+    refresh(); return true;
+  }
+  function status() { // runner device -> builder after any reconnect
+    var r = MM.play.run, has = !!(D && D.net === 'runner' && r && !r.done);
+    var m = has ? posMsg('status') : { t: 'status' };
+    m.hasRun = has; if (has) { m.tiles = r.tiles.join(''); m.map = r.map; m.mode = D.mode; m.gid = D.gid; }
+    MM.net.send(m);
+  }
+  function onWin(result) { if (D && D.net === 'runner') { var m = posMsg('win'); m.result = result; MM.net.send(m); } }
+
+  // ---- UI ----
+  var noteT = 0;
+  function note(s, warn) { var m = $('#dMsg'); m.textContent = s; m.classList.toggle('warn', !!warn); m.classList.add('show'); clearTimeout(noteT); noteT = setTimeout(function () { m.classList.remove('show'); }, 3200); }
+  function refresh() {
+    if (!D || D.net === 'runner') return;
+    var n = D.queue.length, el = $('#dqCount');
+    el.dataset.n = n;
+    el.textContent = D.mode === 'live' ? (n ? '📡 ' + n + ' edit' + (n > 1 ? 's' : '') + ' waiting for the runner' : '⚡ Live chaos: edits land right away') : n ? '⏳ ' + n + ' edit' + (n > 1 ? 's' : '') + ' waiting for next checkpoint' : '✅ No edits waiting';
+    var b = $('#dqBudget'); b.dataset.n = D.tokens; b.textContent = '✏️ ' + D.tokens + ' left';
+    b.title = X.budget + ' per checkpoint, bank up to ' + X.bankMax;
+    var w = Object.keys(D.warn).length, wv = $('#dqWarn'); wv.classList.toggle('hidden', !w);
+    wv.textContent = w ? '💨 Fizzle!' + (w > 1 ? ' ×' + w : '') : '';
+    wv.title = w ? 'Red edits would block the way to the goal, so they will fizzle' : '';
+    $('#dqUndo').disabled = !n;
+  }
+  function resize() {
+    if (!cv || !D) return;
+    var r = $('#dStage').getBoundingClientRect();
+    ts = Math.max(6, Math.floor(Math.min((r.width - 6) / W, (r.height - 6) / H)));
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.style.width = ts * W + 'px'; cv.style.height = ts * H + 'px'; cv.width = ts * W * dpr; cv.height = ts * H * dpr;
+  }
+  function frame(t, dt) {
+    if (!D || MM.ui.screen !== 'play') return;
+    var r = D.run;
+    if (D.net === 'runner') { if (!r.modal && !r.done && !r.hold) D.stretchT += dt; netTick(dt); return; }
+    if (D.net === 'builder' ? !D.remotePaused && !r.done && MM.net.peerOnline() : !r.modal && !r.done && !r.hold) D.stretchT += dt;
+    if (D.tab === 'run' && narrow()) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    MM.render.map(ctx, r.tiles.join(''), r.map.theme, ts, { t: t, editor: true, checkpoint: r.checkpoint });
+    // respawn checkpoint ring + runner dot
+    var c = r.checkpoint; ctx.strokeStyle = '#4aa3ff'; ctx.lineWidth = 3; MM.render.rr(ctx, (c % W) * ts + 1.5, ((c / W) | 0) * ts + 1.5, ts - 3, ts - 3, 4); ctx.stroke();
+    ctx.fillStyle = '#ff7eb6'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(r.p.x * ts, r.p.y * ts, ts * 0.34, 0, 6.29); ctx.fill(); ctx.stroke();
+    ghosts(ctx, ts, t, 1);
+    if (D.net) flashes(ctx, ts);
+    fizzDraw(ctx, ts);
+    if (hover) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; MM.render.rr(ctx, hover.x * ts + 1, hover.y * ts + 1, ts - 2, ts - 2, 4); ctx.stroke(); }
+  }
+  // ghost tiles for waiting edits (builder grid; also the runner's view in Mode 2 Checkpoint mode)
+  function ghosts(c, s, t, numbers) {
+    var r = D.run, th = MM.THEMES[r.map.theme] || MM.THEMES.grass;
+    D.queue.forEach(function (e, n) {
+      var x = e.i % W, y = (e.i / W) | 0;
+      c.globalAlpha = (numbers ? 0.55 : 0.4) + 0.15 * Math.sin(t * 5);
+      c.fillStyle = (x + y) & 1 ? th.floorB : th.floorA; c.fillRect(x * s, y * s, s, s);
+      if (e.ch !== '.') MM.render.tile(c, e.ch, x, y, s, th, r.map.theme, t, { editor: true });
+      c.globalAlpha = 1; c.setLineDash([4, 3]); c.lineWidth = 2.5; c.strokeStyle = D.warn[e.i] ? '#ff3b4f' : '#ff8a3d';
+      MM.render.rr(c, x * s + 1.5, y * s + 1.5, s - 3, s - 3, 4); c.stroke(); c.setLineDash([]);
+      if (numbers) { c.fillStyle = D.warn[e.i] ? '#ff3b4f' : '#ff8a3d'; c.font = 'bold ' + Math.max(9, s * 0.4) + 'px sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText(String(n + 1), x * s + 3, y * s + 2); }
+    });
+  }
+  function fizzDraw(c, s) {
+    var now = performance.now() / 1000;
+    D.fizz = D.fizz.filter(function (f) {
+      var a = (now - f.t0) / X.fizzleS; if (a >= 1) return false;
+      var cx = ((f.i % W) + 0.5) * s, cy = (((f.i / W) | 0) + 0.5) * s;
+      for (var k = 0; k < 7; k++) { var ang = k * 0.9 + 0.3, d = s * (0.15 + 0.7 * a); c.fillStyle = 'rgba(235,235,245,' + (0.85 * (1 - a)) + ')'; c.beginPath(); c.arc(cx + Math.cos(ang) * d, cy + Math.sin(ang) * d - a * s * 0.3, s * (0.18 + 0.12 * a), 0, 6.29); c.fill(); }
+      c.globalAlpha = 1 - a; c.font = 'bold ' + Math.max(11, s * 0.55) + 'px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'bottom';
+      c.lineWidth = 3; c.strokeStyle = '#2a2560'; c.strokeText('Fizzle!', cx, cy - s * (0.4 + a * 0.8)); c.fillStyle = '#fff'; c.fillText('Fizzle!', cx, cy - s * (0.4 + a * 0.8)); c.globalAlpha = 1;
+      return true;
+    });
+  }
+  function flashes(c, s) {
+    var now = performance.now() / 1000;
+    for (var k in D.flash) {
+      var a = (now - D.flash[k]) / X.flashS; if (a >= 1) { delete D.flash[k]; continue; }
+      var x = k % W, y = (k / W) | 0;
+      c.fillStyle = 'rgba(255,255,255,' + (0.6 * (1 - a) * (0.6 + 0.4 * Math.sin(a * 20))) + ')'; c.fillRect(x * s, y * s, s, s);
+      c.strokeStyle = 'rgba(255,210,63,' + (1 - a) + ')'; c.lineWidth = 3; c.strokeRect(x * s + 1.5, y * s + 1.5, s - 3, s - 3);
+    }
+  }
+  // runner's canvas: flash changed tiles; in Mode 2 also show the builder's waiting edits as ghosts
+  function drawRunner(c, s) {
+    if (!D) return;
+    if (D.net === 'runner' && D.mode === 'checkpoint' && D.queue.length) ghosts(c, s, performance.now() / 1000, 0);
+    flashes(c, s);
+  }
+  function hudText() { return D ? '🛠️ ' + D.queue.length + ' waiting • 🚩 stretch ' + MM.fmtTime(D.stretchT) : ''; }
+
+  // ---- map picker + stretch estimate ----
+  // Seconds per checkpoint stretch (Start -> checkpoints in path order -> Finish). Flag maps only.
+  function stretches(m) {
+    var t = m.tiles, s = t.indexOf('S'), f = t.indexOf('F'); if (s < 0 || f < 0 || (m.goal && m.goal.type !== 'flag')) return [];
+    var d0 = MM.maps.bfs(t, s % W, (s / W) | 0, { doorsOpen: true }).dist, pts = [s], ps = [];
+    for (var i = 0; i < t.length; i++) if (t[i] === 'P' && d0[i] >= 0 && d0[i] < d0[f]) ps.push(i);
+    ps.sort(function (a, b) { return d0[a] - d0[b]; }); pts = pts.concat(ps, [f]);
+    var out = [];
+    for (var k = 1; k < pts.length; k++) { var a = pts[k - 1], d = MM.maps.bfs(t, a % W, (a / W) | 0, { doorsOpen: true }).dist[pts[k]]; out.push(Math.round(Math.max(0, d) / MM.CONF.speed * X.pace)); }
+    return out;
+  }
+  function stretchNote(m) {
+    var s = stretches(m); if (!s.length) return '';
+    var mx = Math.max.apply(null, s);
+    if (mx > X.stretchWarn) return '<span class="dwarn">⚠️ Checkpoints are far apart (~' + mx + 's) — the builder gets fewer refills. Add 🚩 checkpoints every ' + X.stretchMin + '–' + X.stretchMax + 's.</span>';
+    return '🚩 ' + (s.length - 1) + ' checkpoint' + (s.length === 2 ? '' : 's') + ', ~' + s.join('s / ~') + 's stretches';
+  }
+  function mapList() {
+    return MM.maps.DUEL.concat(MM.maps.PREMADE.filter(function (m) { return m.goal.type !== 'survive'; })).concat(MM.myMaps().filter(function (m) { var v = MM.maps.validate(m); return v.ok && m.goal.type !== 'survive'; }));
+  }
+  // shared by the one-device picker and the two-device builder picker
+  function pickerHTML(list) {
+    return '<div class="dmode"><button class="pack on" data-dmode="checkpoint">🚩 Checkpoint<small>edits land at checkpoints (default)</small></button><button class="pack" data-dmode="live">⚡ Live chaos<small>edits land right away</small></button></div>' +
+      '<div class="dlist">' + list.map(function (m, n) { return '<button class="ditem" data-dpick="' + n + '"><b>' + (MM.THEMES[m.theme] || MM.THEMES.grass).emoji + ' ' + MM.esc(m.name) + '</b>' + (m.duelMap ? ' <span class="dtag">made for duels</span>' : '') + '<small>' + MM.ui.goalText(m) + (stretchNote(m) ? ' • ' + stretchNote(m) : '') + '</small></button>'; }).join('') + '</div>';
+  }
+  function wirePicker(c, list, go) {
+    var mode = 'checkpoint';
+    MM.$$('[data-dmode]', c).forEach(function (b) { b.onclick = function () { mode = b.dataset.dmode; MM.audio.play('click'); MM.$$('[data-dmode]', c).forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
+    MM.$$('[data-dpick]', c).forEach(function (b) { b.onclick = function () { MM.audio.play('click'); go(list[+b.dataset.dpick], mode); }; });
+  }
+  function pick() {
+    var list = mapList(), hosted = MM.net.hosted();
+    var html = '<h2>⚔️ Builder vs Runner</h2>' +
+      '<button class="big b-net" id="dNet">📡 Two devices<small>' + (hosted ? 'each player on their own iPad / phone' : 'needs the host page on the Mac') + '</small></button>' +
+      '<p class="dintro">📱 <b>One device:</b> one player <b>runs</b> (keys or joystick), the other <b>builds</b> on the second grid. Builder changes wait until the runner reaches a 🚩 checkpoint — nothing changes under the runner\'s feet!</p>' +
+      pickerHTML(list) +
+      '<p class="dnote">' + (hosted ? '📡 Two devices: tap the purple button above — no download needed on the other device.' : '📡 Two-device play only works from the page served by the host computer (the Mac running “Start Map Makers Host”) — not from the Game Night (https) link or a downloaded file. On phones, swap players with the 🏃/🛠️ tabs.') + '</p>' +
+      '<div class="mrow"><button class="btn ghost" id="dCancel">Cancel</button></div>';
+    var c = MM.ui.modal(html);
+    wirePicker(c, list, function (m, mode) { start(m, { mode: mode }); });
+    $('#dNet', c).onclick = function () { MM.audio.play('click'); MM.net.open(); };
+    $('#dCancel', c).onclick = function () { MM.audio.play('click'); MM.ui.closeModal(); };
+  }
+  function start(m, o) { o = o || {}; MM.play.start(m, { duel: true, mode: o.mode || 'checkpoint', net: o.net, gid: o.gid, adopt: o.adopt, keep: o.keep }); }
+
+  return {
+    init: init, attach: attach, pick: pick, start: start, queueEdit: queueEdit, undo: undo, land: land, onCheckpoint: onCheckpoint, onDeath: onDeath,
+    keepForRestart: keepForRestart, frame: frame, resize: resize, drawRunner: drawRunner, hudText: hudText, setTab: setTab, stretches: stretches, stretchNote: stretchNote,
+    mapList: mapList, pickerHTML: pickerHTML, wirePicker: wirePicker, netMsg: netMsg, status: status, onWin: onWin, fizzle: fizzle,
+    setBrush: function (ch) { brush = ch; if (D) buildPalette(); },
+    get net() { return D && D.net; }, get gid() { return D && D.gid; },
+    get state() { return D && { mode: D.mode, net: D.net, gid: D.gid, queue: D.queue.map(function (e) { return { i: e.i, ch: e.ch }; }), tokens: D.tokens, stats: D.stats, warn: Object.keys(D.warn).map(Number), tab: D.tab, hold: !!D.run.hold, lastLand: D.lastLand || null, base: D.base.join(''), stretchT: D.stretchT, fizzles: D.fizzles, cpSeq: D.cpSeq, pending: Object.keys(D.pending).length, remotePaused: D.remotePaused }; },
+    get ts() { return ts; }
+  };
+})();
+
+// ===== src/net.js =====
+// net.js - Mode 2: two devices on the same Wi-Fi, through the Map Makers host (host/mapmakers-host.js on the Mac).
+// The host serves this page AND a WebSocket relay at /ws. Players meet in a 4-digit room. The Builder's device is the
+// boss of the map; the Runner's device sends its position. Works only from the page the host serves (the Mac address on port 8787):
+// a downloaded file or the https Game Night link cannot reach the host, and we say so plainly.
+MM.net = (function () {
+  var $ = MM.$;
+  var ws = null, st = 'off', fails = 0, everOpen = false, want = false, retryT = 0, pingT = 0, lastRx = 0, blockUntil = 0;
+  var welcome = null, room = null, ses = null, err = '', view = '', lobbyOpen = false, keypad = '', inGame = false, quiet = false, prevBuilder = null, joined = false;
+  var log = [], padMode = false, lastKey = '', autoOpened = false;
+
+  // ---- small helpers ----
+  function hosted() { return location.protocol === 'http:'; }
+  function sget() { try { return JSON.parse(sessionStorage.getItem('mm.net') || 'null'); } catch (e) { return ses; } }
+  function sset(v) { ses = v; try { if (v) sessionStorage.setItem('mm.net', JSON.stringify(v)); else sessionStorage.removeItem('mm.net'); } catch (e) {} }
+  function cid() { var s = sget() || {}; if (!s.cid) { s.cid = Math.random().toString(36).slice(2) + Date.now().toString(36); sset(s); } return s.cid; }
+  // join address for the QR / screen: prefer the Mac's stable Bonjour name (Name.local), else a LAN IP
+  function isIP(h) { return /^\d+\.\d+\.\d+\.\d+$/.test(h); }
+  function loopback() { return /^(localhost|127\.|\[::1\])/.test(location.hostname); }
+  function ipBase() {
+    if (isIP(location.hostname) && !loopback()) return location.origin + '/';
+    return welcome && welcome.urls && welcome.urls.length ? welcome.urls[0] : null;
+  }
+  function baseURL() {
+    if (welcome && welcome.local) return welcome.local;
+    if (!loopback()) return location.origin + '/';
+    return ipBase() || location.origin + '/';
+  }
+  function joinURL() { return baseURL() + '?room=' + (room ? room.code : ''); }
+  function fallbackURL() { var b = baseURL(), ip = ipBase(); return ip && ip !== b ? ip : null; } // shown on screen in case Name.local doesn't load
+  function short(u) { return u.replace(/^[a-z]+:\/\//, '').replace(/\/?\?.*$/, '').replace(/\/$/, ''); }
+  function role() { return room && room.role; }
+  function other() { return role() === 'builder' ? 'runner' : 'builder'; }
+  function peerOnline() { return !!(room && st === 'open' && room.peers && room.peers[other()] === 'online'); }
+
+  // ---- socket ----
+  function connect() {
+    if (!hosted()) return;
+    want = true; clearTimeout(retryT);
+    if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+    if (Date.now() < blockUntil) { retryT = setTimeout(connect, blockUntil - Date.now() + 10); return; }
+    setStatus(everOpen ? 'reconnecting' : 'connecting');
+    var s; try { s = new WebSocket('ws:' + '//' + location.host + '/ws'); } catch (e) { return failed(); }
+    ws = s; joined = false;
+    s.onopen = function () {
+      if (ws !== s) return;
+      fails = 0; everOpen = true; lastRx = Date.now(); setStatus('open');
+      raw({ t: 'hello', cid: cid() });
+      var se = sget(); if (se && se.code) raw({ t: 'join', code: se.code, role: se.role || undefined, resume: true });
+      clearInterval(pingT); pingT = setInterval(tick, 2500);
+    };
+    s.onmessage = function (e) { if (ws !== s) return; lastRx = Date.now(); var m; try { m = JSON.parse(e.data); } catch (er) { return; } onMsg(m); };
+    s.onclose = function () { if (ws !== s) return; ws = null; clearInterval(pingT); joined = false; if (want) failed(); else setStatus('off'); };
+    s.onerror = function () {};
+  }
+  function failed() {
+    fails++; var wasOpen = st === 'open';
+    setStatus(!everOpen || fails >= 3 ? 'notfound' : 'reconnecting');
+    if (wasOpen) holdGame(true);
+    clearTimeout(retryT); retryT = setTimeout(connect, Math.min(4000, 500 * Math.pow(2, Math.max(0, fails - 1))));
+  }
+  function tick() {
+    if (!ws || ws.readyState !== 1) return;
+    if (Date.now() - lastRx > 7000) { try { ws.close(); } catch (e) {} kill(); return; }
+    raw({ t: 'ping', at: Date.now() });
+  }
+  function kill() { var s = ws; ws = null; clearInterval(pingT); joined = false; if (s) { s.onclose = s.onmessage = s.onopen = null; try { s.close(); } catch (e) {} } if (want) failed(); }
+  function raw(m) { if (ws && ws.readyState === 1) { try { ws.send(JSON.stringify(m)); return true; } catch (e) {} } return false; }
+  function send(m) { if (!joined) return false; return raw(m); }
+  function setStatus(s) { st = s; chip(); if (lobbyOpen) render(); }
+
+  // ---- incoming ----
+  function onMsg(m) {
+    log.push(m.t); if (log.length > 200) log.shift();
+    switch (m.t) {
+      case 'welcome': welcome = m; chip(); if (lobbyOpen) render(); return;
+      case 'pong': return;
+      case 'left': room = null; joined = false; chip(); if (lobbyOpen) render(); return;
+      case 'error':
+        if (m.code === 'no-room' || m.code === 'room-full' || m.code === 'bad-code') {
+          var se = sget(); if (se && se.code && (!room || room.code !== se.code)) sset({ cid: se.cid }); // stale room: forget it
+          err = m.code === 'no-room' ? '🤔 No room with that number. Check the Builder\'s screen.' : m.code === 'room-full' ? '🚪 That room already has two players.' : '🔢 Room numbers have 4 digits.';
+          keypad = ''; open(); MM.audio.play('nope');
+        } else if (m.code === 'role-taken') { err = '🙂 The other player already picked that one.'; render(); }
+        return;
+      case 'room': return onRoom(m);
+    }
+    // game messages from the other player
+    if (MM.duel.net && MM.duel.netMsg(m)) return;
+    if (m.t === 'start' && role() === 'runner') return startRunner(m);
+    if (m.t === 'status' && role() === 'builder' && m.hasRun && m.gid) return adopt(m);
+    if (m.t === 'end') return otherEnded(m);
+  }
+  function onRoom(m) {
+    var first = !joined; joined = true; err = first ? '' : err;
+    room = m; var se = sget() || {}; sset({ cid: se.cid || cid(), code: m.code, role: m.role || null });
+    holdGame(false); chip();
+    var b = m.peers.builder;
+    if (m.role === 'runner' && b === 'online' && (first || prevBuilder !== 'online')) MM.duel.status(); // resync after anyone reconnects
+    prevBuilder = b;
+    if (m.role && m.peers[other()] === 'online' && view === 'room' && lobbyOpen) MM.audio.play('checkpoint');
+    if (lobbyOpen) render();
+    else if (first && !autoOpened && m.role && MM.ui.screen !== 'play') { autoOpened = true; open(); } // page reloaded mid-session: show where we are
+  }
+  function startRunner(m) {
+    lobbyOpen = false; var t = document.getElementById('toast'); if (t) t.classList.remove('show'); // drop any old "picking a new map" note
+    MM.duel.start(m.map, { mode: m.mode, net: 'runner', gid: m.gid, keep: m.restart ? { mode: m.mode, stats: { applied: 0, skipped: 0, updates: 0 }, queue: [], tab: 'run' } : null });
+  }
+  function adopt(m) { // this Builder device reloaded mid-game: take the runner's game back
+    if (MM.ui.screen === 'play' && MM.duel.net) return;
+    lobbyOpen = false;
+    MM.duel.start(m.map, { mode: m.mode, net: 'builder', gid: m.gid, adopt: m });
+  }
+  function otherEnded(m) {
+    if (!inGame) return;
+    quiet = true; MM.ui.show('home'); quiet = false;
+    open(true); MM.ui.toast(m.from === 'builder' ? '🛠️ The Builder is picking a new map' : '👋 The Runner left the game', 2600);
+  }
+  // keep the runner frozen while its own connection is down (nothing changes unseen)
+  function holdGame(on) {
+    var o = $('#netOverlay');
+    if (!MM.duel.net || MM.ui.screen !== 'play') { o.classList.add('hidden'); return; }
+    o.classList.toggle('hidden', !on);
+    if (on) o.innerHTML = '<div><div class="big-emoji">📡</div><b>Reconnecting…</b><small>Hold on — the game is paused.' + (st === 'notfound' ? '<br>Can\'t reach the host Mac. Is it still on?' : '') + '</small><button class="btn ghost" id="noLeave">🏠 Leave game</button></div>';
+    if (on) $('#noLeave').onclick = function () { MM.ui.show('home'); };
+    var r = MM.play.run; if (r && MM.duel.net === 'runner') r.hold = !!on;
+  }
+  function resynced() { holdGame(false); }
+
+  // ---- status chip ----
+  function chip() {
+    var c = $('#netChip'); if (!c) return;
+    var show = st !== 'off' && (want || room);
+    c.classList.toggle('hidden', !show); if (!show) return;
+    var p = room && room.peers, o = p && room.role ? p[other()] : null, nm = other() === 'builder' ? 'Builder' : 'Runner';
+    var txt, cls;
+    if (st === 'open' && room) { cls = o === 'online' ? 'ok' : 'wait'; txt = '🟢 Room ' + room.code + (room.role ? (o === 'online' ? ' · ' + nm + ' ✓' : o === 'away' ? ' · ' + nm + ' reconnecting…' : ' · waiting for ' + nm) : ''); if (o !== 'online') txt = txt.replace('🟢', '🟡'); }
+    else if (st === 'open') { cls = 'ok'; txt = '🟢 Connected'; }
+    else if (st === 'notfound') { cls = 'bad'; txt = '🔴 Host not found'; }
+    else { cls = 'wait'; txt = '🟡 ' + (everOpen ? 'Reconnecting…' : 'Connecting…'); }
+    c.className = 'netchip ' + cls; c.textContent = txt; c.dataset.st = st;
+  }
+
+  // ---- lobby (one modal, several views) ----
+  function open(force) {
+    if (!hosted()) return needHost();
+    lobbyOpen = true; connect(); lastKey = ''; render();
+  }
+  function needHost() {
+    var c = MM.ui.modal('<h2>📡 Two devices</h2><div class="big-emoji">💻 ↔ 📱</div><p id="needHost">Two-device play needs the <b>host page</b>.</p><ol class="nsteps"><li>On the Mac, double-click <b>Start Map Makers Host</b>.</li><li>On <b>both</b> devices, open the address it shows (it looks like <b>192.168.1.20:8787</b>).</li></ol><p style="font-size:13px;color:#889">This copy (a downloaded file or the Game Night link) can\'t reach the host. One-device Builder vs Runner works everywhere.</p><div class="mrow"><button class="btn go" id="nhOk">OK</button></div>');
+    $('#nhOk', c).onclick = function () { MM.audio.play('click'); MM.ui.closeModal(); };
+  }
+  function curView() {
+    if (st === 'notfound') return 'notfound';
+    if (st !== 'open' || !welcome) return 'connecting';
+    if (!room) return padMode ? 'keypad' : 'menu';
+    var p = room.peers, here = (p.builder ? 1 : 0) + (p.runner ? 1 : 0) + room.waiting;
+    if (!room.role) return here >= 2 || (p.builder || p.runner) ? 'roles' : 'room';
+    if (p[other()] == null) return 'room';
+    return room.role === 'builder' ? 'pick' : 'wait';
+  }
+  function render() {
+    if (!lobbyOpen) return;
+    if (MM.ui.screen === 'play') { lobbyOpen = false; return; }
+    var v = curView(), key = v + '|' + (room ? room.code + room.role + JSON.stringify(room.peers) + room.waiting : '') + '|' + err + '|' + (v === 'room' ? joinURL() : '');
+    if (key === lastKey && $('#modalCard .nlobby')) return; // re-render only when something visible changed
+    view = v; lastKey = key; if (v !== 'keypad') padMode = padMode && !room;
+    var head = '<h2>📡 Two devices</h2>', foot = '<div class="mrow"><button class="btn ghost" id="nClose">' + (room ? 'Close' : 'Cancel') + '</button>' + (room ? '<button class="btn ghost" id="nLeave">🚪 Leave room</button>' : '') + '</div>';
+    var e = err ? '<p class="nerr" id="nErr">' + err + '</p>' : '', h = '';
+    if (v === 'connecting') h = '<div class="big-emoji spin">📡</div><p>Finding the host…</p>';
+    else if (v === 'notfound') h = '<div class="big-emoji">🔌</div><p id="nNotFound"><b>Host not found.</b> Is the Mac still running <b>Start Map Makers Host</b>, and are both devices on the same Wi-Fi?</p><div class="mrow"><button class="btn go" id="nRetry">🔄 Try again</button></div>';
+    else if (v === 'menu') h = '<button class="big b-build" id="nMake">🛠️ Make a room<small>show a code on this screen</small></button><button class="big b-play" id="nJoin">🔢 Join a room<small>type the code from the other screen</small></button>';
+    else if (v === 'keypad') {
+      h = '<p>Type the room number:</p><div class="nkeys-show" id="nShow">' + [0, 1, 2, 3].map(function (n) { return '<span>' + (keypad[n] || '') + '</span>'; }).join('') + '</div><div class="nkeys">' +
+        [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) { return '<button data-k="' + n + '">' + n + '</button>'; }).join('') + '<button data-k="back" aria-label="Delete">⌫</button><button data-k="0">0</button><button data-k="go" class="go" id="nGo">Go</button></div>';
+    } else if (v === 'room') {
+      var u = joinURL();
+      var fb = fallbackURL(); h = '<p class="nsub">On the other iPad or phone, scan this — or open <b>' + MM.esc(short(u)) + '</b>' + (fb ? ' <span class="nfb">(or <b id="nFallback">' + MM.esc(short(fb)) + '</b>)</span>' : '') + ' and type:</p><div class="ncode" id="nCode">' + room.code + '</div><canvas id="nQR" class="nqr"></canvas><p class="nwait">⏳ Waiting for the other player…</p>';
+    } else if (v === 'roles') {
+      var p = room.peers;
+      h = '<p class="nsub">Room <b>' + room.code + '</b> — who are you?</p><button class="big b-run nrole" data-role="runner" id="nRunner"' + (p.runner ? ' disabled' : '') + '>I\'m the Runner 🏃</button><button class="big b-build nrole" data-role="builder" id="nBuilder"' + (p.builder ? ' disabled' : '') + '>I\'m the Builder 🛠️</button>';
+    } else if (v === 'pick') {
+      h = '<p class="nsub">🛠️ You\'re the <b>Builder</b> · Room ' + room.code + ' · Runner ' + (room.peers.runner === 'online' ? '🟢' : '🟡') + '</p><p>Pick a map — it starts on the Runner\'s screen.</p>' + MM.duel.pickerHTML(MM.duel.mapList());
+    } else if (v === 'wait') {
+      h = '<div class="big-emoji">🏃</div><p class="nsub" id="nWaitPick">You\'re the <b>Runner</b>!</p><p>Waiting for the Builder to pick a map…</p><p style="font-size:13px;color:#889">Room ' + room.code + ' · Builder ' + (room.peers.builder === 'online' ? '🟢' : '🟡 reconnecting') + '</p>';
+    }
+    var c = MM.ui.modal('<div class="nlobby" data-view="' + v + '">' + head + e + h + foot + '</div>', function () { lobbyOpen = false; padMode = false; });
+    if (v === 'room') MM.qr.draw($('#nQR', c), joinURL(), window.innerHeight < 560 ? 150 : 200);
+    var on = function (id, f) { var b = $(id, c); if (b) b.onclick = function () { MM.audio.unlock(); MM.audio.play('click'); f(b); }; };
+    on('#nClose', function () { MM.ui.closeModal(); });
+    on('#nLeave', function () { leave(); });
+    on('#nRetry', function () { fails = 0; everOpen = false; err = ''; connect(); render(); });
+    on('#nMake', function () { err = ''; raw({ t: 'create' }); });
+    on('#nJoin', function () { err = ''; keypad = ''; padMode = true; render(); });
+    MM.$$('[data-role]', c).forEach(function (b) { b.onclick = function () { MM.audio.play('click'); err = ''; raw({ t: 'role', role: b.dataset.role }); }; });
+    MM.$$('[data-k]', c).forEach(function (b) { b.onclick = function () { MM.audio.unlock(); key4(b.dataset.k); }; });
+    if (v === 'pick') MM.duel.wirePicker(c, MM.duel.mapList(), function (m, mode) {
+      if (!peerOnline()) { MM.audio.play('nope'); MM.ui.toast('Wait for the Runner to connect 🟡'); return; }
+      lobbyOpen = false; MM.duel.start(m, { mode: mode, net: 'builder' });
+    });
+  }
+  function key4(k) {
+    if (k === 'back') keypad = keypad.slice(0, -1);
+    else if (k === 'go') { if (keypad.length === 4) return joinCode(keypad); MM.audio.play('nope'); return; }
+    else if (keypad.length < 4) { keypad += k; MM.audio.play('click'); }
+    var sh = MM.$$('#nShow span'); sh.forEach(function (s, n) { s.textContent = keypad[n] || ''; });
+    if (keypad.length === 4) joinCode(keypad);
+  }
+  function joinCode(code) { err = ''; if (!raw({ t: 'join', code: code })) { err = '📡 Not connected yet — try again in a moment.'; keypad = ''; render(); } }
+  function leave() { raw({ t: 'leave' }); room = null; joined = false; var se = sget() || {}; sset({ cid: se.cid }); want = false; MM.ui.closeModal(); chip(); try { ws && ws.close(); } catch (e) {} }
+
+  // ---- screens ----
+  function onScreen(id) {
+    if (id === 'play') { inGame = !!MM.duel.net; if (inGame) holdGame(st !== 'open'); return; }
+    $('#netOverlay').classList.add('hidden');
+    if (inGame) { inGame = false; if (!quiet) send({ t: 'end' }); var r = MM.play.run; if (r && r.net) r.done = true; }
+  }
+  function builderWin(res, applied) {
+    var c = MM.ui.modal('<h2>🏁 The Runner made it!</h2><p style="font-size:20px">' + (res ? '⏱️ ' + MM.fmtTime(res.time) + ' &nbsp; ' + '⭐'.repeat(res.stars || 1) : '') + '</p><p>🛠️ Your changes that landed: <b>' + applied + '</b></p><div class="mrow"><button class="btn go" id="bwAgain">🔄 Play again</button><button class="btn" id="bwNew">🗺️ Another map</button></div>');
+    $('#bwAgain', c).onclick = function () { MM.audio.play('click'); MM.play.restart(); };
+    $('#bwNew', c).onclick = function () { MM.audio.play('click'); MM.ui.show('home'); open(true); };
+  }
+
+  function init() {
+    var ov = document.createElement('div'); ov.id = 'netOverlay'; ov.className = 'net-overlay hidden'; $('#play').appendChild(ov);
+    var c = document.createElement('div'); c.id = 'netChip'; c.className = 'netchip hidden'; c.setAttribute('aria-live', 'polite'); document.body.appendChild(c);
+    c.onclick = function () { if (MM.ui.screen !== 'play') open(true); };
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden || !want) return;
+      if (!ws || ws.readyState > 1) { fails = Math.min(fails, 1); connect(); }
+      else if (Date.now() - lastRx > 3000) kill(); // woke from screen lock: the old socket is probably dead
+    });
+    window.addEventListener('online', function () { if (want && (!ws || ws.readyState > 1)) connect(); });
+    if (!hosted()) return;
+    var q = /[?&]room=(\d{4})/.exec(location.search), se = sget();
+    if (q) {
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      if (!se || se.code !== q[1]) sset({ cid: cid(), code: q[1], role: null });
+      autoOpened = true; open();
+    } else if (se && se.code) { connect(); } // reloaded mid-session: rejoin quietly (the chip shows it)
+  }
+
+  return {
+    init: init, open: open, send: send, hosted: hosted, peerOnline: peerOnline, onScreen: onScreen, resynced: resynced, builderWin: builderWin,
+    drop: function (ms) { blockUntil = Date.now() + (ms || 0); kill(); }, // test hook: simulate a Wi-Fi blip
+    get state() { return { st: st, room: room, role: role(), view: lobbyOpen ? view : null, inGame: inGame, fails: fails, joinURL: room ? joinURL() : null, fallbackURL: room ? fallbackURL() : null, log: log.slice(-30), hold: !!(MM.play.run && MM.play.run.hold) }; }
+  };
+})();
+
+// ===== src/main.js =====
+// main.js - boot, main loop, home screen, Continue, mute, debug hook.
+(function () {
+  var $ = MM.$;
+  MM.errors = [];
+  window.addEventListener('error', function (e) { MM.errors.push(String(e.message)); });
+  function setMuteIcon() { $('#muteBtn').textContent = MM.settings.mute ? '🔇' : '🔊'; }
+  function boot() {
+    MM.editor.init(); MM.play.init(); MM.duel.init();
+    $('#btnPlay').onclick = function () { MM.audio.play('click'); MM.ui.show('maps'); };
+    $('#btnBuild').onclick = function () { MM.audio.play('click'); MM.editor.open(null); };
+    $('#btnDuel').onclick = function () { MM.audio.play('click'); MM.duel.pick(); };
+    $('#btnNewMap').onclick = function () { MM.audio.play('click'); MM.editor.open(null); };
+    $('#btnContinue').onclick = function () { MM.audio.play('click'); cont(); };
+    $('#btnImport').onclick = function () { MM.audio.play('click'); MM.ui.importBox(); };
+    MM.$$('[data-go]').forEach(function (b) { b.onclick = function () { MM.audio.play('click'); MM.ui.show(b.dataset.go); }; });
+    $('#muteBtn').onclick = function () { MM.settings.mute = !MM.settings.mute; MM.saveSettings(); setMuteIcon(); MM.audio.unlock(); MM.audio.play('click'); };
+    $('#modal').addEventListener('pointerdown', function (e) { if (e.target === $('#modal') && MM.play.run && MM.play.run.modal === 'shop') MM.play.closeShop(); });
+    setMuteIcon();
+    // audio starts only after the first real input
+    ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) { window.addEventListener(ev, function () { MM.audio.unlock(); }, { passive: true }); });
+    MM.onScreen = function (id) { MM.editor.setActive(id === 'editor'); MM.play.setActive(id === 'play'); if (netReady) MM.net.onScreen(id); requestAnimationFrame(resize); };
+    window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', function () { setTimeout(resize, 200); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) { if (MM.ui.screen === 'play') MM.play.save(true); if (MM.ui.screen === 'editor') MM.editor.persist(); } });
+    window.addEventListener('pagehide', function () { if (MM.ui.screen === 'play') MM.play.save(true); });
+    MM.ui.show('home');
+    MM.net.init(); netReady = true; // two-device play (only does anything on the page served by the host)
+    requestAnimationFrame(loop);
+  }
+  var netReady = false;
+  function resize() { MM.editor.resize(); MM.play.resize(); MM.duel.resize(); }
+  function cont() {
+    var s = MM.store.get('session', null); if (!s || !s.map) { MM.ui.refreshHome(); return; }
+    if (s.mode === 'build') MM.editor.restore(s);
+    else MM.play.start(s.map, { resume: s.run, fromEditor: s.fromEditor, pack: s.run && s.run.pack });
+  }
+  var last = 0;
+  function loop(ms) {
+    var t = ms / 1000, dt = Math.min(0.05, Math.max(0, t - last)); last = t;
+    try { MM.editor.frame(t); MM.play.frame(t, dt); } catch (e) { MM.errors.push(String(e && e.stack || e)); console.error(e); }
+    requestAnimationFrame(loop);
+  }
+  // ---- debug / test hook ----
+  window.__game = {
+    MM: MM,
+    get screen() { return MM.ui.screen; },
+    get run() { var r = MM.play.run; return r && { cash: r.cash, coins: r.coins, keys: r.keys, x: r.p.x, y: r.p.y, shield: r.p.shield, up: r.up, elapsed: r.elapsed, rewind: r.rewind, hits: r.hits, done: r.done, modal: r.modal, result: r.result, mapId: r.map.id, goal: r.map.goal, doubleT: r.doubleT, questions: r.questions, checkpoint: r.checkpoint }; },
+    get editor() { var m = MM.editor.map; return m && { name: m.name, theme: m.theme, goal: m.goal, tiles: m.tiles, id: m.id, tool: MM.editor.tool, brush: MM.editor.brush, undo: MM.editor.undoCount }; },
+    get question() { var r = MM.play.run; return r && r.q ? { q: r.q.q, choices: r.q.choices, answer: r.q.answer } : null; },
+    premade: function () { return MM.maps.PREMADE.map(function (m) { return { id: m.id, name: m.name, theme: m.theme, goal: m.goal }; }); },
+    myMaps: function () { return MM.myMaps(); },
+    playPremade: function (id) { var m = MM.maps.PREMADE.filter(function (x) { return x.id === id; })[0]; if (m) MM.play.start(m); return !!m; },
+    autopilot: function (on) { MM.play.setAuto(on); },
+    timeScale: function (n) { MM.timeScale = n || 1; },
+    give: function (n) { MM.play.run.cash += n; },
+    buy: function (k) { return MM.play.buy(k); },
+    answer: function (n) { MM.play.answer(n); },
+    validate: function (m) { return MM.maps.validate(m || MM.editor.map); },
+    code: function (m) { return MM.maps.toCode(m || MM.editor.map); },
+    get storage() { return { mode: MM.store.state.mode, lastKind: MM.store.state.lastKind, lastError: MM.store.state.lastError, bytes: MM.store.bytes() }; },
+    get lastSave() { return MM.editor.lastSave; },
+    errors: MM.errors,
+    // Builder vs Runner test hooks
+    duel: {
+      get state() { return MM.duel.state; },
+      maps: function () { return MM.maps.DUEL.map(function (m) { return { id: m.id, name: m.name, stretches: MM.duel.stretches(m) }; }); },
+      start: function (idOrMap, mode) { var m = typeof idOrMap === 'string' ? MM.maps.DUEL.concat(MM.maps.PREMADE).filter(function (x) { return x.id === idOrMap; })[0] : idOrMap; MM.duel.start(m, { mode: mode }); MM.play.resume(); return !!m; },
+      queue: function (x, y, ch) { return MM.duel.queueEdit(MM.idx(x, y), ch); },
+      undo: function () { return MM.duel.undo(); },
+      tile: function (x, y) { return MM.play.run.tiles[MM.idx(x, y)]; },
+      teleport: function (x, y) { var p = MM.play.run.p; p.x = x + 0.5; p.y = y + 0.5; MM.play.replan(); },
+      hurt: function () { MM.play.ouch('spikes'); },
+      restart: function () { MM.play.restart(); },
+      tab: function (t) { MM.duel.setTab(t); },
+      get ts() { return MM.duel.ts; },
+      tileAt: function (i) { return MM.play.run.tiles[i]; },
+      get tiles() { return MM.play.run && MM.play.run.tiles.join(''); }
+    },
+    // two-device (Mode 2) test hooks
+    net: {
+      get state() { return MM.net.state; },
+      open: function () { MM.net.open(); },
+      drop: function (ms) { MM.net.drop(ms); },
+      qr: function () { var c = document.querySelector('#nQR'); return c ? { text: c.dataset.qr, png: c.toDataURL('image/png') } : null; }
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "map-makers";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

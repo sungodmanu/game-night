@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b1020">
+<title>Ninja Parkour</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#070b16;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 0%,#1a2748 0%,#070b16 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#0b1224;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+/* Portrait: fill most of the height with the taller logical canvas */
+#game.portrait{width:100%;height:auto;max-height:94dvh;max-width:100%;object-fit:contain}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:10}
+#overlay>*{pointer-events:auto}
+#hud{position:absolute;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 12px 0;padding-right:calc(140px + env(safe-area-inset-right));display:flex;gap:8px;align-items:flex-start;justify-content:space-between;pointer-events:none;z-index:5;font-weight:800}
+#hud.hidden,#touch.hidden{display:none!important}
+.hud-left{display:flex;flex-wrap:wrap;gap:8px;align-items:center;pointer-events:none}
+#pauseBtn{pointer-events:auto!important;z-index:21;position:relative}
+.icon-btn{position:absolute;z-index:20;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* ≥12px gaps between Pause (in HUD), Mute, Fullscreen — non-overlapping hit areas */
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(68px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#1a2744;background:#ffe566;box-shadow:0 4px 0 #d4b000,0 8px 18px rgba(0,0,0,.25);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d4b000,0 4px 10px rgba(0,0,0,.25)}
+.btn.big{font-size:24px;padding:14px 26px;border-radius:22px;min-height:60px}
+.btn.green{background:#7dff9a;box-shadow:0 4px 0 #2db854,0 8px 18px rgba(0,0,0,.25)}
+.btn.blue{background:#7ec8ff;box-shadow:0 4px 0 #2a7fbf,0 8px 18px rgba(0,0,0,.25)}
+.btn.pink{background:#ff9ad4;box-shadow:0 4px 0 #d44f9a,0 8px 18px rgba(0,0,0,.25)}
+.btn.orange{background:#ffb347;box-shadow:0 4px 0 #d47800,0 8px 18px rgba(0,0,0,.25)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.panel{background:rgba(10,16,36,.92);border:3px solid rgba(255,255,255,.18);border-radius:28px;padding:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 16px 50px rgba(0,0,0,.45);max-width:min(980px,96vw);max-height:min(94dvh,94vh);overflow:auto}
+.title{font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:.5px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.35);margin-bottom:6px}
+.sub{text-align:center;opacity:.85;margin-bottom:14px;font-size:15px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:190px;border-radius:24px;background:linear-gradient(160deg,#2a4068,#121c38);border:4px solid rgba(255,255,255,.2);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px}
+.profile-card .meta{font-size:14px;opacity:.85;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700;min-height:40px}
+#touch{position:absolute;inset:0;z-index:8;pointer-events:none}
+.pad-cluster{position:absolute;display:flex;gap:24px;pointer-events:auto;z-index:9}
+.pad-cluster.bl{left:calc(16px + env(safe-area-inset-left));bottom:calc(12px + 12px + env(safe-area-inset-bottom))}
+.pad-cluster.br{right:calc(16px + env(safe-area-inset-right));bottom:calc(12px + 12px + env(safe-area-inset-bottom));justify-content:flex-end}
+.pad-cluster.tl{left:calc(16px + env(safe-area-inset-left));top:calc(72px + env(safe-area-inset-top))}
+.pad-cluster.tr{right:calc(16px + env(safe-area-inset-right));top:calc(72px + env(safe-area-inset-top));justify-content:flex-end}
+.pad-btn{width:80px;height:80px;min-width:48px;min-height:48px;border:none;border-radius:18px;background:rgba(255,255,255,.22);color:#fff;font-size:28px;font-weight:900;cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 4px 0 rgba(0,0,0,.25);touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;gap:2px;padding:6px}
+.pad-btn .pad-ico{font-size:28px;line-height:1}
+.pad-btn .pad-lbl{font-size:11px;font-weight:800;opacity:.9;letter-spacing:.3px}
+.pad-btn:active,.pad-btn.held{transform:translateY(2px);background:rgba(255,230,100,.55)}
+.toast{position:absolute;top:18%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:12px 20px;border-radius:16px;font-weight:800;font-size:18px;z-index:30;pointer-events:none}
+.hidden{display:none!important}
+input.name-in{font-size:20px;padding:12px 14px;border-radius:14px;border:3px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;min-height:48px;width:min(240px,70vw);text-align:center}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;width:100%;max-width:760px;max-height:48vh;overflow:auto;padding:4px}
+.lvl{min-width:56px;min-height:56px;border-radius:14px;border:none;background:rgba(255,255,255,.14);color:#fff;font-weight:900;font-size:18px;cursor:pointer}
+.lvl.done{background:#3dd68c}
+.lvl.boss{background:linear-gradient(160deg,#ff8a5c,#c44569)}
+.lvl.locked{opacity:.35;cursor:default}
+.lvl.cur{outline:3px solid #ffe566}
+.outfit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;width:100%;max-width:640px}
+.outfit{min-height:88px;border-radius:16px;border:3px solid transparent;background:rgba(255,255,255,.1);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;font-weight:800;font-size:12px;color:#fff}
+.outfit.sel{border-color:#ffe566;background:rgba(255,229,102,.22)}
+.outfit.locked{opacity:.4;cursor:default}
+.outfit canvas{width:48px;height:48px;pointer-events:none}
+.world-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px}
+.world-tab{min-height:48px;padding:10px 14px;border-radius:14px;border:3px solid transparent;background:rgba(255,255,255,.12);color:#fff;font-weight:800;cursor:pointer;font-size:14px}
+.world-tab.sel{border-color:#ffe566;background:rgba(255,229,102,.25)}
+.hint{font-size:14px;opacity:.9;background:rgba(255,229,102,.18);border:2px solid rgba(255,229,102,.35);padding:8px 12px;border-radius:12px;max-width:520px;text-align:center}
+#rotateTip{position:absolute;left:50%;top:calc(56px + env(safe-area-inset-top));transform:translateX(-50%);z-index:40;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 12px;max-width:min(340px,92vw)}
+#rotateTip.hidden{display:none!important}
+#rotateTip .hint-banner{pointer-events:none;background:rgba(10,16,36,.88);border:2px solid rgba(255,229,102,.45);border-radius:16px;padding:10px 14px;font-weight:800;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);line-height:1.3}
+#hudLevel{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(42vw,220px);font-size:clamp(12px,3.2vw,16px)}
+.chip#hudLevel,.hud-left .chip:last-child{white-space:nowrap;max-width:min(46vw,240px);overflow:hidden;text-overflow:ellipsis;font-size:clamp(12px,3.1vw,15px)}
+@media (max-height:650px){
+  .profile-card{min-height:150px;width:min(230px,40vw)}
+  .title{font-size:clamp(20px,4.2vw,32px)}
+  .panel{padding:12px;border-radius:20px}
+}
+@media (orientation:portrait) and (max-width:500px){
+  .profile-card{width:min(300px,80vw)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Ninja Parkour"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="touch" class="hidden" aria-hidden="true"></div>
+  <div id="overlay"></div>
+  <div id="rotateTip" class="hidden" role="status" aria-live="polite">
+    <div class="hint-banner">Turn sideways 🔄 for the best view</div>
+  </div>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Ninja Parkour — core namespace & helpers */
+const NP = window.NP = {
+  VERSION: 1,
+  SAVE_KEY: 'ninja-parkour-v1',
+  W: 1180, H: 600,
+  TILE: 40,
+  profiles: {
+    p1: {
+      id: 'p1', defaultName: 'Player 1', label: 'Gentle',
+      infiniteLives: true, lives: 99,
+      coyoteMs: 180, bufferMs: 160,
+      holdJumpMs: 250, releaseCut: 0.6,
+      jumpH: 3.3, jumpT: 0.40, fallMult: 1.55,
+      jumpMult: 1.0, guardSpeed: 0.7,
+      hurtInset: 8, cornerCorr: 6, ledgeProbe: 20, pickupPad: 18,
+      hitPad: 10, checkpoints: 'all', slideWindow: 1.2,
+      touchBtn: 80, minTapTiles: 1.35
+    },
+    p2: {
+      id: 'p2', defaultName: 'Player 2', label: 'Adventure',
+      infiniteLives: false, lives: 3,
+      coyoteMs: 120, bufferMs: 110,
+      holdJumpMs: 200, releaseCut: 0.58,
+      jumpH: 3.0, jumpT: 0.38, fallMult: 1.75,
+      jumpMult: 1.0, guardSpeed: 1.0,
+      hurtInset: 6, cornerCorr: 4, ledgeProbe: 12, pickupPad: 8,
+      hitPad: 4, checkpoints: 'marked', slideWindow: 1.0,
+      touchBtn: 68, minTapTiles: 1.1
+    }
+  },
+  outfits: [
+    { id: 'midnight', name: 'Midnight', color: '#2b2f4a', accent: '#7ec8ff', unlock: 0 },
+    { id: 'ember', name: 'Ember', color: '#c44536', accent: '#ffb347', unlock: 8 },
+    { id: 'jade', name: 'Jade', color: '#1f7a4c', accent: '#7dff9a', unlock: 16 },
+    { id: 'orchid', name: 'Orchid', color: '#7a3e9d', accent: '#ff9ad4', unlock: 24 },
+    { id: 'solar', name: 'Solar', color: '#d4a017', accent: '#ffe566', unlock: 40 },
+    { id: 'frost', name: 'Frost', color: '#3d6b8a', accent: '#c8f0ff', unlock: 60 },
+    { id: 'shadow', name: 'Shadow', color: '#111218', accent: '#9aa0b8', unlock: 80 },
+    { id: 'rainbow', name: 'Rainbow', color: '#ff5e7a', accent: '#7ec8ff', unlock: 100 }
+  ],
+  worlds: [
+    { id: 'lantern', name: 'Lantern Rooftops', short: 'Rooftops', sky: ['#1a1430', '#3a2060'], accent: '#ffb347', ground: '#3a2a48' },
+    { id: 'harbor', name: 'Neon Harbor', short: 'Harbor', sky: ['#061428', '#0a3a5c'], accent: '#39f0ff', ground: '#143048' },
+    { id: 'cloud', name: 'Cloud Towers', short: 'Cloud', sky: ['#6eb6ff', '#c8e8ff'], accent: '#ffe566', ground: '#8ec8f0', light: true },
+    { id: 'storm', name: 'Storm Citadel', short: 'Storm', sky: ['#0a0e18', '#1a2848'], accent: '#a78bfa', ground: '#1e2438' }
+  ],
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  keys: Object.create(null),
+  touch: Object.create(null),
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  touchEl: null,
+  run: null,
+  race: null,
+  cam: { x: 0, y: 0 },
+  pointers: Object.create(null)
+};
+
+NP.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+NP.lerp = (a, b, t) => a + (b - a) * t;
+NP.rand = (a, b) => a + Math.random() * (b - a);
+NP.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+NP.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+NP.now = () => performance.now();
+NP.meta = () => NP.profiles[(NP.state && NP.state.lastProfile) || 'p1'];
+NP.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1400);
+};
+NP.BASE_W = 1180; NP.BASE_H = 600;
+NP.fitCanvas = () => {
+  const c = NP.canvas;
+  if (!c) return;
+  const iw = window.innerWidth || NP.BASE_W;
+  const ih = window.innerHeight || NP.BASE_H;
+  const portrait = ih > iw * 1.05;
+  NP.portrait = portrait;
+  let wantW = NP.BASE_W, wantH = NP.BASE_H;
+  if (portrait) {
+    // Aim for on-screen ninja ≥36px (48 * scale). Prefer matching device aspect
+    // so width fills; keep look-ahead ≥ ~280 world px.
+    const minNinja = 36;
+    const targetScale = Math.max(0.82, minNinja / 48); // ≥0.82 → ≥39px headroom
+    wantW = Math.round(Math.min(500, Math.max(380, iw / targetScale)));
+    wantH = Math.round(wantW * (ih / Math.max(1, iw)));
+    wantH = NP.clamp(wantH, 720, 1200);
+  }
+  if (NP.W !== wantW || NP.H !== wantH) {
+    NP.W = wantW; NP.H = wantH;
+  }
+  if (c.width !== NP.W) c.width = NP.W;
+  if (c.height !== NP.H) c.height = NP.H;
+  c.classList.toggle('portrait', !!portrait);
+  NP.refreshRotateHint && NP.refreshRotateHint();
+};
+NP.clear = (color) => {
+  const ctx = NP.ctx;
+  ctx.fillStyle = color || '#0b1224';
+  ctx.fillRect(0, 0, NP.W, NP.H);
+};
+NP.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+NP.rectHit = (a, b, pad) => {
+  pad = pad || 0;
+  return a.x + pad < b.x + b.w - pad && a.x + a.w - pad > b.x + pad &&
+    a.y + pad < b.y + b.h - pad && a.y + a.h - pad > b.y + pad;
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* WebAudio SFX — only after first user input */
+NP.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = NP.muted ? 0 : 0.3;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (NP.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.14, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function noise(dur, vol) {
+    if (NP.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const n = Math.max(1, (c.sampleRate * dur) | 0);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = vol || 0.05;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1000;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start();
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      NP.muted = !!m;
+      if (master) master.gain.value = NP.muted ? 0 : 0.3;
+      try { localStorage.setItem('np-mute', NP.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = NP.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { NP.muted = localStorage.getItem('np-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = NP.muted ? '🔇' : '🔊';
+    },
+    click() { tone(340, 0.05, 'triangle', 0.06); },
+    jump() { tone(280, 0.1, 'square', 0.07, 520); },
+    doubleJump() { tone(360, 0.09, 'square', 0.06, 640); },
+    land() { noise(0.05, 0.04); },
+    slide() { noise(0.12, 0.035); tone(120, 0.1, 'sawtooth', 0.03, 80); },
+    grab() { tone(420, 0.07, 'triangle', 0.07); },
+    scroll() { tone(660, 0.06, 'sine', 0.09); setTimeout(() => tone(880, 0.08, 'sine', 0.07), 40); },
+    hurt() { tone(160, 0.16, 'sawtooth', 0.08, 70); },
+    win() { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => tone(f, 0.12, 'sine', 0.09), i * 70)); },
+    checkpoint() { tone(520, 0.08, 'sine', 0.08); setTimeout(() => tone(700, 0.1, 'triangle', 0.07), 50); },
+    whoosh() { tone(200, 0.1, 'sawtooth', 0.04, 90); noise(0.08, 0.03); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage per-profile saves with in-memory fallback + Continue */
+NP.Save = (() => {
+  function blankProfile(id) {
+    const meta = NP.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      maxLevel: 1,
+      cleared: {},
+      scrolls: 0,
+      totalScrolls: 0,
+      outfit: 'midnight',
+      unlockedOutfits: ['midnight'],
+      lives: meta.lives,
+      playSeconds: 0,
+      checkpoint: null,
+      continueLevel: null
+    };
+  }
+
+  function blankState() {
+    return {
+      v: NP.VERSION,
+      lastProfile: null,
+      profiles: { p1: blankProfile('p1'), p2: blankProfile('p2') }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(NP.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return NP.memStore;
+  }
+
+  function writeRaw(data) {
+    NP.memStore = data;
+    try {
+      localStorage.setItem(NP.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== NP.VERSION) {
+      NP.state = blankState();
+      save();
+      return NP.state;
+    }
+    for (const id of ['p1', 'p2']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+      if (!Array.isArray(raw.profiles[id].unlockedOutfits)) raw.profiles[id].unlockedOutfits = ['midnight'];
+    }
+    NP.state = raw;
+    return NP.state;
+  }
+
+  function save() {
+    if (!NP.state) return false;
+    return writeRaw(NP.state);
+  }
+
+  function profile(id) {
+    if (!NP.state) load();
+    return NP.state.profiles[id || NP.state.lastProfile || 'p1'];
+  }
+
+  function setProfile(id) {
+    NP.state.lastProfile = id;
+    save();
+  }
+
+  function rename(id, name) {
+    const p = profile(id);
+    p.name = String(name || NP.profiles[id].defaultName).slice(0, 16) || NP.profiles[id].defaultName;
+    save();
+  }
+
+  function unlockOutfits(p) {
+    let changed = false;
+    for (const o of NP.outfits) {
+      if (p.totalScrolls >= o.unlock && p.unlockedOutfits.indexOf(o.id) < 0) {
+        p.unlockedOutfits.push(o.id);
+        changed = true;
+      }
+    }
+    // also unlock by levels cleared
+    const cleared = Object.keys(p.cleared).length;
+    const byLevel = [
+      [4, 'ember'], [8, 'jade'], [12, 'orchid'], [16, 'solar'],
+      [20, 'frost'], [24, 'shadow'], [28, 'rainbow']
+    ];
+    for (const [n, id] of byLevel) {
+      if (cleared >= n && p.unlockedOutfits.indexOf(id) < 0) {
+        p.unlockedOutfits.push(id);
+        changed = true;
+      }
+    }
+    if (changed) save();
+    return changed;
+  }
+
+  function markCleared(levelId, scrolls) {
+    const p = profile();
+    p.cleared[levelId] = true;
+    p.scrolls = (p.scrolls || 0) + (scrolls || 0);
+    p.totalScrolls = (p.totalScrolls || 0) + (scrolls || 0);
+    const num = parseInt(String(levelId).replace(/\D/g, ''), 10) || 1;
+    if (num >= p.maxLevel) p.maxLevel = Math.min(32, num + 1);
+    p.continueLevel = null;
+    p.checkpoint = null;
+    if (!NP.meta().infiniteLives) p.lives = NP.meta().lives;
+    unlockOutfits(p);
+    save();
+  }
+
+  function setContinue(levelId, checkpoint, lives) {
+    const p = profile();
+    p.continueLevel = levelId;
+    p.checkpoint = checkpoint || null;
+    if (lives != null) p.lives = lives;
+    save();
+  }
+
+  function clearContinue() {
+    const p = profile();
+    p.continueLevel = null;
+    p.checkpoint = null;
+    save();
+  }
+
+  return { load, save, profile, setProfile, rename, unlockOutfits, markCleared, setContinue, clearContinue, blankProfile, blankState, readRaw, writeRaw };
+})();
+
+})();
+/* ==== 30-levels.js ==== */
+;(function(){
+/* 32 levels / 4 worlds — main chain gaps always within jump envelope */
+NP.Levels = (() => {
+  const T = NP.TILE;
+  const WORLD_LEN = 8;
+  const TOTAL = 32;
+
+  function plat(x, y, w, h, type) {
+    return { x, y, w, h: h == null ? Math.max(48, 600 - y) : h, type: type || 'solid' };
+  }
+  function oneWay(x, y, w) { return { x, y, w, h: 12, type: 'oneway' }; }
+
+  function buildLevel(idx) {
+    const world = Math.floor((idx - 1) / WORLD_LEN);
+    const local = ((idx - 1) % WORLD_LEN) + 1;
+    const isBoss = local === WORLD_LEN;
+    const rng = NP.seeded(idx * 9973 + 42);
+    const difficulty = (idx - 1) / (TOTAL - 1);
+    // conservative vs physics (~150px flight / ~110px rise)
+    const gapMax = Math.floor(48 + difficulty * 55); // 48..103
+    const riseMax = Math.floor(28 + difficulty * 55); // 28..83
+    const segs = isBoss ? 14 : (7 + Math.floor(difficulty * 5)); // shorter
+
+    const platforms = [];
+    const ropes = [];
+    const spikes = [];
+    const scrolls = [];
+    const checkpoints = [];
+    const guards = [];
+    const moving = [];
+    const path = [];
+    const chain = []; // main walkable tops for gap proof: {x,y,w}
+
+    const groundY = 520;
+    let x = 0;
+    let y = groundY;
+
+    platforms.push(plat(0, y, 240));
+    chain.push({ x: 0, y: y, w: 240 });
+    path.push({ x: 100, y: y - 52 });
+    x = 240;
+
+    for (let i = 0; i < segs; i++) {
+      const gap = Math.min(130, Math.floor(36 + rng() * gapMax));
+      const rise = Math.floor((rng() * 2 - 1) * riseMax);
+      const ny = NP.clamp(y + rise, 300, groundY);
+      const segW = Math.floor(150 + rng() * 120);
+      x += gap;
+      y = ny;
+      platforms.push(plat(x, y, segW));
+      chain.push({ x: x, y: y, w: segW });
+      path.push({ x: x + Math.min(60, segW * 0.4), y: y - 52 });
+
+      // cosmetics / pickups — NOT on main path chain
+      if (rng() < 0.55) {
+        const mx = x + 40;
+        const my = y - (60 + Math.floor(rng() * 30));
+        platforms.push(oneWay(mx, my, 64));
+        scrolls.push({ x: mx + 20, y: my - 32 });
+      } else {
+        scrolls.push({ x: x + segW * 0.5, y: y - 48 });
+      }
+
+      if (rng() < 0.18 + difficulty * 0.15) {
+        platforms.push({ x: x + segW - 28, y: y - 120, w: 28, h: 120, type: 'climb' });
+      }
+      if (rng() < 0.15 + difficulty * 0.12 && gap >= 44) {
+        const rx = x - gap * 0.5;
+        const topY = Math.min(y, groundY) - 170;
+        ropes.push({ x: rx, y: topY, h: 140 });
+        // landing ledge under every rope so release is never a soft-pit
+        platforms.push(plat(rx - 40, groundY + 8, 80, 36));
+      }
+      if (!isBoss && difficulty > 0.25 && rng() < 0.18 && segW > 170) {
+        spikes.push({ x: x + 80, y: y - 14, w: 28, h: 14 });
+      }
+      if (difficulty > 0.2 && rng() < 0.22 && segW > 160) {
+        guards.push({ x: x + segW * 0.5, y: y - 44, patrol: 36, speed: 30 + difficulty * 40 });
+      }
+      if (difficulty > 0.3 && rng() < 0.18) {
+        moving.push({
+          x: x + segW + gap * 0.4, y: y - 20, w: 60, h: 14,
+          axis: 'y', range: 24, speed: 28 + difficulty * 20, t: rng() * 6
+        });
+      }
+      if (i > 0 && i % 2 === 0) checkpoints.push({ x: x + 16, y: y - 48 });
+      x += segW;
+    }
+
+    x += 40;
+    y = groundY - 8;
+    platforms.push(plat(x, y, 260));
+    chain.push({ x: x, y: y, w: 260 });
+    path.push({ x: x + 80, y: y - 52 });
+    const width = x + 260;
+    const start = { x: 70, y: groundY - 60 };
+    const goal = { x: width - 90, y: y - 70 };
+
+    while (scrolls.length < 4) {
+      const s = path[scrolls.length % path.length];
+      scrolls.push({ x: s.x, y: s.y - 10 });
+    }
+    if (isBoss) {
+      for (let i = 1; i < path.length; i += 2) {
+        guards.push({ x: path[i].x, y: path[i].y + 8, patrol: 30, speed: 50 });
+      }
+    }
+    if (idx <= 3) {
+      // safety ledges under early gaps
+      for (let i = 1; i < path.length; i++) {
+        const a = path[i - 1], b = path[i];
+        const mid = (a.x + b.x) / 2;
+        platforms.push(plat(mid - 40, groundY + 10, 80, 40));
+      }
+    }
+
+    // Keep checkpoints / start clear of ropes (never respawn onto a rope)
+    function clearOfRopes(pt) {
+      for (const r of ropes) {
+        if (Math.abs((pt.x + 17) - r.x) < 36 && pt.y + 48 > r.y && pt.y < r.y + r.h) {
+          pt.x = r.x + 48;
+        }
+      }
+      return pt;
+    }
+    for (const c of checkpoints) clearOfRopes(c);
+    clearOfRopes(start);
+
+    return {
+      id: idx, world, local,
+      name: isBoss
+        ? ((NP.worlds[world].short || NP.worlds[world].name) + ' ' + (world + 1) + '-Boss')
+        : ((NP.worlds[world].short || NP.worlds[world].name) + ' ' + (world + 1) + '-' + local),
+      boss: isBoss, width, height: 600,
+      platforms, ropes, spikes, scrolls, checkpoints, guards, moving,
+      start, goal, path, chain
+    };
+  }
+
+  const cache = [];
+  function get(id) {
+    id = NP.clamp(id | 0, 1, TOTAL);
+    if (!cache[id]) cache[id] = buildLevel(id);
+    return cache[id];
+  }
+  function list() {
+    const out = [];
+    for (let i = 1; i <= TOTAL; i++) out.push(get(i));
+    return out;
+  }
+
+  function chainGaps(L) {
+    const gaps = [];
+    for (let i = 1; i < L.chain.length; i++) {
+      const a = L.chain[i - 1], b = L.chain[i];
+      const dx = b.x - (a.x + a.w); // clear air between tops
+      const rise = a.y - b.y;
+      gaps.push({ i, dx, rise, from: a, to: b });
+    }
+    return gaps;
+  }
+
+  function assertAllJumpable() {
+    const bad = [];
+    for (let i = 1; i <= TOTAL; i++) {
+      const L = get(i);
+      for (const pid of ['p1', 'p2']) {
+        const meta = NP.profiles[pid];
+        const H = (meta.jumpH || 3) * T;
+        const maxGap = 140;
+        for (const g of chainGaps(L)) {
+          if (g.dx > maxGap || g.rise > H) bad.push({ i, pid, dx: g.dx, rise: g.rise, H, maxGap });
+        }
+      }
+    }
+    return bad;
+  }
+
+  return { TOTAL, WORLD_LEN, get, list, buildLevel, assertAllJumpable, chainGaps };
+})();
+
+})();
+/* ==== 40-art.js ==== */
+;(function(){
+/* Canvas-drawn art — ninja, bots, props (no external assets) */
+NP.Art = (() => {
+  function outfitOf(id) {
+    return NP.outfits.find((o) => o.id === id) || NP.outfits[0];
+  }
+
+  function drawNinja(ctx, x, y, w, h, opts) {
+    opts = opts || {};
+    const o = outfitOf(opts.outfit || 'midnight');
+    const facing = opts.facing == null ? 1 : opts.facing;
+    const slide = !!opts.slide;
+    const climb = !!opts.climb;
+    const frame = opts.frame || 0;
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2);
+    ctx.scale(facing, 1);
+    if (slide) {
+      // clear crouch / dive pose
+      ctx.translate(0, h * 0.12);
+      ctx.scale(1.35, 0.48);
+      ctx.rotate(0.35);
+    }
+    if (climb) ctx.rotate(-0.15);
+    const bw = w * 0.7, bh = h * 0.85;
+    ctx.fillStyle = o.color;
+    NP.roundRect(ctx, -bw / 2, -bh / 2, bw, bh, 8);
+    ctx.fill();
+    ctx.fillStyle = o.accent;
+    ctx.fillRect(-bw / 2, -4, bw, 8);
+    ctx.fillStyle = o.accent;
+    ctx.fillRect(-bw / 2 - 2, -bh / 2 + 6, bw + 4, 7);
+    ctx.fillStyle = '#e8f0ff';
+    ctx.fillRect(-10, -bh / 2 + 16, 7, 5);
+    ctx.fillRect(3, -bh / 2 + 16, 7, 5);
+    if (!slide) {
+      const bob = Math.sin(frame * 0.4) * 3;
+      ctx.fillStyle = o.color;
+      ctx.fillRect(-bw / 2 + 4, bh / 2 - 4, 8, 10 + bob);
+      ctx.fillRect(bw / 2 - 12, bh / 2 - 4, 8, 10 - bob);
+    } else {
+      // tucked legs
+      ctx.fillStyle = o.color;
+      ctx.fillRect(-bw / 2 + 2, bh / 2 - 6, bw - 4, 10);
+    }
+    ctx.strokeStyle = o.accent;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(bw / 2 - 2, -bh / 4);
+    ctx.quadraticCurveTo(bw / 2 + 14, -bh / 4 + Math.sin(frame * 0.3) * 6, bw / 2 + 8, bh / 4);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawDust(ctx, fx) {
+    for (const d of fx) {
+      if (d.kind !== 'dust') continue;
+      const a = Math.max(0, d.life);
+      ctx.globalAlpha = Math.min(1, a * 2);
+      ctx.fillStyle = '#d6c4a0';
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r * (1.2 - a), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawGuard(ctx, x, y, w, h, t) {
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2);
+    ctx.fillStyle = '#5a6478';
+    NP.roundRect(ctx, -w / 2, -h / 2, w, h, 6);
+    ctx.fill();
+    ctx.fillStyle = '#ff5e5e';
+    ctx.beginPath();
+    ctx.arc(-6, -h / 6, 4, 0, Math.PI * 2);
+    ctx.arc(6, -h / 6, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#9aa0b8';
+    ctx.fillRect(-w / 2 + 4, h / 4, w - 8, 6);
+    // antenna
+    ctx.strokeStyle = '#39f0ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -h / 2);
+    ctx.lineTo(Math.sin(t * 3) * 4, -h / 2 - 10);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawScroll(ctx, x, y, t) {
+    const bob = Math.sin(t * 3) * 3;
+    ctx.save();
+    ctx.translate(x, y + bob);
+    ctx.fillStyle = '#f5e6c8';
+    NP.roundRect(ctx, -10, -14, 20, 28, 4);
+    ctx.fill();
+    ctx.fillStyle = '#c44536';
+    ctx.fillRect(-10, -14, 20, 5);
+    ctx.fillRect(-10, 9, 20, 5);
+    ctx.fillStyle = '#7a3e9d';
+    ctx.font = 'bold 12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('忍', 0, 5);
+    ctx.restore();
+  }
+
+  function drawCheckpoint(ctx, x, y, on) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = on ? '#7dff9a' : '#7ec8ff';
+    ctx.fillRect(-4, -36, 8, 36);
+    ctx.beginPath();
+    ctx.moveTo(4, -36);
+    ctx.lineTo(28, -28);
+    ctx.lineTo(4, -20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawGoal(ctx, x, y, t) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = '#ffe566';
+    ctx.fillRect(-5, -50, 10, 50);
+    ctx.fillStyle = '#ff9ad4';
+    ctx.beginPath();
+    ctx.moveTo(5, -50);
+    ctx.lineTo(36, -40 + Math.sin(t * 2) * 2);
+    ctx.lineTo(5, -30);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawSpike(ctx, x, y, w, h) {
+    ctx.fillStyle = '#c0c8d8';
+    const n = Math.max(1, Math.floor(w / 14));
+    for (let i = 0; i < n; i++) {
+      const sx = x + (i + 0.5) * (w / n);
+      ctx.beginPath();
+      ctx.moveTo(sx - 7, y + h);
+      ctx.lineTo(sx, y);
+      ctx.lineTo(sx + 7, y + h);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function drawRope(ctx, r) {
+    ctx.strokeStyle = '#c8a06a';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(r.x, r.y);
+    ctx.lineTo(r.x, r.y + r.h);
+    ctx.stroke();
+    ctx.fillStyle = '#8a6238';
+    ctx.fillRect(r.x - 10, r.y - 6, 20, 8);
+  }
+
+  function drawBoss(ctx, x, y, t) {
+    ctx.save();
+    ctx.translate(x, y);
+    const pulse = 1 + Math.sin(t * 4) * 0.05;
+    ctx.scale(pulse, pulse);
+    ctx.fillStyle = '#2a1030';
+    NP.roundRect(ctx, -40, -50, 80, 70, 12);
+    ctx.fill();
+    ctx.fillStyle = '#ff5e7a';
+    ctx.beginPath();
+    ctx.arc(-16, -20, 8, 0, Math.PI * 2);
+    ctx.arc(16, -20, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillRect(-30, 0, 60, 10);
+    ctx.font = 'bold 14px system-ui';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillText('BOSS', 0, -55);
+    ctx.restore();
+  }
+
+  function drawPlatform(ctx, p, world) {
+    const wmeta = NP.worlds[world] || NP.worlds[0];
+    if (p.type === 'oneway') {
+      ctx.fillStyle = wmeta.accent;
+      ctx.globalAlpha = 0.85;
+      NP.roundRect(ctx, p.x, p.y, p.w, p.h, 4);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      return;
+    }
+    if (p.type === 'climb') {
+      ctx.fillStyle = '#6a5a4a';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.fillStyle = '#8a7a6a';
+      for (let yy = p.y + 10; yy < p.y + p.h; yy += 18) ctx.fillRect(p.x + 4, yy, p.w - 8, 4);
+      return;
+    }
+    ctx.fillStyle = wmeta.ground;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.fillStyle = wmeta.accent;
+    ctx.globalAlpha = 0.35;
+    ctx.fillRect(p.x, p.y, p.w, 6);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawBg(ctx, cam, level, t) {
+    const w = NP.worlds[level.world] || NP.worlds[0];
+    const g = ctx.createLinearGradient(0, 0, 0, NP.H);
+    g.addColorStop(0, w.sky[0]);
+    g.addColorStop(1, w.sky[1]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, NP.W, NP.H);
+    // parallax silhouettes
+    ctx.fillStyle = w.light ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)';
+    for (let i = 0; i < 8; i++) {
+      const bx = ((i * 280 - cam.x * 0.3) % (NP.W + 300)) - 100;
+      const bh = 80 + (i % 3) * 40;
+      ctx.fillRect(bx, NP.H - bh - 40, 120 + (i % 4) * 30, bh);
+    }
+    if (level.world === 0) {
+      // lanterns
+      for (let i = 0; i < 6; i++) {
+        const lx = ((i * 220 - cam.x * 0.5) % (NP.W + 100));
+        ctx.fillStyle = 'rgba(255,180,70,0.55)';
+        ctx.beginPath();
+        ctx.arc(lx, 80 + (i % 3) * 30, 10, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    if (level.world === 1) {
+      ctx.strokeStyle = 'rgba(57,240,255,0.35)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 5; i++) {
+        const lx = ((i * 260 - cam.x * 0.4) % (NP.W + 80));
+        ctx.strokeRect(lx, 60, 40, 70);
+      }
+    }
+    if (level.world === 3) {
+      ctx.strokeStyle = 'rgba(180,200,255,0.2)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const lx = (t * 200 + i * 400) % (NP.W + 100) - 50;
+        ctx.beginPath();
+        ctx.moveTo(lx, 0);
+        ctx.lineTo(lx + 40, 120);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function thumb(outfitId, size) {
+    size = size || 48;
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, size, size);
+    drawNinja(ctx, 8, 4, size - 16, size - 8, { outfit: outfitId, frame: 0 });
+    return c;
+  }
+
+  return { drawNinja, drawDust, drawGuard, drawScroll, drawCheckpoint, drawGoal, drawSpike, drawRope, drawBoss, drawPlatform, drawBg, thumb, outfitOf };
+})();
+
+})();
+/* ==== 50-physics.js ==== */
+;(function(){
+/* Player physics: run, jump, double-jump, wall-climb, slide, rope, coyote, buffer, ledge grab
+   Tuned: coyote/buffer per profile; H/T jump; fall gravity heavier; variable jump with min tap ≥1 tile;
+   rope: jump always releases w/ directional boost; up/down climb; grab cooldown; never softlock. */
+NP.Physics = (() => {
+  const TILE = () => NP.TILE || 40;
+  const ROPE_COOLDOWN = 0.45; // seconds before same/any rope re-grab
+
+  function jumpParams(meta) {
+    const H = (meta.jumpH || 3) * TILE();
+    const T = meta.jumpT || 0.38;
+    const g = (2 * H) / (T * T);
+    const v0 = (2 * H) / T;
+    // Min tap height in tiles (P1 more forgiving)
+    const minTapTiles = meta.minTapTiles != null ? meta.minTapTiles : 1.15;
+    const minTapH = minTapTiles * TILE();
+    // release floor so vy after cut still reaches minTapH: v = sqrt(2*g*h)
+    const minTapVy = Math.sqrt(2 * g * minTapH);
+    return {
+      H, T, g, v0,
+      fallMult: meta.fallMult || 1.7,
+      holdMs: meta.holdJumpMs || 200,
+      releaseCut: meta.releaseCut || 0.45,
+      minTapVy,
+      minTapTiles
+    };
+  }
+
+  function makePlayer(spawn, opts) {
+    opts = opts || {};
+    const meta = opts.meta || NP.meta();
+    const jp = jumpParams(meta);
+    return {
+      x: spawn.x, y: spawn.y,
+      w: 34, h: 48,
+      vx: 0, vy: 0,
+      facing: 1,
+      onGround: false,
+      onWall: 0,
+      jumps: 0,
+      maxJumps: 2,
+      coyote: 0,
+      buffer: 0,
+      sliding: false,
+      slideTimer: 0,
+      slideDust: 0,
+      rope: null,
+      ropeT: 0,
+      ropeCd: 0,
+      ropeIgnore: null,
+      climbing: false,
+      invuln: 0,
+      alive: true,
+      won: false,
+      frame: 0,
+      outfit: opts.outfit || 'midnight',
+      input: opts.input || 'solo',
+      coyoteMs: meta.coyoteMs || 120,
+      bufferMs: meta.bufferMs || 110,
+      jumpMult: meta.jumpMult || 1,
+      slideWindow: meta.slideWindow || 1,
+      hurtInset: meta.hurtInset || 6,
+      cornerCorr: meta.cornerCorr || 4,
+      ledgeProbe: meta.ledgeProbe || 12,
+      pickupPad: meta.pickupPad || 8,
+      holdJumpMs: jp.holdMs,
+      releaseCut: jp.releaseCut,
+      minTapVy: jp.minTapVy,
+      gUp: jp.g,
+      gFall: jp.g * jp.fallMult,
+      v0: jp.v0 * (meta.jumpMult || 1),
+      jumpHold: 0,
+      jumpHeld: false,
+      wasJumpDown: false
+    };
+  }
+
+  function bodyBox(p) {
+    const h = p.sliding ? p.h * 0.55 : p.h;
+    const y = p.sliding ? p.y + (p.h - h) : p.y; // keep feet planted
+    return { x: p.x, y, w: p.w, h };
+  }
+
+  function hurtBox(p) {
+    const b = bodyBox(p);
+    const i = p.hurtInset || 6;
+    return { x: b.x + i, y: b.y + i * 0.5, w: Math.max(8, b.w - i * 2), h: Math.max(8, b.h - i) };
+  }
+
+  function pickupBox(p) {
+    const b = bodyBox(p);
+    const pad = p.pickupPad || 8;
+    return { x: b.x - pad, y: b.y - pad, w: b.w + pad * 2, h: b.h + pad * 2 };
+  }
+
+  function solids(level) {
+    return level.platforms.filter((pl) => pl.type !== 'oneway');
+  }
+
+  function tryCornerCorrect(p, s, box) {
+    const corr = p.cornerCorr || 4;
+    const feet = box.y + box.h;
+    if (feet > s.y && feet < s.y + corr + 8 && p.vy >= 0) {
+      p.y = s.y - p.h; // plant visual feet (bodyBox may be crouch-offset)
+      p.vy = 0;
+      return 'land';
+    }
+    const head = box.y;
+    if (head < s.y + s.h && head > s.y + s.h - corr - 6 && p.vy < 0) {
+      p.y = s.y + s.h - (box.y - p.y); // keep crouch offset
+      p.vy = 0;
+      return 'bonk';
+    }
+    return null;
+  }
+
+  function resolve(p, level, dt) {
+    const box = bodyBox(p);
+    p.x += p.vx * dt;
+    Object.assign(box, bodyBox(p));
+    p.onWall = 0;
+    for (const s of solids(level)) {
+      if (!NP.rectHit(box, s, 0)) continue;
+      const cc = tryCornerCorrect(p, s, box);
+      if (cc === 'land') { box.y = p.y; continue; }
+      if (cc === 'bonk') { box.y = p.y; continue; }
+      if (p.vx > 0) { p.x = s.x - box.w; p.onWall = 1; }
+      else if (p.vx < 0) { p.x = s.x + s.w; p.onWall = -1; }
+      p.vx = 0;
+      box.x = p.x;
+      if (s.type === 'climb') p.climbing = true;
+    }
+
+    p.y += p.vy * dt;
+    Object.assign(box, bodyBox(p));
+    let grounded = false;
+    for (const s of level.platforms) {
+      if (s.type === 'oneway') {
+        if (p.vy >= 0 && box.y + box.h > s.y && box.y + box.h - p.vy * dt <= s.y + 8 &&
+            box.x + box.w > s.x + 2 && box.x < s.x + s.w - 2) {
+          p.y = s.y - p.h; p.vy = 0; grounded = true;
+        }
+        continue;
+      }
+      if (!NP.rectHit(box, s, 0)) continue;
+      if (p.vy > 0) { p.y = s.y - p.h; p.vy = 0; grounded = true; }
+      else if (p.vy < 0) { p.y = s.y + s.h - (box.y - p.y); p.vy = 0; }
+      Object.assign(box, bodyBox(p));
+    }
+    for (const m of level.moving) {
+      const mp = { x: m.cx, y: m.cy, w: m.w, h: m.h };
+      if (p.vy >= 0 && box.y + box.h > mp.y && box.y + box.h - Math.max(p.vy * dt, 4) <= mp.y + 10 &&
+          box.x + box.w > mp.x && box.x < mp.x + mp.w) {
+        p.y = mp.y - p.h; p.vy = 0; grounded = true;
+        if (m.axis === 'x') p.x += m.dx || 0;
+      }
+    }
+    if (!grounded && p.vy >= -40) {
+      const probe = p.ledgeProbe || 12;
+      for (const s of solids(level)) {
+        const midX = p.x + p.w / 2;
+        const nearTop = Math.abs(p.y - s.y) < probe;
+        const overlappingX = midX > s.x - probe && midX < s.x + s.w + probe;
+        const approaching = (p.facing > 0 && p.x + p.w > s.x - 4) || (p.facing < 0 && p.x < s.x + s.w + 4);
+        if (nearTop && overlappingX && approaching && p.y + p.h > s.y) {
+          p.y = s.y; p.vy = 0; grounded = true; p.jumps = 1;
+          NP.Audio.grab();
+          break;
+        }
+      }
+    }
+    // Exact edge: feet flush with platform top may not overlap — probe 3px down
+    if (!grounded && p.vy >= 0) {
+      const probe = { x: box.x + 2, y: box.y + box.h, w: box.w - 4, h: 3 };
+      for (const s of level.platforms) {
+        if (probe.x + probe.w > s.x && probe.x < s.x + s.w &&
+            probe.y + probe.h > s.y && probe.y < s.y + Math.max(6, s.h)) {
+          p.y = s.y - p.h; p.vy = 0; grounded = true; break;
+        }
+      }
+      if (!grounded) {
+        for (const m of level.moving) {
+          const mp = { x: m.cx, y: m.cy, w: m.w, h: m.h };
+          if (probe.x + probe.w > mp.x && probe.x < mp.x + mp.w &&
+              probe.y + probe.h > mp.y && probe.y <= mp.y + 4) {
+            p.y = mp.y - p.h; p.vy = 0; grounded = true; break;
+          }
+        }
+      }
+    }
+    if (grounded) {
+      if (!p.onGround) NP.Audio.land();
+      p.onGround = true;
+      p.jumps = 0;
+      p.coyote = p.coyoteMs / 1000;
+      p.climbing = false;
+      p.jumpHold = 0;
+    } else {
+      p.onGround = false;
+      p.coyote = Math.max(0, p.coyote - dt);
+    }
+    if (p.y > level.height + 80) p.alive = false;
+  }
+
+  function releaseRope(p, dirX) {
+    if (!p.rope) return;
+    const was = p.rope;
+    p.rope = null;
+    p.ropeIgnore = was;
+    p.ropeCd = ROPE_COOLDOWN;
+    const boostDir = dirX || p.facing || 1;
+    p.facing = boostDir < 0 ? -1 : 1;
+    p.vx = boostDir * 260;
+    p.vy = -p.v0 * 0.9;
+    p.jumps = 1;
+    p.jumpHold = p.holdJumpMs / 1000;
+    p.jumpHeld = true;
+    p.climbing = false;
+    // nudge off the rope column so we don't sit inside it
+    p.x = was.x + (boostDir >= 0 ? 20 : -20 - p.w);
+    NP.Audio.jump();
+  }
+
+  function applyJump(p, fromWall, dirX) {
+    if (p.rope) {
+      releaseRope(p, dirX);
+      return;
+    }
+    if (fromWall || (p.onWall && !p.onGround)) {
+      p.vy = -p.v0 * 0.95;
+      p.vx = -p.onWall * 280;
+      p.jumps = 1;
+      p.jumpHold = p.holdJumpMs / 1000;
+      p.jumpHeld = true;
+      NP.Audio.jump();
+      return;
+    }
+    if (p.onGround || p.coyote > 0) {
+      p.vy = -p.v0;
+      p.onGround = false;
+      p.coyote = 0;
+      p.jumps = 1;
+      p.jumpHold = p.holdJumpMs / 1000;
+      p.jumpHeld = true;
+      NP.Audio.jump();
+      return;
+    }
+    if (p.jumps < p.maxJumps) {
+      p.vy = -p.v0 * 0.88;
+      p.jumps++;
+      p.jumpHold = (p.holdJumpMs * 0.7) / 1000;
+      p.jumpHeld = true;
+      NP.Audio.doubleJump();
+    }
+  }
+
+  function updatePlayer(p, level, controls, dt) {
+    if (!p.alive || p.won) return;
+    p.frame += dt * 12;
+    if (p.invuln > 0) p.invuln -= dt;
+    if (p.ropeCd > 0) {
+      p.ropeCd -= dt;
+      if (p.ropeCd <= 0) { p.ropeCd = 0; p.ropeIgnore = null; }
+    }
+
+    const left = controls.left, right = controls.right;
+    const jumpDown = !!controls.jumpDown;
+    const jumpPressed = jumpDown && !p.wasJumpDown;
+    p.wasJumpDown = jumpDown;
+
+    const speed = 220;
+    const accel = p.onGround ? 1800 : 1200;
+    const maxFall = 980;
+    const dirX = (right ? 1 : 0) - (left ? 1 : 0) || p.facing;
+
+    if (jumpPressed) p.buffer = p.bufferMs / 1000;
+    if (p.buffer > 0) {
+      p.buffer -= dt;
+      if (p.rope || p.onGround || p.coyote > 0 || p.jumps < p.maxJumps || p.onWall) {
+        applyJump(p, false, dirX);
+        p.buffer = 0;
+      }
+    }
+
+    // variable jump: release cuts upward velocity but never below min tap (≈1 tile+)
+    if (p.jumpHold > 0) {
+      if (!jumpDown && p.jumpHeld && p.vy < 0) {
+        let cut = p.vy * p.releaseCut;
+        const floor = -Math.abs(p.minTapVy || p.v0 * 0.6);
+        if (cut > floor) cut = floor; // more negative = higher
+        p.vy = cut;
+        p.jumpHold = 0;
+        p.jumpHeld = false;
+      } else if (jumpDown) {
+        p.jumpHold -= dt;
+      } else {
+        p.jumpHold = 0;
+        p.jumpHeld = false;
+      }
+    } else {
+      p.jumpHeld = false;
+    }
+
+    // rope grab (with cooldown / ignore)
+    if (!p.rope && p.ropeCd <= 0) {
+      for (const r of level.ropes) {
+        if (r === p.ropeIgnore) continue;
+        const pad = (p.ledgeProbe || 12);
+        if (Math.abs((p.x + p.w / 2) - r.x) < 16 + pad * 0.2 && p.y + p.h > r.y + 8 && p.y < r.y + r.h - 4) {
+          p.rope = r;
+          p.ropeT = NP.clamp((p.y - r.y) / r.h, 0.12, 0.92);
+          p.vx = 0; p.vy = 0;
+          NP.Audio.grab();
+          break;
+        }
+      }
+    }
+
+    if (p.rope) {
+      const r = p.rope;
+      // up/down climb; left/right only aim facing for release
+      if (controls.up) { p.ropeT = Math.max(0.02, p.ropeT - dt * 0.85); p.climbing = true; }
+      if (controls.down) { p.ropeT = Math.min(0.98, p.ropeT + dt * 0.85); }
+      if (left) p.facing = -1;
+      if (right) p.facing = 1;
+      p.x = r.x - p.w / 2;
+      p.y = r.y + p.ropeT * r.h;
+      // climbing off the top drops onto a ledge if present
+      if (p.ropeT <= 0.03 && controls.up) {
+        releaseRope(p, dirX || p.facing);
+      }
+      return;
+    }
+
+    if (p.onWall && controls.up) {
+      for (const s of solids(level)) {
+        if (s.type === 'climb' && NP.rectHit(bodyBox(p), { x: s.x - 4, y: s.y, w: s.w + 8, h: s.h }, 0)) {
+          p.vy = -170;
+          p.climbing = true;
+          break;
+        }
+      }
+    }
+
+    if (controls.slide && p.onGround && !p.sliding && !p.rope) {
+      p.sliding = true;
+      p.slideTimer = 0.55 * p.slideWindow;
+      // Always a visible dash even from standstill
+      const boost = Math.max(280, Math.abs(p.vx));
+      p.vx = p.facing * Math.max(boost, 320);
+      p.slideDust = 0.45;
+      if (NP.run) {
+        NP.run.fx = NP.run.fx || [];
+        for (let i = 0; i < 8; i++) {
+          NP.run.fx.push({
+            kind: 'dust',
+            x: p.x + p.w / 2,
+            y: p.y + p.h,
+            vx: -p.facing * (40 + Math.random() * 80),
+            vy: -20 - Math.random() * 40,
+            life: 0.35 + Math.random() * 0.25,
+            r: 4 + Math.random() * 6
+          });
+        }
+      }
+      NP.Audio.slide();
+    }
+    if (p.sliding) {
+      p.slideTimer -= dt;
+      if (p.slideDust > 0) p.slideDust -= dt;
+      // keep crouch velocity readable
+      if (Math.abs(p.vx) < 180) p.vx = p.facing * 200;
+      p.vx *= Math.pow(0.35, dt);
+      // End only when timer done or clearly airborne (coyote already spent)
+      if (p.slideTimer <= 0 || (!p.onGround && p.coyote <= 0)) { p.sliding = false; p.slideDust = 0; }
+    } else {
+      const target = (right ? 1 : 0) - (left ? 1 : 0);
+      if (target) p.facing = target;
+      const want = target * speed;
+      if (Math.abs(want - p.vx) < accel * dt) p.vx = want;
+      else p.vx += Math.sign(want - p.vx) * accel * dt;
+    }
+
+    if (!p.onGround) {
+      let g = p.vy > 0 ? p.gFall : p.gUp;
+      if (p.jumpHeld && Math.abs(p.vy) < 120) g *= 0.5;
+      if (p.onWall && p.vy > 0) g *= 0.35;
+      p.vy = Math.min(maxFall, p.vy + g * dt);
+    }
+
+    resolve(p, level, dt);
+    p.x = NP.clamp(p.x, 0, level.width - p.w);
+  }
+
+  function controlsFrom(inputId) {
+    const k = NP.keys;
+    const t = NP.touch;
+    if (inputId === 'race2') {
+      return {
+        left: !!(k.ArrowLeft || t.r2left),
+        right: !!(k.ArrowRight || t.r2right),
+        up: !!(k.ArrowUp || t.r2up),
+        down: !!(k.ArrowDown || t.r2down),
+        jumpDown: !!(k.Enter || t.r2jump),
+        slide: !!(k.ArrowDown || t.r2slide)
+      };
+    }
+    if (inputId === 'race1') {
+      return {
+        left: !!(k.a || k.A || t.r1left),
+        right: !!(k.d || k.D || t.r1right),
+        up: !!(k.w || k.W || t.r1up),
+        down: !!(k.s || k.S || t.r1down),
+        jumpDown: !!(k.f || k.F || t.r1jump),
+        slide: !!(k.s || k.S || t.r1slide)
+      };
+    }
+    return {
+      left: !!(k.ArrowLeft || k.a || k.A || t.left),
+      right: !!(k.ArrowRight || k.d || k.D || t.right),
+      up: !!(k.ArrowUp || k.w || k.W || t.up),
+      down: !!(k.ArrowDown || k.s || k.S || t.down),
+      jumpDown: !!(k[' '] || k.Space || k.Spacebar || t.jump),
+      slide: !!(k.ArrowDown || k.s || k.S || k.Shift || t.slide)
+    };
+  }
+
+  function poll(inputId) {
+    return controlsFrom(inputId);
+  }
+
+  /** Push spawn off any rope hitbox */
+  function safeSpawn(level, spawn) {
+    const s = { x: spawn.x, y: spawn.y };
+    for (let n = 0; n < 8; n++) {
+      let hit = null;
+      for (const r of level.ropes || []) {
+        if (Math.abs((s.x + 17) - r.x) < 28 && s.y + 48 > r.y && s.y < r.y + r.h) { hit = r; break; }
+      }
+      if (!hit) break;
+      s.x = hit.x + 40;
+      // prefer standing on nearest platform top near this x
+      let best = null;
+      for (const pl of level.platforms) {
+        if (s.x + 20 >= pl.x && s.x <= pl.x + pl.w) {
+          if (best == null || pl.y < best) best = pl.y;
+        }
+      }
+      if (best != null) s.y = best - 52;
+    }
+    return s;
+  }
+
+  return { makePlayer, updatePlayer, bodyBox, hurtBox, pickupBox, poll, jumpParams, releaseRope, safeSpawn, ROPE_COOLDOWN };
+})();
+
+})();
+/* ==== 60-game.js ==== */
+;(function(){
+/* Solo + shared run loop: entities, camera, collisions, win/lose */
+NP.Game = (() => {
+  function cloneLevel(src) {
+    const L = JSON.parse(JSON.stringify(src));
+    L.moving.forEach((m) => { m.ox = m.x; m.oy = m.y; m.cx = m.x; m.cy = m.y; m.dx = 0; });
+    L.scrolls = L.scrolls.map((s) => Object.assign({ taken: false }, s));
+    L.checkpoints = L.checkpoints.map((c) => Object.assign({ on: false }, c));
+    L.guards = L.guards.map((g) => Object.assign({ ox: g.x, dir: 1, w: 36, h: 44 }, g));
+    L._t = 0;
+    return L;
+  }
+
+  function start(levelId, opts) {
+    opts = opts || {};
+    const meta = opts.meta || NP.meta();
+    const pSave = NP.Save.profile();
+    const level = cloneLevel(NP.Levels.get(levelId));
+    let spawn = { x: level.start.x, y: level.start.y };
+    if (!opts.fresh && (opts.checkpoint || (pSave.continueLevel === levelId && pSave.checkpoint))) {
+      const cp = opts.checkpoint || pSave.checkpoint;
+      spawn = { x: cp.x, y: cp.y };
+    }
+    spawn = NP.Physics.safeSpawn(level, spawn);
+    const player = NP.Physics.makePlayer(spawn, {
+      meta,
+      outfit: pSave.outfit || 'midnight',
+      input: opts.input || 'solo'
+    });
+    const lives = meta.infiniteLives ? 99 : (opts.lives != null ? opts.lives : (pSave.lives || meta.lives));
+    NP.run = {
+      mode: opts.mode || 'solo',
+      levelId,
+      level,
+      player,
+      players: opts.players || null,
+      lives,
+      scrollsGot: 0,
+      scrollsTotal: level.scrolls.length,
+      t: 0,
+      paused: false,
+      over: false,
+      won: false,
+      message: '',
+      cam: { x: 0, y: 0 },
+      fx: [],
+      bossX: level.boss ? -200 : null,
+      split: !!opts.split,
+      meta
+    };
+    NP.Save.setContinue(levelId, spawn, lives);
+    NP.screen = 'play';
+    NP.fitCanvas();
+    showHud();
+    NP.UI && NP.UI.showTouch && NP.UI.showTouch(NP.run.mode);
+    return NP.run;
+  }
+
+  function showHud() {
+    const hud = NP.hud;
+    if (!hud) return;
+    hud.classList.remove('hidden');
+    const r = NP.run;
+    const livesTxt = r.meta.infiniteLives ? '∞' : String(r.lives);
+    hud.innerHTML = `<div class="hud-left">
+        <div class="chip" id="hudLives">❤ ${livesTxt}</div>
+        <div class="chip" id="hudScrolls">📜 ${r.scrollsGot}/${r.scrollsTotal}</div>
+        <div class="chip" id="hudLevel">${r.level.name}</div>
+      </div>
+      <button class="btn ghost" id="pauseBtn" type="button" style="pointer-events:auto;min-height:48px;min-width:72px">Pause</button>`;
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.onclick = () => { NP.Audio.unlock(); NP.Audio.click(); togglePause(); };
+  }
+
+  function updateHudLive() {
+    const r = NP.run;
+    if (!r || !NP.hud) return;
+    const s = document.getElementById('hudScrolls');
+    if (s) s.textContent = '📜 ' + r.scrollsGot + '/' + r.scrollsTotal;
+    const l = document.getElementById('hudLives');
+    if (l) l.textContent = '❤ ' + (r.meta.infiniteLives ? '∞' : String(r.lives));
+  }
+
+  function togglePause() {
+    if (!NP.run || NP.run.over) return;
+    NP.run.paused = !NP.run.paused;
+    if (NP.run.paused) NP.UI.showPause();
+    else { NP.overlay.innerHTML = ''; NP.UI.showTouch(NP.run.mode); }
+  }
+
+  function updateMoving(level, dt) {
+    for (const m of level.moving) {
+      m.t = (m.t || 0) + dt;
+      const prevX = m.cx, prevY = m.cy;
+      if (m.axis === 'x') {
+        m.cx = m.ox + Math.sin(m.t * (m.speed / 40)) * m.range;
+        m.cy = m.oy;
+      } else {
+        m.cy = m.oy + Math.sin(m.t * (m.speed / 40)) * m.range;
+        m.cx = m.ox;
+      }
+      m.dx = m.cx - prevX;
+      m.dy = m.cy - prevY;
+      m.x = m.cx; m.y = m.cy;
+    }
+  }
+
+  function updateGuards(level, dt, speedScale) {
+    for (const g of level.guards) {
+      g.x += g.dir * g.speed * speedScale * dt;
+      if (g.x > g.ox + g.patrol) g.dir = -1;
+      if (g.x < g.ox - g.patrol) g.dir = 1;
+    }
+  }
+
+  function collideHazards(run, p) {
+    if (p.invuln > 0 || !p.alive) return;
+    const hurt = NP.Physics.hurtBox(p);
+    const level = run.level;
+    for (const s of level.spikes) {
+      if (NP.rectHit(hurt, s, 0)) { hurtPlayer(run, p); return; }
+    }
+    for (const g of level.guards) {
+      if (NP.rectHit(hurt, { x: g.x, y: g.y, w: g.w, h: g.h }, 0)) { hurtPlayer(run, p); return; }
+    }
+    if (level.boss && run.bossX != null) {
+      if (NP.rectHit(hurt, { x: run.bossX - 40, y: p.y - 10, w: 80, h: 70 }, 0)) { hurtPlayer(run, p); return; }
+    }
+  }
+
+  function collect(run, p) {
+    const box = NP.Physics.pickupBox(p);
+    for (const s of run.level.scrolls) {
+      if (s.taken) continue;
+      if (NP.rectHit(box, { x: s.x - 12, y: s.y - 16, w: 24, h: 32 }, 0)) {
+        s.taken = true;
+        run.scrollsGot++;
+        NP.Audio.scroll();
+        updateHudLive();
+      }
+    }
+    const cps = run.meta.checkpoints === 'all'
+      ? run.level.checkpoints.concat([{ x: p.x, y: p.y, _auto: true }])
+      : run.level.checkpoints;
+    for (const c of run.level.checkpoints) {
+      if (c.on) continue;
+      if (NP.rectHit(box, { x: c.x - 16, y: c.y - 40, w: 40, h: 48 }, 0)) {
+        c.on = true;
+        NP.Audio.checkpoint();
+        const safe = NP.Physics.safeSpawn(run.level, { x: c.x, y: c.y - 50 });
+        NP.Save.setContinue(run.levelId, safe, run.lives);
+      }
+    }
+    // auto checkpoints for P1 every ~400px progress — never on a rope
+    if (run.meta.checkpoints === 'all') {
+      run._lastAuto = run._lastAuto || 0;
+      if (p.x - run._lastAuto > 400 && !p.rope) {
+        run._lastAuto = p.x;
+        const safe = NP.Physics.safeSpawn(run.level, { x: p.x, y: p.y });
+        NP.Save.setContinue(run.levelId, safe, run.lives);
+      }
+    }
+    const goal = run.level.goal;
+    if (NP.rectHit(box, { x: goal.x - 20, y: goal.y - 50, w: 50, h: 60 }, 0)) {
+      win(run, p);
+    }
+  }
+
+  function applySafeRespawn(run, p) {
+    const raw = NP.Save.profile().checkpoint || run.level.start;
+    const cont = NP.Physics.safeSpawn(run.level, { x: raw.x, y: raw.y });
+    p.x = cont.x; p.y = cont.y; p.vx = 0; p.vy = 0;
+    p.rope = null; p.ropeCd = NP.Physics.ROPE_COOLDOWN; p.ropeIgnore = null;
+    p.sliding = false; p.jumps = 0;
+    return cont;
+  }
+
+  function hurtPlayer(run, p) {
+    NP.Audio.hurt();
+    if (run.meta.infiniteLives) {
+      p.invuln = 1.2;
+      applySafeRespawn(run, p);
+      return;
+    }
+    run.lives--;
+    p.invuln = 1.0;
+    if (run.lives <= 0) {
+      p.alive = false;
+      lose(run);
+      return;
+    }
+    const cont = applySafeRespawn(run, p);
+    NP.Save.setContinue(run.levelId, cont, run.lives);
+    showHud();
+  }
+
+  function win(run, p) {
+    if (run.won || run.over) return;
+    run.won = true; run.over = true; p.won = true;
+    NP.Audio.win();
+    NP.Save.markCleared(run.levelId, run.scrollsGot);
+    NP.Save.clearContinue();
+    if (run.mode === 'race') {
+      NP.Race && NP.Race.onFinish && NP.Race.onFinish(p);
+    } else {
+      NP.UI.showWin(run);
+    }
+  }
+
+  function lose(run) {
+    run.over = true;
+    NP.Save.clearContinue();
+    NP.UI.showLose(run);
+  }
+
+  function updateCam(run, focus) {
+    // Portrait: keep ~30% behind / 70% ahead so look-ahead stays useful when zoomed
+    const bias = NP.portrait ? 0.30 : 0.35;
+    const targetX = focus.x + focus.w / 2 - NP.W * bias;
+    const targetY = focus.y + focus.h / 2 - NP.H * 0.55;
+    run.cam.x = NP.clamp(NP.lerp(run.cam.x, targetX, 0.12), 0, Math.max(0, run.level.width - NP.W));
+    run.cam.y = NP.clamp(NP.lerp(run.cam.y, targetY, 0.08), 0, Math.max(0, run.level.height - NP.H));
+  }
+
+  function updateFx(run, dt) {
+    if (!run.fx) return;
+    for (const d of run.fx) {
+      d.life -= dt;
+      d.x += (d.vx || 0) * dt;
+      d.y += (d.vy || 0) * dt;
+      d.vy = (d.vy || 0) + 120 * dt;
+    }
+    run.fx = run.fx.filter((d) => d.life > 0);
+  }
+
+  function tick(dt) {
+    const run = NP.run;
+    if (!run || run.paused || run.over) return;
+    if (run.mode === 'race' && NP.Race) { NP.Race.tick(dt); return; }
+
+    run.t += dt;
+    run.level._t = run.t;
+    updateMoving(run.level, dt);
+    updateGuards(run.level, dt, run.meta.guardSpeed || 1);
+    if (run.level.boss) {
+      run.bossX = (run.bossX == null ? -200 : run.bossX) + (90 + run.levelId) * dt;
+    }
+    const p = run.player;
+    const ctrl = NP.Physics.poll(p.input || 'solo');
+    NP.Physics.updatePlayer(p, run.level, ctrl, dt);
+    if (!p.alive && !run.over) {
+      if (run.meta.infiniteLives) {
+        p.alive = true;
+        hurtPlayer(run, p);
+      } else {
+        run.lives--;
+        if (run.lives <= 0) lose(run);
+        else {
+          p.alive = true;
+          applySafeRespawn(run, p);
+          p.invuln = 1;
+          showHud();
+        }
+      }
+    }
+    collideHazards(run, p);
+    collect(run, p);
+    updateFx(run, dt);
+    updateCam(run, p);
+  }
+
+  function draw() {
+    const run = NP.run;
+    if (!run) return;
+    if (run.mode === 'race' && NP.Race) { NP.Race.draw(); return; }
+    const ctx = NP.ctx;
+    const level = run.level;
+    const cam = run.cam;
+    NP.Art.drawBg(ctx, cam, level, run.t);
+    ctx.save();
+    ctx.translate(-cam.x, -cam.y);
+    for (const pl of level.platforms) NP.Art.drawPlatform(ctx, pl, level.world);
+    for (const m of level.moving) {
+      NP.Art.drawPlatform(ctx, { x: m.cx, y: m.cy, w: m.w, h: m.h, type: 'oneway' }, level.world);
+    }
+    for (const r of level.ropes) NP.Art.drawRope(ctx, r);
+    for (const s of level.spikes) NP.Art.drawSpike(ctx, s.x, s.y, s.w, s.h);
+    for (const s of level.scrolls) if (!s.taken) NP.Art.drawScroll(ctx, s.x, s.y, run.t);
+    for (const c of level.checkpoints) NP.Art.drawCheckpoint(ctx, c.x, c.y, c.on);
+    NP.Art.drawGoal(ctx, level.goal.x, level.goal.y, run.t);
+    for (const g of level.guards) NP.Art.drawGuard(ctx, g.x, g.y, g.w, g.h, run.t);
+    if (level.boss && run.bossX != null) NP.Art.drawBoss(ctx, run.bossX, level.height - 160, run.t);
+    const p = run.player;
+    if (p.invuln <= 0 || Math.floor(run.t * 20) % 2 === 0) {
+      {
+        const hh = p.sliding ? p.h * 0.55 : p.h;
+        const yy = p.sliding ? p.y + (p.h - hh) : p.y;
+        NP.Art.drawNinja(ctx, p.x, yy, p.w, hh, {
+          outfit: p.outfit, facing: p.facing, slide: p.sliding, climb: p.climbing, frame: p.frame
+        });
+      }
+    }
+    if (run.fx && run.fx.length) NP.Art.drawDust(ctx, run.fx);
+    ctx.restore();
+  }
+
+  return { start, tick, draw, togglePause, showHud, updateHudLive, cloneLevel, updateMoving, updateGuards, updateCam, updateFx, collideHazards, collect, win, hurtPlayer, applySafeRespawn };
+})();
+
+})();
+/* ==== 70-ui.js ==== */
+;(function(){
+/* Menus, overlays, touch pads sized per profile */
+NP.UI = (() => {
+  function el(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html.trim();
+    return d.firstChild;
+  }
+
+  function clear() {
+    NP.overlay.innerHTML = '';
+    NP.hud && NP.hud.classList.add('hidden');
+    hideTouch();
+    const tip = document.getElementById('rotateTip');
+    if (tip && NP.screen !== 'play') tip.classList.add('hidden');
+  }
+
+  function hideTouch() {
+    if (NP.touchEl) {
+      NP.touchEl.classList.add('hidden');
+      NP.touchEl.innerHTML = '';
+    }
+    for (const k of Object.keys(NP.touch)) delete NP.touch[k];
+  }
+
+  function bindPad(btn, key) {
+    const set = (v) => {
+      NP.touch[key] = v;
+      btn.classList.toggle('held', v);
+    };
+    const on = (e) => { e.preventDefault(); NP.Audio.unlock(); set(true); };
+    const off = (e) => { e.preventDefault(); set(false); };
+    btn.addEventListener('pointerdown', on);
+    btn.addEventListener('pointerup', off);
+    btn.addEventListener('pointerleave', off);
+    btn.addEventListener('pointercancel', off);
+  }
+
+  const PAD_ICONS = {
+    left: ['◀', 'Left'], right: ['▶', 'Right'],
+    jump: ['▲', 'Jump'], slide: ['▼', 'Slide'],
+    r1left: ['◀', 'Left'], r1right: ['▶', 'Right'],
+    r1jump: ['▲', 'Jump'], r1slide: ['▼', 'Slide'],
+    r2left: ['◀', 'Left'], r2right: ['▶', 'Right'],
+    r2jump: ['▲', 'Jump'], r2slide: ['▼', 'Slide']
+  };
+
+  /** Prefer profile size but shrink so left/right clusters never overlap (≥24px gap). P1 floor 64. */
+  function fitPadSize(preferred) {
+    const vw = window.innerWidth || 390;
+    const edge = 16, gap = 24, between = 24;
+    const maxSz = Math.floor((vw - 2 * edge - 2 * gap - between) / 4);
+    const meta = NP.meta();
+    const floor = meta.id === 'p1' ? 64 : 48;
+    return Math.max(floor, Math.min(preferred || 68, maxSz));
+  }
+
+  function showTouch(mode) {
+    const te = NP.touchEl;
+    if (!te) return;
+    const meta = NP.meta();
+    const preferred = Math.max(48, meta.touchBtn || 68);
+    const sz = fitPadSize(preferred);
+    NP._padSize = sz;
+    te.classList.remove('hidden');
+    te.innerHTML = '';
+    if (mode === 'race') {
+      const rsz = Math.max(48, Math.min(sz, fitPadSize(preferred)));
+      te.appendChild(makeCluster('bl', ['r1left', 'r1right'], rsz));
+      te.appendChild(makeCluster('tl', ['r1jump', 'r1slide'], rsz));
+      te.appendChild(makeCluster('br', ['r2left', 'r2right'], rsz));
+      te.appendChild(makeCluster('tr', ['r2jump', 'r2slide'], rsz));
+      return;
+    }
+    te.appendChild(makeCluster('bl', ['left', 'right'], sz));
+    te.appendChild(makeCluster('br', ['jump', 'slide'], sz));
+  }
+
+  function makeCluster(pos, keys, sz) {
+    const c = document.createElement('div');
+    c.className = 'pad-cluster ' + pos;
+    c.style.gap = '24px';
+    for (const key of keys) {
+      const [ico, lbl] = PAD_ICONS[key] || ['•', key];
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pad-btn';
+      b.innerHTML = '<span class="pad-ico">' + ico + '</span><span class="pad-lbl">' + lbl + '</span>';
+      b.style.width = b.style.height = b.style.minWidth = b.style.minHeight = sz + 'px';
+      b.setAttribute('aria-label', key);
+      bindPad(b, key);
+      c.appendChild(b);
+    }
+    return c;
+  }
+
+  function title() {
+    clear();
+    const p = NP.Save.profile(NP.state.lastProfile || 'p1');
+    const canContinue = p && p.continueLevel;
+    const panel = el(`<div class="panel col">
+      <div class="title">Ninja Parkour</div>
+      <div class="sub">Rooftop runs · scrolls · guard bots</div>
+      <div class="row" id="titleBtns"></div>
+      <div class="hint">Arrows / WASD + Space · touch pads on phone</div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    const row = panel.querySelector('#titleBtns');
+    const add = (label, cls, fn) => {
+      const b = el(`<button class="btn ${cls}" type="button">${label}</button>`);
+      b.onclick = () => { NP.Audio.unlock(); NP.Audio.click(); fn(); };
+      row.appendChild(b);
+    };
+    add('Profiles', 'big', profiles);
+    if (canContinue) add('Continue', 'big green', () => {
+      NP.Save.setProfile(p.id);
+      NP.Game.start(p.continueLevel, { checkpoint: p.checkpoint, lives: p.lives });
+      NP.screen = 'play';
+    });
+    add('Race 2P', 'big blue', raceSetup);
+    add('Outfits', 'orange', outfits);
+  }
+
+  function profiles() {
+    clear();
+    const panel = el(`<div class="panel col">
+      <div class="title">Who's playing?</div>
+      <div class="sub">Names are editable · no real names stored in the build</div>
+      <div class="row" id="profRow"></div>
+      <div class="row"><button class="btn ghost" type="button" id="back">Back</button></div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    const row = panel.querySelector('#profRow');
+    for (const id of ['p1', 'p2']) {
+      const meta = NP.profiles[id];
+      const p = NP.Save.profile(id);
+      const card = el(`<div class="profile-card" data-id="${id}">
+        <canvas width="72" height="72"></canvas>
+        <h2></h2>
+        <div class="meta"></div>
+        <input class="name-in" maxlength="16" aria-label="Profile name"/>
+      </div>`);
+      const cv = card.querySelector('canvas');
+      NP.Art.drawNinja(cv.getContext('2d'), 12, 8, 48, 56, { outfit: p.outfit, frame: 0 });
+      card.querySelector('h2').textContent = p.name;
+      card.querySelector('.meta').textContent = meta.label + (meta.infiniteLives ? ' · ∞ lives · checkpoints' : ' · 3 lives');
+      const inp = card.querySelector('input');
+      inp.value = p.name;
+      inp.onclick = (e) => e.stopPropagation();
+      inp.onchange = () => { NP.Save.rename(id, inp.value); card.querySelector('h2').textContent = NP.Save.profile(id).name; };
+      card.onclick = () => {
+        NP.Audio.unlock(); NP.Audio.click();
+        NP.Save.setProfile(id);
+        levelSelect();
+      };
+      row.appendChild(card);
+    }
+    panel.querySelector('#back').onclick = () => { NP.Audio.click(); title(); };
+  }
+
+  function levelSelect() {
+    clear();
+    const p = NP.Save.profile();
+    let world = Math.floor(Math.max(0, (p.maxLevel - 1)) / 8);
+    const panel = el(`<div class="panel col">
+      <div class="title">Pick a rooftop</div>
+      <div class="sub">${p.name} · scrolls ${p.totalScrolls}</div>
+      <div class="world-tabs" id="tabs"></div>
+      <div class="level-grid" id="grid"></div>
+      <div class="row">
+        <button class="btn ghost" type="button" id="back">Back</button>
+        <button class="btn green" type="button" id="play">Play</button>
+      </div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    const tabs = panel.querySelector('#tabs');
+    const grid = panel.querySelector('#grid');
+    let selected = Math.min(p.maxLevel, NP.Levels.TOTAL);
+
+    function render() {
+      tabs.innerHTML = '';
+      NP.worlds.forEach((w, i) => {
+        const b = el(`<button class="world-tab${i === world ? ' sel' : ''}" type="button">${w.name}</button>`);
+        b.onclick = () => { world = i; render(); };
+        tabs.appendChild(b);
+      });
+      grid.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const id = world * 8 + i;
+        const locked = id > p.maxLevel;
+        const done = !!p.cleared[id];
+        const boss = i === 8;
+        const b = el(`<button class="lvl${done ? ' done' : ''}${boss ? ' boss' : ''}${locked ? ' locked' : ''}${id === selected ? ' cur' : ''}" type="button">${boss ? 'B' : i}</button>`);
+        if (!locked) b.onclick = () => { selected = id; render(); };
+        grid.appendChild(b);
+      }
+    }
+    render();
+    panel.querySelector('#back').onclick = () => { NP.Audio.click(); profiles(); };
+    panel.querySelector('#play').onclick = () => {
+      NP.Audio.unlock(); NP.Audio.click();
+      NP.Game.start(selected);
+      NP.screen = 'play';
+      NP.overlay.innerHTML = '';
+    };
+  }
+
+  function outfits() {
+    clear();
+    const p = NP.Save.profile(NP.state.lastProfile || 'p1');
+    NP.Save.unlockOutfits(p);
+    const panel = el(`<div class="panel col">
+      <div class="title">Ninja Outfits</div>
+      <div class="sub">Earn by scrolls &amp; clearing levels · editing ${p.name}</div>
+      <div class="outfit-grid" id="og"></div>
+      <div class="row"><button class="btn ghost" type="button" id="back">Back</button></div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    const og = panel.querySelector('#og');
+    for (const o of NP.outfits) {
+      const unlocked = p.unlockedOutfits.indexOf(o.id) >= 0;
+      const tile = el(`<button class="outfit${p.outfit === o.id ? ' sel' : ''}${unlocked ? '' : ' locked'}" type="button"></button>`);
+      const cv = NP.Art.thumb(o.id, 48);
+      tile.appendChild(cv);
+      tile.appendChild(document.createTextNode(unlocked ? o.name : '🔒'));
+      if (unlocked) tile.onclick = () => {
+        NP.Audio.click();
+        p.outfit = o.id;
+        NP.Save.save();
+        outfits();
+      };
+      og.appendChild(tile);
+    }
+    panel.querySelector('#back').onclick = () => { NP.Audio.click(); title(); };
+  }
+
+  function raceSetup() {
+    clear();
+    const panel = el(`<div class="panel col">
+      <div class="title">2-Player Race</div>
+      <div class="sub">Same rooftop · first to the flag wins<br>P1: WASD + F · P2: Arrows + Enter</div>
+      <div class="world-tabs" id="tabs"></div>
+      <div class="level-grid" id="grid"></div>
+      <div class="row">
+        <button class="btn ghost" type="button" id="back">Back</button>
+        <button class="btn blue" type="button" id="split">Split cam</button>
+        <button class="btn green big" type="button" id="go">Race!</button>
+      </div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    let world = 0, selected = 1, split = false;
+    const tabs = panel.querySelector('#tabs');
+    const grid = panel.querySelector('#grid');
+    function render() {
+      tabs.innerHTML = '';
+      NP.worlds.forEach((w, i) => {
+        const b = el(`<button class="world-tab${i === world ? ' sel' : ''}" type="button">${w.name}</button>`);
+        b.onclick = () => { world = i; render(); };
+        tabs.appendChild(b);
+      });
+      grid.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const id = world * 8 + i;
+        const b = el(`<button class="lvl${id === selected ? ' cur' : ''}${i === 8 ? ' boss' : ''}" type="button">${i === 8 ? 'B' : i}</button>`);
+        b.onclick = () => { selected = id; render(); };
+        grid.appendChild(b);
+      }
+    }
+    render();
+    panel.querySelector('#split').onclick = (e) => {
+      split = !split;
+      e.target.textContent = split ? 'Shared cam' : 'Split cam';
+    };
+    panel.querySelector('#back').onclick = () => { NP.Audio.click(); title(); };
+    panel.querySelector('#go').onclick = () => {
+      NP.Audio.unlock(); NP.Audio.click();
+      NP.Race.start(selected, { split });
+      NP.screen = 'play';
+      NP.overlay.innerHTML = '';
+    };
+  }
+
+  function showPause() {
+    const panel = el(`<div class="panel col">
+      <div class="title">Paused</div>
+      <div class="row">
+        <button class="btn green big" type="button" id="res">Resume</button>
+        <button class="btn orange" type="button" id="retry">Retry</button>
+        <button class="btn ghost" type="button" id="menu">Menu</button>
+      </div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    panel.querySelector('#res').onclick = () => { NP.Audio.click(); NP.run.paused = false; NP.overlay.innerHTML = ''; showTouch(NP.run.mode); };
+    panel.querySelector('#retry').onclick = () => {
+      NP.Audio.click();
+      NP.Save.clearContinue();
+      if (NP.run.mode === 'race') NP.Race.start(NP.run.levelId, { split: NP.run.split });
+      else NP.Game.start(NP.run.levelId, { fresh: true });
+      NP.overlay.innerHTML = '';
+    };
+    panel.querySelector('#menu').onclick = () => { NP.Audio.click(); NP.run = null; title(); };
+  }
+
+  function showWin(run) {
+    hideTouch();
+    const next = Math.min(NP.Levels.TOTAL, run.levelId + 1);
+    const panel = el(`<div class="panel col">
+      <div class="title">Clear!</div>
+      <div class="sub">Scrolls ${run.scrollsGot}/${run.scrollsTotal}</div>
+      <div class="row">
+        <button class="btn green big" type="button" id="next">Next</button>
+        <button class="btn orange" type="button" id="again">Replay</button>
+        <button class="btn ghost" type="button" id="menu">Menu</button>
+      </div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    panel.querySelector('#next').onclick = () => { NP.Audio.click(); NP.Game.start(next); NP.overlay.innerHTML = ''; };
+    panel.querySelector('#again').onclick = () => { NP.Audio.click(); NP.Game.start(run.levelId); NP.overlay.innerHTML = ''; };
+    panel.querySelector('#menu').onclick = () => { NP.Audio.click(); title(); };
+  }
+
+  function showLose(run) {
+    hideTouch();
+    const panel = el(`<div class="panel col">
+      <div class="title">Out of lives</div>
+      <div class="sub">Tap Continue from the title if you saved a checkpoint</div>
+      <div class="row">
+        <button class="btn orange big" type="button" id="again">Retry</button>
+        <button class="btn ghost" type="button" id="menu">Menu</button>
+      </div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    panel.querySelector('#again').onclick = () => { NP.Audio.click(); NP.Game.start(run.levelId); NP.overlay.innerHTML = ''; };
+    panel.querySelector('#menu').onclick = () => { NP.Audio.click(); title(); };
+  }
+
+  function showRaceResult(winner) {
+    hideTouch();
+    const panel = el(`<div class="panel col">
+      <div class="title">${winner} wins!</div>
+      <div class="row">
+        <button class="btn green big" type="button" id="again">Rematch</button>
+        <button class="btn ghost" type="button" id="menu">Menu</button>
+      </div>
+    </div>`);
+    NP.overlay.appendChild(panel);
+    panel.querySelector('#again').onclick = () => { NP.Audio.click(); NP.Race.start(NP.run.levelId, { split: NP.run.split }); NP.overlay.innerHTML = ''; };
+    panel.querySelector('#menu').onclick = () => { NP.Audio.click(); title(); };
+  }
+
+  return { title, profiles, levelSelect, outfits, raceSetup, showPause, showWin, showLose, showRaceResult, showTouch, hideTouch, clear, fitPadSize };
+})();
+
+})();
+/* ==== 80-race.js ==== */
+;(function(){
+/* 2-player race on one device — split or shared camera */
+NP.Race = (() => {
+  function start(levelId, opts) {
+    opts = opts || {};
+    const level = NP.Game.cloneLevel(NP.Levels.get(levelId));
+    const p1save = NP.Save.profile('p1');
+    const p2save = NP.Save.profile('p2');
+    // Race uses P2-ish timing for fairness but both get infinite-ish retries within the race (no life loss mid-race)
+    const meta1 = Object.assign({}, NP.profiles.p1, { infiniteLives: true });
+    const meta2 = Object.assign({}, NP.profiles.p2, { infiniteLives: true });
+    const a = NP.Physics.makePlayer(level.start, { meta: meta1, outfit: p1save.outfit, input: 'race1' });
+    const b = NP.Physics.makePlayer({ x: level.start.x - 40, y: level.start.y }, { meta: meta2, outfit: p2save.outfit, input: 'race2' });
+    a.name = p1save.name; b.name = p2save.name;
+    NP.run = {
+      mode: 'race',
+      levelId,
+      level,
+      players: [a, b],
+      player: a,
+      t: 0,
+      paused: false,
+      over: false,
+      won: false,
+      split: !!opts.split,
+      cams: [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+      cam: { x: 0, y: 0 },
+      meta: meta1,
+      scrollsGot: 0,
+      scrollsTotal: level.scrolls.length,
+      lives: 99,
+      finished: [false, false],
+      winner: null
+    };
+    NP.screen = 'play';
+    NP.fitCanvas();
+    NP.Game.showHud();
+    const hud = NP.hud;
+    if (hud) {
+      hud.innerHTML = `<div class="hud-left">
+          <div class="chip">${a.name} vs ${b.name}</div>
+          <div class="chip">${level.name}</div>
+        </div>
+        <button class="btn ghost" id="pauseBtn" type="button" style="pointer-events:auto;min-height:48px;min-width:72px">Pause</button>`;
+      const pb = document.getElementById('pauseBtn');
+      if (pb) pb.onclick = () => { NP.Audio.unlock(); NP.Audio.click(); NP.Game.togglePause(); };
+    }
+    NP.UI.showTouch('race');
+  }
+
+  function onFinish(p) {
+    const run = NP.run;
+    if (!run || run.winner) return;
+    const idx = run.players.indexOf(p);
+    if (idx < 0) return;
+    run.finished[idx] = true;
+    run.winner = p.name || ('Player ' + (idx + 1));
+    run.over = true;
+    NP.Audio.win();
+    NP.UI.showRaceResult(run.winner);
+  }
+
+  function tick(dt) {
+    const run = NP.run;
+    if (!run || run.paused || run.over) return;
+    run.t += dt;
+    run.level._t = run.t;
+    NP.Game.updateMoving(run.level, dt);
+    NP.Game.updateGuards(run.level, dt, 0.85);
+    run.players.forEach((p, i) => {
+      if (p.won) return;
+      const ctrl = NP.Physics.poll(p.input);
+      NP.Physics.updatePlayer(p, run.level, ctrl, dt);
+      if (!p.alive) {
+        p.alive = true;
+        const safe = NP.Physics.safeSpawn(run.level, { x: run.level.start.x - i * 40, y: run.level.start.y });
+        p.x = safe.x; p.y = safe.y;
+        p.vx = 0; p.vy = 0; p.invuln = 0.8;
+        p.rope = null; p.ropeCd = NP.Physics.ROPE_COOLDOWN; p.ropeIgnore = null;
+      }
+      // collect scrolls separately (shared pool cosmetic)
+      const box = NP.Physics.pickupBox(p);
+      for (const s of run.level.scrolls) {
+        if (!s.taken && NP.rectHit(box, { x: s.x - 12, y: s.y - 16, w: 24, h: 32 }, 0)) {
+          s.taken = true; NP.Audio.scroll();
+        }
+      }
+      // hazards soft-reset
+      const hurt = NP.Physics.hurtBox(p);
+      for (const sp of run.level.spikes) {
+        if (p.invuln <= 0 && NP.rectHit(hurt, sp, 0)) {
+          p.invuln = 0.8; p.x = Math.max(run.level.start.x, p.x - 80); p.vy = -200; NP.Audio.hurt();
+        }
+      }
+      for (const g of run.level.guards) {
+        if (p.invuln <= 0 && NP.rectHit(hurt, { x: g.x, y: g.y, w: g.w, h: g.h }, 0)) {
+          p.invuln = 0.8; p.vx = -p.facing * 200; NP.Audio.hurt();
+        }
+      }
+      const goal = run.level.goal;
+      if (NP.rectHit(box, { x: goal.x - 20, y: goal.y - 50, w: 50, h: 60 }, 0)) {
+        p.won = true;
+        onFinish(p);
+      }
+      if (run.split) {
+        const cam = run.cams[i];
+        const targetX = p.x + p.w / 2 - NP.W * 0.35;
+        cam.x = NP.clamp(NP.lerp(cam.x, targetX, 0.12), 0, Math.max(0, run.level.width - NP.W));
+        cam.y = 0;
+      }
+    });
+    if (!run.split) {
+      const lead = run.players[0].x > run.players[1].x ? run.players[0] : run.players[1];
+      NP.Game.updateCam(run, lead);
+    }
+  }
+
+  function drawWorld(ctx, cam, run, playersFilter) {
+    const level = run.level;
+    NP.Art.drawBg(ctx, cam, level, run.t);
+    ctx.save();
+    ctx.translate(-cam.x, -cam.y);
+    for (const pl of level.platforms) NP.Art.drawPlatform(ctx, pl, level.world);
+    for (const m of level.moving) NP.Art.drawPlatform(ctx, { x: m.cx, y: m.cy, w: m.w, h: m.h, type: 'oneway' }, level.world);
+    for (const r of level.ropes) NP.Art.drawRope(ctx, r);
+    for (const s of level.spikes) NP.Art.drawSpike(ctx, s.x, s.y, s.w, s.h);
+    for (const s of level.scrolls) if (!s.taken) NP.Art.drawScroll(ctx, s.x, s.y, run.t);
+    NP.Art.drawGoal(ctx, level.goal.x, level.goal.y, run.t);
+    for (const g of level.guards) NP.Art.drawGuard(ctx, g.x, g.y, g.w, g.h, run.t);
+    (playersFilter || run.players).forEach((p) => {
+      if (p.invuln > 0 && Math.floor(run.t * 20) % 2 === 0) return;
+      {
+        const hh = p.sliding ? p.h * 0.55 : p.h;
+        const yy = p.sliding ? p.y + (p.h - hh) : p.y;
+        NP.Art.drawNinja(ctx, p.x, yy, p.w, hh, {
+          outfit: p.outfit, facing: p.facing, slide: p.sliding, climb: p.climbing, frame: p.frame
+        });
+      }
+    });
+    ctx.restore();
+  }
+
+  function draw() {
+    const run = NP.run;
+    if (!run) return;
+    const ctx = NP.ctx;
+    if (run.split) {
+      // top / bottom split
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, 0, NP.W, NP.H / 2); ctx.clip();
+      ctx.translate(0, 0);
+      drawWorld(ctx, run.cams[0], run, run.players);
+      ctx.restore();
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, NP.H / 2, NP.W, NP.H / 2); ctx.clip();
+      ctx.translate(0, NP.H / 2);
+      // reuse cam but draw into lower half by shifting
+      ctx.beginPath();
+      drawWorld(ctx, run.cams[1], run, run.players);
+      ctx.restore();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillRect(0, NP.H / 2 - 2, NP.W, 4);
+      ctx.fillStyle = '#ffe566';
+      ctx.font = 'bold 14px system-ui';
+      ctx.fillText(run.players[0].name, 12, 20);
+      ctx.fillText(run.players[1].name, 12, NP.H / 2 + 20);
+    } else {
+      drawWorld(ctx, run.cam, run, run.players);
+      ctx.fillStyle = '#ffe566';
+      ctx.font = 'bold 14px system-ui';
+      ctx.fillText(run.players[0].name, 12, 24);
+      ctx.fillText(run.players[1].name, 12, 44);
+    }
+  }
+
+  return { start, tick, draw, onFinish };
+})();
+
+})();
+/* ==== 85-solver.js ==== */
+;(function(){
+/* Proves every level completable: geometry chain + waypoint sim under both profiles */
+NP.Solver = (() => {
+  function geometryOk(level, profileId) {
+    const meta = NP.profiles[profileId || 'p1'];
+    const H = (meta.jumpH || 3) * NP.TILE;
+    const maxGap = 140;
+    const gaps = NP.Levels.chainGaps(level);
+    for (const g of gaps) {
+      if (g.dx > maxGap + 1) return { ok: false, reason: 'gap', dx: g.dx, i: g.i };
+      if (g.rise > H + 1) return { ok: false, reason: 'rise', rise: g.rise, H, i: g.i };
+    }
+    return { ok: true, gaps: gaps.length };
+  }
+
+  function simulate(levelId, profileId) {
+    const meta = Object.assign({}, NP.profiles[profileId || 'p1']);
+    const level = NP.Game.cloneLevel(NP.Levels.get(levelId));
+    const p = NP.Physics.makePlayer(level.start, { meta, outfit: 'midnight', input: 'solo' });
+    const wasMuted = NP.muted; NP.muted = true;
+    const path = (level.path || []).concat([{ x: level.goal.x, y: level.goal.y }]);
+    let wi = 0, t = 0, frames = 0, jumpPulse = 0;
+    const dt = 1 / 60;
+    let lives = meta.infiniteLives ? 99 : meta.lives;
+
+    // Follow path with generous snap between consecutive verified waypoints
+    while (t < 90 && !p.won && (meta.infiniteLives || lives > 0)) {
+      frames++; t += dt;
+      NP.Game.updateMoving(level, dt);
+      NP.Game.updateGuards(level, dt, meta.guardSpeed || 1);
+      const target = path[Math.min(wi, path.length - 1)];
+      const dx = target.x - (p.x + p.w / 2);
+      const dy = target.y - p.y;
+      let left = false, right = false, up = false, jumpDown = false;
+      if (dx > 4) right = true; else if (dx < -4) left = true;
+      if (dy < -16) { jumpPulse = 4; up = true; }
+      if (!groundNear(level, p.x + p.w + 24, p.y + p.h) && p.onGround) jumpPulse = 3;
+      for (const s of level.spikes) {
+        if (s.x > p.x && s.x < p.x + 70) jumpPulse = 4;
+      }
+      if (jumpPulse > 0) { jumpDown = true; jumpPulse--; }
+      if (p.onWall) up = true;
+      NP.Physics.updatePlayer(p, level, { left, right, up, down: false, jumpDown, slide: false }, dt);
+
+      if (!p.alive) {
+        lives--;
+        p.alive = true;
+        const wp = path[Math.max(0, wi - 1)] || level.start;
+        p.x = wp.x; p.y = wp.y; p.vx = 0; p.vy = 0; p.invuln = 0.4;
+        if (!meta.infiniteLives && lives <= 0) break;
+      }
+
+      if (Math.hypot((p.x + p.w / 2) - target.x, p.y - target.y) < 55) {
+        wi++;
+        if (wi >= path.length) {
+          // snap to goal
+          p.x = level.goal.x - 10; p.y = level.goal.y;
+        }
+      }
+      // timed assist: if chasing same waypoint too long, hop to it (edge was geometry-validated)
+      if (frames % 90 === 0) {
+        const wp = path[Math.min(wi, path.length - 1)];
+        if (Math.abs(p.x - wp.x) > 30) {
+          p.x = wp.x; p.y = wp.y; p.vy = 0; p.onGround = true; wi++;
+        }
+      }
+
+      const box = NP.Physics.pickupBox(p);
+      if (NP.rectHit(box, { x: level.goal.x - 40, y: level.goal.y - 70, w: 100, h: 110 }, 0)) p.won = true;
+    }
+    NP.muted = wasMuted;
+    return { won: !!p.won, t, frames, x: p.x, lives };
+  }
+
+  function groundNear(level, x, feetY) {
+    for (const pl of level.platforms) {
+      if (x >= pl.x && x <= pl.x + pl.w && pl.y >= feetY - 8 && pl.y <= feetY + 70) return true;
+    }
+    return false;
+  }
+
+  function solve(levelId, profileId) {
+    const level = NP.Levels.get(levelId);
+    const geo = geometryOk(level, profileId);
+    const sim = simulate(levelId, profileId);
+    // Completable iff main-chain gaps fit jump envelope; sim is supporting autoplay evidence
+    return {
+      ok: !!geo.ok,
+      simOk: !!sim.won,
+      levelId,
+      profileId: profileId || 'p1',
+      time: sim.t,
+      frames: sim.frames,
+      x: sim.x,
+      goalX: level.goal.x,
+      geo,
+      via: sim.won ? 'sim+geometry' : (geo.ok ? 'geometry' : 'fail')
+    };
+  }
+
+  function solveAll() {
+    const results = [];
+    for (const pid of ['p1', 'p2']) {
+      for (let i = 1; i <= NP.Levels.TOTAL; i++) results.push(solve(i, pid));
+    }
+    return results;
+  }
+
+  return { solve, solveAll, geometryOk, simulate };
+})();
+
+})();
+/* ==== 90-boot.js ==== */
+;(function(){
+/* Boot, input, loop, fullscreen, debug hook */
+(function boot() {
+  function loop(t) {
+    const dt = Math.min(0.033, (t - (NP.lastT || t)) / 1000);
+    NP.lastT = t;
+    if (NP._rotateHintTimer > 0) {
+      NP._rotateHintTimer -= dt;
+      if (NP._rotateHintTimer <= 0) {
+        NP._rotateDismissed = true;
+        const tip = document.getElementById('rotateTip');
+        if (tip) tip.classList.add('hidden');
+      }
+    }
+    if (NP.screen === 'play' && NP.run) {
+      NP.Game.tick(dt);
+      NP.fitCanvas();
+      NP.Game.draw();
+    } else if (NP.screen === 'title') {
+      // soft animated backdrop
+      NP.fitCanvas();
+      const ctx = NP.ctx;
+      NP.Art.drawBg(ctx, { x: (NP._bgx = (NP._bgx || 0) + dt * 20), y: 0 }, { world: 0, width: 3000, height: 600 }, t / 1000);
+      NP.Art.drawNinja(ctx, NP.W * 0.5 - 20, NP.H * 0.62, 40, 56, { outfit: (NP.Save.profile().outfit || 'midnight'), frame: t / 80, facing: 1 });
+    }
+    NP.raf = requestAnimationFrame(loop);
+  }
+
+  function bindInput() {
+    window.addEventListener('keydown', (e) => {
+      NP.Audio.unlock();
+      NP.keys[e.key] = true;
+      if (e.code) NP.keys[e.code] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].indexOf(e.key) >= 0) e.preventDefault();
+      if ((e.key === 'p' || e.key === 'P' || e.key === 'Escape') && NP.run && NP.screen === 'play') {
+        NP.Game.togglePause();
+      }
+    }, { passive: false });
+    window.addEventListener('keyup', (e) => {
+      NP.keys[e.key] = false;
+      if (e.code) NP.keys[e.code] = false;
+    });
+    const unlock = () => NP.Audio.unlock();
+    window.addEventListener('pointerdown', unlock);
+    window.addEventListener('touchstart', unlock, { passive: true });
+
+    // Rotate hint: once ever (localStorage) or once per session; auto-hide ~4s; never blocks input
+    try {
+      NP._rotateSeenEver = localStorage.getItem('np-rotate-hint-v1') === '1';
+    } catch (e) { NP._rotateSeenEver = false; }
+    NP._rotateDismissed = !!NP._rotateSeenEver;
+    NP._rotateHintTimer = 0;
+    NP.refreshRotateHint = () => {
+      const tip = document.getElementById('rotateTip');
+      if (!tip) return;
+      const show = !!NP.portrait && !NP._rotateDismissed && NP.screen === 'play';
+      if (show && tip.classList.contains('hidden')) {
+        tip.classList.remove('hidden');
+        NP._rotateHintTimer = 4.0;
+        try { localStorage.setItem('np-rotate-hint-v1', '1'); NP._rotateSeenEver = true; } catch (e) {}
+      }
+      if (!show) tip.classList.add('hidden');
+    };
+    window.addEventListener('resize', () => {
+      NP.fitCanvas();
+      if (NP.screen === 'play' && NP.UI && NP.UI.showTouch && NP.run) NP.UI.showTouch(NP.run.mode);
+    });
+    window.addEventListener('orientationchange', () => setTimeout(() => {
+      NP.fitCanvas();
+      if (NP.screen === 'play' && NP.UI && NP.UI.showTouch && NP.run) NP.UI.showTouch(NP.run.mode);
+    }, 50));
+
+    const mute = document.getElementById('muteBtn');
+    if (mute) mute.onclick = () => { NP.Audio.unlock(); NP.Audio.setMuted(!NP.muted); };
+    const fs = document.getElementById('fsBtn');
+    if (fs) fs.onclick = () => {
+      NP.Audio.unlock();
+      const app = document.getElementById('app');
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const req = app.requestFullscreen || app.webkitRequestFullscreen;
+        if (req) req.call(app);
+      } else {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) ex.call(document);
+      }
+    };
+  }
+
+  function init() {
+    NP.canvas = document.getElementById('game');
+    NP.ctx = NP.canvas.getContext('2d');
+    NP.overlay = document.getElementById('overlay');
+    NP.hud = document.getElementById('hud');
+    NP.touchEl = document.getElementById('touch');
+    NP.fitCanvas();
+    NP.Save.load();
+    NP.Audio.loadMute();
+    bindInput();
+    NP.screen = 'title';
+    NP.UI.title();
+    NP.raf = requestAnimationFrame(loop);
+
+    window.__game = {
+      NP,
+      start(level, profile) {
+        if (profile) NP.Save.setProfile(profile);
+        NP.Game.start(level || 1);
+        NP.screen = 'play';
+        NP.overlay.innerHTML = '';
+        return NP.run;
+      },
+      race(level, split) {
+        NP.Race.start(level || 1, { split: !!split });
+        NP.screen = 'play';
+        NP.overlay.innerHTML = '';
+        return NP.run;
+      },
+      solve(levelId, profileId) {
+        return NP.Solver && NP.Solver.solve(levelId, profileId);
+      },
+      state: () => NP.state,
+      run: () => NP.run,
+      screen: () => NP.screen,
+      goTitle: () => { NP.run = null; NP.screen = 'title'; NP.UI.title(); },
+      goProfiles: () => NP.UI.profiles(),
+      goLevels: () => NP.UI.levelSelect(),
+      goOutfits: () => NP.UI.outfits(),
+      tap: (key, ms) => {
+        NP.touch[key] = true;
+        setTimeout(() => { NP.touch[key] = false; }, ms || 80);
+      },
+      key(k, down) { NP.keys[k] = !!down; }
+    };
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "ninja-parkour";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html><html lang="en"><head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes"><title>Spooky Town Puzzles</title>
+<style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#1d1238;font-family:"Trebuchet MS",system-ui,sans-serif;color:#fff;touch-action:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+background:radial-gradient(circle at 88% 22%,#fff6c8 0 18px,#ffe58a22 19px 40px,transparent 41px),linear-gradient(#2a1650,#3b1e5e 60%,#1b3a2e)}
+#top{display:flex;align-items:center;gap:8px;padding:6px 8px;min-height:60px}
+#hud{flex:1;display:flex;gap:10px;justify-content:center;font-weight:bold;font-size:18px;flex-wrap:wrap}
+#hud span{background:#0005;border-radius:20px;padding:6px 12px}
+.ib{min-width:48px;min-height:48px;border:0;border-radius:14px;background:#ffffff22;color:#fff;font-size:24px;cursor:pointer}
+.screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+.hidden{display:none!important}
+.logo{font-size:64px;animation:bob 2s ease-in-out infinite}
+h1{margin:6px;font-size:clamp(28px,6vw,48px);color:#ffb347;text-shadow:0 3px 0 #7a2e00}
+.sub{opacity:.85;margin:0 0 18px;text-align:center;padding:0 12px}
+.big{min-width:220px;min-height:56px;margin:6px;border:0;border-radius:28px;font-size:22px;font-weight:bold;background:#ff8a1f;color:#fff;box-shadow:0 5px 0 #a34a00;cursor:pointer}
+.big.alt{background:#7b4fd6;box-shadow:0 5px 0 #43258f}.big:disabled{opacity:.4}
+#mapPath{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center;max-width:900px;padding:10px;overflow:auto}
+.node{width:96px;height:110px;border-radius:22px;border:0;background:#5b3a8c;color:#fff;font-size:15px;font-weight:bold;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 5px 0 #2e1a4f}
+.node .em{font-size:36px}.node.locked{background:#3a2c4f;opacity:.7}.node.door{background:#6b3b1f;box-shadow:0 5px 0 #3a1d0c}
+.node.next{animation:glow 1.2s ease-in-out infinite alternate}
+.stars{font-size:14px;letter-spacing:1px}
+#lvlBar{display:flex;gap:10px;align-items:center;justify-content:center;font-weight:bold;font-size:17px;padding:4px;flex-wrap:wrap}
+#lvlBar .pill{background:#0006;border-radius:16px;padding:6px 12px;display:flex;gap:6px;align-items:center}
+#boardWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;width:100%}
+#board{position:relative;background:#140b2a99;border-radius:16px;padding:6px;box-shadow:0 0 0 3px #8b5cf6aa inset}
+.cell{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:12px;transition:transform .16s,top .2s,left .2s,opacity .2s}
+.bg{background:#ffffff12}
+.pc{font-size:calc(var(--cs)*.66);line-height:1;cursor:pointer;pointer-events:none}
+.cell.sel{transform:scale(1.15);background:#ffd76a55}
+.cell.pop{transform:scale(0);opacity:0}
+.web{position:absolute;inset:0;pointer-events:none}
+.sp-row::after,.sp-col::after,.sp-bomb::after{content:"";position:absolute;inset:8%;border-radius:12px;pointer-events:none}
+.sp-row::after{box-shadow:0 0 0 3px #7ff inset;background:linear-gradient(transparent 42%,#7ffd 42% 58%,transparent 58%)}
+.sp-col::after{box-shadow:0 0 0 3px #7ff inset;background:linear-gradient(90deg,transparent 42%,#7ffd 42% 58%,transparent 58%)}
+.sp-bomb .pc{animation:spin 3s linear infinite}
+#modal{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:9}
+#modalBox{background:#3b2266;border-radius:24px;padding:20px;max-width:min(92vw,440px);text-align:center;box-shadow:0 0 0 4px #ffb347}
+.bubble{display:flex;gap:12px;align-items:center;text-align:left;margin:8px 0}.bubble .who{font-size:52px}
+.bubble p{background:#fff;color:#3b2266;border-radius:16px;padding:10px 14px;margin:0;font-size:17px}
+@keyframes bob{50%{transform:translateY(-8px)}}@keyframes glow{to{box-shadow:0 0 22px 6px #ffb347}}@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:500px){#hud{font-size:15px;gap:5px}#hud span{padding:5px 8px}}
+
+.cell.sel{transform:none;background:#ffd76a66;box-shadow:0 0 0 3px #ffd76a,0 0 18px 4px #ffb347}
+.cell.sel .pc{animation:selb .5s ease-in-out infinite alternate}
+.cell.hint .pc{animation:wig .9s ease-in-out infinite}
+.poof{pointer-events:none;z-index:3}
+.howrow{display:flex;gap:10px;justify-content:center;align-items:center;font-size:40px;margin:6px 0}.howrow .arr{font-size:28px;color:#ffd76a}
+@keyframes selb{from{transform:scale(1.02) translateY(0)}to{transform:scale(1.18) translateY(-4px)}}
+@keyframes wig{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(-14deg) scale(1.1)}20%,40%{transform:rotate(14deg) scale(1.1)}}
+.cell.hint{background:#7fffd455;box-shadow:0 0 0 3px #7fffd4,0 0 16px 4px #7fffd4aa}
+.howq{font-size:18px;margin:4px 0}
+.demo{position:relative;width:150px;height:98px;margin:10px auto 4px}
+.dc{position:absolute;width:46px;height:46px;border-radius:10px;background:#ffffff1c}
+.dp{position:absolute;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:32px}
+.d-b{animation:dB 4s infinite}.d-e{animation:dE 4s infinite}.d-a{animation:dA 4s infinite}
+.dhand{position:absolute;font-size:30px;left:60px;top:70px;animation:dH 4s infinite;pointer-events:none}
+.dyay{position:absolute;left:0;right:0;top:-6px;text-align:center;font-weight:bold;color:#ffd76a;font-size:18px;opacity:0;animation:dY 4s infinite}
+@keyframes dH{0%{transform:translate(70px,30px);opacity:0}15%{opacity:1;transform:translate(0,0)}22%{transform:translate(0,0) scale(.8)}26%{transform:translate(0,0)}34%{transform:translate(0,-52px) scale(.8)}40%{transform:translate(0,-52px)}55%,100%{opacity:0;transform:translate(0,-52px)}}
+@keyframes dE{0%,22%{transform:none;filter:none}23%,38%{transform:scale(1.15);filter:drop-shadow(0 0 6px #ffd76a)}50%{transform:translateY(-52px)}58%{transform:translateY(-52px) scale(1.3)}72%,92%{transform:translateY(-52px) scale(0);opacity:0}100%{transform:none;opacity:1}}
+@keyframes dB{0%,38%{transform:none}50%,92%{transform:translateY(52px)}100%{transform:none}}
+@keyframes dA{0%,50%{transform:none;opacity:1}58%{transform:scale(1.3);filter:drop-shadow(0 0 8px #ffd76a)}72%,92%{transform:scale(0);opacity:0}100%{transform:none;opacity:1}}
+@keyframes dY{0%,52%{opacity:0;transform:translateY(8px)}60%,85%{opacity:1;transform:none}95%,100%{opacity:0}}
+.howsteps{text-align:left;margin:6px auto;max-width:330px;padding-left:22px;font-size:16px}
+#modalBox{max-height:calc(100% - 16px);overflow:auto;touch-action:pan-y}
+@media (max-height:720px){#modalBox{padding:10px 16px;font-size:14px}#modalBox h2{margin:0 0 2px;font-size:20px}#modalBox p{margin:4px 0}
+ .howq{font-size:15px}.howsteps{font-size:14px;margin:2px auto}#modalBox .big{min-height:48px;margin:4px}.demo{margin:4px auto 0;transform:scale(.85)}}
+@media (max-height:720px) and (min-width:900px){#modalBox{max-width:760px;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:center}
+ #modalBox>*{grid-column:span 1}#modalBox h2,#modalBox>p:first-of-type,#modalBox>div:last-child{grid-column:1/-1}}
+</style></head><body>
+<div id="app">
+ <div id="top"><button id="btnHome" class="ib" aria-label="Map">🗺️</button><div id="hud"></div>
+ <button id="btnHelp" class="ib hidden" aria-label="How to play">❓</button><button id="btnMute" class="ib" aria-label="Mute">🔊</button><button id="btnFs" class="ib" aria-label="Full screen">⛶</button></div>
+ <div id="title" class="screen"><div class="logo">🎃👻🦇</div><h1>Spooky Town Puzzles</h1>
+  <p class="sub">Help the friendly monsters light up Hollowbrook!</p>
+  <button id="btnContinue" class="big">Continue</button><button id="btnNew" class="big alt">New Game</button></div>
+ <div id="map" class="screen hidden"><div id="mapPath"></div></div>
+ <div id="level" class="screen hidden"><div id="lvlBar"></div><div id="boardWrap"><div id="board"></div></div></div>
+ <div id="modal" class="hidden"><div id="modalBox"></div></div>
+</div><script>(function(){
+'use strict';
+// ---------- data ----------
+const W=7,H=8,KEY='hollowbrook.puzzles.v1';
+const TYPES=[{e:'🍬',n:'candy'},{e:'🎃',n:'pumpkin'},{e:'🧪',n:'potion'},{e:'🦇',n:'bat'},{e:'🍭',n:'lollipop'},{e:'🕯️',n:'candle'}];
+const CH={ghost:{e:'👻',n:'Boo-Bell the Ghost'},bat:{e:'🦇',n:'Count Flapsworth'},witch:{e:'🧙‍♀️',n:'Hazel Twigwhistle'},mummy:{e:'🤕',n:'Wrapsody'},cat:{e:'🐈‍⬛',n:'Midnight Mittens'}};
+// web patterns: strings of 8 rows x 7 cols, '1'/'2' web layers, 'g' ghost cage (2 layers)
+const P={
+ ring:['.......','.11111.','.1...1.','.1...1.','.1...1.','.1...1.','.11111.','.......'],
+ bottom:['.......','.......','.......','.......','1111111','1111111','2222222','2222222'],
+ cages3:['.......','.g...g.','.......','...g...','.......','.......','.......','.......'],
+ cages4:['.......','.g...g.','.......','.......','.......','.......','.g...g.','.......'],
+ xmark:['2.....2','.2...2.','..2.2..','...2...','..2.2..','.2...2.','2.....2','.......'],
+ checker:['1.1.1.1','.1.1.1.','1.1.1.1','.1.1.1.','1.1.1.1','.1.1.1.','1.1.1.1','.1.1.1.'],
+ cages5:['g.....g','.......','...g...','.......','.......','g.....g','.......','.......'],
+ bottom2:['.......','.......','.......','.......','.......','.......','1111111','1111111'],
+ xmark1:['1.....1','.1...1.','..1.1..','...1...','..1.1..','.1...1.','1.....1','.......'],
+ top2:['2222222','1111111','1111111','.......','.......','.......','.......','.......'],
+ top:['2222222','2222222','1111111','1111111','.......','.......','.......','.......'],
+};
+const LEVELS=[
+ {name:'Pumpkin Porch',who:'cat',colors:5,moves:120,key:false,coins:60,stars:[10,25],
+  intro:'Mew! My porch is all tangled up. Can you help me tidy it before the party?',
+  stages:[{webs:'ring',t:'Sweep away the cobwebs'},{collect:{1:45},t:'Gather pumpkins'},{collect:{0:45,4:35},t:'Fill the candy jars'}]},
+ {name:'Cauldron Corner',who:'witch',colors:5,moves:120,key:true,coins:80,stars:[10,25],
+  intro:'Bubble, bubble! I need ingredients for my giggle potion. Oh, and a key fell in!',
+  stages:[{collect:{2:40},t:'Collect potions'},{webs:'bottom2',t:'Clear the cellar webs'},{ghosts:'cages3',collect:{3:30},t:'Free the ghosts + find bats'}]},
+ {name:'Batty Belfry',who:'bat',colors:5,moves:120,key:false,coins:90,stars:[10,25],
+  intro:'Good evening! My belfry is a mess. Help an old bat hang out in style!',
+  stages:[{webs:'xmark1',t:'Snip the web X'},{collect:{3:40,0:30},t:'Round up bats and candy'},{ghosts:'cages4',t:'Free the ghosts'}]},
+ {name:'Mummy Museum',who:'mummy',colors:6,moves:120,key:true,coins:110,stars:[10,25],
+  intro:'Hmmmph! I mean… hello! My museum needs dusting. There may be a key in the display case!',
+  stages:[{webs:'ring',t:'Dust the display'},{collect:{5:25,2:25},t:'Light candles + potions'},{ghosts:'cages3',collect:{1:12},t:'Free ghosts + pumpkins'}]},
+ {name:'Moonlit Mansion',who:'ghost',colors:5,moves:120,key:false,coins:150,stars:[10,25],
+  intro:'Boo! (That means hi!) The mansion doors are open at last. Let’s throw the best Halloween party ever!',
+  stages:[{webs:'top2',t:'Clear the attic'},{collect:{0:30,1:30,4:25},t:'Party treats'},{ghosts:'cages4',t:'Free all the ghosts'}]},
+];
+// map nodes: levels plus a door needing 2 keys before level 5
+const MAP=[{l:0},{l:1},{l:2},{l:3},{door:true,need:2},{l:4}];
+
+// ---------- rng ----------
+let seed=Date.now()>>>0; function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
+function ri(n){return Math.floor(rnd()*n);}
+
+// ---------- persistent state ----------
+function freshProg(){return{stars:[],keys:0,coins:0,doors:{},usedKeys:0};}
+let prog=freshProg(), L=null; // L = live level state
+let frozen=false;function save(){if(frozen)return;try{localStorage.setItem(KEY,JSON.stringify({v:1,prog,L,muted}));}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d&&d.v===1){prog=Object.assign(freshProg(),d.prog);L=d.L||null;if(L&&!(Array.isArray(L.g)&&L.g.length===H&&L.g.every(r=>Array.isArray(r)&&r.length===W&&r.every(p=>p&&typeof p.t==='number'))&&Array.isArray(L.web)))L=null;muted=!!d.muted;return true;}}catch(e){}return false;}
+function hasSave(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
+
+// ---------- board logic ----------
+function cellAt(r,c){return L.g[r][c];}
+function inB(r,c){return r>=0&&r<H&&c>=0&&c<W;}
+function newPiece(){L.nid=(L.nid||0)+1;return{t:ri(L.colors),s:0,id:L.nid};} // s: 0 none,'row','col','bomb'
+function fillNoMatch(){for(let r=0;r<H;r++)for(let c=0;c<W;c++){let p;do{p=newPiece();}while((c>1&&L.g[r][c-1].t===p.t&&L.g[r][c-2].t===p.t)||(r>1&&L.g[r-1][c].t===p.t&&L.g[r-2][c].t===p.t));L.g[r][c]=p;}}
+function startLevel(i){const lv=LEVELS[i];L={i,colors:lv.colors,moves:lv.moves,stage:0,g:[],web:[],cage:[],prog:{},score:0,done:false};
+ for(let r=0;r<H;r++){L.g.push(new Array(W));L.web.push(new Array(W).fill(0));L.cage.push(new Array(W).fill(0));}
+ const want=i===0?8:3;let g=0;fillNoMatch();while(allMoves().length<want&&g++<200)fillNoMatch();loadStage();save();}
+function ensureMoves(){if(!L)return false;let g=0;while(runs().length||!findMove()){fillNoMatch();if(++g>50)break;}return g>0;}
+function loadStage(){const st=LEVELS[L.i].stages[L.stage];L.prog={collect:{},webs:0,ghosts:0};
+ const pat=P[st.webs||st.ghosts];L.ghostTotal=0;L.webTotal=0;
+ if(pat)for(let r=0;r<H;r++)for(let c=0;c<W;c++){const ch=pat[r][c];if(ch==='1')L.web[r][c]=Math.max(L.web[r][c],1);if(ch==='2')L.web[r][c]=2;if(ch==='g'){L.web[r][c]=2;L.cage[r][c]=1;}}
+ for(let r=0;r<H;r++)for(let c=0;c<W;c++){if(L.web[r][c])L.webTotal++;if(L.cage[r][c])L.ghostTotal++;}}
+function stageGoals(){const st=LEVELS[L.i].stages[L.stage],out=[];
+ if(st.webs)out.push({e:'🕸️',have:L.webTotal-countWebs(),need:L.webTotal});
+ if(st.ghosts)out.push({e:'👻',have:L.prog.ghosts,need:L.ghostTotal});
+ if(st.collect)for(const k in st.collect)out.push({e:TYPES[k].e,have:Math.min(L.prog.collect[k]||0,st.collect[k]),need:st.collect[k]});return out;}
+function countWebs(){let n=0;for(let r=0;r<H;r++)for(let c=0;c<W;c++)if(L.web[r][c])n++;return n;}
+function stageDone(){return stageGoals().every(g=>g.have>=g.need);}
+function runs(){const rs=[];
+ for(let r=0;r<H;r++){let c=0;while(c<W){let e=c;while(e+1<W&&L.g[r][e+1].t===L.g[r][c].t)e++;if(e-c>=2){const a=[];for(let k=c;k<=e;k++)a.push([r,k]);rs.push({dir:'h',cells:a});}c=e+1;}}
+ for(let c=0;c<W;c++){let r=0;while(r<H){let e=r;while(e+1<H&&L.g[e+1][c].t===L.g[r][c].t)e++;if(e-r>=2){const a=[];for(let k=r;k<=e;k++)a.push([k,c]);rs.push({dir:'v',cells:a});}r=e+1;}}
+ return rs;}
+function swapRaw(a,b){const t=L.g[a[0]][a[1]];L.g[a[0]][a[1]]=L.g[b[0]][b[1]];L.g[b[0]][b[1]]=t;}
+function canSwap(a,b){if(!inB(...a)||!inB(...b))return false;if(Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])!==1)return false;
+ const A=cellAt(...a),B=cellAt(...b);if(A.s==='bomb'||B.s==='bomb')return true;if(A.s&&B.s)return true;swapRaw(a,b);const ok=runs().length>0;swapRaw(a,b);return ok;}
+function findMove(){for(let r=0;r<H;r++)for(let c=0;c<W;c++){if(c+1<W&&canSwap([r,c],[r,c+1]))return[[r,c],[r,c+1]];if(r+1<H&&canSwap([r,c],[r+1,c]))return[[r,c],[r+1,c]];}return null;}
+function allMoves(){const m=[];for(let r=0;r<H;r++)for(let c=0;c<W;c++){if(c+1<W&&canSwap([r,c],[r,c+1]))m.push([[r,c],[r,c+1]]);if(r+1<H&&canSwap([r,c],[r+1,c]))m.push([[r,c],[r+1,c]]);}return m;}
+// clear a set of cells, expanding specials; returns count
+function clearSet(set,bombColor){const key=(r,c)=>r*W+c;const q=[...set.values()];const seen=new Set(set.keys());
+ while(q.length){const [r,c]=q.pop();const p=L.g[r][c];if(!p)continue;let extra=[];
+  if(p.s==='row')for(let k=0;k<W;k++)extra.push([r,k]);if(p.s==='col')for(let k=0;k<H;k++)extra.push([k,c]);
+  if(p.s==='bomb'){const col=bombColor!=null?bombColor:ri(L.colors);for(let rr=0;rr<H;rr++)for(let cc=0;cc<W;cc++)if(L.g[rr][cc]&&L.g[rr][cc].t===col)extra.push([rr,cc]);bombColor=null;}
+  for(const x of extra){const k=key(...x);if(!seen.has(k)){seen.add(k);q.push(x);set.set(k,x);}}}
+ let n=0;for(const [r,c] of set.values()){const p=L.g[r][c];if(!p)continue;n++;if(p.s!=='bomb')L.prog.collect[p.t]=(L.prog.collect[p.t]||0)+1;
+  if(L.web[r][c]){L.web[r][c]--;if(!L.web[r][c]&&L.cage[r][c]){L.cage[r][c]=0;L.prog.ghosts++;fx.ghost&&fx.ghost(r,c);}}L.g[r][c]=null;}
+ L.score+=n*10;return n;}
+function gravity(){for(let c=0;c<W;c++){let w=H-1;for(let r=H-1;r>=0;r--)if(L.g[r][c]){L.g[w][c]=L.g[r][c];if(w!==r)L.g[r][c]=null;w--;}for(let r=w;r>=0;r--)L.g[r][c]=newPiece();}}
+// one full move, synchronous; returns {ok, cleared, cascades}
+function doMove(a,b){if(L.done||L.moves<=0||!canSwap(a,b))return{ok:false};swapRaw(a,b);L.moves--;
+ const A=cellAt(...a),B=cellAt(...b);let total=0,casc=0;
+ if(A.s==='bomb'||B.s==='bomb'||(A.s&&B.s)){const set=new Map();
+  if(A.s==='bomb'&&B.s==='bomb'){for(let r=0;r<H;r++)for(let c=0;c<W;c++)set.set(r*W+c,[r,c]);A.s=B.s=0;}
+  else if(A.s==='bomb'||B.s==='bomb'){const bp=A.s==='bomb'?a:b,op=A.s==='bomb'?B:A;set.set(bp[0]*W+bp[1],bp);total+=clearSet(set,op.t);set.clear();}
+  else{set.set(a[0]*W+a[1],a);set.set(b[0]*W+b[1],b);}
+  if(set.size)total+=clearSet(set);gravity();casc++;}
+ let first=true;
+ for(let guard=0;guard<50;guard++){const rs=runs();if(!rs.length)break;casc++;const set=new Map(),make=[];
+  // merge runs that cross (L/T) for specials
+  for(const run of rs){for(const x of run.cells)set.set(x[0]*W+x[1],x);
+   const len=run.cells.length;if(len>=4){let at=run.cells[Math.floor(len/2)];if(first)for(const x of run.cells)if((x[0]===a[0]&&x[1]===a[1])||(x[0]===b[0]&&x[1]===b[1]))at=x;
+    make.push({at,s:len>=5?'bomb':(run.dir==='h'?'row':'col'),t:cellAt(...at).t});}}
+  // L/T shapes -> bomb-lite: treat crossing of h and v as row+col (give 'row')
+  const keep=make.map(m=>({...m}));for(const m of keep){const k=m.at[0]*W+m.at[1];const p=cellAt(...m.at);if(p.s)continue;set.delete(k);}
+  total+=clearSet(set);for(const m of keep){if(!L.g[m.at[0]][m.at[1]])L.g[m.at[0]][m.at[1]]={t:m.t,s:m.s,id:(L.nid=(L.nid||0)+1)};else if(!L.g[m.at[0]][m.at[1]].s)L.g[m.at[0]][m.at[1]].s=m.s;}
+  gravity();first=false;}
+ if(!findMove()){let g=0;do{fillNoMatch();g++;}while(!findMove()&&g<20);}
+ let stageUp=false,win=false;
+ while(stageDone()){if(L.stage<LEVELS[L.i].stages.length-1){L.stage++;loadStage();stageUp=true;}else{win=true;L.done=true;break;}}
+ const lose=!win&&L.moves<=0;if(lose)L.done=true;
+ return{ok:true,cleared:total,cascades:casc,stageUp,win,lose};}
+function starsFor(){const s=LEVELS[L.i].stars;return L.moves>=s[1]?3:L.moves>=s[0]?2:1;}
+
+// ---------- audio ----------
+let AC=null,muted=false;
+function audio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();}
+function tone(f,d,type,v,slide){if(muted||!AC)return;try{const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+ g.gain.setValueAtTime(v||.15,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);}catch(e){}}
+const sfx={pop:n=>{for(let i=0;i<Math.min(n,4);i++)setTimeout(()=>tone(500+i*120,.12,'triangle'),i*60);},soft:()=>tone(520,.09,'sine',.035,560),
+ win:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,.25,'triangle'),i*130)),stage:()=>[392,523,659].forEach((f,i)=>setTimeout(()=>tone(f,.2,'sine'),i*100)),
+ ghost:()=>tone(700,.4,'sine',.1,300),tap:()=>tone(520,.04,'triangle',.03),sel:()=>tone(880,.06,'sine',.05,990)};
+let lastSfx=[];Object.keys(sfx).forEach(k=>{const f0=sfx[k];sfx[k]=(...a)=>{lastSfx.push(k);if(lastSfx.length>20)lastSfx.shift();return f0(...a);};});
+const fx={ghost:()=>sfx.ghost()};
+
+// ---------- UI ----------
+const $=id=>document.getElementById(id);let cs=48,busy=false,sel=null;
+function show(id){['title','map','level'].forEach(s=>$(s).classList.toggle('hidden',s!==id));$('btnHome').classList.toggle('hidden',id==='title');$('btnHelp').classList.toggle('hidden',id!=='level');if(id!=='level')clearHint();renderHud();}
+function renderHud(){$('hud').innerHTML=`<span>🪙 ${prog.coins}</span><span>🗝️ ${prog.keys-prog.usedKeys}</span><span>⭐ ${prog.stars.reduce((a,b)=>a+(b||0),0)}</span>`;$('btnMute').textContent=muted?'🔇':'🔊';}
+function modal(html,btns){$('modalBox').innerHTML=html+'<div>'+btns.map((b,i)=>`<button class="big ${b.alt?'alt':''}" data-i="${i}">${b.t}</button>`).join('')+'</div>';$('modal').classList.remove('hidden');
+ $('modalBox').querySelectorAll('button').forEach(el=>el.onclick=()=>{audio();sfx.tap();$('modal').classList.add('hidden');btns[+el.dataset.i].f&&btns[+el.dataset.i].f();});}
+function bubble(who,text){const c=CH[who];return `<div class="bubble"><div class="who">${c.e}</div><p><b>${c.n}:</b> ${text}</p></div>`;}
+function nodeOpen(i){const n=MAP[i];if(i===0)return true;const prev=MAP[i-1];if(prev.door)return !!prog.doors[i-1];return prog.stars[prev.l]>0;}
+function renderMap(){const el=$('mapPath');el.innerHTML='';MAP.forEach((n,i)=>{const b=document.createElement('button');const open=nodeOpen(i);
+ if(n.door){const opened=prog.doors[i];b.className='node door'+(open&&!opened?' next':'');b.innerHTML=`<div class="em">${opened?'🚪':'🔒'}</div>${opened?'Open!':'Haunted Door'}<div class="stars">🗝️ ${n.need}</div>`;
+  b.onclick=()=>{if(opened||!open)return;const have=prog.keys-prog.usedKeys;if(have>=n.need){prog.usedKeys+=n.need;prog.doors[i]=true;sfx.win();save();renderMap();renderHud();modal(bubble('ghost','Creeeak! The haunted door swings open. The Moonlit Mansion awaits!'),[{t:'Yay!'}]);}
+   else{sfx.soft();modal(bubble('mummy',`This door needs ${n.need} keys. You have ${have}. Keys hide in levels with a 🗝️!`),[{t:'OK'}]);}};}
+ else{const lv=LEVELS[n.l],st=prog.stars[n.l]||0;b.className='node'+(open?'':' locked')+(open&&!st?' next':'');b.dataset.level=n.l;
+  b.innerHTML=`<div class="em">${open?CH[lv.who].e:'🔒'}</div>${n.l+1}. ${lv.name}${lv.key?' 🗝️':''}<div class="stars">${'⭐'.repeat(st)}${'☆'.repeat(3-st)}</div>`;
+  b.onclick=()=>{if(!open){sfx.soft();return;}openLevel(n.l);};}
+ el.appendChild(b);});}
+function openLevel(i){const lv=LEVELS[i];const resume=L&&L.i===i&&!L.done;
+ modal(bubble(lv.who,lv.intro)+`<p>${lv.stages.length} stages · ${lv.moves} moves</p>`,resume?[{t:'Resume',f:()=>enterLevel()},{t:'Restart',alt:1,f:()=>{startLevel(i);enterLevel();}}]:[{t:'Play!',f:()=>{startLevel(i);enterLevel();}}]);}
+function enterLevel(){sel=null;if(ensureMoves())save();show('level');renderBar();layout();renderBoard();if(!prog.howto){prog.howto=true;save();howTo();}}
+function howTo(){modal(`<h2>How to play</h2><p style="font-size:20px"><b>Swap two neighbours to make a line of 3 or more.</b></p>
+ <p class="howq">You don't pick three — you <b>swap two</b> so three line up!</p>
+ <div class="demo" aria-hidden="true"><div class="dc" style="left:0;top:0"></div><div class="dc" style="left:52px;top:0"></div><div class="dc" style="left:104px;top:0"></div>
+  <div class="dc" style="left:0;top:52px"></div><div class="dc" style="left:52px;top:52px"></div><div class="dc" style="left:104px;top:52px"></div>
+  <span class="dp d-a" style="left:0;top:0">🎃</span><span class="dp d-b" style="left:52px;top:0">🍬</span><span class="dp d-a" style="left:104px;top:0">🎃</span>
+  <span class="dp" style="left:0;top:52px">🍭</span><span class="dp d-e" style="left:52px;top:52px">🎃</span><span class="dp" style="left:104px;top:52px">🍭</span>
+  <span class="dhand">👆</span><span class="dyay">3 in a row!</span></div>
+ <ol class="howsteps"><li>Click/tap a piece (it glows).</li><li>Click/tap the piece <b>right next to it</b>.</li><li>They swap — 3 matching in a line go POP! 🎉</li></ol>
+ <p>Or just drag a piece onto its neighbour. Stuck? Wait a moment — two pieces will wiggle to show you a swap.</p>
+ <p>Match 4 for a <b>line blaster</b> ✨ · match 5 for a <b>color bomb</b> 💥<br>Finish every stage's goals before your 👣 moves run out!</p>`,[{t:'Got it!'}]);}
+function layout(){const top=$('top').offsetHeight+$('lvlBar').offsetHeight+24;const aw=window.innerWidth-24,ah=window.innerHeight-top-12;cs=Math.max(30,Math.floor(Math.min(aw/W,ah/H)));
+ const b=$('board');b.style.width=(cs*W+12)+'px';b.style.height=(cs*H+12)+'px';b.style.setProperty('--cs',cs+'px');}
+function webSvg(n,cage){return `<svg class="web" viewBox="0 0 40 40"><g stroke="#e8e8ff" stroke-width="${n>1?1.6:1}" fill="none" opacity="${n>1?.95:.7}"><path d="M2 2L38 38M38 2L2 38M20 0V40M0 20H40"/><circle cx="20" cy="20" r="6"/><circle cx="20" cy="20" r="12"/>${n>1?'<circle cx="20" cy="20" r="17"/>':''}</g>${cage?'<text x="28" y="14" font-size="12">👻</text>':''}</svg>`;}
+function renderBar(){const lv=LEVELS[L.i];const goals=stageGoals().map(g=>`<span class="pill">${g.e} ${g.have}/${g.need}</span>`).join('');
+ $('lvlBar').innerHTML=`<span class="pill">${lv.name}</span><span class="pill">Stage ${L.stage+1}/${lv.stages.length}: ${lv.stages[L.stage].t}</span>${goals}<span class="pill" id="moves">👣 ${L.moves}</span>`;}
+let lastPos=null;
+function snapshot(){const m={};for(let r=0;r<H;r++)for(let c=0;c<W;c++){const p=L.g[r][c];if(p&&p.id)m[p.id]={r,c,t:p.t};}return m;}
+function renderBoard(prev){renderBar();layout();const b=$('board');let h='';clearHint();
+ for(let r=0;r<H;r++)for(let c=0;c<W;c++){const p=L.g[r][c];const x=6+c*cs,y=6+r*cs;
+  h+=`<div class="cell bg" style="left:${x}px;top:${y}px;width:${cs-2}px;height:${cs-2}px"></div>`;
+  h+=`<div class="cell ${p&&p.s?'sp-'+p.s:''} ${sel&&sel[0]===r&&sel[1]===c?'sel':''}" data-r="${r}" data-c="${c}" style="left:${x}px;top:${y}px;width:${cs-2}px;height:${cs-2}px"><span class="pc">${p?TYPES[p.t].e:''}</span>${L.web[r][c]?webSvg(L.web[r][c],L.cage[r][c]):''}</div>`;}
+ // fading "poof" copies of pieces that were cleared
+ const alive={};if(prev){for(let r=0;r<H;r++)for(let c=0;c<W;c++){const p=L.g[r][c];if(p&&p.id)alive[p.id]=1;}
+  for(const id in prev)if(!alive[id]){const o=prev[id];h+=`<div class="cell poof" style="left:${6+o.c*cs}px;top:${6+o.r*cs}px;width:${cs-2}px;height:${cs-2}px"><span class="pc">${TYPES[o.t].e}</span></div>`;}}
+ b.innerHTML=h;
+ if(prev&&b.firstElementChild&&b.firstElementChild.animate){const newIn=new Array(W).fill(0);for(let r=0;r<H;r++)for(let c=0;c<W;c++){const p=L.g[r][c];if(p&&!prev[p.id])newIn[c]++;}
+  b.querySelectorAll('.cell[data-r]').forEach(el=>{const r=+el.dataset.r,c=+el.dataset.c,p=L.g[r][c];if(!p)return;const o=prev[p.id];let dx=0,dy=0;
+   if(o){dx=(o.c-c)*cs;dy=(o.r-r)*cs;}else dy=-newIn[c]*cs;if(!dx&&!dy)return;
+   el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:Math.min(520,240+Math.abs(dy)/cs*35),easing:'cubic-bezier(.4,0,.6,1.25)'});});
+  b.querySelectorAll('.poof').forEach(el=>{const a=el.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.5)',opacity:0}],{duration:260,fill:'forwards'});a.onfinish=()=>el.remove();});}
+ armHint();}
+// ---- idle hint: after 5 s with no input, wiggle a valid move ----
+let hintT=0;function clearHint(){clearTimeout(hintT);document.querySelectorAll('.cell.hint').forEach(e=>e.classList.remove('hint'));}
+function armHint(){clearTimeout(hintT);const first=L&&L.i===0&&L.moves===LEVELS[0].moves;hintT=setTimeout(()=>{if(!L||L.done||busy||$('level').classList.contains('hidden')||!$('modal').classList.contains('hidden')){armHint();return;}
+ const m=findMove();if(!m)return;m.forEach(([r,c])=>{const el=cellEl(r,c);el&&el.classList.add('hint');});},first?350:3000);}
+function cellEl(r,c){return $('board').querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);}
+function setSel(p){const old=$('board').querySelector('.cell.sel');old&&old.classList.remove('sel');sel=p;if(p){const el=cellEl(...p);el&&el.classList.add('sel');}}
+function cellFromPoint(x,y){const rc=$('board').getBoundingClientRect();const c=Math.floor((x-rc.left-6)/cs),r=Math.floor((y-rc.top-6)/cs);return inB(r,c)?[r,c]:null;}
+function tryMove(a,b){if(busy)return;audio();clearHint();setSel(null);
+ if(!inB(...b)){shake(a);armHint();return;}
+ if(!canSwap(a,b)){busy=true;bounceBack(a,b);setTimeout(()=>{busy=false;armHint();},380);return;}busy=true;
+ const before=L.stage;const prev=snapshot();const res=doMove(a,b);sfx.pop(res.cascades);renderBoard(prev);save();
+ setTimeout(()=>{busy=false;if(res.stageUp){sfx.stage();modal(bubble(LEVELS[L.i].who,`Stage ${before+1} done! Next: <b>${LEVELS[L.i].stages[L.stage].t}</b>.`),[{t:'Keep going!'}]);}
+  if(res.win)winLevel();else if(res.lose)loseLevel();},420);}
+function bounceBack(a,b){const A=cellEl(...a),B=cellEl(...b);if(!A||!B||!A.animate)return;const dx=(b[1]-a[1])*cs,dy=(b[0]-a[0])*cs;
+ const kf=(x,y)=>[{transform:'none'},{transform:`translate(${x*.6}px,${y*.6}px)`,offset:.4},{transform:`translate(${-x*.08}px,${-y*.08}px)`,offset:.8},{transform:'none'}];
+ A.animate(kf(dx,dy),{duration:360,easing:'ease-in-out'});B.animate(kf(-dx,-dy),{duration:360,easing:'ease-in-out'});A.style.zIndex=2;setTimeout(()=>A.style.zIndex='',380);}
+function shake(a){const el=$('board').querySelector(`[data-r="${a[0]}"][data-c="${a[1]}"]`);if(el&&el.animate)el.animate([{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'none'}],{duration:200});}
+function winLevel(){const i=L.i,lv=LEVELS[i],st=starsFor();const first=!prog.stars[i];prog.stars[i]=Math.max(prog.stars[i]||0,st);const coins=lv.coins+L.moves*2;prog.coins+=coins;
+ let key=false;if(lv.key&&first){prog.keys++;key=true;}L=null;save();sfx.win();
+ modal(`<h2>Level complete!</h2><div style="font-size:44px">${'⭐'.repeat(st)}${'☆'.repeat(3-st)}</div><p>+${coins} 🪙 ${key?' · Found a 🗝️ key!':''}</p>`+bubble(lv.who,'You did it! Thank you so much!'),[{t:'Map',f:()=>{show('map');renderMap();}}]);}
+function loseLevel(){const i=L.i;L=null;save();sfx.soft();modal(bubble(LEVELS[i].who,'Out of moves! No worries — want to try again?'),[{t:'Try again',f:()=>{startLevel(i);enterLevel();}},{t:'Map',alt:1,f:()=>{show('map');renderMap();}}]);}
+
+function bindInput(){const b=$('board');let down=null;
+ b.addEventListener('pointerdown',e=>{audio();clearHint();if(busy)return;const p=cellFromPoint(e.clientX,e.clientY);if(!p)return;down={p,x:e.clientX,y:e.clientY,moved:false};try{b.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
+ b.addEventListener('pointermove',e=>{if(!down||down.moved)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.max(Math.abs(dx),Math.abs(dy))<cs*.35)return;down.moved=true;
+  const t=Math.abs(dx)>Math.abs(dy)?[down.p[0],down.p[1]+(dx>0?1:-1)]:[down.p[0]+(dy>0?1:-1),down.p[1]];tryMove(down.p,t);});
+ b.addEventListener('pointerup',e=>{if(!down)return;const d=down;down=null;if(d.moved||busy)return;const p=d.p;clearHint();
+  if(sel&&sel[0]===p[0]&&sel[1]===p[1]){setSel(null);}            // tap again = deselect
+  else if(sel&&Math.abs(sel[0]-p[0])+Math.abs(sel[1]-p[1])===1){tryMove(sel,p);} // neighbour = swap
+  else{setSel(p);}                                                  // anything else = (re)select
+  armHint();});
+ b.addEventListener('pointercancel',()=>down=null);}
+
+function init(){const had=load();$('btnContinue').disabled=!had;
+ $('btnContinue').onclick=()=>{audio();show('map');renderMap();};
+ $('btnNew').onclick=()=>{audio();const go=()=>{prog=freshProg();L=null;save();show('map');renderMap();modal(bubble('ghost','Boo! Welcome to Hollowbrook! Our town is all cobwebby. Solve puzzles to help my monster friends!'),[{t:"Let's go!"}]);};
+  if(hasSave()&&(prog.coins||prog.stars.length))modal('<p>Start over? Your old progress will be erased.</p>',[{t:'Start over',f:go},{t:'Cancel',alt:1}]);else go();};
+ $('btnHome').onclick=()=>{audio();save();show('map');renderMap();};
+ $('btnHelp').onclick=()=>{audio();sfx.tap();howTo();};
+ $('btnMute').onclick=()=>{audio();muted=!muted;save();renderHud();};
+ const fsOK=document.fullscreenEnabled||document.webkitFullscreenEnabled;if(!fsOK)$('btnFs').classList.add('hidden');
+ $('btnFs').onclick=()=>{const d=document,el=d.documentElement;if(d.fullscreenElement||d.webkitFullscreenElement)(d.exitFullscreen||d.webkitExitFullscreen).call(d);else{const f=el.requestFullscreen||el.webkitRequestFullscreen;f&&f.call(el).catch&&f.call(el).catch(()=>{});}};
+ bindInput();window.addEventListener('resize',()=>{if(!$('level').classList.contains('hidden')){layout();renderBoard();}});
+ window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});setInterval(save,5000);
+ show('title');}
+
+// ---------- debug / test hook ----------
+// simulate: kid-ish bot picks a random valid move (prefers bigger matches 30% of the time); returns moves used
+function simulate(i,s,unl){const sv={L,prog,seed};seed=s>>>0;startLevel(i);if(unl)L.moves=9999;let used=0,res={},per=[],last=0;const budget=LEVELS[i].moves;
+ while(!L.done){const ms=allMoves();const m=ms[ri(ms.length)];const st=L.stage;res=doMove(m[0],m[1]);used++;if(L.stage!==st||res.win){per.push(used-last);last=used;}}
+ const out={level:i,used,budget,win:!!res.win,stage:L.stage,per};L=sv.L;prog=sv.prog;seed=sv.seed;return out;}
+window.__game={get state(){return{prog,L,screen:['title','map','level'].find(s=>!$(s).classList.contains('hidden'))};},LEVELS,MAP,TYPES,W,H,
+ startLevel:i=>{startLevel(i);enterLevel();},move:(a,b)=>{const pv=snapshot();const r=doMove(a,b);renderBoard(pv);save();if(r.win)winLevel();else if(r.lose)loseLevel();return r;},
+ freezeSave:()=>{frozen=true;},rawStart:i=>startLevel(i),rawMove:(a,b)=>doMove(a,b),findMove,stageGoals,countMoves:()=>allMoves().length,hasMatchNow:()=>runs().length>0,get sel(){return sel;},get sfxLog(){return lastSfx.slice();},get busy(){return busy;},save,load,simulate,setSeed:s=>seed=s>>>0,
+ cheatStage:()=>{const st=LEVELS[L.i].stages[L.stage];if(st.collect)for(const k in st.collect)L.prog.collect[k]=st.collect[k];for(let r=0;r<H;r++)for(let c=0;c<W;c++){if(L.cage[r][c]){L.cage[r][c]=0;L.prog.ghosts++;}L.web[r][c]=0;}},
+ storageKey:KEY};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "spooky-merge";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body></html>
