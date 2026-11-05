@@ -1,0 +1,4948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a0a2e">
+<title>Diwali Games Pack 2</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d0618;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
+#app{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 20%,#2a1048 0%,#0d0618 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:transparent}
+#overlay,#hud{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:5}
+#overlay>* ,#hud>*{pointer-events:auto}
+.hidden{display:none!important}
+.icon-btn{position:absolute;top:max(8px,env(safe-area-inset-top));z-index:40;width:48px;height:48px;border:2px solid rgba(255,200,100,.45);border-radius:14px;background:rgba(30,10,50,.75);color:#ffe7a8;font-size:22px;cursor:pointer;backdrop-filter:blur(4px)}
+#muteBtn{right:max(8px,env(safe-area-inset-right))}
+#fsBtn{right:max(64px,calc(env(safe-area-inset-right) + 56px))}
+.icon-btn:active{transform:scale(.94)}
+.toast{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);background:rgba(40,15,60,.92);border:2px solid #f5c542;border-radius:16px;padding:12px 20px;font-size:18px;z-index:50;pointer-events:none;max-width:90%;text-align:center}
+.screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overflow:auto;gap:10px}
+.screen.landscape-tight{justify-content:flex-start}
+.title{font-size:clamp(22px,4.2vw,36px);font-weight:800;letter-spacing:.02em;text-shadow:0 2px 0 #7a2e00,0 0 18px rgba(255,180,40,.5);color:#ffe08a;text-align:center}
+.sub{font-size:clamp(13px,2.4vw,18px);color:#f0d4a8;opacity:.9;text-align:center}
+.profiles{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.profile-card{min-width:min(42vw,220px);min-height:120px;padding:16px 18px;border-radius:20px;border:3px solid #f5c542;background:linear-gradient(160deg,#5a1f8a,#2a0a48);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:20px;font-weight:700;box-shadow:0 8px 0 #3a1058,0 0 24px rgba(255,180,40,.25)}
+.profile-card .emoji{font-size:42px;line-height:1}
+.profile-card .label{font-size:14px;font-weight:500;color:#ffd9a0}
+.profile-card:active{transform:translateY(3px);box-shadow:0 4px 0 #3a1058}
+.hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:min(720px,100%);margin-top:6px}
+@media (min-width:900px){.hub-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.game-tile{min-height:88px;border-radius:18px;border:3px solid rgba(255,210,120,.55);background:linear-gradient(145deg,#7a2a10,#3a0e28);padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.35);position:relative}
+.game-tile .emoji{font-size:clamp(28px,5vw,40px)}
+.game-tile .name{font-size:clamp(13px,2.2vw,17px);font-weight:700;color:#fff6d8}
+.game-tile .tag{font-size:11px;color:#ffd090}
+.game-tile.soon{opacity:.55;cursor:default;filter:grayscale(.25)}
+.game-tile.soon .badge{position:absolute;top:6px;right:6px;background:#222;color:#ffd070;font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid #886}
+.game-tile.playable{background:linear-gradient(145deg,#c45a12,#6a1a40);border-color:#ffd060;box-shadow:0 6px 0 #4a1020,0 0 20px rgba(255,160,40,.35)}
+.game-tile:not(.soon):active{transform:translateY(2px)}
+.topbar{display:flex;width:100%;max-width:1100px;align-items:center;justify-content:space-between;gap:8px;padding-right:120px}
+.btn{min-height:48px;min-width:48px;padding:10px 16px;border-radius:14px;border:2px solid #f0c050;background:linear-gradient(180deg,#ff9a3c,#d45410);color:#2a1000;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 0 #7a2a00}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #7a2a00}
+.btn.ghost{background:rgba(40,15,60,.7);color:#ffe7a8;border-color:rgba(255,200,100,.5);box-shadow:0 4px 0 #1a0830}
+.btn.big{min-height:56px;font-size:18px;padding:12px 20px}
+.btn.p1{min-height:64px;min-width:64px;font-size:18px;border-radius:18px}
+.btn.danger{background:linear-gradient(180deg,#ff6a6a,#b02020);border-color:#ffaaaa;color:#fff}
+.stickers{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:28px}
+.sticker{font-size:22px;filter:drop-shadow(0 0 4px rgba(255,200,80,.5))}
+.edit-name{margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.edit-name input{min-height:44px;min-width:140px;border-radius:12px;border:2px solid #c8a040;padding:8px 12px;font-size:16px;background:#2a1040;color:#fff}
+.modal{position:absolute;inset:0;background:rgba(10,4,20,.72);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.modal .card{background:linear-gradient(160deg,#4a2068,#1e0a38);border:3px solid #f5c542;border-radius:20px;padding:20px;max-width:420px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px}
+.modal .card h3{font-size:22px;color:#ffe08a}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;width:min(720px,100%);padding:4px 0 12px}
+.level-card{min-height:72px;min-width:64px;border-radius:16px;border:2px solid #e8b040;background:linear-gradient(160deg,#3a1860,#1a0830);color:#ffe8b0;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 4px 0 #120420}
+.level-card .num{font-size:20px}
+.level-card .meta{font-size:11px;opacity:.8;font-weight:600}
+.level-card .stars{font-size:12px;min-height:16px}
+.level-card.locked{opacity:.45;cursor:default;filter:grayscale(.3)}
+.level-card.p1,.p1-mode .level-card{min-height:80px;min-width:72px;border-radius:18px}
+.quiz-stars{font-size:28px;letter-spacing:2px}
+
+/* Lantern Glide */
+.lantern-screen{max-width:1180px;width:100%;height:100%}
+.lantern-play{padding-bottom:0;overflow:hidden}
+.lantern-stage{position:relative;flex:1;width:min(1180px,100%);min-height:0;border-radius:16px;border:3px solid #e8b060;overflow:hidden;background:#140828;box-shadow:0 4px 0 #1a0c04;touch-action:none}
+.lantern-stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.lantern-hud{position:absolute;left:8px;top:8px;right:8px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;z-index:2;font-weight:800;color:#ffe8b0;text-shadow:0 1px 3px #000}
+.lantern-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(20,8,40,.75);border:2px solid #e8b060;border-radius:14px;padding:8px 14px;font-size:14px;color:#ffe8b0;pointer-events:none;z-index:2}
+.lantern-result{width:min(520px,100%);background:linear-gradient(165deg,rgba(40,24,70,.95),rgba(20,10,40,.96));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;margin:24px auto;box-shadow:0 0 28px rgba(255,160,40,.2)}
+@media (max-height:420px){
+  .title{font-size:22px}
+  .game-tile{min-height:72px;padding:8px}
+  .profile-card{min-height:96px;padding:10px}
+  .level-card{min-height:64px}
+}
+
+/* Kandil Craft */
+.kandil-screen{max-width:1180px;width:100%;height:100%}
+.kandil-layout{display:flex;gap:10px;width:100%;max-width:1100px;flex:1;min-height:0;align-items:stretch}
+.kandil-preview-wrap{flex:0 0 min(42%,420px);display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.kandil-preview-wrap canvas{width:100%;max-width:420px;height:auto;aspect-ratio:420/460;border-radius:16px;border:3px solid #e8b060;background:#1a0a30;touch-action:none}
+.kandil-preview-actions{flex-wrap:wrap;justify-content:center}
+.kandil-tools{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 12px;min-width:0;-webkit-overflow-scrolling:touch}
+.tool-section{background:rgba(30,12,50,.55);border:2px solid rgba(232,176,96,.35);border-radius:14px;padding:8px}
+.tool-label{font-size:12px;font-weight:700;color:#ffd090;margin-bottom:6px}
+.tool-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tool-btn{min-height:44px;min-width:44px;padding:8px 10px;border-radius:12px;border:2px solid rgba(255,200,100,.45);background:rgba(40,15,60,.75);color:#ffe8b0;font-weight:700;font-size:13px;cursor:pointer}
+.tool-btn.on{border-color:#ffd060;background:linear-gradient(180deg,#c45a12,#6a1a40);color:#fff}
+.tool-btn.p1,.p1-mode .tool-btn{min-height:56px;min-width:56px;font-size:15px;border-radius:16px}
+.tool-btn .tname{display:block;font-size:11px;font-weight:600}
+.swatch{width:40px;height:40px;border-radius:12px;border:3px solid rgba(255,255,255,.35);cursor:pointer;padding:0}
+.swatch.big,.p1-mode .swatch{width:56px;height:56px;border-radius:16px;border-width:4px}
+.swatch.on{outline:3px solid #ffe08a;outline-offset:1px}
+.panel-chip{width:40px;height:40px;border-radius:12px;border:3px solid #fff;font-weight:800;color:#1a0800;cursor:pointer;text-shadow:0 0 2px #fff}
+.panel-chip.big{width:56px;height:56px;border-radius:16px;font-size:18px}
+.panel-chip.on{box-shadow:0 0 0 3px #ffe08a}
+.btn.surprise{width:100%;margin-top:4px;background:linear-gradient(180deg,#ff80c0,#a02070);border-color:#ffc0e0;color:#fff}
+.kandil-target{position:absolute;right:8px;top:8px;background:rgba(20,8,40,.85);border:2px solid #e8b060;border-radius:12px;padding:6px;text-align:center;pointer-events:none}
+.kandil-preview-wrap{position:relative}
+.target-cv{display:block;width:90px;height:105px}
+.street-wrap{width:100%;max-width:1100px;border-radius:16px;border:3px solid #e8b060;overflow:hidden;background:#140828}
+.street-wrap canvas{display:block;width:100%;height:auto}
+.order-card .meta{font-size:10px;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:700px){
+  .kandil-layout{flex-direction:column}
+  .kandil-preview-wrap{flex:0 0 auto;width:100%}
+  .kandil-preview-wrap canvas{max-height:220px;width:auto}
+}
+@media (max-height:420px){
+  .kandil-preview-wrap canvas{max-height:180px}
+  .tool-btn{min-height:40px}
+}
+
+/* Ayodhya Boat Ride */
+.boats-screen{max-width:1180px;width:100%;height:100%}
+.boats-play{padding-bottom:0;overflow:hidden}
+.boats-stage{position:relative;flex:1;width:min(1180px,100%);min-height:0;border-radius:16px;border:3px solid #e8b060;overflow:hidden;background:#140828;box-shadow:0 4px 0 #1a0c04;touch-action:none}
+.boats-stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.boats-hud{position:absolute;left:8px;top:8px;right:8px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;z-index:2;font-weight:800;color:#ffe8b0;text-shadow:0 1px 3px #000}
+.boats-controls{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:space-between;padding:0 16px;z-index:3;pointer-events:none}
+.boats-steer{pointer-events:auto;min-width:72px;min-height:72px;font-size:28px;border-radius:20px;opacity:.92}
+.boats-hint{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(20,8,40,.75);border:2px solid #e8b060;border-radius:14px;padding:8px 14px;font-size:14px;color:#ffe8b0;pointer-events:none;z-index:2;white-space:nowrap}
+.boats-result{width:min(520px,100%);background:linear-gradient(165deg,rgba(40,24,70,.95),rgba(20,10,40,.96));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;margin:24px auto;box-shadow:0 0 28px rgba(255,160,40,.2)}
+@media (max-height:420px){
+  .boats-steer{min-width:56px;min-height:56px;font-size:22px}
+  .boats-hint{bottom:70px;font-size:12px}
+}
+
+/* Mehndi Patterns */
+.mehndi-screen{max-width:1180px;width:100%;height:100%}
+.mehndi-studio{padding-bottom:0;overflow:hidden}
+.mehndi-layout{display:flex;gap:10px;width:100%;max-width:1100px;flex:1;min-height:0;align-items:stretch}
+.mehndi-stage{position:relative;flex:0 0 min(48%,500px);display:flex;flex-direction:column;align-items:center;min-width:0}
+.mehndi-stage canvas{width:100%;max-width:500px;height:auto;aspect-ratio:500/620;border-radius:16px;border:3px solid #e8b060;background:#2a1040;touch-action:none;display:block}
+.mehndi-tools{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 12px;min-width:0;-webkit-overflow-scrolling:touch}
+.mehndi-swatches{display:flex;gap:8px;flex-wrap:wrap}
+.mehndi-swatch{width:44px;height:44px;border-radius:50%;border:3px solid #ffe8b0;box-shadow:0 3px 0 #1a0c04;cursor:pointer}
+.mehndi-swatch.on{outline:3px solid #f0c040;outline-offset:2px}
+.mehndi-stamps{display:flex;flex-wrap:wrap;gap:6px}
+.mehndi-stamp.on{border-color:#f0c040;background:rgba(240,192,64,.2)}
+.mehndi-hud{position:absolute;left:8px;top:8px;right:8px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;z-index:2;font-weight:800;color:#ffe8b0;text-shadow:0 1px 3px #000;font-size:13px}
+.mehndi-gal{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;overflow:auto;padding:8px;width:100%}
+.mehndi-gal-card{background:rgba(30,12,50,.8);border:2px solid #e8b060;border-radius:14px;padding:8px;text-align:center}
+.mehndi-gal-card canvas{border-radius:10px;display:block}
+.mehndi-toast{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(20,8,40,.9);border:2px solid #e8b060;border-radius:14px;padding:8px 14px;color:#ffe8b0;z-index:5;font-weight:700;white-space:nowrap}
+.mehndi-result-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,4,20,.45);z-index:8;pointer-events:auto}
+.mehndi-result{width:min(420px,92%);background:linear-gradient(165deg,rgba(40,24,70,.96),rgba(20,10,40,.97));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 0 28px rgba(255,160,40,.2)}
+.mehndi-result .stars-lg{font-size:32px;color:#f0c040;letter-spacing:4px}
+@media (max-width:700px){
+  .mehndi-layout{flex-direction:column}
+  .mehndi-stage{flex:0 0 auto;width:100%}
+  .mehndi-stage canvas{max-height:240px;width:auto}
+}
+@media (max-height:420px){
+  .mehndi-stage canvas{max-height:180px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Diwali Games Pack 2"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="overlay"></div>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Diwali Games Pack 2 — core */
+const DG = window.DG = {
+  VERSION: 1,
+  SAVE_KEY: 'diwali-games-2-v1',
+  W: 1180, H: 600,
+  profiles: {
+    alpha: { id: 'alpha', defaultName: 'Player 1', label: 'Easy · big taps', emoji: '🪔', easy: true },
+    beta:  { id: 'beta',  defaultName: 'Player 2', label: 'More challenge', emoji: '✨', easy: false }
+  },
+  games: [
+    { id: 'lantern', name: 'Lantern Glide', emoji: '🏮', tag: 'One-touch flyer', ready: true },
+    { id: 'kandil', name: 'Kandil Craft', emoji: '🎨', tag: 'Lantern designer', ready: true },
+    { id: 'boats', name: 'Ayodhya Boat Ride', emoji: '⛵', tag: 'Gentle river', ready: true },
+    { id: 'mehndi', name: 'Mehndi Patterns', emoji: '✋', tag: 'Trace & color', ready: true }
+  ],
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  muted: false,
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  profileId: null,
+  run: null
+};
+
+DG.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+DG.lerp = (a, b, t) => a + (b - a) * t;
+DG.rand = (a, b) => a + Math.random() * (b - a);
+DG.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+DG.now = () => performance.now();
+
+DG.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1500);
+};
+
+DG.isEasy = () => {
+  const p = DG.profiles[DG.profileId || 'alpha'];
+  return !!(p && p.easy);
+};
+
+DG.fitCanvas = () => {
+  const c = DG.canvas;
+  if (!c) return;
+  if (c.width !== DG.W) c.width = DG.W;
+  if (c.height !== DG.H) c.height = DG.H;
+};
+
+DG.clear = (color) => {
+  const ctx = DG.ctx;
+  if (!ctx) return;
+  ctx.fillStyle = color || '#1a0a2e';
+  ctx.fillRect(0, 0, DG.W, DG.H);
+};
+
+DG.bindTap = (el, fn) => {
+  if (!el) return;
+  let locked = false;
+  const go = (e) => {
+    if (locked) return;
+    locked = true;
+    try { DG.Audio && DG.Audio.unlock(); } catch (_) {}
+    try { fn(e); } catch (err) { console.error(err); }
+    setTimeout(() => { locked = false; }, 180);
+  };
+  el.addEventListener('click', go);
+  el.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'touch') go(e);
+  });
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* Gentle WebAudio — unlock only after first input */
+DG.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = DG.muted ? 0 : 0.28;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (DG.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.16, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function scheduleTone(freq, when, dur, type, vol, slide) {
+    if (DG.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = Math.max(when, c.currentTime);
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    const v = Math.min(0.12, vol || 0.06); // keep festive tune gentle
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(v, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  return {
+    unlock,
+    getCtx: () => ensure(),
+    currentTime: () => { const c = ensure(); return c ? c.currentTime : 0; },
+    scheduleTone,
+    setMuted(m) {
+      DG.muted = !!m;
+      if (master) master.gain.value = DG.muted ? 0 : 0.28;
+      try { localStorage.setItem('diwali-games-2-mute', DG.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DG.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { DG.muted = localStorage.getItem('diwali-games-2-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DG.muted ? '🔇' : '🔊';
+      if (master) master.gain.value = DG.muted ? 0 : 0.28;
+    },
+    click() { tone(340, 0.05, 'triangle', 0.07); },
+    soft() { tone(380, 0.08, 'sine', 0.08); },
+    stamp() { tone(520, 0.09, 'triangle', 0.1); },
+    fill() { tone(280, 0.1, 'sine', 0.09, 200); },
+    win() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.15, 'sine', 0.11), i * 85)); },
+    save() { tone(660, 0.08, 'sine', 0.1); setTimeout(() => tone(880, 0.12, 'sine', 0.1), 70); },
+    blocked() { tone(180, 0.1, 'triangle', 0.08, 120); setTimeout(() => tone(140, 0.12, 'sine', 0.07, 90), 90); },
+    lantern() { tone(440, 0.08, 'sine', 0.09); setTimeout(() => tone(660, 0.14, 'sine', 0.1, 880), 70); },
+    sparkle() { tone(880, 0.06, 'triangle', 0.06, 1320); setTimeout(() => tone(1180, 0.05, 'sine', 0.045), 40); },
+    pop() { tone(520, 0.05, 'sine', 0.07, 240); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage with try/catch + memory fallback */
+DG.Save = (() => {
+  function blankProfile(id) {
+    const meta = DG.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      stickers: [],
+      badges: [],
+      gallery: [],
+      playSeconds: 0,
+      lantern: { maxCleared: 0, stars: {}, cleared: {} },
+      kandil: { orders: {}, orderStars: {}, hung: 0 },
+      boats: { maxCleared: 0, stars: {}, cleared: {} },
+      mehndi: { maxCleared: 0, stars: {}, cleared: {}, gallery: [] }
+    };
+  }
+
+  function blankState() {
+    return {
+      v: DG.VERSION,
+      lastProfile: null,
+      profiles: { alpha: blankProfile('alpha'), beta: blankProfile('beta') }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(DG.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return DG.memStore;
+  }
+
+  function writeRaw(data) {
+    DG.memStore = data;
+    try {
+      localStorage.setItem(DG.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== DG.VERSION) {
+      DG.state = blankState();
+      save();
+      return DG.state;
+    }
+    for (const id of ['alpha', 'beta']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!Array.isArray(raw.profiles[id].stickers)) raw.profiles[id].stickers = [];
+      if (!Array.isArray(raw.profiles[id].badges)) raw.profiles[id].badges = [];
+      if (!Array.isArray(raw.profiles[id].gallery)) raw.profiles[id].gallery = [];
+      if (!raw.profiles[id].lantern) raw.profiles[id].lantern = { maxCleared: 0, stars: {}, cleared: {} };
+      if (!raw.profiles[id].lantern.stars) raw.profiles[id].lantern.stars = {};
+      if (!raw.profiles[id].lantern.cleared) raw.profiles[id].lantern.cleared = {};
+      if (!raw.profiles[id].kandil) raw.profiles[id].kandil = { orders: {}, orderStars: {}, hung: 0 };
+      if (!raw.profiles[id].kandil.orders) raw.profiles[id].kandil.orders = {};
+      if (!raw.profiles[id].kandil.orderStars) raw.profiles[id].kandil.orderStars = {};
+      if (!raw.profiles[id].boats) raw.profiles[id].boats = { maxCleared: 0, stars: {}, cleared: {} };
+      if (!raw.profiles[id].boats.stars) raw.profiles[id].boats.stars = {};
+      if (!raw.profiles[id].boats.cleared) raw.profiles[id].boats.cleared = {};
+      if (!raw.profiles[id].mehndi) raw.profiles[id].mehndi = { maxCleared: 0, stars: {}, cleared: {}, gallery: [] };
+      if (!raw.profiles[id].mehndi.stars) raw.profiles[id].mehndi.stars = {};
+      if (!raw.profiles[id].mehndi.cleared) raw.profiles[id].mehndi.cleared = {};
+      if (!Array.isArray(raw.profiles[id].mehndi.gallery)) raw.profiles[id].mehndi.gallery = [];
+    }
+    DG.state = raw;
+    return DG.state;
+  }
+
+  function save() {
+    if (!DG.state) return false;
+    return writeRaw(DG.state);
+  }
+
+  function profile(id) {
+    if (!DG.state) load();
+    return DG.state.profiles[id || DG.profileId || DG.state.lastProfile || 'alpha'];
+  }
+
+  function setProfile(id) {
+    DG.profileId = id;
+    DG.state.lastProfile = id;
+    save();
+  }
+
+  function addSticker(emoji) {
+    const p = profile();
+    if (!p.stickers.includes(emoji)) {
+      p.stickers.push(emoji);
+      if (emoji === '🏮' && !p.badges.includes('lantern')) p.badges.push('lantern');
+      if (emoji === '🎨' && !p.badges.includes('kandil')) p.badges.push('kandil');
+      if (emoji === '⛵' && !p.badges.includes('boats')) p.badges.push('boats');
+      if (emoji === '✋' && !p.badges.includes('mehndi')) p.badges.push('mehndi');
+      save();
+    }
+  }
+
+  function hangLantern(design) {
+    const p = profile();
+    const entry = Object.assign({}, design, { id: 'k' + Date.now().toString(36), at: Date.now() });
+    p.gallery.push(entry);
+    if (p.gallery.length > 24) p.gallery.shift();
+    p.kandil.hung = (p.kandil.hung || 0) + 1;
+    addSticker('🎨');
+    save();
+    return entry;
+  }
+
+  return { load, save, profile, setProfile, blankProfile, blankState, readRaw, writeRaw, addSticker, hangLantern };
+})();
+
+})();
+/* ==== 30-art.js ==== */
+;(function(){
+/* Canvas art helpers — diyas, marigolds, night sky */
+DG.Art = {
+  drawHubBg(ctx, w, h, t) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#1a0838');
+    g.addColorStop(0.55, '#2a0e48');
+    g.addColorStop(1, '#1a0a18');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    // stars
+    ctx.fillStyle = 'rgba(255,240,200,0.85)';
+    for (let i = 0; i < 60; i++) {
+      const x = ((i * 97) % w);
+      const y = ((i * 53) % (h * 0.55));
+      const tw = 0.5 + 0.5 * Math.sin(t * 0.002 + i);
+      ctx.globalAlpha = 0.35 + 0.55 * tw;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.2 + (i % 3) * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // moon
+    ctx.beginPath();
+    ctx.arc(w * 0.88, h * 0.14, 28, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff4c8';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(w * 0.9, h * 0.12, 24, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a0838';
+    ctx.fill();
+    // marigold garland
+    for (let i = 0; i < 18; i++) {
+      const x = (i / 17) * w;
+      const y = h * 0.78 + Math.sin(i * 0.9 + t * 0.001) * 6;
+      this.marigold(ctx, x, y, 10 + (i % 3));
+    }
+    // diyas along bottom
+    for (let i = 0; i < 7; i++) {
+      const x = w * (0.12 + i * 0.12);
+      this.diya(ctx, x, h * 0.9, 1 + 0.15 * Math.sin(t * 0.004 + i));
+    }
+  },
+
+  marigold(ctx, x, y, r) {
+    ctx.save();
+    ctx.translate(x, y);
+    for (let i = 0; i < 8; i++) {
+      ctx.rotate(Math.PI / 4);
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.55, r * 0.35, r * 0.55, 0, 0, Math.PI * 2);
+      ctx.fillStyle = i % 2 ? '#ff9a1a' : '#ffd24a';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = '#c45a00';
+    ctx.fill();
+    ctx.restore();
+  },
+
+  diya(ctx, x, y, flicker) {
+    ctx.save();
+    ctx.translate(x, y);
+    // bowl
+    ctx.beginPath();
+    ctx.ellipse(0, 4, 22, 10, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#c45a18';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 20, 8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#8a3010';
+    ctx.fill();
+    // flame
+    const fh = 18 * flicker;
+    const grad = ctx.createRadialGradient(0, -fh * 0.4, 1, 0, -fh * 0.2, fh);
+    grad.addColorStop(0, '#fff6c0');
+    grad.addColorStop(0.4, '#ffb020');
+    grad.addColorStop(1, 'rgba(255,80,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(8 * flicker, -fh * 0.5, 0, -fh);
+    ctx.quadraticCurveTo(-8 * flicker, -fh * 0.5, 0, 0);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
+  },
+
+  powderDisc(ctx, x, y, r, color) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    // grain
+    ctx.globalAlpha = 0.35;
+    for (let i = 0; i < 8; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * r * 0.85;
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+};
+
+})();
+/* ==== 60-ui.js ==== */
+;(function(){
+/* Screens: profiles, hub, confirm */
+DG.UI = (() => {
+  let bgRaf = 0;
+
+  function ov() { return DG.overlay; }
+
+  function startBg() {
+    cancelAnimationFrame(bgRaf);
+    const tick = (t) => {
+      if (DG.screen === 'hub' || DG.screen === 'profiles' || DG.screen === 'lantern-select') {
+        DG.fitCanvas();
+        DG.Art.drawHubBg(DG.ctx, DG.W, DG.H, t);
+        bgRaf = requestAnimationFrame(tick);
+      }
+    };
+    bgRaf = requestAnimationFrame(tick);
+  }
+
+  function showProfiles() {
+    DG.screen = 'profiles';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const scr = document.createElement('div');
+    scr.className = 'screen';
+    scr.innerHTML = `
+      <div class="title">🪔 Diwali Games · Pack 2</div>
+      <div class="sub">Who is playing?</div>
+      <div class="profiles" id="profiles"></div>
+      <div class="edit-name"><span class="sub">Tap a player, then you can rename them</span></div>`;
+    el.appendChild(scr);
+    const box = scr.querySelector('#profiles');
+    ['alpha', 'beta'].forEach((id) => {
+      const meta = DG.profiles[id];
+      const p = DG.Save.profile(id);
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'profile-card';
+      card.dataset.id = id;
+      card.innerHTML = `<span class="emoji">${meta.emoji}</span><span>${p.name}</span><span class="label">${meta.label}</span>`;
+      DG.bindTap(card, () => {
+        DG.Audio.click();
+        DG.Save.setProfile(id);
+        showHub();
+      });
+      box.appendChild(card);
+    });
+    startBg();
+  }
+
+  function showHub() {
+    DG.screen = 'hub';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const p = DG.Save.profile();
+    const meta = DG.profiles[p.id];
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight';
+    const stickers = (p.stickers || []).map((s) => `<span class="sticker">${s}</span>`).join('') ||
+      '<span class="sub">Play to earn stickers!</span>';
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="btnSwitch">👥 Switch</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.5vw,28px)">🪔 Diwali Hub · Pack 2</div>
+          <div class="sub">${p.name} · ${meta.label}</div>
+        </div>
+        <button class="btn ghost" id="btnRename">✏️ Name</button>
+      </div>
+      <div class="stickers">${stickers}</div>
+      <div class="hub-grid" id="grid"></div>`;
+    el.appendChild(scr);
+    const grid = scr.querySelector('#grid');
+    DG.games.forEach((g) => {
+      const tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'game-tile ' + (g.ready ? 'playable' : 'soon');
+      tile.dataset.game = g.id;
+      tile.innerHTML = `${g.ready ? '' : '<span class="badge">Soon</span>'}
+        <span class="emoji">${g.emoji}</span>
+        <span class="name">${g.name}</span>
+        <span class="tag">${g.tag}</span>`;
+      if (g.ready) {
+        DG.bindTap(tile, () => {
+          DG.Audio.click();
+          if (g.id === 'lantern') DG.Lantern.open();
+          else if (g.id === 'kandil') DG.Kandil.open();
+          else if (g.id === 'boats') DG.Boats.open();
+          else if (g.id === 'mehndi') DG.Mehndi.open();
+        });
+      } else {
+        DG.bindTap(tile, () => {
+          DG.Audio.soft();
+          DG.toast('Coming soon! ✨');
+        });
+      }
+      grid.appendChild(tile);
+    });
+    DG.bindTap(scr.querySelector('#btnSwitch'), () => { DG.Audio.click(); showProfiles(); });
+    DG.bindTap(scr.querySelector('#btnRename'), () => renamePrompt());
+    startBg();
+  }
+
+  function renamePrompt() {
+    const p = DG.Save.profile();
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>Player name</h3>
+      <input id="nameIn" maxlength="16" value="${p.name.replace(/"/g, '&quot;')}" aria-label="Name">
+      <div class="row">
+        <button class="btn ghost" id="cancel">Cancel</button>
+        <button class="btn" id="ok">Save</button>
+      </div>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    const input = modal.querySelector('#nameIn');
+    setTimeout(() => input.focus(), 50);
+    DG.bindTap(modal.querySelector('#cancel'), () => modal.remove());
+    DG.bindTap(modal.querySelector('#ok'), () => {
+      let n = (input.value || '').trim().slice(0, 16);
+      if (!n) n = DG.profiles[p.id].defaultName;
+      if (new RegExp('\\b(' + ['R'+'uhi','A'+'man'].join('|') + ')\\b','i').test(n)) n = DG.profiles[p.id].defaultName;
+      p.name = n;
+      DG.Save.save();
+      modal.remove();
+      showHub();
+    });
+  }
+
+  function confirm(title, body, onYes) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>${title}</h3>
+      <div class="sub">${body || ''}</div>
+      <div class="row">
+        <button class="btn ghost" id="no">No</button>
+        <button class="btn danger" id="yes">Yes</button>
+      </div>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    DG.bindTap(modal.querySelector('#no'), () => modal.remove());
+    DG.bindTap(modal.querySelector('#yes'), () => { modal.remove(); onYes && onYes(); });
+  }
+
+  return { showProfiles, showHub, startBg, confirm };
+})();
+
+})();
+/* ==== 70-lantern-levels.js ==== */
+;(function(){
+/* Lantern Glide — separate easy/hard ladders (guaranteed corridor) */
+DG.LanternLevels = (() => {
+  const WORLD_H = 520;
+
+  const EASY_PHYS = {
+    gravity: 0.11,
+    lift: 0.32,
+    maxVy: 3.2,
+    maxFall: 3.6,
+    scroll: 2.15,
+    radius: 18,
+    bumpSlow: 0.45,
+    infiniteLives: true,
+    autoCheckpoint: true,
+    softHit: true,
+    wind: false
+  };
+  const HARD_PHYS = {
+    gravity: 0.18,
+    lift: 0.38,
+    maxVy: 4.0,
+    maxFall: 4.6,
+    scroll: 2.6,
+    radius: 14,
+    bumpSlow: 0,
+    infiniteLives: false,
+    lives: 3,
+    autoCheckpoint: false,
+    softHit: false,
+    wind: true
+  };
+
+  function rng(seed) {
+    let s = seed | 0;
+    return () => {
+      s = (s * 1664525 + 1013904223) | 0;
+      return (s >>> 0) / 4294967296;
+    };
+  }
+
+  function makeLevel(opts) {
+    const {
+      id, seed, length, gapMin, gapMax, obsEvery, pickupEvery,
+      windChance, checkEvery, easy
+    } = opts;
+    const r = rng(seed);
+    const obstacles = [];
+    const pickups = [];
+    const winds = [];
+    const checkpoints = [];
+    const H = WORLD_H;
+    const pad = easy ? 28 : 22; // clearance beyond radius
+
+    // Smooth flyable path
+    const path = [];
+    let cy = H * 0.5;
+    for (let x = 0; x <= length; x += 40) {
+      const drift = (r() - 0.5) * (easy ? 22 : 30);
+      cy = DG.clamp(cy + drift, 120, H - 120);
+      const corridorH = gapMin + r() * (gapMax - gapMin);
+      path.push({ x, y: cy, h: corridorH });
+    }
+
+    function pathAt(x) {
+      let a = path[0], b = path[path.length - 1];
+      for (let i = 0; i < path.length - 1; i++) {
+        if (path[i].x <= x && path[i + 1].x >= x) {
+          a = path[i]; b = path[i + 1];
+          break;
+        }
+      }
+      const t = a.x === b.x ? 0 : (x - a.x) / (b.x - a.x);
+      return { y: a.y + (b.y - a.y) * t, h: a.h + (b.h - a.h) * t };
+    }
+
+    // Obstacles ONLY outside the safe corridor (+ pad)
+    for (let x = 200; x < length - 220; x += obsEvery) {
+      const p = pathAt(x);
+      const half = p.h / 2;
+      const openTop = p.y - half;
+      const openBot = p.y + half;
+      const topLimit = Math.max(8, openTop - pad);
+      const botStart = Math.min(H - 8, openBot + pad);
+
+      const wTop = easy ? 34 : 40;
+      const wBot = easy ? 38 : 44;
+
+      if (topLimit > 55) {
+        obstacles.push({
+          x: x + (r() - 0.5) * 16,
+          y: 0,
+          w: wTop,
+          h: topLimit,
+          kind: r() < 0.5 ? 'branch' : 'roof'
+        });
+      }
+      if (H - botStart > 55) {
+        obstacles.push({
+          x: x + 28 + (r() - 0.5) * 16,
+          y: botStart,
+          w: wBot,
+          h: H - botStart,
+          kind: r() < 0.45 ? 'roof' : 'branch'
+        });
+      }
+
+      // Kite string: short horizontal near corridor EDGE (not center)
+      if (!easy && r() < 0.3 && topLimit > 40) {
+        obstacles.push({
+          x: x + 50,
+          y: Math.max(20, openTop - pad - 6),
+          w: 70,
+          h: 3,
+          kind: 'kite'
+        });
+      }
+    }
+
+    // Pickups along path center
+    for (let x = 140; x < length - 180; x += pickupEvery) {
+      const p = pathAt(x);
+      pickups.push({
+        x: x + (r() - 0.5) * 24,
+        y: p.y + (r() - 0.5) * (p.h * 0.25),
+        kind: r() < 0.55 ? 'spark' : 'marigold'
+      });
+    }
+
+    if (checkEvery) {
+      for (let x = checkEvery; x < length - 120; x += checkEvery) checkpoints.push(x);
+    }
+
+    if (windChance > 0) {
+      for (let x = 280; x < length - 240; x += 300) {
+        if (r() < windChance) {
+          winds.push({
+            x,
+            w: 100 + r() * 60,
+            force: (r() < 0.5 ? -1 : 1) * (0.06 + r() * 0.08)
+          });
+        }
+      }
+    }
+
+    return {
+      id, length, startY: path[0].y, path, pathAt,
+      obstacles, pickups, winds, checkpoints, easy, worldH: H
+    };
+  }
+
+  function buildEasy() {
+    const levels = [];
+    for (let i = 1; i <= 12; i++) {
+      levels.push(makeLevel({
+        id: i,
+        seed: 1100 + i * 19,
+        length: 880 + i * 110,
+        gapMin: 210 - Math.min(30, i * 2),
+        gapMax: 270 - Math.min(25, i),
+        obsEvery: 210 - Math.min(30, i * 2),
+        pickupEvery: 130,
+        windChance: 0,
+        checkEvery: 340,
+        easy: true
+      }));
+    }
+    return levels;
+  }
+
+  function buildHard() {
+    const levels = [];
+    for (let i = 1; i <= 18; i++) {
+      levels.push(makeLevel({
+        id: i,
+        seed: 5200 + i * 37,
+        length: 960 + i * 130,
+        gapMin: 175 - Math.min(20, i * 1.0),
+        gapMax: 220 - Math.min(18, i),
+        obsEvery: 175 - Math.min(35, i * 1.2),
+        pickupEvery: 150,
+        windChance: 0.3 + Math.min(0.35, i * 0.015),
+        checkEvery: 0,
+        easy: false
+      }));
+    }
+    return levels;
+  }
+
+  const EASY = buildEasy();
+  const HARD = buildHard();
+
+  return {
+    WORLD_H,
+    EASY_PHYS,
+    HARD_PHYS,
+    easy: EASY,
+    hard: HARD,
+    forProfile(easy) { return easy ? EASY : HARD; },
+    phys(easy) { return easy ? EASY_PHYS : HARD_PHYS; }
+  };
+})();
+
+})();
+/* ==== 71-lantern-solver.js ==== */
+;(function(){
+/* Autoplay / passability solver for Lantern Glide */
+DG.LanternSolver = (() => {
+  function collideCircleRect(cx, cy, r, o) {
+    const nx = DG.clamp(cx, o.x, o.x + o.w);
+    const ny = DG.clamp(cy, o.y, o.y + o.h);
+    const dx = cx - nx, dy = cy - ny;
+    return dx * dx + dy * dy < r * r;
+  }
+
+  function windAt(level, x) {
+    let f = 0;
+    for (const w of level.winds || []) {
+      if (x >= w.x && x <= w.x + w.w) f += w.force;
+    }
+    return f;
+  }
+
+  function hitAny(level, x, y, r) {
+    for (const o of level.obstacles) {
+      if (o.x + o.w < x - 50 || o.x > x + 50) continue;
+      if (collideCircleRect(x, y, r, o)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Hold when below (or about to fall below) the path — canvas y grows downward.
+   * holding = true raises the lantern (negative vy).
+   */
+  function simulate(level, phys, opts) {
+    opts = opts || {};
+    const maxFrames = opts.maxFrames || 30000;
+    const H = level.worldH || 520;
+    let x = 40;
+    let y = level.startY;
+    let vy = 0;
+    let frames = 0;
+    let pickups = 0;
+    const got = new Set();
+    const r = phys.radius * 0.85;
+    let softCooldown = 0;
+    // frames of look-ahead for target
+    const lookF = 18;
+
+    while (x < level.length - 60 && frames < maxFrames) {
+      frames++;
+      const look = level.pathAt(x + phys.scroll * lookF);
+      // Predict where we will be if we keep current vy
+      const predY = y + vy * 10;
+      // If predicted / current is below target, hold to rise
+      const holding = predY > look.y - 6;
+
+      if (holding) vy -= phys.lift;
+      else vy += phys.gravity;
+      vy += windAt(level, x);
+      vy = DG.clamp(vy, -phys.maxVy, phys.maxFall);
+      y += vy;
+      x += phys.scroll;
+      if (softCooldown > 0) softCooldown--;
+
+      if (y < r + 4) { y = r + 4; vy = Math.max(0, vy * 0.2); }
+      if (y > H - r - 4) { y = H - r - 4; vy = Math.min(0, vy * 0.2); }
+
+      if (hitAny(level, x, y, r)) {
+        if (phys.softHit) {
+          if (softCooldown === 0) {
+            x = Math.max(40, x - 25);
+            y = level.pathAt(x).y;
+            vy = 0;
+            softCooldown = 35;
+          }
+        } else {
+          return { ok: false, frames, pickups, reason: 'hit', x, y };
+        }
+      }
+
+      for (let i = 0; i < level.pickups.length; i++) {
+        if (got.has(i)) continue;
+        const p = level.pickups[i];
+        const dx = x - p.x, dy = y - p.y;
+        if (dx * dx + dy * dy < (phys.radius + 14) * (phys.radius + 14)) {
+          got.add(i); pickups++;
+        }
+      }
+    }
+
+    if (x >= level.length - 60) return { ok: true, frames, pickups, x, y };
+    return { ok: false, frames, pickups, reason: 'timeout', x, y };
+  }
+
+  function proveAll(easy) {
+    const levels = DG.LanternLevels.forProfile(easy);
+    const phys = DG.LanternLevels.phys(easy);
+    const results = [];
+    let allOk = true;
+    for (const lv of levels) {
+      let res = simulate(lv, phys);
+      if (!res.ok) res = simulate(lv, phys, { maxFrames: 40000 });
+      if (!res.ok) allOk = false;
+      results.push({ id: lv.id, ok: res.ok, frames: res.frames, reason: res.reason || null });
+    }
+    return { ok: allOk, count: levels.length, results };
+  }
+
+  return { simulate, proveAll, collideCircleRect, windAt };
+})();
+
+})();
+/* ==== 72-lantern.js ==== */
+;(function(){
+/* Lantern Glide — one-touch flyer */
+DG.Lantern = (() => {
+  let stage = null;
+  let canvas = null;
+  let ctx = null;
+  let raf = 0;
+  let holding = false;
+  let state = null; // play state
+  let lastTs = 0;
+
+  function isEasy() { return DG.isEasy(); }
+  function levels() { return DG.LanternLevels.forProfile(isEasy()); }
+  function phys() { return DG.LanternLevels.phys(isEasy()); }
+
+  function open() {
+    cancelAnimationFrame(raf);
+    DG.screen = 'lantern-select';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const p = DG.Save.profile();
+    const easy = isEasy();
+    const list = levels();
+    const prog = p.lantern || { maxCleared: 0, stars: {}, cleared: {} };
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight lantern-screen' + (easy ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.5vw,28px)">🏮 Lantern Glide</div>
+          <div class="sub">${p.name} · ${easy ? 'Calm sky · ∞ lives' : 'Gusty sky · 3 lives'} · ${list.length} levels</div>
+        </div>
+        <button class="btn ghost" id="how">?</button>
+      </div>
+      <div class="level-grid" id="lg"></div>`;
+    el.appendChild(scr);
+    const grid = scr.querySelector('#lg');
+    list.forEach((lv) => {
+      const unlocked = easy || lv.id === 1 || !!prog.cleared[lv.id - 1] || lv.id <= (prog.maxCleared + 1);
+      const stars = prog.stars[lv.id] || 0;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'level-card' + (unlocked ? '' : ' locked') + (easy ? ' p1' : '');
+      card.innerHTML = `<span class="num">${lv.id}</span>
+        <span class="stars">${unlocked && stars ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : (unlocked ? '·' : '🔒')}</span>
+        <span class="meta">${easy ? 'calm' : 'gust'}</span>`;
+      if (unlocked) {
+        DG.bindTap(card, () => { DG.Audio.click(); startLevel(lv.id); });
+      }
+      grid.appendChild(card);
+    });
+    DG.bindTap(scr.querySelector('#back'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.bindTap(scr.querySelector('#how'), () => {
+      DG.Audio.soft();
+      showHow();
+    });
+    DG.UI.startBg();
+  }
+
+  function showHow() {
+    const easy = isEasy();
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>How to glide</h3>
+      <div class="sub" style="text-align:left;line-height:1.45">
+        Hold or tap to rise · release to drift down.<br>
+        Collect ✨ diya sparks and 🌼 marigolds.<br>
+        Steer clear of branches, rooftops and kite strings.<br>
+        Reach glowing Ayodhya at the end!<br>
+        ${easy
+          ? 'Bump only slows you · infinite tries · checkpoints save progress.'
+          : 'Watch for wind gusts · 3 lives · earn ★ stars.'}
+      </div>
+      <button class="btn big" id="ok">Got it</button>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    DG.bindTap(modal.querySelector('#ok'), () => modal.remove());
+  }
+
+  function startLevel(id) {
+    const list = levels();
+    const lv = list.find((l) => l.id === id) || list[0];
+    const ph = phys();
+    DG.screen = 'lantern-play';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const scr = document.createElement('div');
+    scr.className = 'screen lantern-screen lantern-play';
+    scr.innerHTML = `
+      <div class="topbar" style="padding-right:120px">
+        <button class="btn ghost" id="quit">←</button>
+        <div class="sub" id="titleLine">Level ${lv.id}</div>
+        <button class="btn ghost" id="pause">❚❚</button>
+      </div>
+      <div class="lantern-stage" id="stage">
+        <canvas id="lanternCv" width="1180" height="520"></canvas>
+        <div class="lantern-hud">
+          <span id="hudLives"></span>
+          <span id="hudScore"></span>
+          <span id="hudProg"></span>
+        </div>
+        <div class="lantern-hint" id="hint">Hold to rise · release to glide</div>
+      </div>`;
+    el.appendChild(scr);
+    stage = scr.querySelector('#stage');
+    canvas = scr.querySelector('#lanternCv');
+    ctx = canvas.getContext('2d');
+    fitStage();
+
+    state = {
+      level: lv,
+      phys: ph,
+      x: 40,
+      y: lv.startY,
+      vy: 0,
+      camX: 0,
+      lives: ph.infiniteLives ? Infinity : (ph.lives || 3),
+      score: 0,
+      sparks: 0,
+      marigolds: 0,
+      got: new Set(),
+      softCooldown: 0,
+      checkpointIdx: 0,
+      lastCheckpointX: 40,
+      lastCheckpointY: lv.startY,
+      paused: false,
+      won: false,
+      lost: false,
+      t0: DG.now(),
+      ayodhyaLit: 0,
+      hintUntil: DG.now() + 2500,
+      particles: []
+    };
+    holding = false;
+    bindInput();
+    updateHud();
+    DG.bindTap(scr.querySelector('#quit'), () => {
+      DG.Audio.click();
+      stopPlay();
+      open();
+    });
+    DG.bindTap(scr.querySelector('#pause'), () => {
+      if (state.won || state.lost) return;
+      state.paused = !state.paused;
+      if (!state.paused) { lastTs = 0; loop(DG.now()); }
+      else draw();
+    });
+    lastTs = 0;
+    loop(DG.now());
+  }
+
+  function fitStage() {
+    if (!stage || !canvas) return;
+    const rect = stage.getBoundingClientRect();
+    const w = Math.max(320, Math.floor(rect.width));
+    const h = Math.max(200, Math.floor(rect.height));
+    if (canvas.width !== 1180) canvas.width = 1180;
+    // Keep logical 1180x520; CSS scales
+    if (canvas.height !== 520) canvas.height = 520;
+  }
+
+  function bindInput() {
+    const down = (e) => {
+      e.preventDefault();
+      holding = true;
+      try { DG.Audio.unlock(); } catch (_) {}
+      const hint = document.getElementById('hint');
+      if (hint) hint.style.display = 'none';
+    };
+    const up = (e) => {
+      e.preventDefault();
+      holding = false;
+    };
+    stage.addEventListener('pointerdown', down);
+    stage.addEventListener('pointerup', up);
+    stage.addEventListener('pointercancel', up);
+    stage.addEventListener('pointerleave', up);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('keyup', onKeyUp);
+  }
+
+  function unbindInput() {
+    window.removeEventListener('keydown', onKey);
+    window.removeEventListener('keyup', onKeyUp);
+  }
+
+  function onKey(e) {
+    if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); holding = true; }
+  }
+  function onKeyUp(e) {
+    if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); holding = false; }
+  }
+
+  function stopPlay() {
+    cancelAnimationFrame(raf);
+    unbindInput();
+    holding = false;
+    state = null;
+  }
+
+  function updateHud() {
+    if (!state) return;
+    const livesEl = document.getElementById('hudLives');
+    const scoreEl = document.getElementById('hudScore');
+    const progEl = document.getElementById('hudProg');
+    if (livesEl) {
+      livesEl.textContent = state.phys.infiniteLives
+        ? '∞ calm'
+        : ('💛'.repeat(Math.max(0, Math.min(5, state.lives))) + ` ×${state.lives}`);
+    }
+    if (scoreEl) {
+      scoreEl.textContent = isEasy()
+        ? `✨${state.sparks} 🌼${state.marigolds}`
+        : `★ score ${state.score}`;
+    }
+    if (progEl) {
+      const pct = Math.min(100, Math.floor((state.x / state.level.length) * 100));
+      progEl.textContent = `${pct}% → Ayodhya`;
+    }
+  }
+
+  function windForce(x) {
+    let f = 0;
+    for (const w of state.level.winds || []) {
+      if (x >= w.x && x <= w.x + w.w) f += w.force;
+    }
+    return f;
+  }
+
+  function step(dt) {
+    if (!state || state.paused || state.won || state.lost) return;
+    const ph = state.phys;
+    const steps = Math.min(3, Math.max(1, Math.round(dt / 16)));
+    for (let s = 0; s < steps; s++) {
+      if (holding) state.vy -= ph.lift;
+      else state.vy += ph.gravity;
+      state.vy += windForce(state.x);
+      state.vy = DG.clamp(state.vy, -ph.maxVy, ph.maxFall);
+      state.y += state.vy;
+      state.x += ph.scroll;
+      if (state.softCooldown > 0) state.softCooldown--;
+
+      const r = ph.radius;
+      if (state.y < r + 4) { state.y = r + 4; state.vy = Math.max(0, state.vy * 0.35); }
+      if (state.y > 520 - r - 4) { state.y = 520 - r - 4; state.vy = Math.min(0, state.vy * 0.35); }
+
+      // Checkpoints (easy)
+      if (ph.autoCheckpoint && state.level.checkpoints) {
+        while (state.checkpointIdx < state.level.checkpoints.length &&
+               state.x >= state.level.checkpoints[state.checkpointIdx]) {
+          state.lastCheckpointX = state.level.checkpoints[state.checkpointIdx];
+          state.lastCheckpointY = state.y;
+          state.checkpointIdx++;
+          sparkle(state.x, state.y, '#ffe080');
+        }
+      }
+
+      // Collisions
+      let hit = false;
+      for (const o of state.level.obstacles) {
+        if (o.x + o.w < state.x - 50 || o.x > state.x + 50) continue;
+        if (DG.LanternSolver.collideCircleRect(state.x, state.y, r * 0.85, o)) {
+          hit = true; break;
+        }
+      }
+      if (hit) onHit();
+
+      // Pickups
+      state.level.pickups.forEach((p, i) => {
+        if (state.got.has(i)) return;
+        const dx = state.x - p.x, dy = state.y - p.y;
+        if (dx * dx + dy * dy < (r + 16) * (r + 16)) {
+          state.got.add(i);
+          if (p.kind === 'spark') {
+            state.sparks++;
+            state.score += 10;
+            DG.Audio && DG.Audio.soft && DG.Audio.soft();
+          } else {
+            state.marigolds++;
+            state.score += 25;
+            DG.Audio && DG.Audio.click && DG.Audio.click();
+          }
+          sparkle(p.x, p.y, p.kind === 'spark' ? '#ffd060' : '#ff9a20');
+          updateHud();
+        }
+      });
+
+      // Win
+      if (state.x >= state.level.length - 40) {
+        state.won = true;
+        onWin();
+        return;
+      }
+    }
+    state.camX = Math.max(0, state.x - 280);
+    // particles
+    state.particles = state.particles.filter((p) => {
+      p.life -= 1; p.x += p.vx; p.y += p.vy; p.vy += 0.04; return p.life > 0;
+    });
+  }
+
+  function sparkle(x, y, color) {
+    for (let i = 0; i < 8; i++) {
+      state.particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        life: 20 + Math.random() * 15,
+        color
+      });
+    }
+  }
+
+  function onHit() {
+    const ph = state.phys;
+    if (ph.softHit) {
+      if (state.softCooldown === 0) {
+        state.x = Math.max(state.lastCheckpointX, state.x - 40);
+        state.vy *= ph.bumpSlow;
+        state.softCooldown = 45;
+        sparkle(state.x, state.y, '#a0c0ff');
+        DG.Audio && DG.Audio.soft && DG.Audio.soft();
+      }
+      return;
+    }
+    // hard: lose life
+    state.lives -= 1;
+    DG.Audio && DG.Audio.soft && DG.Audio.soft();
+    updateHud();
+    if (state.lives <= 0) {
+      state.lost = true;
+      showResult(false);
+      return;
+    }
+    // respawn near recent progress
+    state.x = Math.max(40, state.x - 120);
+    state.y = state.level.pathAt(state.x).y;
+    state.vy = 0;
+    state.softCooldown = 60;
+  }
+
+  function onWin() {
+    cancelAnimationFrame(raf);
+    const p = DG.Save.profile();
+    if (!p.lantern) p.lantern = { maxCleared: 0, stars: {}, cleared: {} };
+    p.lantern.cleared[state.level.id] = true;
+    p.lantern.maxCleared = Math.max(p.lantern.maxCleared || 0, state.level.id);
+    let stars = 1;
+    if (!isEasy()) {
+      const totalPick = state.level.pickups.length || 1;
+      const ratio = state.got.size / totalPick;
+      if (ratio > 0.45) stars = 2;
+      if (ratio > 0.75 && state.lives >= 2) stars = 3;
+      const prev = p.lantern.stars[state.level.id] || 0;
+      p.lantern.stars[state.level.id] = Math.max(prev, stars);
+    } else {
+      stars = 3;
+      p.lantern.stars[state.level.id] = 3;
+    }
+    DG.Save.addSticker('🏮');
+    DG.Save.save();
+    // Animate Ayodhya lighting then result
+    state.ayodhyaLit = 0;
+    const lightUp = () => {
+      state.ayodhyaLit = Math.min(1, state.ayodhyaLit + 0.04);
+      draw();
+      if (state.ayodhyaLit < 1) requestAnimationFrame(lightUp);
+      else showResult(true, stars);
+    };
+    DG.Audio && DG.Audio.win && DG.Audio.win();
+    lightUp();
+  }
+
+  function showResult(won, stars) {
+    unbindInput();
+    const wrap = document.createElement('div');
+    wrap.className = 'lantern-result';
+    const nextId = state.level.id + 1;
+    const hasNext = levels().some((l) => l.id === nextId);
+    wrap.innerHTML = `
+      <div class="title" style="font-size:28px">${won ? 'Ayodhya shines! 🌆' : 'Lantern rested 🌙'}</div>
+      <div class="quiz-stars">${won ? '★'.repeat(stars || 1) + '☆'.repeat(3 - (stars || 1)) : '· · ·'}</div>
+      <div class="sub">✨ ${state.sparks} sparks · 🌼 ${state.marigolds} marigolds${isEasy() ? '' : ' · score ' + state.score}</div>
+      <div class="row">
+        <button class="btn ghost" id="toSelect">Levels</button>
+        <button class="btn big" id="again">${won ? 'Replay' : 'Try again'}</button>
+        ${won && hasNext ? '<button class="btn big" id="next">Next →</button>' : ''}
+      </div>`;
+    // Clear stage children overlay-style
+    const stageEl = document.getElementById('stage');
+    if (stageEl) {
+      const holder = document.createElement('div');
+      holder.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,4,24,.55);z-index:5';
+      holder.appendChild(wrap);
+      stageEl.appendChild(holder);
+    }
+    DG.bindTap(wrap.querySelector('#toSelect'), () => { stopPlay(); open(); });
+    DG.bindTap(wrap.querySelector('#again'), () => { const id = state.level.id; stopPlay(); startLevel(id); });
+    const nx = wrap.querySelector('#next');
+    if (nx) DG.bindTap(nx, () => { stopPlay(); startLevel(nextId); });
+  }
+
+  function draw() {
+    if (!ctx || !state) return;
+    const W = canvas.width, H = canvas.height;
+    const cam = state.camX;
+    // Night sky
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0a0620');
+    g.addColorStop(0.55, '#1a0a38');
+    g.addColorStop(1, '#2a1040');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars
+    ctx.fillStyle = 'rgba(255,240,200,0.85)';
+    for (let i = 0; i < 60; i++) {
+      const sx = ((i * 97 + 13) * 13 - cam * 0.15) % W;
+      const sy = (i * 53) % (H * 0.7);
+      const tw = 0.5 + 0.5 * Math.sin(DG.now() / 400 + i);
+      ctx.globalAlpha = 0.4 + tw * 0.6;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+
+    // Moon
+    ctx.beginPath();
+    ctx.fillStyle = '#fff4c8';
+    ctx.arc(W - 100, 70, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1a0a38';
+    ctx.beginPath();
+    ctx.arc(W - 88, 62, 24, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Wind zones
+    if (state.phys.wind) {
+      for (const w of state.level.winds) {
+        const wx = w.x - cam;
+        if (wx > W + 40 || wx + w.w < -40) continue;
+        ctx.fillStyle = 'rgba(140,180,255,0.12)';
+        ctx.fillRect(wx, 0, w.w, H);
+        ctx.fillStyle = 'rgba(180,210,255,0.35)';
+        ctx.font = '18px sans-serif';
+        ctx.fillText(w.force > 0 ? '↓ wind' : '↑ wind', wx + 10, 40);
+      }
+    }
+
+    // Obstacles
+    for (const o of state.level.obstacles) {
+      const ox = o.x - cam;
+      if (ox > W + 40 || ox + o.w < -40) continue;
+      drawObstacle(ctx, ox, o);
+    }
+
+    // Pickups
+    state.level.pickups.forEach((p, i) => {
+      if (state.got.has(i)) return;
+      const px = p.x - cam;
+      if (px < -20 || px > W + 20) return;
+      const bob = Math.sin(DG.now() / 250 + i) * 3;
+      ctx.font = '18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.kind === 'spark' ? '✨' : '🌼', px, p.y + bob);
+    });
+
+    // Checkpoints
+    if (state.phys.autoCheckpoint) {
+      for (const cx of state.level.checkpoints) {
+        const x = cx - cam;
+        if (x < -10 || x > W + 10) continue;
+        ctx.strokeStyle = 'rgba(255,220,100,0.35)';
+        ctx.setLineDash([4, 6]);
+        ctx.beginPath();
+        ctx.moveTo(x, 0); ctx.lineTo(x, H);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // Ayodhya skyline at end
+    const endX = state.level.length - cam;
+    drawAyodhya(ctx, endX, H, state.won ? state.ayodhyaLit : Math.max(0, 1 - (state.level.length - state.x) / 400));
+
+    // Particles
+    for (const p of state.particles) {
+      ctx.globalAlpha = Math.min(1, p.life / 20);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x - cam, p.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Lantern (akash kandil)
+    drawLantern(ctx, state.x - cam, state.y, state.phys.radius, holding);
+
+    if (state.paused) {
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#ffe08a';
+      ctx.font = 'bold 36px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Paused', W / 2, H / 2);
+    }
+  }
+
+  function drawObstacle(ctx, ox, o) {
+    if (o.kind === 'kite') {
+      ctx.strokeStyle = '#e8d0a0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox, o.y);
+      ctx.lineTo(ox + 80, o.y + 2);
+      ctx.stroke();
+      ctx.fillStyle = '#ff6a6a';
+      ctx.beginPath();
+      ctx.moveTo(ox + 70, o.y - 10);
+      ctx.lineTo(ox + 90, o.y);
+      ctx.lineTo(ox + 70, o.y + 10);
+      ctx.closePath();
+      ctx.fill();
+      return;
+    }
+    if (o.kind === 'roof') {
+      ctx.fillStyle = '#4a2830';
+      ctx.fillRect(ox, o.y, o.w, o.h);
+      ctx.fillStyle = '#c45a30';
+      if (o.y === 0) {
+        ctx.beginPath();
+        ctx.moveTo(ox - 4, o.h);
+        ctx.lineTo(ox + o.w / 2, o.h + 14);
+        ctx.lineTo(ox + o.w + 4, o.h);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(ox - 4, o.y);
+        ctx.lineTo(ox + o.w / 2, o.y - 14);
+        ctx.lineTo(ox + o.w + 4, o.y);
+        ctx.fill();
+      }
+      // tiny window glow
+      ctx.fillStyle = '#ffcc66';
+      ctx.globalAlpha = 0.7;
+      ctx.fillRect(ox + o.w * 0.3, o.y === 0 ? o.h - 24 : o.y + 10, 10, 12);
+      ctx.globalAlpha = 1;
+      return;
+    }
+    // branch
+    ctx.strokeStyle = '#6a4020';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    if (o.y === 0) {
+      ctx.moveTo(ox + o.w / 2, 0);
+      ctx.quadraticCurveTo(ox + o.w, o.h * 0.5, ox + 4, o.h);
+    } else {
+      ctx.moveTo(ox + o.w / 2, o.y + o.h);
+      ctx.quadraticCurveTo(ox - 4, o.y + o.h * 0.5, ox + o.w - 4, o.y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = '#2a6030';
+    ctx.beginPath();
+    ctx.arc(ox + 8, o.y === 0 ? o.h - 8 : o.y + 8, 10, 0, Math.PI * 2);
+    ctx.arc(ox + o.w - 6, o.y === 0 ? o.h - 18 : o.y + 18, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawAyodhya(ctx, endX, H, lit) {
+    const base = endX - 40;
+    if (base > 1180 + 200 || base < -400) return;
+    const buildings = [
+      { x: 0, w: 40, h: 90 }, { x: 50, w: 55, h: 130 }, { x: 110, w: 35, h: 80 },
+      { x: 155, w: 70, h: 160 }, { x: 235, w: 45, h: 100 }, { x: 290, w: 60, h: 140 }
+    ];
+    buildings.forEach((b, i) => {
+      const bx = base + b.x;
+      const by = H - b.h;
+      ctx.fillStyle = '#1a1028';
+      ctx.fillRect(bx, by, b.w, b.h);
+      // dome on tall ones
+      if (b.h > 120) {
+        ctx.fillStyle = '#2a1838';
+        ctx.beginPath();
+        ctx.arc(bx + b.w / 2, by, b.w * 0.35, Math.PI, 0);
+        ctx.fill();
+      }
+      const windows = 3 + (i % 3);
+      for (let wy = 0; wy < windows; wy++) {
+        for (let wx = 0; wx < 2; wx++) {
+          const glow = lit * (0.5 + 0.5 * Math.sin(DG.now() / 300 + i + wy));
+          ctx.fillStyle = `rgba(255,${180 + glow * 60|0},80,${0.15 + lit * 0.85})`;
+          ctx.fillRect(bx + 8 + wx * 16, by + 16 + wy * 22, 10, 12);
+        }
+      }
+    });
+    // river reflection strip
+    ctx.fillStyle = `rgba(255,180,80,${0.05 + lit * 0.2})`;
+    ctx.fillRect(base - 20, H - 18, 360, 18);
+    if (lit > 0.3) {
+      ctx.fillStyle = '#ffe08a';
+      ctx.font = 'bold 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.globalAlpha = lit;
+      ctx.fillText('Ayodhya', base + 160, H - 28);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawLantern(ctx, x, y, r, glow) {
+    // glow
+    const grd = ctx.createRadialGradient(x, y, 4, x, y, r * 2.2);
+    grd.addColorStop(0, 'rgba(255,200,80,0.55)');
+    grd.addColorStop(1, 'rgba(255,140,40,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    // body
+    ctx.fillStyle = glow ? '#ffb040' : '#e89030';
+    ctx.beginPath();
+    ctx.ellipse(x, y, r * 0.7, r, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#a05010';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // top cap
+    ctx.fillStyle = '#6a3010';
+    ctx.fillRect(x - r * 0.35, y - r - 4, r * 0.7, 8);
+    // flame
+    ctx.fillStyle = '#fff0a0';
+    ctx.beginPath();
+    ctx.ellipse(x, y - 2, 4, 7 + (glow ? 3 : 0), 0, 0, Math.PI * 2);
+    ctx.fill();
+    // tassels
+    ctx.strokeStyle = '#c06020';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - 6, y + r);
+    ctx.lineTo(x - 8, y + r + 14);
+    ctx.moveTo(x + 6, y + r);
+    ctx.lineTo(x + 8, y + r + 14);
+    ctx.stroke();
+  }
+
+  function loop(ts) {
+    if (!state) return;
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min(50, ts - lastTs);
+    lastTs = ts;
+    if (!state.paused && !state.won && !state.lost) step(dt);
+    draw();
+    updateHud();
+    if (state && !state.won && !state.lost) raf = requestAnimationFrame(loop);
+  }
+
+  // --- test / autoplay hook ---
+  function autoplayLevel(id, easy) {
+    const list = DG.LanternLevels.forProfile(easy);
+    const lv = list.find((l) => l.id === id) || list[0];
+    const ph = DG.LanternLevels.phys(easy);
+    return DG.LanternSolver.simulate(lv, ph, { maxFrames: 30000 });
+  }
+
+  function prove() {
+    return {
+      easy: DG.LanternSolver.proveAll(true),
+      hard: DG.LanternSolver.proveAll(false)
+    };
+  }
+
+  return { open, startLevel, stopPlay, autoplayLevel, prove, getState: () => state };
+})();
+
+})();
+/* ==== 80-kandil-orders.js ==== */
+;(function(){
+/* Kandil Craft — order challenge cards (P2) */
+DG.KandilOrders = (() => {
+  const C = {
+    red: '#e23a3a', saffron: '#f08a18', gold: '#f0c040', green: '#2e9a4a',
+    pink: '#e85a9a', purple: '#7a3cb8', teal: '#2a9a9a', cream: '#fff0c8',
+    blue: '#3a6ad8', maroon: '#8a2030'
+  };
+  const P = ['solid', 'stripes', 'dots', 'diamonds', 'zigzag'];
+
+  function design(partial) {
+    const base = {
+      shape: 'star',
+      panels: [],
+      tassel: 'gold',
+      sequins: true,
+      cutout: 'diamond',
+      glow: '#ffb040'
+    };
+    return Object.assign(base, partial);
+  }
+
+  function panels(n, colors, pattern) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      out.push({ color: colors[i % colors.length], pattern: pattern || 'solid' });
+    }
+    return out;
+  }
+
+  // panel counts by shape
+  const N = { star: 5, round: 4, hex: 6, tube: 4, diamond: 4 };
+
+  const ORDERS = [
+    { id: 1, name: 'Aunty Meera', blurb: 'Warm saffron star',
+      target: design({ shape: 'star', panels: panels(5, [C.saffron, C.gold], 'solid'), tassel: 'gold', sequins: true, cutout: 'diamond', glow: '#ffb040' }) },
+    { id: 2, name: 'Uncle Raj', blurb: 'Green hex for the porch',
+      target: design({ shape: 'hex', panels: panels(6, [C.green, C.cream], 'stripes'), tassel: 'green', sequins: false, cutout: 'none', glow: '#a0ff80' }) },
+    { id: 3, name: 'Neighbor Pia', blurb: 'Pink round with dots',
+      target: design({ shape: 'round', panels: panels(4, [C.pink, C.cream], 'dots'), tassel: 'pink', sequins: true, cutout: 'flower', glow: '#ff80c0' }) },
+    { id: 4, name: 'Shopkeeper Dev', blurb: 'Classic red tube',
+      target: design({ shape: 'tube', panels: panels(4, [C.red, C.gold], 'solid'), tassel: 'red', sequins: true, cutout: 'diamond', glow: '#ff6040' }) },
+    { id: 5, name: 'Cousin Leela', blurb: 'Purple diamond zigzags',
+      target: design({ shape: 'diamond', panels: panels(4, [C.purple, C.gold], 'zigzag'), tassel: 'purple', sequins: true, cutout: 'paisley', glow: '#c080ff' }) },
+    { id: 6, name: 'Grandma Kamala', blurb: 'Cream star, soft glow',
+      target: design({ shape: 'star', panels: panels(5, [C.cream, C.gold], 'solid'), tassel: 'gold', sequins: false, cutout: 'flower', glow: '#ffe0a0' }) },
+    { id: 7, name: 'Friend Kabir', blurb: 'Teal hex stripes',
+      target: design({ shape: 'hex', panels: panels(6, [C.teal, C.cream], 'stripes'), tassel: 'teal', sequins: true, cutout: 'diamond', glow: '#60ffe0' }) },
+    { id: 8, name: 'Teacher Anita', blurb: 'Maroon round solid',
+      target: design({ shape: 'round', panels: panels(4, [C.maroon, C.gold], 'solid'), tassel: 'red', sequins: true, cutout: 'none', glow: '#ff8060' }) },
+    { id: 9, name: 'Chef Ravi', blurb: 'Saffron tube diamonds',
+      target: design({ shape: 'tube', panels: panels(4, [C.saffron, C.red], 'diamonds'), tassel: 'saffron', sequins: false, cutout: 'diamond', glow: '#ffaa30' }) },
+    { id: 10, name: 'Didi Sana', blurb: 'Blue star with sequins',
+      target: design({ shape: 'star', panels: panels(5, [C.blue, C.cream], 'dots'), tassel: 'blue', sequins: true, cutout: 'paisley', glow: '#80c0ff' }) },
+    { id: 11, name: 'Bhai Arjun', blurb: 'Gold hex all matching',
+      target: design({ shape: 'hex', panels: panels(6, [C.gold], 'solid'), tassel: 'gold', sequins: true, cutout: 'flower', glow: '#ffe060' }) },
+    { id: 12, name: 'Festival Stall', blurb: 'Rainbow diamond!',
+      target: design({ shape: 'diamond', panels: [
+        { color: C.red, pattern: 'solid' }, { color: C.saffron, pattern: 'solid' },
+        { color: C.gold, pattern: 'solid' }, { color: C.green, pattern: 'solid' }
+      ], tassel: 'gold', sequins: true, cutout: 'diamond', glow: '#ffd060' }) },
+    { id: 13, name: 'Night Market', blurb: 'Purple tube zigzag',
+      target: design({ shape: 'tube', panels: panels(4, [C.purple, C.pink], 'zigzag'), tassel: 'purple', sequins: true, cutout: 'none', glow: '#e080ff' }) },
+    { id: 14, name: 'Temple Gate', blurb: 'Deep red star stripes',
+      target: design({ shape: 'star', panels: panels(5, [C.red, C.maroon], 'stripes'), tassel: 'gold', sequins: false, cutout: 'paisley', glow: '#ff5030' }) }
+  ];
+
+  function scoreMatch(made, target) {
+    let pts = 0, max = 0;
+    max += 2; if (made.shape === target.shape) pts += 2;
+    max += 1; if (made.tassel === target.tassel) pts += 1;
+    max += 1; if (!!made.sequins === !!target.sequins) pts += 1;
+    max += 1; if (made.cutout === target.cutout) pts += 1;
+    max += 1; if (glowClose(made.glow, target.glow)) pts += 1;
+    const n = Math.min(made.panels.length, target.panels.length);
+    for (let i = 0; i < target.panels.length; i++) {
+      max += 2;
+      if (i < n) {
+        if (colorClose(made.panels[i].color, target.panels[i].color)) pts += 1;
+        if ((made.panels[i].pattern || 'solid') === (target.panels[i].pattern || 'solid')) pts += 1;
+      }
+    }
+    const ratio = max ? pts / max : 0;
+    let stars = 0;
+    if (ratio >= 0.45) stars = 1;
+    if (ratio >= 0.7) stars = 2;
+    if (ratio >= 0.9) stars = 3;
+    return { pts, max, ratio, stars };
+  }
+
+  function colorClose(a, b) {
+    if (!a || !b) return false;
+    if (a.toLowerCase() === b.toLowerCase()) return true;
+    // near match by channel
+    const pa = hex(a), pb = hex(b);
+    if (!pa || !pb) return false;
+    const d = Math.abs(pa.r - pb.r) + Math.abs(pa.g - pb.g) + Math.abs(pa.b - pb.b);
+    return d < 40;
+  }
+  function glowClose(a, b) { return colorClose(a, b); }
+  function hex(h) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(h || '');
+    if (!m) return null;
+    const n = parseInt(m[1], 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  return { ORDERS, N, C, P, scoreMatch, design, panels };
+})();
+
+})();
+/* ==== 81-kandil.js ==== */
+;(function(){
+/* Kandil Craft — creative lantern designer */
+DG.Kandil = (() => {
+  const SHAPES = [
+    { id: 'star', name: 'Star', emoji: '⭐', panels: 5 },
+    { id: 'round', name: 'Round', emoji: '🟠', panels: 4 },
+    { id: 'hex', name: 'Hex', emoji: '⬡', panels: 6 },
+    { id: 'tube', name: 'Tube', emoji: '🏮', panels: 4 },
+    { id: 'diamond', name: 'Diamond', emoji: '◆', panels: 4 }
+  ];
+  const COLORS = [
+    { id: 'red', hex: '#e23a3a', name: 'Red' },
+    { id: 'saffron', hex: '#f08a18', name: 'Saffron' },
+    { id: 'gold', hex: '#f0c040', name: 'Gold' },
+    { id: 'green', hex: '#2e9a4a', name: 'Green' },
+    { id: 'pink', hex: '#e85a9a', name: 'Pink' },
+    { id: 'purple', hex: '#7a3cb8', name: 'Purple' },
+    { id: 'teal', hex: '#2a9a9a', name: 'Teal' },
+    { id: 'cream', hex: '#fff0c8', name: 'Cream' },
+    { id: 'blue', hex: '#3a6ad8', name: 'Blue' },
+    { id: 'maroon', hex: '#8a2030', name: 'Maroon' }
+  ];
+  const PATTERNS = [
+    { id: 'solid', name: 'Solid' },
+    { id: 'stripes', name: 'Stripes' },
+    { id: 'dots', name: 'Dots' },
+    { id: 'diamonds', name: 'Diamonds' },
+    { id: 'zigzag', name: 'Zigzag' }
+  ];
+  const TASSELS = [
+    { id: 'gold', hex: '#f0c040' }, { id: 'red', hex: '#e23a3a' },
+    { id: 'green', hex: '#2e9a4a' }, { id: 'pink', hex: '#e85a9a' },
+    { id: 'purple', hex: '#7a3cb8' }, { id: 'teal', hex: '#2a9a9a' },
+    { id: 'saffron', hex: '#f08a18' }, { id: 'blue', hex: '#3a6ad8' },
+    { id: 'none', hex: 'transparent' }
+  ];
+  const CUTOUTS = [
+    { id: 'none', name: 'None' }, { id: 'diamond', name: '◇' },
+    { id: 'flower', name: '❀' }, { id: 'paisley', name: 'S' }
+  ];
+  const GLOWS = ['#ffb040', '#ff6040', '#ffe0a0', '#a0ff80', '#ff80c0', '#80c0ff', '#c080ff', '#60ffe0', '#ffe060'];
+
+  let design = null;
+  let selectedPanel = 0;
+  let lit = false;
+  let mode = 'craft'; // craft | gallery | orders | order-play
+  let orderId = null;
+  let canvas = null, ctx = null, raf = 0;
+
+  function isEasy() { return DG.isEasy(); }
+
+  function defaultDesign(shapeId) {
+    const sh = SHAPES.find((s) => s.id === shapeId) || SHAPES[0];
+    const panels = [];
+    for (let i = 0; i < sh.panels; i++) {
+      panels.push({ color: COLORS[i % COLORS.length].hex, pattern: 'solid' });
+    }
+    return {
+      shape: sh.id,
+      panels,
+      tassel: 'gold',
+      sequins: true,
+      cutout: 'diamond',
+      glow: GLOWS[0]
+    };
+  }
+
+  function ensurePanels() {
+    const sh = SHAPES.find((s) => s.id === design.shape) || SHAPES[0];
+    while (design.panels.length < sh.panels) {
+      design.panels.push({ color: COLORS[design.panels.length % COLORS.length].hex, pattern: 'solid' });
+    }
+    design.panels = design.panels.slice(0, sh.panels);
+    if (selectedPanel >= design.panels.length) selectedPanel = 0;
+  }
+
+  function open() {
+    cancelAnimationFrame(raf);
+    mode = 'craft';
+    orderId = null;
+    lit = false;
+    design = defaultDesign('star');
+    selectedPanel = 0;
+    renderShell();
+  }
+
+  function renderShell() {
+    DG.screen = mode === 'gallery' ? 'kandil-gallery'
+      : mode === 'orders' ? 'kandil-orders'
+      : mode === 'order-play' ? 'kandil-order'
+      : 'kandil-craft';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const easy = isEasy();
+    const p = DG.Save.profile();
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight kandil-screen' + (easy ? ' p1-mode' : '');
+
+    if (mode === 'gallery') {
+      renderGallery(scr, p);
+    } else if (mode === 'orders') {
+      renderOrdersList(scr, p);
+    } else {
+      renderCraft(scr, p, easy);
+    }
+    el.appendChild(scr);
+    wireChrome(scr);
+    if (mode === 'craft' || mode === 'order-play') {
+      canvas = scr.querySelector('#kandilCv');
+      if (canvas) {
+        ctx = canvas.getContext('2d');
+        loop();
+      }
+    } else {
+      DG.UI.startBg();
+    }
+  }
+
+  function renderCraft(scr, p, easy) {
+    const order = orderId ? DG.KandilOrders.ORDERS.find((o) => o.id === orderId) : null;
+    const title = order ? `Order: ${order.name}` : '🎨 Kandil Craft';
+    const sub = order ? order.blurb : (easy ? 'Big taps · Surprise me!' : 'Patterns · Symmetry · Glow');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">${order ? '← Orders' : '← Hub'}</button>
+        <div>
+          <div class="title" style="font-size:clamp(16px,3.2vw,26px)">${title}</div>
+          <div class="sub">${p.name} · ${sub}</div>
+        </div>
+        <div class="row" style="gap:6px">
+          ${!easy && !order ? '<button class="btn ghost" id="btnOrders">📋 Orders</button>' : ''}
+          <button class="btn ghost" id="btnGallery">🏘️ Street</button>
+        </div>
+      </div>
+      <div class="kandil-layout">
+        <div class="kandil-preview-wrap">
+          <canvas id="kandilCv" width="420" height="460" aria-label="Lantern preview"></canvas>
+          ${order ? '<div class="kandil-target" id="targetCard"></div>' : ''}
+          <div class="row kandil-preview-actions">
+            <button class="btn ${lit ? '' : 'ghost'}" id="btnLight">${lit ? '💡 Lit' : '🌙 Light'}</button>
+            <button class="btn big" id="btnHang">Hang it up 🏘️</button>
+            ${order ? '<button class="btn big" id="btnCheck">Check order ★</button>' : ''}
+          </div>
+        </div>
+        <div class="kandil-tools" id="tools"></div>
+      </div>`;
+    fillTools(scr.querySelector('#tools'), easy, !!order);
+    if (order) drawTargetCard(scr.querySelector('#targetCard'), order);
+  }
+
+  function fillTools(box, easy, inOrder) {
+    box.innerHTML = '';
+    // Shapes
+    const shapeRow = section(box, 'Shape');
+    SHAPES.forEach((s) => {
+      const b = toolBtn(`${s.emoji}<span class="tname">${s.name}</span>`, design.shape === s.id, easy);
+      DG.bindTap(b, () => {
+        DG.Audio.click();
+        design.shape = s.id;
+        ensurePanels();
+        fillTools(box, easy, inOrder);
+      });
+      shapeRow.appendChild(b);
+    });
+
+    // Colors (big for P1)
+    const colorRow = section(box, easy ? 'Color (tap a panel, then a swatch)' : 'Panel color');
+    COLORS.forEach((c) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch' + (easy ? ' big' : '');
+      b.style.background = c.hex;
+      b.title = c.name;
+      b.setAttribute('aria-label', c.name);
+      DG.bindTap(b, () => {
+        DG.Audio.soft();
+        design.panels[selectedPanel].color = c.hex;
+        if (easy) {
+          // P1: also paint all if holding? simple: paint selected; double-apply all similar via surprise
+        }
+      });
+      colorRow.appendChild(b);
+    });
+
+    // Patterns (P2) or simplified for P1
+    if (!easy) {
+      const patRow = section(box, 'Pattern');
+      PATTERNS.forEach((pt) => {
+        const b = toolBtn(pt.name, design.panels[selectedPanel].pattern === pt.id, false);
+        DG.bindTap(b, () => {
+          DG.Audio.click();
+          design.panels[selectedPanel].pattern = pt.id;
+          fillTools(box, easy, inOrder);
+        });
+        patRow.appendChild(b);
+      });
+      const symRow = section(box, 'Symmetry');
+      const allBtn = toolBtn('All same', false, false);
+      DG.bindTap(allBtn, () => {
+        DG.Audio.click();
+        const src = design.panels[selectedPanel];
+        design.panels.forEach((p) => { p.color = src.color; p.pattern = src.pattern; });
+        DG.toast('All panels match!');
+      });
+      symRow.appendChild(allBtn);
+      const mirBtn = toolBtn('Mirror', false, false);
+      DG.bindTap(mirBtn, () => {
+        DG.Audio.click();
+        const n = design.panels.length;
+        for (let i = 0; i < Math.floor(n / 2); i++) {
+          const j = n - 1 - i;
+          design.panels[j] = { color: design.panels[i].color, pattern: design.panels[i].pattern };
+        }
+        DG.toast('Mirrored!');
+      });
+      symRow.appendChild(mirBtn);
+    } else {
+      const patRow = section(box, 'Look');
+      ['solid', 'dots', 'stripes'].forEach((pid) => {
+        const pt = PATTERNS.find((x) => x.id === pid);
+        const b = toolBtn(pt.name, design.panels[selectedPanel].pattern === pid, true);
+        DG.bindTap(b, () => {
+          DG.Audio.click();
+          design.panels.forEach((p) => { p.pattern = pid; });
+          fillTools(box, easy, inOrder);
+        });
+        patRow.appendChild(b);
+      });
+    }
+
+    // Panel picker
+    const panRow = section(box, `Panel ${selectedPanel + 1}/${design.panels.length}`);
+    design.panels.forEach((pn, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'panel-chip' + (i === selectedPanel ? ' on' : '') + (easy ? ' big' : '');
+      b.style.background = pn.color;
+      b.textContent = String(i + 1);
+      DG.bindTap(b, () => {
+        DG.Audio.click();
+        selectedPanel = i;
+        fillTools(box, easy, inOrder);
+      });
+      panRow.appendChild(b);
+    });
+
+    // Tassels
+    const tasRow = section(box, 'Tassels');
+    TASSELS.forEach((t) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch' + (easy ? ' big' : '') + (design.tassel === t.id ? ' on' : '');
+      b.style.background = t.id === 'none' ? '#333' : t.hex;
+      b.title = t.id;
+      if (t.id === 'none') b.textContent = '∅';
+      DG.bindTap(b, () => { DG.Audio.soft(); design.tassel = t.id; fillTools(box, easy, inOrder); });
+      tasRow.appendChild(b);
+    });
+
+    // Sequins + cutout + glow
+    const extra = section(box, 'Sparkle & glow');
+    const seq = toolBtn(design.sequins ? '✨ Sequins on' : 'Sequins off', design.sequins, easy);
+    DG.bindTap(seq, () => { DG.Audio.click(); design.sequins = !design.sequins; fillTools(box, easy, inOrder); });
+    extra.appendChild(seq);
+    CUTOUTS.forEach((c) => {
+      const b = toolBtn(c.name, design.cutout === c.id, easy);
+      DG.bindTap(b, () => { DG.Audio.click(); design.cutout = c.id; fillTools(box, easy, inOrder); });
+      extra.appendChild(b);
+    });
+    const glowRow = section(box, 'Glow');
+    GLOWS.forEach((g) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch' + (easy ? ' big' : '') + (design.glow === g ? ' on' : '');
+      b.style.background = g;
+      DG.bindTap(b, () => { DG.Audio.soft(); design.glow = g; fillTools(box, easy, inOrder); });
+      glowRow.appendChild(b);
+    });
+
+    if (easy) {
+      const sur = document.createElement('button');
+      sur.type = 'button';
+      sur.className = 'btn big surprise';
+      sur.textContent = '🎲 Surprise me!';
+      DG.bindTap(sur, () => { DG.Audio.win(); surprise(); fillTools(box, easy, inOrder); });
+      box.appendChild(sur);
+    }
+  }
+
+  function section(parent, title) {
+    const wrap = document.createElement('div');
+    wrap.className = 'tool-section';
+    wrap.innerHTML = `<div class="tool-label">${title}</div><div class="tool-row"></div>`;
+    parent.appendChild(wrap);
+    return wrap.querySelector('.tool-row');
+  }
+
+  function toolBtn(label, on, big) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tool-btn' + (on ? ' on' : '') + (big ? ' p1' : '');
+    b.innerHTML = label;
+    return b;
+  }
+
+  function surprise() {
+    design.shape = DG.pick(SHAPES).id;
+    ensurePanels();
+    design.panels.forEach((p) => {
+      p.color = DG.pick(COLORS).hex;
+      p.pattern = DG.pick(['solid', 'dots', 'stripes']);
+    });
+    design.tassel = DG.pick(TASSELS.filter((t) => t.id !== 'none')).id;
+    design.sequins = Math.random() > 0.3;
+    design.cutout = DG.pick(CUTOUTS).id;
+    design.glow = DG.pick(GLOWS);
+    lit = true;
+  }
+
+  function wireChrome(scr) {
+    const back = scr.querySelector('#back');
+    if (back) DG.bindTap(back, () => {
+      DG.Audio.click();
+      cancelAnimationFrame(raf);
+      if (mode === 'order-play') { mode = 'orders'; orderId = null; renderShell(); }
+      else if (mode === 'gallery' || mode === 'orders') { mode = 'craft'; renderShell(); }
+      else DG.UI.showHub();
+    });
+    const gal = scr.querySelector('#btnGallery');
+    if (gal) DG.bindTap(gal, () => { DG.Audio.click(); mode = 'gallery'; cancelAnimationFrame(raf); renderShell(); });
+    const ord = scr.querySelector('#btnOrders');
+    if (ord) DG.bindTap(ord, () => { DG.Audio.click(); mode = 'orders'; cancelAnimationFrame(raf); renderShell(); });
+    const light = scr.querySelector('#btnLight');
+    if (light) DG.bindTap(light, () => {
+      DG.Audio.click();
+      lit = !lit;
+      light.textContent = lit ? '💡 Lit' : '🌙 Light';
+      light.className = 'btn' + (lit ? '' : ' ghost');
+    });
+    const hang = scr.querySelector('#btnHang');
+    if (hang) DG.bindTap(hang, () => {
+      DG.Audio.save();
+      DG.Save.hangLantern(cloneDesign(design));
+      DG.toast('Hung on the street! 🏘️');
+    });
+    const check = scr.querySelector('#btnCheck');
+    if (check) DG.bindTap(check, () => checkOrder());
+  }
+
+  function cloneDesign(d) {
+    return {
+      shape: d.shape,
+      panels: d.panels.map((p) => ({ color: p.color, pattern: p.pattern })),
+      tassel: d.tassel,
+      sequins: !!d.sequins,
+      cutout: d.cutout,
+      glow: d.glow
+    };
+  }
+
+  function checkOrder() {
+    const order = DG.KandilOrders.ORDERS.find((o) => o.id === orderId);
+    if (!order) return;
+    const result = DG.KandilOrders.scoreMatch(design, order.target);
+    const p = DG.Save.profile();
+    const prev = p.kandil.orderStars[order.id] || 0;
+    if (result.stars > prev) p.kandil.orderStars[order.id] = result.stars;
+    if (result.stars >= 1) p.kandil.orders[order.id] = true;
+    DG.Save.addSticker('🎨');
+    DG.Save.save();
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>${result.stars ? 'Order delivered!' : 'Keep crafting…'}</h3>
+      <div class="quiz-stars">${'★'.repeat(result.stars)}${'☆'.repeat(3 - result.stars)}</div>
+      <div class="sub">${Math.round(result.ratio * 100)}% match for ${order.name}</div>
+      <div class="row">
+        <button class="btn ghost" id="stay">Keep editing</button>
+        <button class="btn big" id="done">Orders</button>
+      </div>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    if (result.stars) DG.Audio.win(); else DG.Audio.soft();
+    DG.bindTap(modal.querySelector('#stay'), () => modal.remove());
+    DG.bindTap(modal.querySelector('#done'), () => { modal.remove(); mode = 'orders'; orderId = null; cancelAnimationFrame(raf); renderShell(); });
+  }
+
+  function renderOrdersList(scr, p) {
+    const list = DG.KandilOrders.ORDERS;
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">← Craft</button>
+        <div>
+          <div class="title" style="font-size:clamp(16px,3.2vw,26px)">📋 Order challenges</div>
+          <div class="sub">Match the picture card · ${list.length} orders</div>
+        </div>
+        <span></span>
+      </div>
+      <div class="level-grid" id="og"></div>`;
+    const grid = scr.querySelector('#og');
+    list.forEach((o) => {
+      const stars = p.kandil.orderStars[o.id] || 0;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'level-card order-card';
+      card.innerHTML = `<span class="num">${o.id}</span>
+        <span class="meta">${o.name}</span>
+        <span class="stars">${stars ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : '·'}</span>`;
+      DG.bindTap(card, () => {
+        DG.Audio.click();
+        orderId = o.id;
+        mode = 'order-play';
+        design = cloneDesign(o.target);
+        // start from a blankish so they recreate — actually start random for challenge
+        design = defaultDesign(o.target.shape);
+        // leave shape matching so they focus on colors? Better: reset to plain of same panel count
+        design.panels.forEach((pn) => { pn.color = '#fff0c8'; pn.pattern = 'solid'; });
+        design.tassel = 'none';
+        design.sequins = false;
+        design.cutout = 'none';
+        design.glow = '#ffb040';
+        lit = false;
+        selectedPanel = 0;
+        renderShell();
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  function drawTargetCard(el, order) {
+    if (!el) return;
+    const cv = document.createElement('canvas');
+    cv.width = 120; cv.height = 140;
+    cv.className = 'target-cv';
+    el.innerHTML = `<div class="sub">Goal</div>`;
+    el.appendChild(cv);
+    drawLantern(cv.getContext('2d'), 60, 70, 0.45, order.target, true);
+  }
+
+  function renderGallery(scr, p) {
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">← Craft</button>
+        <div>
+          <div class="title" style="font-size:clamp(16px,3.2vw,26px)">🏘️ Lantern street</div>
+          <div class="sub">${p.gallery.length} hung · ${p.name}</div>
+        </div>
+        <button class="btn ghost" id="btnCraft">🎨 New</button>
+      </div>
+      <div class="street-wrap">
+        <canvas id="streetCv" width="1100" height="420"></canvas>
+      </div>
+      <div class="sub">${p.gallery.length ? 'Your kandils glow along the balcony' : 'Hang a lantern from Craft to fill the street!'}</div>`;
+    DG.bindTap(scr.querySelector('#btnCraft'), () => { DG.Audio.click(); mode = 'craft'; renderShell(); });
+    const cv = scr.querySelector('#streetCv');
+    drawStreet(cv.getContext('2d'), cv.width, cv.height, p.gallery);
+  }
+
+  function drawStreet(ctx, W, H, gallery) {
+    // night balcony
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0a0620');
+    g.addColorStop(1, '#1a0a38');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    // stars
+    ctx.fillStyle = 'rgba(255,240,200,0.8)';
+    for (let i = 0; i < 40; i++) {
+      ctx.fillRect((i * 97) % W, (i * 41) % (H * 0.45), 2, 2);
+    }
+    // balcony rail
+    ctx.fillStyle = '#2a1830';
+    ctx.fillRect(0, H - 70, W, 70);
+    ctx.strokeStyle = '#c4a060';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, H - 70); ctx.lineTo(W, H - 70); ctx.stroke();
+    for (let x = 20; x < W; x += 40) {
+      ctx.beginPath();
+      ctx.moveTo(x, H - 70); ctx.lineTo(x, H - 10); ctx.stroke();
+    }
+    const items = gallery.slice(-10);
+    if (!items.length) {
+      ctx.fillStyle = '#ffe08a';
+      ctx.font = '18px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Empty street — hang your first kandil!', W / 2, H / 2);
+      return;
+    }
+    const spacing = W / (items.length + 1);
+    items.forEach((d, i) => {
+      const x = spacing * (i + 1);
+      const y = H - 160;
+      // string
+      ctx.strokeStyle = '#aaa';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, 40); ctx.lineTo(x, y - 50); ctx.stroke();
+      drawLantern(ctx, x, y, 0.55, d, true);
+    });
+  }
+
+  /* ---- lantern drawing ---- */
+  function drawLantern(ctx, cx, cy, scale, d, forceLit) {
+    const isLit = forceLit || lit;
+    const glow = d.glow || '#ffb040';
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(scale, scale);
+
+    if (isLit) {
+      ctx.fillStyle = hexAlpha(glow, 0.45);
+      ctx.beginPath();
+      ctx.arc(0, 10, 110, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const panels = d.panels || [];
+    const shape = d.shape || 'star';
+
+    if (shape === 'star') drawStar(ctx, panels, d, isLit);
+    else if (shape === 'round') drawRound(ctx, panels, d, isLit);
+    else if (shape === 'hex') drawHex(ctx, panels, d, isLit);
+    else if (shape === 'tube') drawTube(ctx, panels, d, isLit);
+    else drawDiamond(ctx, panels, d, isLit);
+
+    // cap
+    ctx.fillStyle = '#5a3010';
+    ctx.fillRect(-18, -78, 36, 10);
+    ctx.beginPath();
+    ctx.moveTo(0, -95); ctx.lineTo(-8, -78); ctx.lineTo(8, -78); ctx.fill();
+
+    // tassels
+    if (d.tassel && d.tassel !== 'none') {
+      const th = (TASSELS.find((t) => t.id === d.tassel) || TASSELS[0]).hex;
+      ctx.strokeStyle = th;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 10, 78);
+        ctx.quadraticCurveTo(i * 12, 100, i * 8, 118);
+        ctx.stroke();
+      }
+    }
+
+    // sequins
+    if (d.sequins) {
+      ctx.fillStyle = '#fff8d0';
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const rr = 28 + (i % 3) * 12;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * rr, Math.sin(a) * rr * 0.9 + 5, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function hexAlpha(hex, a) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+    if (!m) return `rgba(255,180,60,${a})`;
+    const n = parseInt(m[1], 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  }
+
+  function fillPattern(ctx, pathFn, panel, cutout) {
+    ctx.save();
+    pathFn();
+    ctx.clip();
+    ctx.fillStyle = panel.color;
+    ctx.fillRect(-120, -120, 240, 240);
+    const pat = panel.pattern || 'solid';
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    if (pat === 'stripes') {
+      ctx.lineWidth = 6;
+      for (let x = -100; x < 100; x += 14) {
+        ctx.beginPath(); ctx.moveTo(x, -100); ctx.lineTo(x + 40, 100); ctx.stroke();
+      }
+    } else if (pat === 'dots') {
+      for (let y = -80; y < 80; y += 16) {
+        for (let x = -80; x < 80; x += 16) {
+          ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    } else if (pat === 'diamonds') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      for (let y = -70; y < 70; y += 22) {
+        for (let x = -70; x < 70; x += 22) {
+          ctx.beginPath();
+          ctx.moveTo(x, y - 6); ctx.lineTo(x + 6, y); ctx.lineTo(x, y + 6); ctx.lineTo(x - 6, y);
+          ctx.closePath(); ctx.stroke();
+        }
+      }
+    } else if (pat === 'zigzag') {
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      for (let y = -70; y < 70; y += 14) {
+        ctx.beginPath();
+        for (let x = -90; x < 90; x += 12) ctx.lineTo(x, y + ((x / 12) % 2 ? 6 : -6));
+        ctx.stroke();
+      }
+    }
+    // cutout hole
+    if (cutout && cutout !== 'none') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = '#000';
+      if (cutout === 'diamond') {
+        ctx.beginPath();
+        ctx.moveTo(0, -14); ctx.lineTo(12, 0); ctx.lineTo(0, 14); ctx.lineTo(-12, 0);
+        ctx.closePath(); ctx.fill();
+      } else if (cutout === 'flower') {
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * 8, Math.sin(a) * 8, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (cutout === 'paisley') {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 8, 14, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    ctx.restore();
+    // outline
+    ctx.save();
+    pathFn();
+    ctx.strokeStyle = 'rgba(40,20,0,0.55)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawStar(ctx, panels, d, isLit) {
+    const n = 5;
+    for (let i = 0; i < n; i++) {
+      const a0 = -Math.PI / 2 + (i / n) * Math.PI * 2;
+      const a1 = -Math.PI / 2 + ((i + 1) / n) * Math.PI * 2;
+      const panel = panels[i] || panels[0] || { color: '#f0c040', pattern: 'solid' };
+      fillPattern(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(a0) * 70, Math.sin(a0) * 70);
+        ctx.lineTo(Math.cos(a1) * 70, Math.sin(a1) * 70);
+        ctx.closePath();
+      }, panel, i === 0 ? d.cutout : 'none');
+    }
+    if (isLit) {
+      ctx.fillStyle = hexAlpha(d.glow, 0.85);
+      ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawRound(ctx, panels, d, isLit) {
+    const n = Math.max(4, panels.length);
+    for (let i = 0; i < n; i++) {
+      const a0 = (i / n) * Math.PI * 2;
+      const a1 = ((i + 1) / n) * Math.PI * 2;
+      const panel = panels[i] || { color: '#f0c040', pattern: 'solid' };
+      fillPattern(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, 68, a0, a1);
+        ctx.closePath();
+      }, panel, i === 0 ? d.cutout : 'none');
+    }
+    if (isLit) {
+      ctx.fillStyle = hexAlpha(d.glow, 0.85);
+      ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawHex(ctx, panels, d, isLit) {
+    const n = 6;
+    for (let i = 0; i < n; i++) {
+      const a0 = -Math.PI / 6 + (i / n) * Math.PI * 2;
+      const a1 = -Math.PI / 6 + ((i + 1) / n) * Math.PI * 2;
+      const panel = panels[i] || { color: '#f0c040', pattern: 'solid' };
+      fillPattern(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(a0) * 72, Math.sin(a0) * 72);
+        ctx.lineTo(Math.cos(a1) * 72, Math.sin(a1) * 72);
+        ctx.closePath();
+      }, panel, i === 0 ? d.cutout : 'none');
+    }
+    if (isLit) {
+      ctx.fillStyle = hexAlpha(d.glow, 0.85);
+      ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawTube(ctx, panels, d, isLit) {
+    const n = Math.max(4, panels.length);
+    const w = 100, h = 130;
+    const pw = w / n;
+    for (let i = 0; i < n; i++) {
+      const panel = panels[i] || { color: '#f0c040', pattern: 'solid' };
+      const x0 = -w / 2 + i * pw;
+      fillPattern(ctx, () => {
+        ctx.beginPath();
+        ctx.rect(x0, -h / 2, pw + 0.5, h);
+      }, panel, i === 1 ? d.cutout : 'none');
+    }
+    // top/bottom rings
+    ctx.strokeStyle = '#5a3010';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(-w / 2, -h / 2, w, h);
+    if (isLit) {
+      ctx.fillStyle = hexAlpha(d.glow, 0.5);
+      ctx.fillRect(-w / 2 + 8, -h / 2 + 8, w - 16, h - 16);
+    }
+  }
+
+  function drawDiamond(ctx, panels, d, isLit) {
+    const pts = [[0, -75], [60, 0], [0, 75], [-60, 0]];
+    for (let i = 0; i < 4; i++) {
+      const a = pts[i], b = pts[(i + 1) % 4];
+      const panel = panels[i] || { color: '#f0c040', pattern: 'solid' };
+      fillPattern(ctx, () => {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+        ctx.closePath();
+      }, panel, i === 0 ? d.cutout : 'none');
+    }
+    if (isLit) {
+      ctx.fillStyle = hexAlpha(d.glow, 0.85);
+      ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function loop() {
+    cancelAnimationFrame(raf);
+    if (!ctx || !canvas) return;
+    const W = canvas.width, H = canvas.height;
+    // balcony night background when lit, craft table when not
+    if (lit) {
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, '#080418');
+      g.addColorStop(1, '#1a0a30');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(255,240,200,0.7)';
+      for (let i = 0; i < 25; i++) ctx.fillRect((i * 53) % W, (i * 37) % (H * 0.4), 2, 2);
+      // balcony
+      ctx.fillStyle = '#2a1830';
+      ctx.fillRect(0, H - 48, W, 48);
+      ctx.strokeStyle = '#c4a060';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, H - 48); ctx.lineTo(W, H - 48); ctx.stroke();
+    } else {
+      ctx.fillStyle = '#2a1848';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(255,200,100,0.06)';
+      ctx.fillRect(20, 20, W - 40, H - 40);
+    }
+    drawLantern(ctx, W / 2, H / 2 - 10, 1.35, design, lit);
+    // selected panel hint
+    ctx.fillStyle = '#ffe08a';
+    ctx.font = '12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(lit ? 'Glowing on the balcony' : `Panel ${selectedPanel + 1} selected`, W / 2, H - 14);
+    raf = requestAnimationFrame(loop);
+  }
+
+  // hooks for tests
+  function getDesign() { return cloneDesign(design); }
+  function setDesign(d) { design = cloneDesign(d); ensurePanels(); }
+  function setLit(v) { lit = !!v; }
+  function hang() { return DG.Save.hangLantern(cloneDesign(design)); }
+  function openOrders() { mode = 'orders'; orderId = null; renderShell(); }
+  function openGallery() { mode = 'gallery'; orderId = null; cancelAnimationFrame(raf); renderShell(); }
+  function startOrder(id) {
+    orderId = id;
+    mode = 'order-play';
+    const o = DG.KandilOrders.ORDERS.find((x) => x.id === id);
+    design = defaultDesign(o ? o.target.shape : 'star');
+    design.panels.forEach((pn) => { pn.color = '#fff0c8'; pn.pattern = 'solid'; });
+    selectedPanel = 0;
+    lit = false;
+    renderShell();
+  }
+  function applyTarget(id) {
+    const o = DG.KandilOrders.ORDERS.find((x) => x.id === id);
+    if (o) { design = cloneDesign(o.target); ensurePanels(); }
+  }
+  function scoreCurrent() {
+    const o = DG.KandilOrders.ORDERS.find((x) => x.id === orderId);
+    if (!o) return null;
+    return DG.KandilOrders.scoreMatch(design, o.target);
+  }
+
+  return {
+    open, getDesign, setDesign, setLit, hang, openOrders, openGallery,
+    startOrder, applyTarget, scoreCurrent, surprise, SHAPES, COLORS,
+    orderCount: () => DG.KandilOrders.ORDERS.length
+  };
+})();
+
+})();
+/* ==== 82-boats-levels.js ==== */
+;(function(){
+/* Ayodhya Boat Ride — separate easy/hard river ladders */
+DG.BoatsLevels = (() => {
+  const WORLD_W = 1180;
+
+  const EASY_PHYS = {
+    current: 2.0,
+    steer: 3.2,
+    autoAssist: 0.55,
+    boatR: 22,
+    infiniteLives: true,
+    softBump: true,
+    bumpSlow: 0.4,
+    spinOnBump: true,
+    diyaRadius: 48,
+    scoreTiming: false
+  };
+  const HARD_PHYS = {
+    current: 3.1,
+    steer: 3.6,
+    autoAssist: 0,
+    boatR: 18,
+    infiniteLives: false,
+    lives: 3,
+    softBump: true,
+    bumpSlow: 0.55,
+    spinOnBump: true,
+    diyaRadius: 36,
+    scoreTiming: true
+  };
+
+  function rng(seed) {
+    let s = seed | 0;
+    return () => {
+      s = (s * 1664525 + 1013904223) | 0;
+      return (s >>> 0) / 4294967296;
+    };
+  }
+
+  function makeLevel(opts) {
+    const { id, seed, length, halfMin, halfMax, bend, obsEvery, diyaEvery, garlandEvery, easy } = opts;
+    const r = rng(seed);
+    const path = [];
+    let cx = WORLD_W * 0.5;
+    for (let y = 0; y <= length; y += 40) {
+      const drift = (r() - 0.5) * bend;
+      cx = DG.clamp(cx + drift, 220, WORLD_W - 220);
+      const half = halfMin + r() * (halfMax - halfMin);
+      path.push({ y, cx, half });
+    }
+
+    function pathAt(y) {
+      let a = path[0], b = path[path.length - 1];
+      for (let i = 0; i < path.length - 1; i++) {
+        if (path[i].y <= y && path[i + 1].y >= y) { a = path[i]; b = path[i + 1]; break; }
+      }
+      const t = a.y === b.y ? 0 : (y - a.y) / (b.y - a.y);
+      return {
+        cx: a.cx + (b.cx - a.cx) * t,
+        half: a.half + (b.half - a.half) * t
+      };
+    }
+
+    const obstacles = [];
+    const diyaSpots = [];
+    const garlands = [];
+
+    // Obstacles INSIDE river but offset from center corridor (safe lane ~ boatR*2.5)
+    const safe = easy ? 55 : 42;
+    for (let y = 180; y < length - 220; y += obsEvery) {
+      const p = pathAt(y);
+      // place near edges of channel, leaving center clear
+      const side = r() < 0.5 ? -1 : 1;
+      const ox = p.cx + side * (safe + 20 + r() * Math.max(10, p.half - safe - 35));
+      if (Math.abs(ox - p.cx) < safe) continue;
+      const kinds = easy ? ['rock', 'log', 'duck'] : ['rock', 'log', 'duck', 'rock'];
+      obstacles.push({
+        y: y + (r() - 0.5) * 20,
+        x: DG.clamp(ox, p.cx - p.half + 20, p.cx + p.half - 20),
+        kind: kinds[(r() * kinds.length) | 0],
+        r: easy ? 16 : 14
+      });
+    }
+
+    // Diya spots on banks (just outside water edge)
+    for (let y = 140; y < length - 180; y += diyaEvery) {
+      const p = pathAt(y);
+      const side = r() < 0.5 ? -1 : 1;
+      diyaSpots.push({
+        y: y + (r() - 0.5) * 15,
+        x: p.cx + side * (p.half + 28),
+        side,
+        lit: false
+      });
+    }
+
+    for (let y = 160; y < length - 200; y += garlandEvery) {
+      const p = pathAt(y);
+      garlands.push({
+        y: y + (r() - 0.5) * 25,
+        x: p.cx + (r() - 0.5) * (p.half * 0.5),
+        got: false
+      });
+    }
+
+    return { id, length, path, pathAt, obstacles, diyaSpots, garlands, easy, worldW: WORLD_W };
+  }
+
+  function buildEasy() {
+    const levels = [];
+    for (let i = 1; i <= 12; i++) {
+      levels.push(makeLevel({
+        id: i,
+        seed: 7000 + i * 41,
+        length: 1400 + i * 160,
+        halfMin: 160 - Math.min(25, i * 1.5),
+        halfMax: 210 - Math.min(20, i),
+        bend: 18 + i * 0.8,
+        obsEvery: 220 - Math.min(40, i * 2),
+        diyaEvery: 200,
+        garlandEvery: 240,
+        easy: true
+      }));
+    }
+    return levels;
+  }
+
+  function buildHard() {
+    const levels = [];
+    for (let i = 1; i <= 18; i++) {
+      levels.push(makeLevel({
+        id: i,
+        seed: 9000 + i * 53,
+        length: 1600 + i * 180,
+        halfMin: 110 - Math.min(20, i),
+        halfMax: 150 - Math.min(18, i),
+        bend: 32 + i * 1.4,
+        obsEvery: 170 - Math.min(35, i * 1.2),
+        diyaEvery: 180,
+        garlandEvery: 220,
+        easy: false
+      }));
+    }
+    return levels;
+  }
+
+  const EASY = buildEasy();
+  const HARD = buildHard();
+
+  return {
+    WORLD_W,
+    EASY_PHYS,
+    HARD_PHYS,
+    easy: EASY,
+    hard: HARD,
+    forProfile(easy) { return easy ? EASY : HARD; },
+    phys(easy) { return easy ? EASY_PHYS : HARD_PHYS; }
+  };
+})();
+
+})();
+/* ==== 83-boats-solver.js ==== */
+;(function(){
+/* Autoplay / passability solver for Ayodhya Boat Ride */
+DG.BoatsSolver = (() => {
+  function dist2(ax, ay, bx, by) {
+    const dx = ax - bx, dy = ay - by;
+    return dx * dx + dy * dy;
+  }
+
+  function simulate(level, phys, opts) {
+    opts = opts || {};
+    const maxFrames = opts.maxFrames || 40000;
+    let y = 40;
+    let x = level.pathAt(40).cx;
+    let vx = 0;
+    let speedMul = 1;
+    let spin = 0;
+    let frames = 0;
+    let diyas = 0;
+    let garlands = 0;
+    const lit = new Set();
+    const gotG = new Set();
+    const bumpCD = { v: 0 };
+    const R = phys.boatR;
+
+    while (y < level.length - 40 && frames < maxFrames) {
+      frames++;
+      const p = level.pathAt(y + 60);
+      // steer toward center (and away from nearby obstacles)
+      let targetX = p.cx;
+      let nearest = null, nearestD = 1e9;
+      for (const o of level.obstacles) {
+        if (o.y < y - 20 || o.y > y + 140) continue;
+        const d = dist2(x, y, o.x, o.y);
+        if (d < nearestD) { nearestD = d; nearest = o; }
+      }
+      if (nearest && nearestD < (R + nearest.r + 50) * (R + nearest.r + 50)) {
+        // steer away
+        targetX = nearest.x < x ? nearest.x + (R + nearest.r + 40) : nearest.x - (R + nearest.r + 40);
+        // keep in channel
+        targetX = DG.clamp(targetX, p.cx - p.half + R + 4, p.cx + p.half - R - 4);
+      }
+
+      const err = targetX - x;
+      let steer = DG.clamp(err * 0.12, -phys.steer, phys.steer);
+      if (phys.autoAssist) {
+        steer += (p.cx - x) * phys.autoAssist * 0.08;
+      }
+      vx = DG.clamp(steer, -phys.steer, phys.steer);
+      x += vx;
+      y += phys.current * speedMul;
+      if (bumpCD.v > 0) bumpCD.v--;
+      else speedMul = DG.lerp(speedMul, 1, 0.05);
+      if (spin > 0) spin -= 0.08;
+
+      // stay in water
+      const cur = level.pathAt(y);
+      const minX = cur.cx - cur.half + R;
+      const maxX = cur.cx + cur.half - R;
+      if (x < minX) { x = minX; vx = Math.abs(vx) * 0.3; }
+      if (x > maxX) { x = maxX; vx = -Math.abs(vx) * 0.3; }
+
+      // bumps
+      for (const o of level.obstacles) {
+        if (Math.abs(o.y - y) > 80) continue;
+        if (dist2(x, y, o.x, o.y) < (R + o.r) * (R + o.r)) {
+          if (bumpCD.v === 0) {
+            speedMul = phys.bumpSlow;
+            spin = Math.PI * 2;
+            bumpCD.v = 35;
+            // nudge away
+            x += (x < o.x ? -1 : 1) * 12;
+          }
+        }
+      }
+
+      // diyas — auto place when in range (solver always places)
+      level.diyaSpots.forEach((d, i) => {
+        if (lit.has(i)) return;
+        if (Math.abs(d.y - y) < 50 && Math.abs(d.x - x) < phys.diyaRadius + 40) {
+          lit.add(i); diyas++;
+        }
+      });
+      level.garlands.forEach((g, i) => {
+        if (gotG.has(i)) return;
+        if (dist2(x, y, g.x, g.y) < (R + 16) * (R + 16)) {
+          gotG.add(i); garlands++;
+        }
+      });
+    }
+
+    if (y >= level.length - 40) return { ok: true, frames, diyas, garlands, x, y };
+    return { ok: false, frames, diyas, garlands, reason: 'timeout', x, y };
+  }
+
+  function proveAll(easy) {
+    const levels = DG.BoatsLevels.forProfile(easy);
+    const phys = DG.BoatsLevels.phys(easy);
+    const results = [];
+    let allOk = true;
+    for (const lv of levels) {
+      const res = simulate(lv, phys);
+      if (!res.ok) allOk = false;
+      results.push({ id: lv.id, ok: res.ok, frames: res.frames, reason: res.reason || null });
+    }
+    return { ok: allOk, count: levels.length, results };
+  }
+
+  return { simulate, proveAll };
+})();
+
+})();
+/* ==== 84-boats.js ==== */
+;(function(){
+/* Ayodhya Boat Ride — top-down river + diya delivery */
+DG.Boats = (() => {
+  let canvas = null, ctx = null, raf = 0;
+  let state = null;
+  let lastTs = 0;
+  let keys = { left: false, right: false };
+  let dragX = null;
+
+  function isEasy() { return DG.isEasy(); }
+  function levels() { return DG.BoatsLevels.forProfile(isEasy()); }
+  function phys() { return DG.BoatsLevels.phys(isEasy()); }
+
+  function open() {
+    cancelAnimationFrame(raf);
+    DG.screen = 'boats-select';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const p = DG.Save.profile();
+    const easy = isEasy();
+    const list = levels();
+    const prog = p.boats || { maxCleared: 0, stars: {}, cleared: {} };
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight boats-screen' + (easy ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.5vw,28px)">⛵ Ayodhya Boat Ride</div>
+          <div class="sub">${p.name} · ${easy ? 'Wide river · ∞ lives · assist' : 'Narrow bends · 3 lives · timing'} · ${list.length} levels</div>
+        </div>
+        <button class="btn ghost" id="how">?</button>
+      </div>
+      <div class="level-grid" id="bg"></div>`;
+    el.appendChild(scr);
+    const grid = scr.querySelector('#bg');
+    list.forEach((lv) => {
+      const unlocked = easy || lv.id === 1 || !!prog.cleared[lv.id - 1] || lv.id <= (prog.maxCleared + 1);
+      const stars = prog.stars[lv.id] || 0;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'level-card' + (unlocked ? '' : ' locked') + (easy ? ' p1' : '');
+      card.innerHTML = `<span class="num">${lv.id}</span>
+        <span class="stars">${unlocked && stars ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : (unlocked ? '·' : '🔒')}</span>
+        <span class="meta">${easy ? 'calm' : 'swift'}</span>`;
+      if (unlocked) DG.bindTap(card, () => { DG.Audio.click(); startLevel(lv.id); });
+      grid.appendChild(card);
+    });
+    DG.bindTap(scr.querySelector('#back'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.bindTap(scr.querySelector('#how'), () => showHow());
+    DG.UI.startBg();
+  }
+
+  function showHow() {
+    const easy = isEasy();
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>How to ride</h3>
+      <div class="sub" style="text-align:left;line-height:1.45">
+        Steer with ◀ ▶ or drag the water.<br>
+        Float 🪔 diyas at glowing bank spots.<br>
+        Pick up 🌼 marigold garlands.<br>
+        Rocks, logs and ducks only bump and spin you.<br>
+        Reach the lamp-lit ghat!<br>
+        ${easy ? 'Auto-steer helps · infinite tries · wide river.' : 'Time your diyas · 3 lives · earn ★ stars.'}
+      </div>
+      <button class="btn big" id="ok">Got it</button>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    DG.bindTap(modal.querySelector('#ok'), () => modal.remove());
+  }
+
+  function startLevel(id) {
+    const list = levels();
+    const lv = list.find((l) => l.id === id) || list[0];
+    // fresh mutable copies of spots/garlands
+    const level = {
+      id: lv.id,
+      length: lv.length,
+      path: lv.path,
+      pathAt: lv.pathAt,
+      easy: lv.easy,
+      worldW: lv.worldW,
+      obstacles: lv.obstacles.map((o) => Object.assign({}, o)),
+      diyaSpots: lv.diyaSpots.map((d) => Object.assign({}, d, { lit: false })),
+      garlands: lv.garlands.map((g) => Object.assign({}, g, { got: false }))
+    };
+    const ph = phys();
+    DG.screen = 'boats-play';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const scr = document.createElement('div');
+    scr.className = 'screen boats-screen boats-play';
+    scr.innerHTML = `
+      <div class="topbar" style="padding-right:120px">
+        <button class="btn ghost" id="quit">←</button>
+        <div class="sub" id="titleLine">Level ${level.id}</div>
+        <button class="btn ghost" id="pause">❚❚</button>
+      </div>
+      <div class="boats-stage" id="stage">
+        <canvas id="boatsCv" width="1180" height="520"></canvas>
+        <div class="boats-hud">
+          <span id="hudLives"></span>
+          <span id="hudScore"></span>
+          <span id="hudProg"></span>
+        </div>
+        <div class="boats-controls">
+          <button class="btn p1 boats-steer" id="steerL" aria-label="Left">◀</button>
+          <button class="btn p1 boats-steer" id="steerR" aria-label="Right">▶</button>
+        </div>
+        <div class="boats-hint" id="hint">Steer · drop diyas at glowing spots</div>
+      </div>`;
+    el.appendChild(scr);
+    canvas = scr.querySelector('#boatsCv');
+    ctx = canvas.getContext('2d');
+
+    state = {
+      level,
+      phys: ph,
+      x: level.pathAt(40).cx,
+      y: 40,
+      vx: 0,
+      angle: -Math.PI / 2,
+      spin: 0,
+      speedMul: 1,
+      bumpCD: 0,
+      lives: ph.infiniteLives ? Infinity : (ph.lives || 3),
+      diyas: 0,
+      garlands: 0,
+      timingScore: 0,
+      paused: false,
+      won: false,
+      lost: false,
+      ghatLit: 0,
+      bankLit: 0, // how far banks are lit (progress)
+      hintUntil: DG.now() + 2800
+    };
+    keys = { left: false, right: false };
+    dragX = null;
+    bindInput(scr);
+    updateHud();
+    DG.bindTap(scr.querySelector('#quit'), () => { DG.Audio.click(); stopPlay(); open(); });
+    DG.bindTap(scr.querySelector('#pause'), () => {
+      if (state.won || state.lost) return;
+      state.paused = !state.paused;
+      if (!state.paused) { lastTs = 0; loop(DG.now()); }
+      else draw();
+    });
+    lastTs = 0;
+    loop(DG.now());
+  }
+
+  function bindInput(scr) {
+    const L = scr.querySelector('#steerL');
+    const R = scr.querySelector('#steerR');
+    const down = (side) => (e) => { e.preventDefault(); keys[side] = true; hideHint(); try { DG.Audio.unlock(); } catch (_) {} };
+    const up = (side) => (e) => { e.preventDefault(); keys[side] = false; };
+    ['pointerdown', 'mousedown', 'touchstart'].forEach((ev) => {
+      L.addEventListener(ev, down('left'), { passive: false });
+      R.addEventListener(ev, down('right'), { passive: false });
+    });
+    ['pointerup', 'pointerleave', 'mouseup', 'touchend', 'touchcancel'].forEach((ev) => {
+      L.addEventListener(ev, up('left'));
+      R.addEventListener(ev, up('right'));
+    });
+    const stage = scr.querySelector('#stage');
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.boats-steer')) return;
+      dragX = e.clientX;
+      hideHint();
+      try { DG.Audio.unlock(); } catch (_) {}
+    });
+    stage.addEventListener('pointermove', (e) => {
+      if (dragX == null || !state) return;
+      const dx = e.clientX - dragX;
+      dragX = e.clientX;
+      state.x += dx * 0.9;
+    });
+    stage.addEventListener('pointerup', () => { dragX = null; });
+    stage.addEventListener('pointercancel', () => { dragX = null; });
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('keyup', onKeyUp);
+  }
+
+  function hideHint() {
+    const h = document.getElementById('hint');
+    if (h) h.style.display = 'none';
+  }
+
+  function unbindInput() {
+    window.removeEventListener('keydown', onKey);
+    window.removeEventListener('keyup', onKeyUp);
+    keys = { left: false, right: false };
+    dragX = null;
+  }
+
+  function onKey(e) {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') { e.preventDefault(); keys.left = true; }
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') { e.preventDefault(); keys.right = true; }
+    if (e.code === 'Space') { e.preventDefault(); tryPlaceDiya(); }
+  }
+  function onKeyUp(e) {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+  }
+
+  function stopPlay() {
+    cancelAnimationFrame(raf);
+    unbindInput();
+    state = null;
+  }
+
+  function updateHud() {
+    if (!state) return;
+    const livesEl = document.getElementById('hudLives');
+    const scoreEl = document.getElementById('hudScore');
+    const progEl = document.getElementById('hudProg');
+    if (livesEl) {
+      livesEl.textContent = state.phys.infiniteLives
+        ? '∞ calm'
+        : ('💛'.repeat(Math.max(0, Math.min(5, state.lives))) + ` ×${state.lives}`);
+    }
+    if (scoreEl) {
+      scoreEl.textContent = isEasy()
+        ? `🪔${state.diyas} 🌼${state.garlands}`
+        : `🪔${state.diyas} 🌼${state.garlands} · ${state.timingScore}`;
+    }
+    if (progEl) {
+      const pct = Math.min(100, Math.floor((state.y / state.level.length) * 100));
+      progEl.textContent = `${pct}% → Ghat`;
+    }
+  }
+
+  function tryPlaceDiya() {
+    if (!state || state.paused || state.won || state.lost) return;
+    const ph = state.phys;
+    let best = -1, bestD = 1e9;
+    state.level.diyaSpots.forEach((d, i) => {
+      if (d.lit) return;
+      const dy = Math.abs(d.y - state.y);
+      const dx = Math.abs(d.x - state.x);
+      if (dy < 70 && dx < ph.diyaRadius + 50) {
+        const dist = dx + dy;
+        if (dist < bestD) { bestD = dist; best = i; }
+      }
+    });
+    if (best >= 0) {
+      const d = state.level.diyaSpots[best];
+      d.lit = true;
+      state.diyas++;
+      if (ph.scoreTiming) {
+        // closer = better
+        const closeness = 1 - DG.clamp(bestD / 120, 0, 1);
+        state.timingScore += Math.round(50 + closeness * 50);
+      }
+      DG.Audio && DG.Audio.sparkle && DG.Audio.sparkle();
+      updateHud();
+    }
+  }
+
+  function step(dt) {
+    if (!state || state.paused || state.won || state.lost) return;
+    const ph = state.phys;
+    const steps = Math.min(3, Math.max(1, Math.round(dt / 16)));
+    for (let s = 0; s < steps; s++) {
+      const look = state.level.pathAt(state.y + 50);
+      let steer = 0;
+      if (keys.left) steer -= ph.steer;
+      if (keys.right) steer += ph.steer;
+      if (ph.autoAssist) {
+        steer += (look.cx - state.x) * ph.autoAssist * 0.15;
+      }
+      state.vx = DG.clamp(steer, -ph.steer, ph.steer);
+      state.x += state.vx;
+      state.y += ph.current * state.speedMul;
+
+      if (state.bumpCD > 0) state.bumpCD--;
+      else state.speedMul = DG.lerp(state.speedMul, 1, 0.04);
+      if (state.spin > 0) {
+        state.spin -= 0.12;
+        state.angle += 0.2;
+      } else {
+        state.angle = DG.lerp(state.angle, -Math.PI / 2 + state.vx * 0.05, 0.15);
+      }
+
+      const cur = state.level.pathAt(state.y);
+      const R = ph.boatR;
+      const minX = cur.cx - cur.half + R;
+      const maxX = cur.cx + cur.half - R;
+      if (state.x < minX) { state.x = minX; }
+      if (state.x > maxX) { state.x = maxX; }
+
+      // bank lighting trails behind
+      state.bankLit = Math.max(state.bankLit, state.y);
+
+      // obstacles
+      for (const o of state.level.obstacles) {
+        if (Math.abs(o.y - state.y) > 90) continue;
+        const dx = state.x - o.x, dy = state.y - o.y;
+        if (dx * dx + dy * dy < (R + o.r) * (R + o.r)) {
+          if (state.bumpCD === 0) {
+            state.speedMul = ph.bumpSlow;
+            state.spin = Math.PI * 2;
+            state.bumpCD = 40;
+            state.x += (state.x < o.x ? -1 : 1) * 14;
+            DG.Audio && DG.Audio.soft && DG.Audio.soft();
+            if (!ph.infiniteLives) {
+              // soft bump doesn't cost life; only leaving river would — we clamp so no life loss on bump
+            }
+          }
+        }
+      }
+
+      // auto diya assist for P1 when very close
+      if (ph.autoAssist) {
+        state.level.diyaSpots.forEach((d) => {
+          if (d.lit) return;
+          if (Math.abs(d.y - state.y) < 40 && Math.abs(d.x - state.x) < ph.diyaRadius) {
+            d.lit = true;
+            state.diyas++;
+            DG.Audio && DG.Audio.soft && DG.Audio.soft();
+            updateHud();
+          }
+        });
+      } else {
+        // hard: auto-suggest by proximity — player presses space OR we place when overlapping strongly
+        state.level.diyaSpots.forEach((d) => {
+          if (d.lit) return;
+          if (Math.abs(d.y - state.y) < 35 && Math.abs(d.x - state.x) < ph.diyaRadius * 0.7) {
+            // near enough counts as placement with timing
+            d.lit = true;
+            state.diyas++;
+            const closeness = 1 - Math.min(1, (Math.abs(d.x - state.x) + Math.abs(d.y - state.y)) / 80);
+            state.timingScore += Math.round(40 + closeness * 60);
+            DG.Audio && DG.Audio.sparkle && DG.Audio.sparkle();
+            updateHud();
+          }
+        });
+      }
+
+      // garlands
+      state.level.garlands.forEach((g) => {
+        if (g.got) return;
+        const dx = state.x - g.x, dy = state.y - g.y;
+        if (dx * dx + dy * dy < (R + 18) * (R + 18)) {
+          g.got = true;
+          state.garlands++;
+          if (ph.scoreTiming) state.timingScore += 20;
+          DG.Audio && DG.Audio.click && DG.Audio.click();
+          updateHud();
+        }
+      });
+
+      if (state.y >= state.level.length - 50) {
+        state.won = true;
+        onWin();
+        return;
+      }
+    }
+  }
+
+  function onWin() {
+    cancelAnimationFrame(raf);
+    const p = DG.Save.profile();
+    if (!p.boats) p.boats = { maxCleared: 0, stars: {}, cleared: {} };
+    p.boats.cleared[state.level.id] = true;
+    p.boats.maxCleared = Math.max(p.boats.maxCleared || 0, state.level.id);
+    let stars = 1;
+    const totalDiya = state.level.diyaSpots.length || 1;
+    const ratio = state.diyas / totalDiya;
+    if (isEasy()) {
+      stars = ratio > 0.3 ? 3 : 2;
+      p.boats.stars[state.level.id] = 3;
+    } else {
+      if (ratio > 0.4) stars = 2;
+      if (ratio > 0.7 && state.garlands >= 2) stars = 3;
+      const prev = p.boats.stars[state.level.id] || 0;
+      p.boats.stars[state.level.id] = Math.max(prev, stars);
+    }
+    DG.Save.addSticker('⛵');
+    DG.Save.save();
+    state.ghatLit = 0;
+    const lightUp = () => {
+      state.ghatLit = Math.min(1, state.ghatLit + 0.05);
+      draw();
+      if (state.ghatLit < 1) requestAnimationFrame(lightUp);
+      else showResult(true, stars);
+    };
+    DG.Audio && DG.Audio.win && DG.Audio.win();
+    lightUp();
+  }
+
+  function showResult(won, stars) {
+    unbindInput();
+    const nextId = state.level.id + 1;
+    const hasNext = levels().some((l) => l.id === nextId);
+    const wrap = document.createElement('div');
+    wrap.className = 'boats-result';
+    wrap.innerHTML = `
+      <div class="title" style="font-size:28px">${won ? 'Ghat aglow! 🪔' : 'Gentle dock 🌙'}</div>
+      <div class="quiz-stars">${won ? '★'.repeat(stars || 1) + '☆'.repeat(3 - (stars || 1)) : '· · ·'}</div>
+      <div class="sub">🪔 ${state.diyas} diyas · 🌼 ${state.garlands} garlands${isEasy() ? '' : ' · score ' + state.timingScore}</div>
+      <div class="row">
+        <button class="btn ghost" id="toSelect">Levels</button>
+        <button class="btn big" id="again">${won ? 'Replay' : 'Try again'}</button>
+        ${won && hasNext ? '<button class="btn big" id="next">Next →</button>' : ''}
+      </div>`;
+    const stage = document.getElementById('stage');
+    if (stage) {
+      const holder = document.createElement('div');
+      holder.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,4,24,.55);z-index:5';
+      holder.appendChild(wrap);
+      stage.appendChild(holder);
+    }
+    DG.bindTap(wrap.querySelector('#toSelect'), () => { stopPlay(); open(); });
+    DG.bindTap(wrap.querySelector('#again'), () => { const id = state.level.id; stopPlay(); startLevel(id); });
+    const nx = wrap.querySelector('#next');
+    if (nx) DG.bindTap(nx, () => { stopPlay(); startLevel(nextId); });
+  }
+
+  function draw() {
+    if (!ctx || !state) return;
+    const W = canvas.width, H = canvas.height;
+    const camY = state.y - H * 0.65;
+
+    // dusk sky / far banks
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#1a0a28');
+    sky.addColorStop(0.45, '#3a1848');
+    sky.addColorStop(1, '#4a2860');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // sample river path across view
+    const step = 8;
+    // banks + water polygon
+    ctx.beginPath();
+    // left bank edge going up, then right bank down
+    for (let sy = 0; sy <= H; sy += step) {
+      const wy = camY + sy;
+      const p = state.level.pathAt(DG.clamp(wy, 0, state.level.length));
+      const lx = p.cx - p.half;
+      if (sy === 0) ctx.moveTo(lx, sy);
+      else ctx.lineTo(lx, sy);
+    }
+    for (let sy = H; sy >= 0; sy -= step) {
+      const wy = camY + sy;
+      const p = state.level.pathAt(DG.clamp(wy, 0, state.level.length));
+      ctx.lineTo(p.cx + p.half, sy);
+    }
+    ctx.closePath();
+    const water = ctx.createLinearGradient(0, 0, 0, H);
+    water.addColorStop(0, '#1a4068');
+    water.addColorStop(1, '#0e2848');
+    ctx.fillStyle = water;
+    ctx.fill();
+
+    // lit banks behind boat
+    for (let sy = 0; sy <= H; sy += 12) {
+      const wy = camY + sy;
+      if (wy > state.bankLit || wy < 0) continue;
+      const p = state.level.pathAt(DG.clamp(wy, 0, state.level.length));
+      const glow = 0.15 + 0.35 * Math.min(1, (state.bankLit - wy) / 200);
+      ctx.fillStyle = `rgba(255,180,80,${glow})`;
+      ctx.fillRect(p.cx - p.half - 36, sy - 6, 28, 14);
+      ctx.fillRect(p.cx + p.half + 8, sy - 6, 28, 14);
+      // tiny lamps
+      ctx.fillStyle = `rgba(255,220,120,${0.4 + glow})`;
+      ctx.beginPath();
+      ctx.arc(p.cx - p.half - 22, sy, 3, 0, Math.PI * 2);
+      ctx.arc(p.cx + p.half + 22, sy, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // diya spots
+    state.level.diyaSpots.forEach((d) => {
+      const sy = d.y - camY;
+      if (sy < -40 || sy > H + 40) return;
+      if (d.lit) {
+        ctx.fillStyle = 'rgba(255,200,80,0.55)';
+        ctx.beginPath(); ctx.arc(d.x, sy, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🪔', d.x, sy + 6);
+      } else {
+        ctx.strokeStyle = 'rgba(255,220,120,0.7)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.arc(d.x, sy, 18, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 0.5 + 0.5 * Math.sin(DG.now() / 300);
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✦', d.x, sy + 5);
+        ctx.globalAlpha = 1;
+      }
+    });
+
+    // garlands
+    state.level.garlands.forEach((g) => {
+      if (g.got) return;
+      const sy = g.y - camY;
+      if (sy < -20 || sy > H + 20) return;
+      ctx.font = '18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🌼', g.x, sy);
+    });
+
+    // obstacles
+    state.level.obstacles.forEach((o) => {
+      const sy = o.y - camY;
+      if (sy < -40 || sy > H + 40) return;
+      drawObstacle(ctx, o.x, sy, o);
+    });
+
+    // ghat at end
+    const ghatY = state.level.length - camY;
+    if (ghatY < H + 80 && ghatY > -40) {
+      drawGhat(ctx, W, ghatY, state.won ? state.ghatLit : Math.max(0, 1 - (state.level.length - state.y) / 350));
+    }
+
+    // boat
+    const boatSy = state.y - camY;
+    drawBoat(ctx, state.x, boatSy, state.angle, state.phys.boatR);
+
+    if (state.paused) {
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#ffe08a';
+      ctx.font = 'bold 36px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Paused', W / 2, H / 2);
+    }
+  }
+
+  function drawObstacle(ctx, x, y, o) {
+    if (o.kind === 'duck') {
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🦆', x, y + 6);
+      return;
+    }
+    if (o.kind === 'log') {
+      ctx.fillStyle = '#6a4020';
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(0.3);
+      ctx.fillRect(-22, -7, 44, 14);
+      ctx.restore();
+      return;
+    }
+    // rock
+    ctx.fillStyle = '#5a5868';
+    ctx.beginPath();
+    ctx.ellipse(x, y, o.r + 2, o.r * 0.75, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#7a7888';
+    ctx.beginPath();
+    ctx.ellipse(x - 4, y - 3, o.r * 0.4, o.r * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawGhat(ctx, W, gy, lit) {
+    ctx.fillStyle = '#3a2a40';
+    ctx.fillRect(W * 0.15, gy - 30, W * 0.7, 80);
+    ctx.fillStyle = '#5a4060';
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(W * 0.15, gy - 30 + i * 12, W * 0.7, 4);
+    }
+    const n = 12;
+    for (let i = 0; i < n; i++) {
+      const lx = W * 0.2 + (i / (n - 1)) * W * 0.6;
+      const glow = lit * (0.5 + 0.5 * Math.sin(DG.now() / 280 + i));
+      ctx.fillStyle = `rgba(255,${180 + glow * 50 | 0},80,${0.2 + lit * 0.8})`;
+      ctx.beginPath(); ctx.arc(lx, gy - 10, 6 + glow * 4, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.globalAlpha = 0.4 + lit * 0.6;
+      ctx.fillText('🪔', lx, gy - 4);
+      ctx.globalAlpha = 1;
+    }
+    if (lit > 0.3) {
+      ctx.fillStyle = '#ffe08a';
+      ctx.font = 'bold 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.globalAlpha = lit;
+      ctx.fillText('Ayodhya Ghat', W / 2, gy + 36);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawBoat(ctx, x, y, angle, r) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle + Math.PI / 2);
+    // hull
+    ctx.fillStyle = '#c45a20';
+    ctx.beginPath();
+    ctx.moveTo(0, -r - 6);
+    ctx.quadraticCurveTo(r + 4, 0, 0, r + 4);
+    ctx.quadraticCurveTo(-r - 4, 0, 0, -r - 6);
+    ctx.fill();
+    ctx.fillStyle = '#ffe8c0';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.35, r * 0.55, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // tiny diya on boat
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🪔', 0, 4);
+    ctx.restore();
+  }
+
+  function loop(ts) {
+    if (!state) return;
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min(50, ts - lastTs);
+    lastTs = ts;
+    if (!state.paused && !state.won && !state.lost) step(dt);
+    draw();
+    updateHud();
+    if (state && !state.won && !state.lost) raf = requestAnimationFrame(loop);
+  }
+
+  function autoplayLevel(id, easy) {
+    const list = DG.BoatsLevels.forProfile(easy);
+    const lv = list.find((l) => l.id === id) || list[0];
+    const ph = DG.BoatsLevels.phys(easy);
+    return DG.BoatsSolver.simulate(lv, ph);
+  }
+
+  function prove() {
+    return {
+      easy: DG.BoatsSolver.proveAll(true),
+      hard: DG.BoatsSolver.proveAll(false)
+    };
+  }
+
+  return { open, startLevel, stopPlay, autoplayLevel, prove, getState: () => state, tryPlaceDiya };
+})();
+
+})();
+/* ==== 85-mehndi-levels.js ==== */
+;(function(){
+/* Mehndi Patterns — P1 trace paths + P2 finish/mirror puzzles */
+DG.MehndiLevels = (() => {
+  const W = 500, H = 620; // design canvas logical size
+  // Hand palm region roughly centered
+  const PALM = { cx: 250, cy: 340, rx: 90, ry: 120 };
+
+  function rng(seed) {
+    let s = seed | 0;
+    return () => {
+      s = (s * 1664525 + 1013904223) | 0;
+      return (s >>> 0) / 4294967296;
+    };
+  }
+
+  /** Sample a polyline at roughly equal spacing */
+  function densify(pts, step) {
+    if (!pts.length) return [];
+    const out = [pts[0]];
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const n = Math.max(1, Math.ceil(len / step));
+      for (let k = 1; k <= n; k++) {
+        const t = k / n;
+        out.push({ x: a.x + dx * t, y: a.y + dy * t });
+      }
+    }
+    return out;
+  }
+
+  function circleArc(cx, cy, r, a0, a1, n) {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const t = a0 + (a1 - a0) * (i / n);
+      pts.push({ x: cx + Math.cos(t) * r, y: cy + Math.sin(t) * r });
+    }
+    return pts;
+  }
+
+  function spiral(cx, cy, r0, r1, turns, n) {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      const a = t * turns * Math.PI * 2;
+      const r = r0 + (r1 - r0) * t;
+      pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
+    }
+    return pts;
+  }
+
+  function paisleyPath(cx, cy, scale, rot) {
+    const pts = [];
+    for (let i = 0; i <= 40; i++) {
+      const t = i / 40;
+      const a = t * Math.PI * 1.6 - 0.3;
+      const r = scale * (0.35 + 0.65 * Math.sin(t * Math.PI));
+      let x = Math.cos(a) * r;
+      let y = Math.sin(a) * r * 1.4 - scale * 0.2;
+      const c = Math.cos(rot), s = Math.sin(rot);
+      pts.push({ x: cx + x * c - y * s, y: cy + x * s + y * c });
+    }
+    return pts;
+  }
+
+  function vinePath(x0, y0, x1, y1, amp, waves) {
+    const pts = [];
+    const n = 36;
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      const x = x0 + (x1 - x0) * t;
+      const y = y0 + (y1 - y0) * t + Math.sin(t * waves * Math.PI * 2) * amp;
+      pts.push({ x, y });
+    }
+    return pts;
+  }
+
+  // --- P1: trace levels (forgiving tolerance) ---
+  function buildEasy() {
+    const levels = [];
+    const makers = [
+      () => densify(circleArc(PALM.cx, PALM.cy - 20, 55, 0, Math.PI * 2, 48), 10),
+      () => densify(spiral(PALM.cx, PALM.cy, 8, 70, 2.2, 60), 10),
+      () => densify(paisleyPath(PALM.cx - 10, PALM.cy, 70, -0.4), 10),
+      () => densify(vinePath(PALM.cx - 60, PALM.cy + 80, PALM.cx + 60, PALM.cy - 90, 18, 2), 10),
+      () => densify([
+        ...circleArc(PALM.cx, PALM.cy, 40, -Math.PI / 2, Math.PI / 2, 24),
+        ...circleArc(PALM.cx, PALM.cy, 40, Math.PI / 2, Math.PI * 1.5, 24)
+      ], 10),
+      () => densify(paisleyPath(PALM.cx + 20, PALM.cy - 30, 55, 0.6), 10),
+      () => densify(vinePath(PALM.cx, PALM.cy + 100, PALM.cx, PALM.cy - 100, 28, 3), 10),
+      () => densify(spiral(PALM.cx - 15, PALM.cy + 10, 5, 60, 1.8, 50), 10),
+      () => densify(circleArc(PALM.cx, PALM.cy + 40, 70, Math.PI * 0.15, Math.PI * 0.85, 40), 10),
+      () => densify([
+        ...paisleyPath(PALM.cx - 30, PALM.cy - 20, 45, -0.8),
+        ...paisleyPath(PALM.cx + 30, PALM.cy - 20, 45, 0.8).reverse()
+      ], 10),
+      () => densify(vinePath(PALM.cx - 70, PALM.cy, PALM.cx + 70, PALM.cy, 22, 2.5), 10),
+      () => densify(spiral(PALM.cx, PALM.cy - 10, 10, 75, 2.5, 70), 10)
+    ];
+    makers.forEach((fn, i) => {
+      const path = fn();
+      levels.push({
+        id: i + 1,
+        mode: 'trace',
+        easy: true,
+        tolerance: 42, // generous for age 5
+        path,
+        coverNeed: 0.72,
+        title: 'Trace ' + (i + 1)
+      });
+    });
+    return levels;
+  }
+
+  // --- P2: finish pattern / mirror ---
+  function buildHard() {
+    const levels = [];
+    // Motif continuation: show prefix of repeating unit, player continues
+    for (let i = 1; i <= 9; i++) {
+      const r = rng(12000 + i * 17);
+      const unit = densify(paisleyPath(0, 0, 28 + i, r() * 0.4 - 0.2), 8);
+      // place 3 units along an arc — reveal first 1.5, ask to finish rest
+      const full = [];
+      const centers = [];
+      for (let u = 0; u < 3; u++) {
+        const ang = -0.9 + u * 0.7;
+        const cx = PALM.cx + Math.cos(ang) * (50 + i * 2);
+        const cy = PALM.cy + Math.sin(ang) * (40 + i);
+        centers.push({ cx, cy, ang });
+        unit.forEach((p) => {
+          const c = Math.cos(ang), s = Math.sin(ang);
+          full.push({ x: cx + p.x * c - p.y * s, y: cy + p.x * s + p.y * c });
+        });
+      }
+      const revealUntil = Math.floor(full.length * 0.42);
+      levels.push({
+        id: i,
+        mode: 'finish',
+        easy: false,
+        tolerance: 28,
+        path: full, // full solution for scoring/content check
+        revealed: full.slice(0, revealUntil),
+        target: full.slice(revealUntil),
+        coverNeed: 0.65,
+        lives: 3,
+        title: 'Finish motif ' + i
+      });
+    }
+    // Mirror puzzles: left half given, mirror right
+    for (let i = 1; i <= 9; i++) {
+      const base = densify(
+        i % 2 === 0
+          ? spiral(PALM.cx - 40, PALM.cy, 6, 45 + i * 2, 1.6, 40)
+          : vinePath(PALM.cx - 80, PALM.cy + 60, PALM.cx - 10, PALM.cy - 70, 14 + i, 2),
+        8
+      );
+      const mirrored = base.map((p) => ({ x: PALM.cx * 2 - p.x, y: p.y }));
+      const full = base.concat(mirrored);
+      levels.push({
+        id: 9 + i,
+        mode: 'mirror',
+        easy: false,
+        tolerance: 26,
+        path: full,
+        revealed: base.slice(),
+        target: mirrored,
+        coverNeed: 0.7,
+        lives: 3,
+        title: 'Mirror ' + i
+      });
+    }
+    return levels;
+  }
+
+  const EASY = buildEasy();
+  const HARD = buildHard();
+
+  /**
+   * Content check: walk the path with a circular brush of radius=tolerance
+   * and ensure cumulative coverage can reach coverNeed (trivially true if
+   * we sample along the path itself — proves geometry is finite & consistent).
+   * Also verifies consecutive points are within 2*tolerance (drawable stroke).
+   */
+  function checkCompletable(level) {
+    const pts = level.mode === 'trace' ? level.path : level.target;
+    if (!pts || pts.length < 2) return { ok: false, reason: 'empty' };
+    let maxGap = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const g = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+      if (g > maxGap) maxGap = g;
+      if (g > level.tolerance * 2.2) {
+        return { ok: false, reason: 'gap', gap: g, at: i };
+      }
+    }
+    // Simulate perfect trace: mark checkpoints along path
+    const hit = new Array(pts.length).fill(false);
+    const brush = level.tolerance * 0.85;
+    // "draw" along path
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = 0; j < pts.length; j++) {
+        if (hit[j]) continue;
+        if (Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y) <= brush) hit[j] = true;
+      }
+    }
+    const covered = hit.filter(Boolean).length / pts.length;
+    const ok = covered >= Math.min(0.95, level.coverNeed + 0.15);
+    return { ok, covered, maxGap, need: level.coverNeed, id: level.id, mode: level.mode };
+  }
+
+  function proveAll(easy) {
+    const list = easy ? EASY : HARD;
+    const results = list.map(checkCompletable);
+    return { ok: results.every((r) => r.ok), count: list.length, results };
+  }
+
+  return {
+    W, H, PALM,
+    easy: EASY,
+    hard: HARD,
+    forProfile(easy) { return easy ? EASY : HARD; },
+    checkCompletable,
+    proveAll,
+    densify
+  };
+})();
+
+})();
+/* ==== 86-mehndi.js ==== */
+;(function(){
+/* Mehndi Patterns — free draw + trace + finish/mirror */
+DG.Mehndi = (() => {
+  const W = DG.MehndiLevels.W;
+  const H = DG.MehndiLevels.H;
+  const PALM = DG.MehndiLevels.PALM;
+
+  const HENNA = [
+    { id: 'light', wet: '#c47850', dry: '#8a3a22', name: 'Light' },
+    { id: 'classic', wet: '#a05030', dry: '#6a2818', name: 'Classic' },
+    { id: 'maroon', wet: '#902838', dry: '#5a1020', name: 'Maroon' },
+    { id: 'deep', wet: '#703020', dry: '#3a1810', name: 'Deep' }
+  ];
+
+  const STAMPS = [
+    { id: 'paisley', name: 'Paisley', emoji: '💧' },
+    { id: 'flower', name: 'Flower', emoji: '❀' },
+    { id: 'vine', name: 'Vine', emoji: '🌿' },
+    { id: 'dots', name: 'Dots', emoji: '•••' },
+    { id: 'mandala', name: 'Mandala', emoji: '◎' }
+  ];
+
+  let canvas = null, ctx = null, raf = 0;
+  let mode = 'menu'; // menu | free | play | gallery | result
+  let level = null;
+  let state = null;
+  let strokes = []; // {points:[{x,y,t,r}], colorId, driedAt, kind:'brush'|'stamp', stampId?}
+  let tool = 'brush'; // brush | stamp
+  let stampId = 'paisley';
+  let colorId = 'classic';
+  let brushR = 7;
+  let drawing = false;
+  let lastPt = null;
+  let hitMask = null; // Uint8 for target coverage during play
+  let coverTotal = 0;
+  let coverHit = 0;
+
+  function isEasy() { return DG.isEasy(); }
+  function levels() { return DG.MehndiLevels.forProfile(isEasy()); }
+  function henna() { return HENNA.find((h) => h.id === colorId) || HENNA[1]; }
+
+  function open() {
+    cancelAnimationFrame(raf);
+    mode = 'menu';
+    level = null;
+    state = null;
+    renderMenu();
+  }
+
+  function renderMenu() {
+    DG.screen = 'mehndi-select';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const p = DG.Save.profile();
+    const easy = isEasy();
+    const list = levels();
+    const prog = p.mehndi || { maxCleared: 0, stars: {}, cleared: {}, gallery: [] };
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight mehndi-screen' + (easy ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.5vw,28px)">✋ Mehndi Patterns</div>
+          <div class="sub">${p.name} · ${easy ? 'Trace dotted lines · stars · no fail' : 'Finish & mirror · accuracy · 3 lives'} · ${list.length} levels</div>
+        </div>
+        <button class="btn ghost" id="how">?</button>
+      </div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;justify-content:center;margin:4px 0 8px">
+        <button class="btn big p1" id="free">🎨 Free draw</button>
+        <button class="btn ghost" id="gal">🖼 Gallery (${(prog.gallery || []).length})</button>
+      </div>
+      <div class="level-grid" id="mg"></div>`;
+    el.appendChild(scr);
+    const grid = scr.querySelector('#mg');
+    list.forEach((lv) => {
+      const unlocked = easy || lv.id === 1 || !!prog.cleared[lv.id - 1] || lv.id <= (prog.maxCleared + 1);
+      const stars = prog.stars[lv.id] || 0;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'level-card' + (unlocked ? '' : ' locked') + (easy ? ' p1' : '');
+      const tag = lv.mode === 'trace' ? 'trace' : (lv.mode === 'mirror' ? 'mirror' : 'finish');
+      card.innerHTML = `<span class="num">${lv.id}</span>
+        <span class="stars">${unlocked && stars ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : (unlocked ? '·' : '🔒')}</span>
+        <span class="meta">${tag}</span>`;
+      if (unlocked) DG.bindTap(card, () => { DG.Audio.click(); startLevel(lv.id); });
+      grid.appendChild(card);
+    });
+    DG.bindTap(scr.querySelector('#back'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.bindTap(scr.querySelector('#how'), () => showHow());
+    DG.bindTap(scr.querySelector('#free'), () => { DG.Audio.click(); openFree(); });
+    DG.bindTap(scr.querySelector('#gal'), () => { DG.Audio.click(); openGallery(); });
+    DG.UI.startBg();
+  }
+
+  function showHow() {
+    const easy = isEasy();
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `<div class="card">
+      <h3>How to mehndi</h3>
+      <div class="sub" style="text-align:left;line-height:1.45">
+        Draw with a henna cone on the palm.<br>
+        Wet henna dries darker after a few seconds.<br>
+        Stamp paisley, flowers, vines, dots & mandalas.<br>
+        ${easy
+          ? 'Trace the big dotted path. Stars for finishing. You cannot fail!'
+          : 'Finish the motif or mirror the other half. Stay close to the guide. 3 lives.'}
+      </div>
+      <button class="btn big" id="ok">Got it</button>
+    </div>`;
+    document.getElementById('app').appendChild(modal);
+    DG.bindTap(modal.querySelector('#ok'), () => modal.remove());
+  }
+
+  /* ---------- Free draw ---------- */
+  function openFree() {
+    cancelAnimationFrame(raf);
+    mode = 'free';
+    level = null;
+    strokes = [];
+    tool = 'brush';
+    stampId = 'paisley';
+    colorId = 'classic';
+    brushR = isEasy() ? 10 : 7;
+    drawing = false;
+    lastPt = null;
+    state = { paused: false, won: false, lost: false, lives: Infinity, accuracy: 0, stars: 0 };
+    renderStudio('mehndi-free', true);
+  }
+
+  function openGallery() {
+    cancelAnimationFrame(raf);
+    mode = 'gallery';
+    DG.screen = 'mehndi-gallery';
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const p = DG.Save.profile();
+    const gal = (p.mehndi && p.mehndi.gallery) || [];
+    const scr = document.createElement('div');
+    scr.className = 'screen landscape-tight mehndi-screen';
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost" id="back">← Back</button>
+        <div class="title" style="font-size:clamp(18px,3.5vw,26px)">🖼 Mehndi gallery</div>
+        <span></span>
+      </div>
+      <div class="mehndi-gal" id="gg"></div>`;
+    el.appendChild(scr);
+    const gg = scr.querySelector('#gg');
+    if (!gal.length) {
+      gg.innerHTML = '<div class="sub" style="padding:24px">No designs yet — draw one in Free mode!</div>';
+    } else {
+      gal.slice().reverse().forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'mehndi-gal-card';
+        const cv = document.createElement('canvas');
+        cv.width = 160; cv.height = 200;
+        const c = cv.getContext('2d');
+        try {
+          const img = new Image();
+          img.onload = () => c.drawImage(img, 0, 0, 160, 200);
+          img.src = item.dataUrl;
+        } catch (_) {}
+        const label = document.createElement('div');
+        label.className = 'sub';
+        label.textContent = item.label || ('Design ' + (gal.length - idx));
+        card.appendChild(cv);
+        card.appendChild(label);
+        gg.appendChild(card);
+      });
+    }
+    DG.bindTap(scr.querySelector('#back'), () => { DG.Audio.click(); open(); });
+  }
+
+  /* ---------- Levels ---------- */
+  function startLevel(id) {
+    cancelAnimationFrame(raf);
+    const list = levels();
+    const lv = list.find((l) => l.id === id) || list[0];
+    level = {
+      id: lv.id,
+      mode: lv.mode,
+      easy: lv.easy,
+      tolerance: lv.tolerance,
+      path: lv.path.map((p) => ({ x: p.x, y: p.y })),
+      revealed: (lv.revealed || []).map((p) => ({ x: p.x, y: p.y })),
+      target: (lv.target || lv.path).map((p) => ({ x: p.x, y: p.y })),
+      coverNeed: lv.coverNeed,
+      lives: lv.lives || 3,
+      title: lv.title
+    };
+    strokes = [];
+    // seed revealed strokes as already-dry guide ink (non-interactive look)
+    if (level.revealed.length) {
+      strokes.push({
+        points: level.revealed.map((p) => ({ x: p.x, y: p.y, t: 0, r: 4 })),
+        colorId: 'deep',
+        driedAt: 0,
+        kind: 'guide',
+        permanent: true
+      });
+    }
+    tool = 'brush';
+    colorId = 'classic';
+    brushR = level.easy ? 12 : 8;
+    drawing = false;
+    lastPt = null;
+    const targets = level.mode === 'trace' ? level.path : level.target;
+    buildHitMask(targets, level.tolerance);
+    state = {
+      paused: false,
+      won: false,
+      lost: false,
+      lives: level.easy ? Infinity : level.lives,
+      accuracy: 0,
+      stars: 0,
+      outAttempts: 0,
+      covered: 0,
+      need: level.coverNeed
+    };
+    mode = 'play';
+    renderStudio(level.mode === 'trace' ? 'mehndi-play' : 'mehndi-play', false);
+  }
+
+  function buildHitMask(pts, tol) {
+    // coarse grid for coverage
+    const cell = 4;
+    const cols = Math.ceil(W / cell);
+    const rows = Math.ceil(H / cell);
+    hitMask = new Uint8Array(cols * rows);
+    coverTotal = 0;
+    coverHit = 0;
+    const r = Math.max(1, Math.floor(tol / cell));
+    pts.forEach((p) => {
+      const cx = Math.floor(p.x / cell);
+      const cy = Math.floor(p.y / cell);
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          if (dx * dx + dy * dy > r * r) continue;
+          const x = cx + dx, y = cy + dy;
+          if (x < 0 || y < 0 || x >= cols || y >= rows) continue;
+          const i = y * cols + x;
+          if (!hitMask[i]) { hitMask[i] = 1; coverTotal++; }
+        }
+      }
+    });
+    // mark 1 = need, 2 = hit
+    hitMask._cols = cols;
+    hitMask._rows = rows;
+    hitMask._cell = cell;
+    hitMask._tol = tol;
+  }
+
+  function stampCoverage(x, y, radius) {
+    if (!hitMask) return;
+    const cell = hitMask._cell;
+    const cols = hitMask._cols;
+    const rows = hitMask._rows;
+    const cx = Math.floor(x / cell);
+    const cy = Math.floor(y / cell);
+    const r = Math.max(1, Math.ceil(radius / cell));
+    let newly = 0;
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (dx * dx + dy * dy > r * r) continue;
+        const ix = cx + dx, iy = cy + dy;
+        if (ix < 0 || iy < 0 || ix >= cols || iy >= rows) continue;
+        const i = iy * cols + ix;
+        if (hitMask[i] === 1) { hitMask[i] = 2; newly++; }
+      }
+    }
+    coverHit += newly;
+    if (coverTotal > 0) state.covered = coverHit / coverTotal;
+  }
+
+  function pointOnTarget(x, y) {
+    if (!level) return true;
+    const pts = level.mode === 'trace' ? level.path : level.target;
+    const tol = level.tolerance;
+    for (let i = 0; i < pts.length; i++) {
+      if (Math.hypot(pts[i].x - x, pts[i].y - y) <= tol) return true;
+    }
+    return false;
+  }
+
+  function renderStudio(screenName, isFree) {
+    DG.screen = screenName;
+    const el = DG.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const easy = isEasy();
+    const scr = document.createElement('div');
+    scr.className = 'screen mehndi-screen mehndi-studio' + (easy ? ' p1-mode' : '');
+    const title = isFree
+      ? 'Free henna'
+      : (level.mode === 'trace' ? `Trace ${level.id}` : (level.mode === 'mirror' ? `Mirror ${level.id}` : `Finish ${level.id}`));
+    scr.innerHTML = `
+      <div class="topbar" style="padding-right:100px">
+        <button class="btn ghost" id="quit">←</button>
+        <div class="sub" id="titleLine">${title}</div>
+        <button class="btn ghost" id="undo">↩</button>
+      </div>
+      <div class="mehndi-layout">
+        <div class="mehndi-stage" id="stage">
+          <canvas id="mehndiCv" width="${W}" height="${H}"></canvas>
+          <div class="mehndi-hud" id="hud"></div>
+        </div>
+        <div class="mehndi-tools" id="tools"></div>
+      </div>`;
+    el.appendChild(scr);
+    canvas = scr.querySelector('#mehndiCv');
+    ctx = canvas.getContext('2d');
+    buildTools(scr.querySelector('#tools'), isFree);
+    bindDraw(scr.querySelector('#stage'));
+    DG.bindTap(scr.querySelector('#quit'), () => {
+      DG.Audio.click();
+      cancelAnimationFrame(raf);
+      if (isFree) open();
+      else open();
+    });
+    DG.bindTap(scr.querySelector('#undo'), () => {
+      DG.Audio.click();
+      // remove last non-guide stroke
+      for (let i = strokes.length - 1; i >= 0; i--) {
+        if (strokes[i].kind !== 'guide') { strokes.splice(i, 1); break; }
+      }
+      if (!isFree && level) {
+        // rebuild coverage from player strokes
+        const targets = level.mode === 'trace' ? level.path : level.target;
+        buildHitMask(targets, level.tolerance);
+        strokes.forEach((s) => {
+          if (s.kind === 'guide') return;
+          s.points.forEach((p) => stampCoverage(p.x, p.y, (p.r || brushR) + 2));
+        });
+        updateHud();
+      }
+    });
+    updateHud();
+    lastTs = 0;
+    loop(DG.now());
+  }
+
+  let lastTs = 0;
+  function loop(ts) {
+    if (!canvas) return;
+    raf = requestAnimationFrame(loop);
+    const now = ts || DG.now();
+    draw(now);
+    if (mode === 'play' && state && !state.won && !state.lost) {
+      checkWin();
+    }
+  }
+
+  function buildTools(host, isFree) {
+    host.innerHTML = '';
+    const colors = document.createElement('div');
+    colors.className = 'mehndi-swatches';
+    HENNA.forEach((h) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mehndi-swatch' + (colorId === h.id ? ' on' : '');
+      b.style.background = h.wet;
+      b.title = h.name;
+      DG.bindTap(b, () => {
+        colorId = h.id;
+        tool = 'brush';
+        buildTools(host, isFree);
+      });
+      colors.appendChild(b);
+    });
+    host.appendChild(colors);
+
+    const stamps = document.createElement('div');
+    stamps.className = 'mehndi-stamps';
+    STAMPS.forEach((s) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn ghost mehndi-stamp' + (tool === 'stamp' && stampId === s.id ? ' on' : '');
+      b.textContent = s.emoji + ' ' + s.name;
+      DG.bindTap(b, () => {
+        tool = 'stamp';
+        stampId = s.id;
+        buildTools(host, isFree);
+      });
+      stamps.appendChild(b);
+    });
+    host.appendChild(stamps);
+
+    const brushBtn = document.createElement('button');
+    brushBtn.type = 'button';
+    brushBtn.className = 'btn' + (tool === 'brush' ? ' big' : ' ghost');
+    brushBtn.textContent = '✏️ Cone brush';
+    DG.bindTap(brushBtn, () => { tool = 'brush'; buildTools(host, isFree); });
+    host.appendChild(brushBtn);
+
+    if (isFree) {
+      const save = document.createElement('button');
+      save.type = 'button';
+      save.className = 'btn big p1';
+      save.textContent = '💾 Save to gallery';
+      DG.bindTap(save, () => { DG.Audio.success && DG.Audio.success(); saveToGallery(); });
+      host.appendChild(save);
+      const clr = document.createElement('button');
+      clr.type = 'button';
+      clr.className = 'btn ghost';
+      clr.textContent = 'Clear';
+      DG.bindTap(clr, () => { strokes = []; });
+      host.appendChild(clr);
+    } else {
+      const done = document.createElement('button');
+      done.type = 'button';
+      done.className = 'btn big p1';
+      done.id = 'checkBtn';
+      done.textContent = level.easy ? '⭐ Done!' : '✓ Check';
+      DG.bindTap(done, () => { DG.Audio.click(); finishCheck(true); });
+      host.appendChild(done);
+    }
+  }
+
+  function updateHud() {
+    const hud = document.querySelector('#hud');
+    if (!hud) return;
+    if (mode === 'free') {
+      hud.innerHTML = `<span>Henna · ${henna().name}</span><span>Stamps ready</span>`;
+      return;
+    }
+    if (!state) return;
+    const lives = state.lives === Infinity ? '∞' : '❤'.repeat(Math.max(0, state.lives));
+    const pct = Math.round((state.covered || 0) * 100);
+    hud.innerHTML = `<span>${lives}</span><span>Cover ${pct}%</span><span>${level ? level.title : ''}</span>`;
+  }
+
+  function canvasPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    const x = ((src.clientX - rect.left) / rect.width) * W;
+    const y = ((src.clientY - rect.top) / rect.height) * H;
+    return { x, y };
+  }
+
+  function bindDraw(stage) {
+    const down = (e) => {
+      e.preventDefault();
+      if (!state || state.won || state.lost || state.paused) return;
+      try { DG.Audio.unlock(); } catch (_) {}
+      const p = canvasPos(e);
+      if (tool === 'stamp') {
+        placeStamp(p.x, p.y);
+        return;
+      }
+      drawing = true;
+      lastPt = p;
+      const now = DG.now();
+      const stroke = {
+        points: [{ x: p.x, y: p.y, t: now, r: brushR }],
+        colorId,
+        driedAt: null,
+        kind: 'brush'
+      };
+      strokes.push(stroke);
+      if (mode === 'play') {
+        if (!pointOnTarget(p.x, p.y)) {
+          penalizeMiss();
+        } else {
+          stampCoverage(p.x, p.y, brushR + 4);
+        }
+      }
+      updateHud();
+    };
+    const move = (e) => {
+      if (!drawing) return;
+      e.preventDefault();
+      const p = canvasPos(e);
+      const stroke = strokes[strokes.length - 1];
+      if (!stroke || stroke.kind !== 'brush') return;
+      const now = DG.now();
+      // smooth: only add if moved enough
+      const lp = stroke.points[stroke.points.length - 1];
+      if (Math.hypot(p.x - lp.x, p.y - lp.y) < 2) return;
+      stroke.points.push({ x: p.x, y: p.y, t: now, r: brushR });
+      if (mode === 'play') {
+        if (!pointOnTarget(p.x, p.y)) {
+          // allow slight overshoot; count miss if far
+          const pts = level.mode === 'trace' ? level.path : level.target;
+          let min = 1e9;
+          for (let i = 0; i < pts.length; i++) {
+            const d = Math.hypot(pts[i].x - p.x, pts[i].y - p.y);
+            if (d < min) min = d;
+          }
+          if (min > level.tolerance * 1.35) penalizeMiss();
+          else stampCoverage(p.x, p.y, brushR + 4);
+        } else {
+          stampCoverage(p.x, p.y, brushR + 4);
+        }
+      }
+      updateHud();
+    };
+    const up = (e) => {
+      if (!drawing) return;
+      e.preventDefault();
+      drawing = false;
+      const stroke = strokes[strokes.length - 1];
+      if (stroke && stroke.kind === 'brush') stroke.driedAt = DG.now() + 2800;
+      lastPt = null;
+    };
+    ['pointerdown', 'mousedown', 'touchstart'].forEach((ev) => stage.addEventListener(ev, down, { passive: false }));
+    ['pointermove', 'mousemove', 'touchmove'].forEach((ev) => stage.addEventListener(ev, move, { passive: false }));
+    ['pointerup', 'pointerleave', 'mouseup', 'touchend', 'touchcancel'].forEach((ev) => stage.addEventListener(ev, up, { passive: false }));
+  }
+
+  function penalizeMiss() {
+    if (!state || state.won || state.lost || level.easy) return;
+    // debounce misses
+    const now = DG.now();
+    if (state._lastMiss && now - state._lastMiss < 450) return;
+    state._lastMiss = now;
+    state.outAttempts = (state.outAttempts || 0) + 1;
+    if (state.lives !== Infinity) {
+      state.lives -= 1;
+      try { DG.Audio.bump && DG.Audio.bump(); } catch (_) {}
+      if (state.lives <= 0) {
+        state.lost = true;
+        showResult(false);
+      }
+    }
+    updateHud();
+  }
+
+  function placeStamp(x, y) {
+    const now = DG.now();
+    const pts = stampPoints(stampId, x, y, isEasy() ? 1.25 : 1);
+    strokes.push({
+      points: pts.map((p) => ({ x: p.x, y: p.y, t: now, r: p.r || 3 })),
+      colorId,
+      driedAt: now + 2500,
+      kind: 'stamp',
+      stampId
+    });
+    if (mode === 'play') {
+      let any = false, bad = false;
+      pts.forEach((p) => {
+        if (pointOnTarget(p.x, p.y)) { stampCoverage(p.x, p.y, 6); any = true; }
+        else bad = true;
+      });
+      if (bad && !any && !level.easy) penalizeMiss();
+    }
+    updateHud();
+  }
+
+  function stampPoints(id, x, y, scale) {
+    const pts = [];
+    if (id === 'paisley') {
+      for (let i = 0; i <= 24; i++) {
+        const t = i / 24;
+        const a = t * Math.PI * 1.6 - 0.3;
+        const r = 22 * scale * (0.35 + 0.65 * Math.sin(t * Math.PI));
+        pts.push({ x: x + Math.cos(a) * r, y: y + Math.sin(a) * r * 1.35, r: 3 * scale });
+      }
+    } else if (id === 'flower') {
+      for (let p = 0; p < 6; p++) {
+        const a = (p / 6) * Math.PI * 2;
+        for (let i = 0; i <= 8; i++) {
+          const t = i / 8;
+          pts.push({
+            x: x + Math.cos(a) * 18 * scale * t,
+            y: y + Math.sin(a) * 18 * scale * t,
+            r: 3.5 * scale
+          });
+        }
+      }
+      pts.push({ x, y, r: 5 * scale });
+    } else if (id === 'vine') {
+      for (let i = 0; i <= 20; i++) {
+        const t = i / 20;
+        pts.push({
+          x: x + (t - 0.5) * 50 * scale,
+          y: y + Math.sin(t * Math.PI * 2) * 12 * scale,
+          r: 3 * scale
+        });
+      }
+    } else if (id === 'dots') {
+      for (let i = -2; i <= 2; i++) {
+        pts.push({ x: x + i * 10 * scale, y: y, r: 4 * scale });
+        if (i !== 0) pts.push({ x: x, y: y + i * 10 * scale, r: 3 * scale });
+      }
+    } else if (id === 'mandala') {
+      for (let ring = 1; ring <= 3; ring++) {
+        const n = 8 * ring;
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2;
+          pts.push({
+            x: x + Math.cos(a) * 12 * ring * scale * 0.7,
+            y: y + Math.sin(a) * 12 * ring * scale * 0.7,
+            r: 2.5 * scale
+          });
+        }
+      }
+      pts.push({ x, y, r: 5 * scale });
+    }
+    return pts;
+  }
+
+  function checkWin() {
+    if (!state || state.won || state.lost) return;
+    if ((state.covered || 0) >= level.coverNeed) {
+      finishCheck(false);
+    }
+  }
+
+  function finishCheck(manual) {
+    if (!state || state.won || state.lost) return;
+    const cov = state.covered || 0;
+    if (level.easy) {
+      // no fail — award stars by coverage
+      state.won = true;
+      let stars = 1;
+      if (cov >= 0.55) stars = 2;
+      if (cov >= level.coverNeed) stars = 3;
+      if (cov < 0.25 && manual) stars = 1; // still celebrate
+      state.stars = stars;
+      state.accuracy = cov;
+      persistProgress(stars);
+      showResult(true);
+      return;
+    }
+    // hard: need coverNeed, else if manual just report; lives already handle misses
+    if (cov >= level.coverNeed) {
+      state.won = true;
+      state.accuracy = cov;
+      let stars = 1;
+      if (cov >= 0.8) stars = 2;
+      if (cov >= 0.92 && state.lives >= 2) stars = 3;
+      state.stars = stars;
+      persistProgress(stars);
+      showResult(true);
+    } else if (manual) {
+      // flash hint — not enough
+      const hint = document.createElement('div');
+      hint.className = 'mehndi-toast';
+      hint.textContent = 'Keep going — cover more of the pattern!';
+      document.querySelector('.mehndi-stage')?.appendChild(hint);
+      setTimeout(() => hint.remove(), 1600);
+    }
+  }
+
+  function persistProgress(stars) {
+    const p = DG.Save.profile();
+    if (!p.mehndi) p.mehndi = { maxCleared: 0, stars: {}, cleared: {}, gallery: [] };
+    p.mehndi.cleared[level.id] = true;
+    p.mehndi.maxCleared = Math.max(p.mehndi.maxCleared || 0, level.id);
+    const prev = p.mehndi.stars[level.id] || 0;
+    p.mehndi.stars[level.id] = Math.max(prev, stars);
+    DG.Save.addSticker('✋');
+    DG.Save.save();
+  }
+
+  function saveToGallery() {
+    // force dry for snapshot
+    const p = DG.Save.profile();
+    if (!p.mehndi) p.mehndi = { maxCleared: 0, stars: {}, cleared: {}, gallery: [] };
+    draw(DG.now() + 100000, true);
+    let dataUrl = '';
+    try { dataUrl = canvas.toDataURL('image/png'); } catch (_) { dataUrl = ''; }
+    p.mehndi.gallery.push({
+      dataUrl,
+      label: 'Henna ' + new Date().toLocaleDateString(),
+      t: Date.now()
+    });
+    if (p.mehndi.gallery.length > 24) p.mehndi.gallery = p.mehndi.gallery.slice(-24);
+    DG.Save.addSticker('✋');
+    DG.Save.save();
+    const toast = document.createElement('div');
+    toast.className = 'mehndi-toast';
+    toast.textContent = 'Saved to gallery!';
+    document.querySelector('.mehndi-stage')?.appendChild(toast);
+    setTimeout(() => toast.remove(), 1400);
+  }
+
+  function showResult(won) {
+    cancelAnimationFrame(raf);
+    mode = 'result';
+    DG.screen = 'mehndi-result';
+    // keep drawing final frame under modal
+    draw(DG.now() + 5000, true);
+    const el = DG.overlay;
+    const box = document.createElement('div');
+    box.className = 'mehndi-result';
+    const stars = won ? '★'.repeat(state.stars) + '☆'.repeat(3 - state.stars) : '—';
+    box.innerHTML = `
+      <h3>${won ? (level.easy ? 'Beautiful!' : 'Pattern complete!') : 'Try again'}</h3>
+      <div class="stars-lg">${stars}</div>
+      <div class="sub">Cover ${Math.round((state.accuracy || state.covered || 0) * 100)}%</div>
+      <div class="row" style="gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn big p1" id="again">${won ? 'Next' : 'Retry'}</button>
+        <button class="btn ghost" id="menu">Levels</button>
+      </div>`;
+    // attach over studio
+    const stage = el.querySelector('.mehndi-stage') || el;
+    const wrap = document.createElement('div');
+    wrap.className = 'mehndi-result-wrap';
+    wrap.appendChild(box);
+    el.appendChild(wrap);
+    const list = levels();
+    DG.bindTap(box.querySelector('#again'), () => {
+      DG.Audio.click();
+      wrap.remove();
+      if (won) {
+        const next = list.find((l) => l.id === level.id + 1);
+        if (next) startLevel(next.id);
+        else open();
+      } else startLevel(level.id);
+    });
+    DG.bindTap(box.querySelector('#menu'), () => { DG.Audio.click(); open(); });
+    try { if (won) DG.Audio.success && DG.Audio.success(); } catch (_) {}
+  }
+
+  /* ---------- Drawing ---------- */
+  function drawHand(c) {
+    const { cx, cy, rx, ry } = PALM;
+    c.save();
+    // palm
+    c.fillStyle = '#f3d2b0';
+    c.strokeStyle = '#c49870';
+    c.lineWidth = 3;
+    c.beginPath();
+    c.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // fingers
+    const fingers = [
+      { a: -1.15, len: 110, w: 22 },
+      { a: -0.55, len: 125, w: 24 },
+      { a: -0.05, len: 130, w: 24 },
+      { a: 0.45, len: 118, w: 22 },
+      { a: 1.05, len: 90, w: 26 } // thumb-ish
+    ];
+    fingers.forEach((f, i) => {
+      const baseX = cx + Math.cos(f.a - Math.PI / 2) * (rx * 0.55);
+      const baseY = cy - ry * 0.85 + Math.sin(f.a) * 8;
+      const tipX = baseX + Math.cos(f.a - Math.PI / 2) * f.len;
+      const tipY = baseY + Math.sin(f.a - Math.PI / 2) * f.len;
+      c.beginPath();
+      c.lineWidth = f.w;
+      c.lineCap = 'round';
+      c.strokeStyle = '#f3d2b0';
+      c.moveTo(baseX, baseY);
+      c.lineTo(tipX, tipY);
+      c.stroke();
+      c.beginPath();
+      c.lineWidth = 2;
+      c.strokeStyle = '#c49870';
+      c.moveTo(baseX, baseY);
+      c.lineTo(tipX, tipY);
+      c.stroke();
+    });
+    // wrist
+    c.beginPath();
+    c.fillStyle = '#f3d2b0';
+    c.ellipse(cx, cy + ry * 0.95, rx * 0.7, 36, 0, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+  }
+
+  function strokeColor(stroke, now) {
+    const h = HENNA.find((x) => x.id === stroke.colorId) || HENNA[1];
+    if (stroke.kind === 'guide') return 'rgba(120,50,30,0.35)';
+    if (stroke.driedAt == null) return h.wet;
+    if (now >= stroke.driedAt) return h.dry;
+    const t = Math.max(0, Math.min(1, 1 - (stroke.driedAt - now) / 2800));
+    // lerp wet→dry roughly via alpha mix
+    return mixHex(h.wet, h.dry, t);
+  }
+
+  function mixHex(a, b, t) {
+    const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+    const ar = (pa >> 16) & 255, ag = (pa >> 8) & 255, ab = pa & 255;
+    const br = (pb >> 16) & 255, bg = (pb >> 8) & 255, bb = pb & 255;
+    const r = Math.round(ar + (br - ar) * t);
+    const g = Math.round(ag + (bg - ag) * t);
+    const bl = Math.round(ab + (bb - ab) * t);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  function drawStroke(c, stroke, now) {
+    if (!stroke.points.length) return;
+    const col = strokeColor(stroke, now);
+    c.strokeStyle = col;
+    c.fillStyle = col;
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    if (stroke.kind === 'guide') {
+      // dotted guide
+      c.setLineDash([4, 10]);
+      c.lineWidth = 5;
+      c.beginPath();
+      stroke.points.forEach((p, i) => {
+        if (i === 0) c.moveTo(p.x, p.y);
+        else c.lineTo(p.x, p.y);
+      });
+      c.stroke();
+      c.setLineDash([]);
+      return;
+    }
+    if (stroke.points.length === 1) {
+      const p = stroke.points[0];
+      c.beginPath();
+      c.arc(p.x, p.y, p.r || 4, 0, Math.PI * 2);
+      c.fill();
+      return;
+    }
+    c.lineWidth = (stroke.points[0].r || brushR) * 1.6;
+    c.beginPath();
+    stroke.points.forEach((p, i) => {
+      if (i === 0) c.moveTo(p.x, p.y);
+      else c.lineTo(p.x, p.y);
+    });
+    c.stroke();
+  }
+
+  function drawGuidePath(c) {
+    if (!level) return;
+    if (level.mode === 'trace') {
+      c.save();
+      c.setLineDash([5, 12]);
+      c.strokeStyle = 'rgba(140,60,40,0.45)';
+      c.lineWidth = 6;
+      c.lineCap = 'round';
+      c.beginPath();
+      level.path.forEach((p, i) => {
+        if (i === 0) c.moveTo(p.x, p.y);
+        else c.lineTo(p.x, p.y);
+      });
+      c.stroke();
+      // start star
+      const s = level.path[0];
+      c.setLineDash([]);
+      c.fillStyle = '#f0c040';
+      c.font = '22px sans-serif';
+      c.fillText('★', s.x - 8, s.y + 6);
+      c.restore();
+    } else {
+      // faint target ghost for hard modes
+      c.save();
+      c.setLineDash([3, 8]);
+      c.strokeStyle = 'rgba(140,60,40,0.28)';
+      c.lineWidth = 4;
+      c.beginPath();
+      level.target.forEach((p, i) => {
+        if (i === 0) c.moveTo(p.x, p.y);
+        else c.lineTo(p.x, p.y);
+      });
+      c.stroke();
+      c.setLineDash([]);
+      c.restore();
+    }
+  }
+
+  function draw(now, forceDry) {
+    if (!ctx) return;
+    const c = ctx;
+    const t = forceDry ? now + 1e7 : now;
+    c.clearRect(0, 0, W, H);
+    // background cloth
+    c.fillStyle = '#2a1040';
+    c.fillRect(0, 0, W, H);
+    c.fillStyle = 'rgba(255,200,100,0.05)';
+    for (let i = 0; i < 40; i++) {
+      c.fillRect((i * 97) % W, (i * 53) % H, 40, 2);
+    }
+    drawHand(c);
+    if (mode === 'play' || mode === 'result') drawGuidePath(c);
+    strokes.forEach((s) => drawStroke(c, s, t));
+  }
+
+  /* ---------- Hooks for smoke / content ---------- */
+  function prove() {
+    return {
+      easy: DG.MehndiLevels.proveAll(true),
+      hard: DG.MehndiLevels.proveAll(false)
+    };
+  }
+
+  /** Auto-trace the current (or given) level perfectly within tolerance */
+  function autoComplete(id) {
+    if (id != null) startLevel(id);
+    if (!level || !state) return { ok: false };
+    const pts = level.mode === 'trace' ? level.path : level.target;
+    const now = DG.now();
+    const stroke = {
+      points: pts.map((p) => ({ x: p.x, y: p.y, t: now, r: Math.max(6, level.tolerance * 0.35) })),
+      colorId: 'maroon',
+      driedAt: now + 500,
+      kind: 'brush'
+    };
+    strokes.push(stroke);
+    pts.forEach((p) => stampCoverage(p.x, p.y, level.tolerance * 0.9));
+    updateHud();
+    finishCheck(true);
+    return {
+      ok: !!state.won,
+      covered: state.covered,
+      stars: state.stars,
+      level: level.id,
+      mode: level.mode
+    };
+  }
+
+  function getState() {
+    return state && level ? {
+      level: level.id,
+      mode: level.mode,
+      lives: state.lives,
+      covered: state.covered,
+      won: state.won,
+      lost: state.lost,
+      stars: state.stars,
+      accuracy: state.accuracy,
+      strokeCount: strokes.filter((s) => s.kind !== 'guide').length
+    } : state;
+  }
+
+  function galleryCount() {
+    const p = DG.Save.profile();
+    return ((p.mehndi && p.mehndi.gallery) || []).length;
+  }
+
+  return {
+    open,
+    openFree,
+    openGallery,
+    startLevel,
+    autoComplete,
+    prove,
+    getState,
+    galleryCount,
+    HENNA,
+    STAMPS,
+    saveToGallery,
+    // expose for content check hook used by smoke
+    checkPath: (easy, id) => {
+      const list = easy ? DG.MehndiLevels.easy : DG.MehndiLevels.hard;
+      const lv = list.find((l) => l.id === id) || list[0];
+      return DG.MehndiLevels.checkCompletable(lv);
+    }
+  };
+})();
+
+})();
+/* ==== 90-boot.js ==== */
+;(function(){
+/* Boot + window.__game */
+(function () {
+  function boot() {
+    DG.canvas = document.getElementById('game');
+    DG.ctx = DG.canvas.getContext('2d');
+    DG.overlay = document.getElementById('overlay');
+    DG.hud = document.getElementById('hud');
+    DG.fitCanvas();
+    DG.Save.load();
+
+    const muteBtn = document.getElementById('muteBtn');
+    const fsBtn = document.getElementById('fsBtn');
+    try {
+      DG.muted = localStorage.getItem('diwali-games-2-mute') === '1';
+    } catch (_) {}
+    muteBtn.textContent = DG.muted ? '🔇' : '🔊';
+    DG.bindTap(muteBtn, () => {
+      DG.muted = !DG.muted;
+      muteBtn.textContent = DG.muted ? '🔇' : '🔊';
+      try { localStorage.setItem('diwali-games-2-mute', DG.muted ? '1' : '0'); } catch (_) {}
+      try { DG.Audio.unlock(); } catch (_) {}
+    });
+    DG.bindTap(fsBtn, () => {
+      const root = document.documentElement;
+      if (!document.fullscreenElement) {
+        (root.requestFullscreen || root.webkitRequestFullscreen || (() => {})).call(root);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
+      }
+    });
+
+    window.addEventListener('resize', () => DG.fitCanvas());
+    window.addEventListener('orientationchange', () => setTimeout(DG.fitCanvas, 200));
+
+    window.__game = {
+      DG,
+      version: DG.VERSION,
+      pack: 2,
+      screen: () => DG.screen,
+      profile: () => DG.Save.profile(),
+      profileId: () => DG.profileId,
+      setProfile: (id) => { DG.Save.setProfile(id); },
+      showHub: () => DG.UI.showHub(),
+      showProfiles: () => DG.UI.showProfiles(),
+      openLantern: () => DG.Lantern.open(),
+      startLantern: (id) => DG.Lantern.startLevel(id),
+      lanternState: () => {
+        const s = DG.Lantern.getState && DG.Lantern.getState();
+        if (!s) return null;
+        return {
+          level: s.level.id, x: s.x, y: s.y, lives: s.lives, score: s.score,
+          sparks: s.sparks, marigolds: s.marigolds, won: s.won, lost: s.lost, paused: s.paused
+        };
+      },
+      proveLantern: () => DG.Lantern.prove(),
+      autoplayLantern: (id, easy) => DG.Lantern.autoplayLevel(id, easy),
+      levelCounts: () => ({
+        easy: DG.LanternLevels.easy.length,
+        hard: DG.LanternLevels.hard.length
+      }),
+      openBoats: () => DG.Boats.open(),
+      startBoats: (id) => DG.Boats.startLevel(id),
+      boatsState: () => {
+        const s = DG.Boats.getState && DG.Boats.getState();
+        if (!s) return null;
+        return {
+          level: s.level.id, x: s.x, y: s.y, lives: s.lives,
+          diyas: s.diyas, garlands: s.garlands, timingScore: s.timingScore,
+          won: s.won, lost: s.lost, paused: s.paused
+        };
+      },
+      proveBoats: () => DG.Boats.prove(),
+      autoplayBoats: (id, easy) => DG.Boats.autoplayLevel(id, easy),
+      boatsLevelCounts: () => ({
+        easy: DG.BoatsLevels.easy.length,
+        hard: DG.BoatsLevels.hard.length
+      }),
+      openKandil: () => DG.Kandil.open(),
+      kandilDesign: () => DG.Kandil.getDesign(),
+      kandilSetDesign: (d) => DG.Kandil.setDesign(d),
+      kandilLit: (v) => DG.Kandil.setLit(v),
+      kandilHang: () => DG.Kandil.hang(),
+      kandilOrders: () => DG.Kandil.openOrders(),
+      kandilGallery: () => DG.Kandil.openGallery(),
+      kandilStartOrder: (id) => DG.Kandil.startOrder(id),
+      kandilApplyTarget: (id) => DG.Kandil.applyTarget(id),
+      kandilScore: () => DG.Kandil.scoreCurrent(),
+      kandilSurprise: () => DG.Kandil.surprise(),
+      kandilOrderCount: () => DG.Kandil.orderCount(),
+      kandilShapes: () => DG.Kandil.SHAPES.map((s) => s.id),
+      openMehndi: () => DG.Mehndi.open(),
+      startMehndi: (id) => DG.Mehndi.startLevel(id),
+      mehndiState: () => DG.Mehndi.getState(),
+      mehndiFree: () => DG.Mehndi.openFree(),
+      mehndiGallery: () => DG.Mehndi.openGallery(),
+      mehndiSave: () => DG.Mehndi.saveToGallery(),
+      mehndiAuto: (id) => DG.Mehndi.autoComplete(id),
+      proveMehndi: () => DG.Mehndi.prove(),
+      mehndiLevelCounts: () => ({
+        easy: DG.MehndiLevels.easy.length,
+        hard: DG.MehndiLevels.hard.length
+      }),
+      mehndiCheckPath: (easy, id) => DG.Mehndi.checkPath(easy, id),
+      mehndiGalleryCount: () => DG.Mehndi.galleryCount(),
+      getStickers: () => (DG.Save.profile().stickers || []).slice(),
+      games: () => DG.games.map((g) => ({ id: g.id, ready: g.ready, name: g.name })),
+      save: () => DG.Save.profile(),
+      muted: () => DG.muted
+    };
+
+    DG.UI.showProfiles();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "diwali-games-2";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>

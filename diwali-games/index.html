@@ -119,6 +119,143 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0d0618;font-family:
   .level-card{min-height:64px}
   .marigold-frame{padding:6px}
 }
+
+
+/* Quiz Quest — storybook */
+.quiz-screen{max-width:1180px}
+.quiz-story{font-size:clamp(14px,2.4vw,18px);color:#ffd9a8;text-align:center;max-width:640px}
+.quiz-rounds{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;width:min(960px,100%);padding:4px 0 16px}
+.quiz-round-card{min-height:120px;border-radius:18px;border:3px solid #e8b040;background:linear-gradient(160deg,#4a1868,#1a0830);color:#ffe8b0;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:14px 16px;text-align:left;box-shadow:0 5px 0 #120420}
+.quiz-round-card .emoji{font-size:28px}
+.quiz-round-card .name{font-size:16px;font-weight:800}
+.quiz-round-card .story{font-size:12px;opacity:.85;font-weight:500;line-height:1.35}
+.quiz-round-card .stars{font-size:12px;margin-top:4px;color:#ffd070}
+.quiz-round-card.done{border-color:#9fe07a}
+.quiz-round-card.p1,.p1-mode .quiz-round-card{min-height:132px;border-radius:20px}
+.quiz-page{width:min(720px,100%);background:linear-gradient(165deg,rgba(70,30,100,.92),rgba(25,8,45,.94));border:3px solid #f0c050;border-radius:22px;padding:18px 16px 20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 0 28px rgba(255,160,40,.22),inset 0 0 30px rgba(0,0,0,.25);position:relative}
+.quiz-page.result{align-items:center;text-align:center}
+.quiz-q{font-size:clamp(18px,3.2vw,26px);font-weight:800;color:#fff6d8;text-align:center;line-height:1.35;text-shadow:0 2px 0 rgba(80,30,0,.45)}
+.quiz-q.p1{font-size:clamp(20px,3.6vw,28px)}
+.quiz-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.quiz-choices.p1{grid-template-columns:1fr 1fr;gap:12px}
+.quiz-choice{min-height:64px;border-radius:16px;border:3px solid rgba(255,200,100,.55);background:linear-gradient(180deg,#5a2860,#2a1040);color:#fff6d8;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:10px 12px;text-align:left;box-shadow:0 4px 0 #140420}
+.quiz-choice .emoji{font-size:28px;line-height:1;flex-shrink:0}
+.quiz-choice .label{line-height:1.25}
+.quiz-choice.p1,.p1-mode .quiz-choice{min-height:76px;font-size:17px;border-radius:18px}
+.p1-mode .quiz-choice .emoji{font-size:34px}
+.quiz-choice.correct{border-color:#9fe07a;background:linear-gradient(180deg,#3a6840,#1a4028);box-shadow:0 0 16px rgba(120,220,100,.45)}
+.quiz-choice.wrong{animation:wobble .4s ease;border-color:#ff8a8a}
+.quiz-choice:disabled{opacity:.92}
+.quiz-fact{margin-top:4px;padding:12px;border-radius:16px;background:rgba(255,200,80,.12);border:2px dashed #f0c050;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+.quiz-fact .fact-title{font-weight:800;color:#ffe08a;font-size:16px}
+.quiz-fact .fact-body{font-size:clamp(14px,2.4vw,17px);color:#ffe8c8;line-height:1.4}
+.quiz-fact.p1 .fact-body{font-size:clamp(15px,2.6vw,18px)}
+.quiz-stars{font-size:36px;letter-spacing:4px}
+@media (max-width:520px){
+  .quiz-choices{grid-template-columns:1fr}
+  .quiz-rounds{grid-template-columns:1fr}
+}
+@media (max-height:420px){
+  .quiz-round-card{min-height:96px;padding:10px}
+  .quiz-choice{min-height:56px}
+  .quiz-page{padding:12px}
+}
+/* Diya Memory Match */
+.memory-screen{max-width:1180px}
+.mem-table{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:8px;width:min(720px,100%);padding:4px 0 12px;justify-items:stretch}
+.mem-card{position:relative;aspect-ratio:1;min-height:56px;min-width:48px;border-radius:14px;border:3px solid #e8b040;background:linear-gradient(160deg,#4a1868,#1a0830);cursor:pointer;box-shadow:0 4px 0 #120420;perspective:600px;padding:0;overflow:hidden}
+.mem-card .face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,5vw,36px);backface-visibility:hidden;transition:transform .28s ease}
+.mem-card .back{background:linear-gradient(160deg,#5a2868,#2a1040);transform:rotateY(0)}
+.mem-card .front{background:linear-gradient(160deg,#6a3a28,#3a1810);transform:rotateY(180deg);border-radius:11px}
+.mem-card.up .back{transform:rotateY(180deg)}
+.mem-card.up .front{transform:rotateY(0)}
+.mem-card.matched{border-color:#9fe07a;box-shadow:0 0 14px rgba(120,220,100,.4);cursor:default}
+.mem-card.matched .front{background:linear-gradient(160deg,#3a6840,#1a4028)}
+.mem-card.p1,.p1-mode .mem-card{min-height:72px;border-radius:18px;border-width:3px}
+.p1-mode .mem-card .face{font-size:clamp(28px,6vw,42px)}
+.mem-clock{font-weight:800;color:#ffd070;font-size:16px;min-width:52px;text-align:center}
+.mem-result{width:min(520px,100%);background:linear-gradient(165deg,rgba(70,30,100,.92),rgba(25,8,45,.94));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 0 28px rgba(255,160,40,.22)}
+@media (max-height:420px){
+  .mem-table{gap:6px}
+  .mem-card{min-height:48px}
+  .p1-mode .mem-card{min-height:56px}
+}
+@media (max-width:520px){
+  .mem-table{gap:6px}
+}
+/* Phuljhadi Pop — dark night sky, no strobe */
+.phul-screen{max-width:1180px}
+.phul-stage{position:relative;flex:1;width:min(720px,100%);min-height:220px;display:flex;flex-direction:column;background:linear-gradient(180deg,#07041a 0%,#12082e 55%,#1a0a28 100%);border:3px solid #c09040;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 40px rgba(255,160,40,.08),0 0 24px rgba(80,40,120,.35)}
+.phul-count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(48px,12vw,96px);font-weight:900;color:#ffe6a0;text-shadow:0 0 20px rgba(255,180,60,.35);z-index:5;pointer-events:none;transition:opacity .25s ease}
+.phul-count.hidden{opacity:0}
+.phul-track{flex:1;display:grid;grid-template-columns:repeat(var(--lanes),1fr);gap:6px;padding:10px 10px 0;position:relative;min-height:140px}
+.phul-lane{position:relative;border-radius:12px;background:linear-gradient(180deg,rgba(255,200,100,.04),rgba(255,180,80,.07));border:1px solid rgba(255,200,120,.12)}
+.phul-note{position:absolute;left:50%;transform:translate(-50%,-50%);font-size:clamp(22px,4.5vw,34px);filter:drop-shadow(0 0 6px rgba(255,180,60,.35));pointer-events:none;will-change:top}
+.phul-note.boom{font-size:clamp(26px,5vw,38px)}
+.phul-note.missed{opacity:.3;filter:grayscale(.6)}
+.phul-pads{display:grid;grid-template-columns:repeat(var(--lanes),1fr);gap:8px;padding:8px 10px 12px}
+.phul-pad{min-height:64px;border-radius:18px;border:3px solid #e8b040;background:linear-gradient(180deg,#4a2868,#1a1030);color:#ffe8b0;font-size:28px;cursor:pointer;box-shadow:0 4px 0 #0c0618;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.phul-pad.p1,.p1-mode .phul-pad{min-height:80px;font-size:36px;border-radius:22px;border-width:4px}
+.phul-pad.flash{box-shadow:0 0 14px rgba(255,190,80,.4);border-color:#ffe08a;background:linear-gradient(180deg,#5a3870,#2a1840)}
+.phul-pops{position:absolute;left:0;right:0;bottom:70px;height:80px;pointer-events:none;z-index:4}
+.phul-pop{position:absolute;bottom:0;transform:translate(-50%,0);font-size:28px;transition:none}
+.phul-result{width:min(520px,100%);background:linear-gradient(165deg,rgba(30,16,60,.94),rgba(12,6,28,.96));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 0 28px rgba(255,160,40,.18)}
+@media (max-height:420px){
+  .phul-stage{min-height:160px}
+  .phul-pad{min-height:52px}
+  .p1-mode .phul-pad{min-height:60px}
+  .phul-track{min-height:100px}
+}
+/* Sweet Shop Sort — warm counter */
+.sweets-screen{max-width:1180px}
+.sw-patience{width:min(720px,100%);height:8px;background:rgba(80,40,20,.25);border-radius:8px;overflow:hidden;margin:2px 0 4px}
+.sw-patience>div{height:100%;width:100%;background:linear-gradient(90deg,#f0a040,#e07030);border-radius:8px;transition:width .2s linear}
+.sw-counter{width:min(720px,100%);display:flex;flex-direction:column;gap:8px;padding-bottom:8px}
+.sw-order-card{background:linear-gradient(160deg,#6a3a18,#3a1c0c);border:3px solid #e8b060;border-radius:16px;padding:10px 12px;color:#fff3d8;box-shadow:0 4px 0 #1a0c04}
+.sw-order-title{font-weight:800;font-size:clamp(14px,2.6vw,18px);margin-bottom:4px}
+.sw-order-pics{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw-need{display:inline-flex;align-items:center;gap:2px;font-size:clamp(22px,4vw,32px);background:rgba(0,0,0,.2);padding:4px 8px;border-radius:12px}
+.sw-need small{font-size:14px;font-weight:800;color:#ffe08a}
+.sw-box{min-height:88px;background:linear-gradient(180deg,#5a3018,#2a1408);border:3px dashed #e8b060;border-radius:18px;padding:8px 10px;box-shadow:inset 0 0 20px rgba(0,0,0,.25)}
+.sw-box.change{border-style:solid;background:linear-gradient(180deg,#3a4a28,#1a2810)}
+.sw-box-label{font-size:12px;font-weight:700;color:#ffd090;margin-bottom:4px}
+.sw-box-bits{display:flex;flex-wrap:wrap;gap:4px;min-height:40px}
+.sw-bit{font-size:26px;line-height:1}
+.sw-bit.coin{font-size:14px;font-weight:800;color:#1a3010;background:#d8e878;border:2px solid #a0b040;border-radius:999px;padding:4px 8px}
+.sw-shelf{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.sw-sweet,.sw-coin{min-height:64px;min-width:72px;border-radius:16px;border:3px solid #e8b040;background:linear-gradient(180deg,#8a5028,#4a2810);color:#fff6d8;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 10px;box-shadow:0 4px 0 #1a0c04;touch-action:none;user-select:none;-webkit-user-select:none}
+.sw-sweet.p1,.p1-mode .sw-sweet{min-height:80px;min-width:88px;font-size:18px;border-radius:20px}
+.sw-sweet .em,.sw-coin .em{font-size:28px;line-height:1}
+.p1-mode .sw-sweet .em{font-size:36px}
+.sw-sweet .nm,.sw-coin .nm{font-size:11px;font-weight:700;opacity:.9}
+.sw-coin{background:linear-gradient(180deg,#6a8040,#304018);border-color:#c0d060;min-width:64px}
+.sw-coin.empty{opacity:.4}
+.sw-ghost{position:fixed;left:0;top:0;transform:translate(-50%,-50%);font-size:36px;pointer-events:none;z-index:9999;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.sw-result{width:min(520px,100%);background:linear-gradient(165deg,rgba(90,50,20,.94),rgba(40,18,8,.96));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 0 28px rgba(255,160,40,.2)}
+@media (max-height:420px){
+  .sw-box{min-height:64px}
+  .sw-sweet,.sw-coin{min-height:52px}
+  .p1-mode .sw-sweet{min-height:60px}
+}
+
+/* Spot the Diya */
+.spot-screen{max-width:1180px}
+.spot-stage{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(960px,100%);margin:0 auto;align-items:start}
+.spot-stage.stacked{grid-template-columns:1fr}
+.spot-pane{position:relative;width:100%;border:3px solid #e8b060;border-radius:14px;overflow:hidden;background:#1a1040;box-shadow:0 4px 0 #1a0c04}
+.spot-pane canvas{display:block;width:100%;height:auto;touch-action:manipulation}
+.spot-hits{position:absolute;inset:0;pointer-events:none}
+.spot-hit{position:absolute;transform:translate(-50%,-50%);border-radius:50%;border:3px solid transparent;background:transparent;pointer-events:auto;cursor:pointer;padding:0;min-width:44px;min-height:44px;z-index:2}
+.spot-hit.found{border-color:#ffd060;box-shadow:0 0 0 2px rgba(255,200,60,.35),inset 0 0 12px rgba(255,220,80,.25)}
+.spot-hit.glow{border-color:rgba(255,230,100,.9);box-shadow:0 0 16px rgba(255,220,80,.7);animation:spotPulse 0.9s ease-in-out infinite alternate}
+@keyframes spotPulse{from{transform:translate(-50%,-50%) scale(1)}to{transform:translate(-50%,-50%) scale(1.08)}}
+.spot-miss{position:absolute;inset:0;border:0;background:transparent;pointer-events:auto;cursor:crosshair;z-index:1;padding:0}
+.spot-actions{justify-content:center;gap:8px;margin-top:6px;padding-bottom:6px}
+.spot-result{width:min(520px,100%);background:linear-gradient(165deg,rgba(40,24,70,.95),rgba(20,10,40,.96));border:3px solid #f0c050;border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;margin:24px auto;box-shadow:0 0 28px rgba(255,160,40,.2)}
+.p1-mode .spot-hit{min-width:52px;min-height:52px}
+@media (max-width:700px){
+  .spot-stage{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -143,11 +280,12 @@ const DG = window.DG = {
   },
   games: [
     { id: 'rangoli', name: 'Rangoli Studio', emoji: '🎨', tag: 'Color & create', ready: true },
-    { id: 'quiz', name: 'Quiz Quest', emoji: '📖', tag: 'Coming soon', ready: false },
-    { id: 'memory', name: 'Diya Memory', emoji: '🃏', tag: 'Coming soon', ready: false },
+    { id: 'quiz', name: 'Diwali Quiz Quest', emoji: '📖', tag: 'Storybook quiz', ready: true },
+    { id: 'memory', name: 'Diya Memory', emoji: '🃏', tag: 'Flip & match', ready: true },
     { id: 'diyapath', name: 'Diya Path', emoji: '🏮', tag: 'Arrow escape', ready: true },
-    { id: 'fireworks', name: 'Phuljhadi Pop', emoji: '🎆', tag: 'Coming soon', ready: false },
-    { id: 'sweets', name: 'Sweet Shop', emoji: '🍬', tag: 'Coming soon', ready: false }
+    { id: 'fireworks', name: 'Phuljhadi Pop', emoji: '🎆', tag: 'Tap the beat', ready: true },
+    { id: 'sweets', name: 'Sweet Shop', emoji: '🍬', tag: 'Pack orders', ready: true },
+    { id: 'spot', name: 'Spot the Diya', emoji: '🔍', tag: 'Find differences', ready: true }
   ],
   memStore: null,
   state: null,
@@ -234,7 +372,7 @@ DG.Audio = (() => {
     if (!AC) return null;
     ctx = new AC();
     master = ctx.createGain();
-    master.gain.value = DG.muted ? 0 : 0.32;
+    master.gain.value = DG.muted ? 0 : 0.28;
     master.connect(ctx.destination);
     return ctx;
   }
@@ -263,11 +401,32 @@ DG.Audio = (() => {
     o.start(t0); o.stop(t0 + dur + 0.02);
   }
 
+  function scheduleTone(freq, when, dur, type, vol, slide) {
+    if (DG.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = Math.max(when, c.currentTime);
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    const v = Math.min(0.12, vol || 0.06); // keep festive tune gentle
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(v, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
   return {
     unlock,
+    getCtx: () => ensure(),
+    currentTime: () => { const c = ensure(); return c ? c.currentTime : 0; },
+    scheduleTone,
     setMuted(m) {
       DG.muted = !!m;
-      if (master) master.gain.value = DG.muted ? 0 : 0.32;
+      if (master) master.gain.value = DG.muted ? 0 : 0.28;
       try { localStorage.setItem('dg-mute', DG.muted ? '1' : '0'); } catch (_) {}
       const btn = document.getElementById('muteBtn');
       if (btn) btn.textContent = DG.muted ? '🔇' : '🔊';
@@ -276,6 +435,7 @@ DG.Audio = (() => {
       try { DG.muted = localStorage.getItem('dg-mute') === '1'; } catch (_) {}
       const btn = document.getElementById('muteBtn');
       if (btn) btn.textContent = DG.muted ? '🔇' : '🔊';
+      if (master) master.gain.value = DG.muted ? 0 : 0.28;
     },
     click() { tone(340, 0.05, 'triangle', 0.07); },
     soft() { tone(380, 0.08, 'sine', 0.08); },
@@ -284,7 +444,9 @@ DG.Audio = (() => {
     win() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.15, 'sine', 0.11), i * 85)); },
     save() { tone(660, 0.08, 'sine', 0.1); setTimeout(() => tone(880, 0.12, 'sine', 0.1), 70); },
     blocked() { tone(180, 0.1, 'triangle', 0.08, 120); setTimeout(() => tone(140, 0.12, 'sine', 0.07, 90), 90); },
-    lantern() { tone(440, 0.08, 'sine', 0.09); setTimeout(() => tone(660, 0.14, 'sine', 0.1, 880), 70); }
+    lantern() { tone(440, 0.08, 'sine', 0.09); setTimeout(() => tone(660, 0.14, 'sine', 0.1, 880), 70); },
+    sparkle() { tone(880, 0.06, 'triangle', 0.06, 1320); setTimeout(() => tone(1180, 0.05, 'sine', 0.045), 40); },
+    pop() { tone(520, 0.05, 'sine', 0.07, 240); }
   };
 })();
 
@@ -303,7 +465,12 @@ DG.Save = (() => {
       gallery: [],
       rangoliClears: 0,
       playSeconds: 0,
-      diyaPath: { maxCleared: 0, stars: {}, cleared: {} }
+      diyaPath: { maxCleared: 0, stars: {}, cleared: {} },
+      quiz: { rounds: {}, stars: {}, totalCorrect: 0 },
+      memory: { maxCleared: 0, stars: {}, cleared: {}, bestMs: {} },
+      phuljhadi: { maxCleared: 0, stars: {}, cleared: {}, bestCombo: {} },
+      sweets: { maxCleared: 0, stars: {}, cleared: {} },
+      spot: { maxCleared: 0, stars: {}, cleared: {} }
     };
   }
 
@@ -351,6 +518,23 @@ DG.Save = (() => {
       if (!raw.profiles[id].diyaPath) raw.profiles[id].diyaPath = { maxCleared: 0, stars: {}, cleared: {} };
       if (!raw.profiles[id].diyaPath.stars) raw.profiles[id].diyaPath.stars = {};
       if (!raw.profiles[id].diyaPath.cleared) raw.profiles[id].diyaPath.cleared = {};
+      if (!raw.profiles[id].quiz) raw.profiles[id].quiz = { rounds: {}, stars: {}, totalCorrect: 0 };
+      if (!raw.profiles[id].quiz.rounds) raw.profiles[id].quiz.rounds = {};
+      if (!raw.profiles[id].quiz.stars) raw.profiles[id].quiz.stars = {};
+      if (!raw.profiles[id].memory) raw.profiles[id].memory = { maxCleared: 0, stars: {}, cleared: {}, bestMs: {} };
+      if (!raw.profiles[id].memory.stars) raw.profiles[id].memory.stars = {};
+      if (!raw.profiles[id].memory.cleared) raw.profiles[id].memory.cleared = {};
+      if (!raw.profiles[id].memory.bestMs) raw.profiles[id].memory.bestMs = {};
+      if (!raw.profiles[id].phuljhadi) raw.profiles[id].phuljhadi = { maxCleared: 0, stars: {}, cleared: {}, bestCombo: {} };
+      if (!raw.profiles[id].phuljhadi.stars) raw.profiles[id].phuljhadi.stars = {};
+      if (!raw.profiles[id].phuljhadi.cleared) raw.profiles[id].phuljhadi.cleared = {};
+      if (!raw.profiles[id].phuljhadi.bestCombo) raw.profiles[id].phuljhadi.bestCombo = {};
+      if (!raw.profiles[id].sweets) raw.profiles[id].sweets = { maxCleared: 0, stars: {}, cleared: {} };
+      if (!raw.profiles[id].sweets.stars) raw.profiles[id].sweets.stars = {};
+      if (!raw.profiles[id].sweets.cleared) raw.profiles[id].sweets.cleared = {};
+      if (!raw.profiles[id].spot) raw.profiles[id].spot = { maxCleared: 0, stars: {}, cleared: {} };
+      if (!raw.profiles[id].spot.stars) raw.profiles[id].spot.stars = {};
+      if (!raw.profiles[id].spot.cleared) raw.profiles[id].spot.cleared = {};
     }
     DG.state = raw;
     return DG.state;
@@ -376,8 +560,13 @@ DG.Save = (() => {
     const p = profile();
     if (!p.stickers.includes(emoji)) {
       p.stickers.push(emoji);
-      if (p.stickers.length >= 1 && !p.badges.includes('rangoli') && emoji === '🎨') p.badges.push('rangoli');
-      if (emoji === '🪔' && !p.badges.includes('diyapath')) p.badges.push('diyapath');
+      if (emoji === '🎨' && !p.badges.includes('rangoli')) p.badges.push('rangoli');
+      if (emoji === '📖' && !p.badges.includes('quiz')) p.badges.push('quiz');
+      if (emoji === '🃏' && !p.badges.includes('memory')) p.badges.push('memory');
+      if (emoji === '🎆' && !p.badges.includes('phuljhadi')) p.badges.push('phuljhadi');
+      if (emoji === '🍬' && !p.badges.includes('sweets')) p.badges.push('sweets');
+      if (emoji === '🔍' && !p.badges.includes('spot')) p.badges.push('spot');
+      // 🪔 sticker shared across games; each game pushes its own badge id
       save();
     }
   }
@@ -950,6 +1139,764 @@ DG.DiyaLevels = (() => {
 })();
 
 })();
+/* ==== 52-quiz-data.js ==== */
+;(function(){
+/* Diwali Quiz Quest — question banks (separate packs per profile) */
+DG.QuizData = (() => {
+  const ROUNDS = [{"id": "rama", "title": "Rama's Journey", "emoji": "🏹", "story": "A prince, a princess, and a bright path home to Ayodhya."}, {"id": "deities", "title": "Lakshmi & Ganesha", "emoji": "🪷", "story": "Kind deities who bring light, luck, and new beginnings."}, {"id": "fivedays", "title": "Five Festival Days", "emoji": "📅", "story": "Diwali shines for five special days — let's meet them."}, {"id": "festive", "title": "Diyas, Rangoli & Sweets", "emoji": "🪔", "story": "Colors on the floor, lamps in windows, and treats to share."}, {"id": "together", "title": "Many Lights, Many Traditions", "emoji": "🌍", "story": "Hindu, Jain, Sikh, and Buddhist families celebrate with light."}];
+  const EASY = [{"id": "e1", "round": "rama", "q": "Who came home to Ayodhya with lights?", "choices": [{"t": "Rama", "e": "🏹", "ok": true}, {"t": "A dragon", "e": "🐉", "ok": false}, {"t": "A robot", "e": "🤖", "ok": false}], "fact": "Did you know? People lit lamps so Rama could find the way home."}, {"id": "e2", "round": "rama", "q": "Who is Rama's kind wife?", "choices": [{"t": "Sita", "e": "👸", "ok": true}, {"t": "A goose", "e": "🪿", "ok": false}, {"t": "A cloud", "e": "☁️", "ok": false}], "fact": "Did you know? Sita is brave and gentle in the story."}, {"id": "e3", "round": "rama", "q": "Who walked with Rama as a helpful brother?", "choices": [{"t": "Lakshmana", "e": "🛡️", "ok": true}, {"t": "A turtle", "e": "🐢", "ok": false}, {"t": "A kite", "e": "🪁", "ok": false}], "fact": "Did you know? Brothers helping each other is a big Diwali story."}, {"id": "e4", "round": "rama", "q": "Where did Rama return to?", "choices": [{"t": "Ayodhya", "e": "🏡", "ok": true}, {"t": "The moon", "e": "🌙", "ok": false}, {"t": "A castle of ice", "e": "🧊", "ok": false}], "fact": "Did you know? Ayodhya glowed with diyas to welcome them."}, {"id": "e5", "round": "rama", "q": "In the gentle story, Ravana learned that…", "choices": [{"t": "Kindness wins", "e": "💛", "ok": true}, {"t": "Shouting wins", "e": "📢", "ok": false}, {"t": "Hiding wins", "e": "🙈", "ok": false}], "fact": "Did you know? We tell Ravana's story softly — light and good choices win."}, {"id": "e6", "round": "rama", "q": "What do people light for Rama's return?", "choices": [{"t": "Diyas", "e": "🪔", "ok": true}, {"t": "Ice cubes", "e": "🧊", "ok": false}, {"t": "Socks", "e": "🧦", "ok": false}], "fact": "Did you know? Rows of little lamps look like a sparkling path."}, {"id": "e7", "round": "rama", "q": "Diwali remembers a journey that ends with…", "choices": [{"t": "Coming home", "e": "🏠", "ok": true}, {"t": "Getting lost", "e": "🧭", "ok": false}, {"t": "Nap time only", "e": "😴", "ok": false}], "fact": "Did you know? Coming home safe is a joyful part of the tale."}, {"id": "e8", "round": "deities", "q": "Who is the goddess of good luck and light?", "choices": [{"t": "Lakshmi", "e": "🪷", "ok": true}, {"t": "A penguin", "e": "🐧", "ok": false}, {"t": "A clock", "e": "⏰", "ok": false}], "fact": "Did you know? Families welcome Lakshmi with clean homes and lamps."}, {"id": "e9", "round": "deities", "q": "Who has an elephant face and loves new starts?", "choices": [{"t": "Ganesha", "e": "🐘", "ok": true}, {"t": "A fish", "e": "🐟", "ok": false}, {"t": "A broom", "e": "🧹", "ok": false}], "fact": "Did you know? Ganesha helps remove bumps in the road — gently!"}, {"id": "e10", "round": "deities", "q": "What do people open so Lakshmi can visit?", "choices": [{"t": "Doors & windows", "e": "🚪", "ok": true}, {"t": "A fridge only", "e": "🧊", "ok": false}, {"t": "A backpack", "e": "🎒", "ok": false}], "fact": "Did you know? Light and open doors mean “you are welcome.”"}, {"id": "e11", "round": "deities", "q": "Lakshmi likes homes that feel…", "choices": [{"t": "Clean & bright", "e": "✨", "ok": true}, {"t": "Messy forever", "e": "🗑️", "ok": false}, {"t": "Dark & scary", "e": "🌑", "ok": false}], "fact": "Did you know? Sweeping and glowing lamps are part of the welcome."}, {"id": "e12", "round": "deities", "q": "Ganesha is often called the god of…", "choices": [{"t": "New beginnings", "e": "🌱", "ok": true}, {"t": "Loud thunder only", "e": "⚡", "ok": false}, {"t": "Lost socks", "e": "🧦", "ok": false}], "fact": "Did you know? Many kids say a hello to Ganesha before new things."}, {"id": "e13", "round": "deities", "q": "What flower do people often offer?", "choices": [{"t": "Lotus", "e": "🪷", "ok": true}, {"t": "Pinecone", "e": "🌲", "ok": false}, {"t": "Chili", "e": "🌶️", "ok": false}], "fact": "Did you know? The lotus stands for beauty growing from the mud."}, {"id": "e14", "round": "deities", "q": "A good Diwali wish is for…", "choices": [{"t": "Happiness & light", "e": "🌟", "ok": true}, {"t": "Endless rain", "e": "🌧️", "ok": false}, {"t": "Broken toys", "e": "🧸", "ok": false}], "fact": "Did you know? Wishes of peace and joy are shared with everyone."}, {"id": "e15", "round": "fivedays", "q": "How many special days does Diwali often span?", "choices": [{"t": "Five", "e": "5️⃣", "ok": true}, {"t": "One hundred", "e": "💯", "ok": false}, {"t": "Zero", "e": "0️⃣", "ok": false}], "fact": "Did you know? Each day has its own gentle meaning."}, {"id": "e16", "round": "fivedays", "q": "Dhanteras is a day to…", "choices": [{"t": "Start the lights", "e": "🪔", "ok": true}, {"t": "Hide all lamps", "e": "🙈", "ok": false}, {"t": "Eat only ice", "e": "🧊", "ok": false}], "fact": "Did you know? Families may buy something useful and light a diya."}, {"id": "e17", "round": "fivedays", "q": "Naraka Chaturdashi is about…", "choices": [{"t": "Waking early & cleaning", "e": "🌅", "ok": true}, {"t": "Staying muddy", "e": "🥾", "ok": false}, {"t": "Turning off stars", "e": "⭐", "ok": false}], "fact": "Did you know? A fresh wash and tidy home greet the festival."}, {"id": "e18", "round": "fivedays", "q": "The main Diwali night is full of…", "choices": [{"t": "Lamps & joy", "e": "🪔", "ok": true}, {"t": "Only homework", "e": "📚", "ok": false}, {"t": "Silent darkness", "e": "🌑", "ok": false}], "fact": "Did you know? This night celebrates light over darkness."}, {"id": "e19", "round": "fivedays", "q": "Govardhan Puja thanks…", "choices": [{"t": "Nature & food", "e": "🌾", "ok": true}, {"t": "Broken bikes", "e": "🚲", "ok": false}, {"t": "Loud storms", "e": "⛈️", "ok": false}], "fact": "Did you know? Some families remember caring for the Earth."}, {"id": "e20", "round": "fivedays", "q": "Bhai Dooj celebrates…", "choices": [{"t": "Sisters & brothers", "e": "👫", "ok": true}, {"t": "Only robots", "e": "🤖", "ok": false}, {"t": "Empty boxes", "e": "📦", "ok": false}], "fact": "Did you know? Siblings share sweets and kind wishes."}, {"id": "e21", "round": "fivedays", "q": "Across five days, Diwali is mostly about…", "choices": [{"t": "Light & togetherness", "e": "💛", "ok": true}, {"t": "Being alone forever", "e": "🧍", "ok": false}, {"t": "Throwing toys", "e": "🪀", "ok": false}], "fact": "Did you know? Sharing time with family is the brightest part."}, {"id": "e22", "round": "festive", "q": "What is a rangoli?", "choices": [{"t": "A colorful floor design", "e": "🎨", "ok": true}, {"t": "A flying carpet", "e": "🧞", "ok": false}, {"t": "A rainy cloud", "e": "☁️", "ok": false}], "fact": "Did you know? Rangoli welcomes guests with bright patterns."}, {"id": "e23", "round": "festive", "q": "A diya is a little…", "choices": [{"t": "Oil lamp", "e": "🪔", "ok": true}, {"t": "Soccer ball", "e": "⚽", "ok": false}, {"t": "Ice cream", "e": "🍦", "ok": false}], "fact": "Did you know? Clay diyas hold oil and a soft cotton wick."}, {"id": "e24", "round": "festive", "q": "Which sweet is often shared at Diwali?", "choices": [{"t": "Ladoo", "e": "🍬", "ok": true}, {"t": "Mustard", "e": "🌭", "ok": false}, {"t": "Soap", "e": "🧼", "ok": false}], "fact": "Did you know? Ladoos are round treats made with love."}, {"id": "e25", "round": "festive", "q": "What do marigold flowers make?", "choices": [{"t": "Garlands", "e": "🌼", "ok": true}, {"t": "Snowmen", "e": "⛄", "ok": false}, {"t": "Boats", "e": "⛵", "ok": false}], "fact": "Did you know? Orange and yellow garlands decorate doors."}, {"id": "e26", "round": "festive", "q": "Phuljhari / sparklers should be used…", "choices": [{"t": "With a grown-up", "e": "👨‍👩‍👧", "ok": true}, {"t": "Alone in the dark", "e": "🌑", "ok": false}, {"t": "In a bathtub", "e": "🛁", "ok": false}], "fact": "Did you know? Safety keeps the celebration happy."}, {"id": "e27", "round": "festive", "q": "Mithai means…", "choices": [{"t": "Indian sweets", "e": "🍭", "ok": true}, {"t": "Rain boots", "e": "👢", "ok": false}, {"t": "Pencil tips", "e": "✏️", "ok": false}], "fact": "Did you know? Boxes of mithai are gifted to neighbors and friends."}, {"id": "e28", "round": "festive", "q": "Why do people draw rangoli near the door?", "choices": [{"t": "To say welcome", "e": "🤗", "ok": true}, {"t": "To block friends", "e": "🚫", "ok": false}, {"t": "To hide keys", "e": "🔑", "ok": false}], "fact": "Did you know? A bright welcome starts the party."}, {"id": "e29", "round": "together", "q": "Bandi Chhor Divas is a Sikh day of…", "choices": [{"t": "Freedom & lights", "e": "🪔", "ok": true}, {"t": "Only naps", "e": "😴", "ok": false}, {"t": "Lost hats", "e": "🎩", "ok": false}], "fact": "Did you know? Sikhs remember a kind leader freeing people — with lamps too!"}, {"id": "e30", "round": "together", "q": "Jain families may celebrate Diwali for…", "choices": [{"t": "Lord Mahavira's peace", "e": "🕊️", "ok": true}, {"t": "Racing cars", "e": "🏎️", "ok": false}, {"t": "Spooky ghosts", "e": "👻", "ok": false}], "fact": "Did you know? Jains honor wisdom and calm with light."}, {"id": "e31", "round": "together", "q": "Some Buddhists mark the season with…", "choices": [{"t": "Lights & kindness", "e": "🕯️", "ok": true}, {"t": "Throwing stones", "e": "🪨", "ok": false}, {"t": "Broken books", "e": "📕", "ok": false}], "fact": "Did you know? Many paths use light to remember good teachings."}, {"id": "e32", "round": "together", "q": "In South India, people may make…", "choices": [{"t": "Kolam patterns", "e": "🔶", "ok": true}, {"t": "Igloos", "e": "🏠", "ok": false}, {"t": "Sandcastles only", "e": "🏖️", "ok": false}], "fact": "Did you know? Kolam uses rice flour in beautiful dots and lines."}, {"id": "e33", "round": "together", "q": "In some places Diwali is also called…", "choices": [{"t": "Deepavali", "e": "🪔", "ok": true}, {"t": "Snow Day", "e": "❄️", "ok": false}, {"t": "Pizza Fest", "e": "🍕", "ok": false}], "fact": "Did you know? Deepavali means a row of lamps."}, {"id": "e34", "round": "together", "q": "A kind Diwali greeting is…", "choices": [{"t": "Happy Diwali!", "e": "🙌", "ok": true}, {"t": "Go away!", "e": "👋", "ok": false}, {"t": "No sweets!", "e": "🚫", "ok": false}], "fact": "Did you know? Smiles and greetings are free gifts."}, {"id": "e35", "round": "together", "q": "Diwali brings people together to share…", "choices": [{"t": "Light & love", "e": "💖", "ok": true}, {"t": "Only arguments", "e": "🗯️", "ok": false}, {"t": "Empty plates forever", "e": "🍽️", "ok": false}], "fact": "Did you know? Different faiths can celebrate light side by side."}];
+  const HARD = [{"id": "h1", "round": "rama", "q": "Rama, Sita, and Lakshmana returned to which city?", "choices": [{"t": "Ayodhya", "e": "🏡", "ok": true}, {"t": "Atlantis", "e": "🌊", "ok": false}, {"t": "Olympia", "e": "🏛️", "ok": false}, {"t": "Venice", "e": "🛶", "ok": false}], "fact": "Did you know? The Ramayana tells of their long journey and joyful homecoming."}, {"id": "h2", "round": "rama", "q": "Why do many families light rows of lamps on Diwali?", "choices": [{"t": "To welcome Rama home & honor light", "e": "🪔", "ok": true}, {"t": "To melt the snow", "e": "❄️", "ok": false}, {"t": "To call thunderstorms", "e": "⛈️", "ok": false}, {"t": "To hide the moon", "e": "🌑", "ok": false}], "fact": "Did you know? The glow symbolizes hope guiding the way."}, {"id": "h3", "round": "rama", "q": "Lakshmana is best known in the story as Rama's…", "choices": [{"t": "Loyal brother and helper", "e": "🛡️", "ok": true}, {"t": "Flying horse", "e": "🐴", "ok": false}, {"t": "Court jester", "e": "🃏", "ok": false}, {"t": "Rival king", "e": "👑", "ok": false}], "fact": "Did you know? Loyalty and courage are big themes in their adventure."}, {"id": "h4", "round": "rama", "q": "A gentle way to tell the Ravana part of the story is that…", "choices": [{"t": "Good choices and light overcome pride", "e": "💛", "ok": true}, {"t": "Fight scenes are the whole point", "e": "⚔️", "ok": false}, {"t": "Nobody learns anything", "e": "🤷", "ok": false}, {"t": "Ravana becomes a dragon", "e": "🐉", "ok": false}], "fact": "Did you know? Kid-friendly tellings focus on wisdom, not scary details."}, {"id": "h5", "round": "rama", "q": "Sita is remembered for her…", "choices": [{"t": "Courage, dignity, and steadfastness", "e": "👸", "ok": true}, {"t": "Love of video games", "e": "🎮", "ok": false}, {"t": "Ice magic", "e": "🧊", "ok": false}, {"t": "Pirate ship", "e": "🏴‍☠️", "ok": false}], "fact": "Did you know? Many retellings celebrate her strength and grace."}, {"id": "h6", "round": "rama", "q": "Diwali's link to the Ramayana is strongest in which region traditionally?", "choices": [{"t": "Much of North India", "e": "🗺️", "ok": true}, {"t": "Only Antarctica", "e": "🐧", "ok": false}, {"t": "Only the ocean floor", "e": "🐙", "ok": false}, {"t": "Only the desert of Mars", "e": "🔴", "ok": false}], "fact": "Did you know? Other regions emphasize Lakshmi, harvest, or local legends too."}, {"id": "h7", "round": "rama", "q": "What feeling does the Ayodhya homecoming highlight?", "choices": [{"t": "Joy, reunion, and light over darkness", "e": "🌟", "ok": true}, {"t": "Endless anger", "e": "😡", "ok": false}, {"t": "Forgetting family", "e": "🫥", "ok": false}, {"t": "Fear of lamps", "e": "😨", "ok": false}], "fact": "Did you know? Reunion stories help kids talk about belonging."}, {"id": "h8", "round": "deities", "q": "Goddess Lakshmi is especially associated with…", "choices": [{"t": "Prosperity, generosity, and well-being", "e": "🪷", "ok": true}, {"t": "Earthquakes", "e": "🌍", "ok": false}, {"t": "Board games only", "e": "🎲", "ok": false}, {"t": "Winter coats", "e": "🧥", "ok": false}], "fact": "Did you know? People invite her with clean spaces and glowing diyas."}, {"id": "h9", "round": "deities", "q": "Ganesha is often honored at new beginnings because he…", "choices": [{"t": "Helps remove obstacles", "e": "🐘", "ok": true}, {"t": "Controls the tides alone", "e": "🌊", "ok": false}, {"t": "Invented pizza", "e": "🍕", "ok": false}, {"t": "Hides all keys", "e": "🔑", "ok": false}], "fact": "Did you know? Many families keep a small Ganesha near study or doorways."}, {"id": "h10", "round": "deities", "q": "Lakshmi Puja on Diwali night often includes…", "choices": [{"t": "Lamps, offerings, and family prayers", "e": "🙏", "ok": true}, {"t": "Turning off every light", "e": "🌑", "ok": false}, {"t": "Ignoring neighbors", "e": "🚪", "ok": false}, {"t": "Throwing away sweets", "e": "🍬", "ok": false}], "fact": "Did you know? Gratitude for home and livelihood is central."}, {"id": "h11", "round": "deities", "q": "The lotus with Lakshmi symbolizes…", "choices": [{"t": "Purity and beauty rising from challenges", "e": "🌸", "ok": true}, {"t": "Fast cars", "e": "🏎️", "ok": false}, {"t": "Loud fireworks only", "e": "🎆", "ok": false}, {"t": "Forgotten chores", "e": "🧹", "ok": false}], "fact": "Did you know? Symbols help kids remember big ideas kindly."}, {"id": "h12", "round": "deities", "q": "A respectful way to speak of deities in class is to…", "choices": [{"t": "Use gentle words and learn from many stories", "e": "📚", "ok": true}, {"t": "Make fun of faiths", "e": "😝", "ok": false}, {"t": "Claim only one story exists", "e": "📣", "ok": false}, {"t": "Skip listening", "e": "🙉", "ok": false}], "fact": "Did you know? Curiosity plus respect keeps celebrations inclusive."}, {"id": "h13", "round": "deities", "q": "Why might doors stay open during Lakshmi Puja?", "choices": [{"t": "As a welcome for blessings and guests", "e": "🚪", "ok": true}, {"t": "To cool a dragon", "e": "🐉", "ok": false}, {"t": "To lose the cat on purpose", "e": "🐱", "ok": false}, {"t": "To invite dust storms", "e": "🌪️", "ok": false}], "fact": "Did you know? Hospitality is a festival value."}, {"id": "h14", "round": "deities", "q": "Ganesha's elephant head in art reminds many of…", "choices": [{"t": "Wisdom and listening carefully", "e": "👂", "ok": true}, {"t": "Forgetting homework forever", "e": "📝", "ok": false}, {"t": "Fear of animals", "e": "😰", "ok": false}, {"t": "Silence only", "e": "🤫", "ok": false}], "fact": "Did you know? Art and symbols teach without scary stories."}, {"id": "h15", "round": "fivedays", "q": "Diwali's five-day arc commonly begins with…", "choices": [{"t": "Dhanteras", "e": "1️⃣", "ok": true}, {"t": "New Year's Day in January", "e": "🎉", "ok": false}, {"t": "Halloween", "e": "🎃", "ok": false}, {"t": "April Fools", "e": "🃏", "ok": false}], "fact": "Did you know? Dhanteras focuses on health, prosperity, and first lights."}, {"id": "h16", "round": "fivedays", "q": "Naraka Chaturdashi / Choti Diwali is often linked to…", "choices": [{"t": "Cleansing, early baths, and small lamps", "e": "🌅", "ok": true}, {"t": "Building snow forts", "e": "⛄", "ok": false}, {"t": "Turning off music forever", "e": "🔇", "ok": false}, {"t": "Hiding all sweets", "e": "🍭", "ok": false}], "fact": "Did you know? \"Choti\" means the smaller, earlier celebration night."}, {"id": "h17", "round": "fivedays", "q": "The main Diwali (Lakshmi Puja) night emphasizes…", "choices": [{"t": "Light triumphing over darkness", "e": "🪔", "ok": true}, {"t": "Endless night with no lamps", "e": "🌑", "ok": false}, {"t": "Only outdoor camping", "e": "⛺", "ok": false}, {"t": "Closing every window forever", "e": "🪟", "ok": false}], "fact": "Did you know? Families gather for prayers, sweets, and glowing homes."}, {"id": "h18", "round": "fivedays", "q": "Govardhan / Annakut traditions may include…", "choices": [{"t": "Thanking nature and sharing food mounds", "e": "🌾", "ok": true}, {"t": "Throwing away harvests", "e": "🗑️", "ok": false}, {"t": "Ignoring farmers", "e": "🚜", "ok": false}, {"t": "Eating only ice cubes", "e": "🧊", "ok": false}], "fact": "Did you know? Annakut means a \"mountain\" of vegetarian dishes."}, {"id": "h19", "round": "fivedays", "q": "Bhai Dooj focuses on bonds between…", "choices": [{"t": "Sisters and brothers", "e": "👫", "ok": true}, {"t": "Cats and vacuum cleaners", "e": "🐱", "ok": false}, {"t": "Clouds and kites only", "e": "🪁", "ok": false}, {"t": "Shoes and mud", "e": "👟", "ok": false}], "fact": "Did you know? Tilak and sweets mark care between siblings."}, {"id": "h20", "round": "fivedays", "q": "Why teach the five days as a sequence?", "choices": [{"t": "It shows cleaning, light, gratitude, and family over time", "e": "📅", "ok": true}, {"t": "It makes kids skip school forever", "e": "🏫", "ok": false}, {"t": "It replaces all other holidays", "e": "🌍", "ok": false}, {"t": "It bans sweets", "e": "🍬", "ok": false}], "fact": "Did you know? Sequences help memory without overwhelming little kids."}, {"id": "h21", "round": "fivedays", "q": "Which idea ties all five days together?", "choices": [{"t": "Renewal, light, and care for others", "e": "💛", "ok": true}, {"t": "Winning arguments", "e": "🗯️", "ok": false}, {"t": "Collecting only gold coins", "e": "🪙", "ok": false}, {"t": "Staying indoors angrily", "e": "😠", "ok": false}], "fact": "Did you know? Values matter more than perfect rituals."}, {"id": "h22", "round": "festive", "q": "Rangoli / kolam patterns at the entrance mainly mean…", "choices": [{"t": "Welcome and festive joy", "e": "🎨", "ok": true}, {"t": "Keep out visitors", "e": "🚫", "ok": false}, {"t": "Mark a soccer field", "e": "⚽", "ok": false}, {"t": "Hide a treasure map only", "e": "🗺️", "ok": false}], "fact": "Did you know? Materials range from colored powders to rice flour."}, {"id": "h23", "round": "festive", "q": "A traditional diya typically burns…", "choices": [{"t": "Oil or ghee with a cotton wick", "e": "🪔", "ok": true}, {"t": "Only battery LEDs by rule", "e": "🔋", "ok": false}, {"t": "Iced water", "e": "💧", "ok": false}, {"t": "Glitter glue", "e": "✨", "ok": false}], "fact": "Did you know? Modern homes may mix clay diyas and safe LEDs."}, {"id": "h24", "round": "festive", "q": "Mithai platters at Diwali are meant to…", "choices": [{"t": "Share sweetness with family and neighbors", "e": "🍭", "ok": true}, {"t": "Replace all meals forever", "e": "🍽️", "ok": false}, {"t": "Be thrown in the street", "e": "🛣️", "ok": false}, {"t": "Stay locked away", "e": "🔒", "ok": false}], "fact": "Did you know? Giving sweets builds community ties."}, {"id": "h25", "round": "festive", "q": "Safe sparkler (phuljhadi) use requires…", "choices": [{"t": "Adult supervision and open outdoor space", "e": "👨‍👩‍👧", "ok": true}, {"t": "Playing alone in a closet", "e": "🚪", "ok": false}, {"t": "Holding near curtains", "e": "커튼", "ok": false}, {"t": "No water nearby ever", "e": "💧", "ok": false}], "fact": "Did you know? Many cities encourage community displays over home fireworks."}, {"id": "h26", "round": "festive", "q": "Marigold garlands are popular because they…", "choices": [{"t": "Are bright, festive, and easy to string", "e": "🌼", "ok": true}, {"t": "Attract snow", "e": "❄️", "ok": false}, {"t": "Replace all lamps", "e": "🪔", "ok": false}, {"t": "Scare away music", "e": "🎵", "ok": false}], "fact": "Did you know? Flowers and leaves turn doorways into celebrations."}, {"id": "h27", "round": "festive", "q": "Which sweet is a round gram-flour classic?", "choices": [{"t": "Besan ladoo", "e": "🍬", "ok": true}, {"t": "Plain ice cubes", "e": "🧊", "ok": false}, {"t": "Raw onions only", "e": "🧅", "ok": false}, {"t": "Mustard packets", "e": "🌭", "ok": false}], "fact": "Did you know? Regional sweets vary — from barfi to jalebi to payasam."}, {"id": "h28", "round": "festive", "q": "Why might a family choose LEDs instead of fireworks?", "choices": [{"t": "Safer for lungs, pets, and neighbors", "e": "🌱", "ok": true}, {"t": "Because light is not part of Diwali", "e": "🌑", "ok": false}, {"t": "To cancel the festival", "e": "❌", "ok": false}, {"t": "To avoid all joy", "e": "😐", "ok": false}], "fact": "Did you know? Eco-friendly celebrations are a growing tradition."}, {"id": "h29", "round": "together", "q": "Bandi Chhor Divas for Sikhs commemorates…", "choices": [{"t": "Guru Hargobind Sahib's release of prisoners", "e": "🕊️", "ok": true}, {"t": "A cooking contest only", "e": "👨‍🍳", "ok": false}, {"t": "A sports trophy", "e": "🏆", "ok": false}, {"t": "Closing all gurdwaras", "e": "🏛️", "ok": false}], "fact": "Did you know? Gurdwaras glow with lights; the story centers on freedom and justice."}, {"id": "h30", "round": "together", "q": "Many Jains connect Diwali with…", "choices": [{"t": "Lord Mahavira's nirvana / liberation", "e": "🕊️", "ok": true}, {"t": "Inventing airplanes", "e": "✈️", "ok": false}, {"t": "A pirate code", "e": "🏴‍☠️", "ok": false}, {"t": "A comic-book villain", "e": "😈", "ok": false}], "fact": "Did you know? Lights honor knowledge overcoming ignorance."}, {"id": "h31", "round": "together", "q": "Some Buddhist communities mark the season by…", "choices": [{"t": "Remembering compassion and lighting lamps", "e": "🕯️", "ok": true}, {"t": "Banning kindness", "e": "🚫", "ok": false}, {"t": "Collecting only candy", "e": "🎃", "ok": false}, {"t": "Ignoring teachers", "e": "📚", "ok": false}], "fact": "Did you know? Practices vary by country and lineage."}, {"id": "h32", "round": "together", "q": "Deepavali is a name especially common in…", "choices": [{"t": "South India and among Tamil speakers", "e": "🪔", "ok": true}, {"t": "Only Iceland", "e": "🧊", "ok": false}, {"t": "Only undersea cities", "e": "🐠", "ok": false}, {"t": "Only desert oases on Mars", "e": "🔴", "ok": false}], "fact": "Did you know? Same festival family — local foods and stories differ."}, {"id": "h33", "round": "together", "q": "In Nepal, a related festival period includes…", "choices": [{"t": "Tihar, with days for animals and siblings", "e": "🐾", "ok": true}, {"t": "Only skiing contests", "e": "⛷️", "ok": false}, {"t": "A single silent hour", "e": "🤫", "ok": false}, {"t": "Closing all markets forever", "e": "🏪", "ok": false}], "fact": "Did you know? Tihar's lights and rangoli feel cousin-close to Diwali."}, {"id": "h34", "round": "together", "q": "An inclusive classroom note about Diwali should mention…", "choices": [{"t": "Hindu roots plus Jain, Sikh, and Buddhist observances", "e": "🌍", "ok": true}, {"t": "Only one allowed story worldwide", "e": "📣", "ok": false}, {"t": "That light festivals do not exist", "e": "🌑", "ok": false}, {"t": "That kids may not ask questions", "e": "🤐", "ok": false}], "fact": "Did you know? Respectful curiosity helps everyone feel welcome."}, {"id": "h35", "round": "together", "q": "What shared theme links these traditions in this season?", "choices": [{"t": "Light, freedom, knowledge, and kindness", "e": "💛", "ok": true}, {"t": "Winning by shouting", "e": "📢", "ok": false}, {"t": "Keeping all gifts", "e": "🎁", "ok": false}, {"t": "Avoiding neighbors", "e": "🚪", "ok": false}], "fact": "Did you know? Different doors, same warm glow of hope."}];
+
+  function forProfile(easyMode) {
+    return easyMode ? EASY.slice() : HARD.slice();
+  }
+  function rounds() { return ROUNDS.slice(); }
+  function byRound(easyMode, roundId) {
+    return forProfile(easyMode).filter((q) => q.round === roundId);
+  }
+  function validateAll() {
+    const report = { easy: EASY.length, hard: HARD.length, ok: true, issues: [] };
+    function check(pack, name) {
+      const seen = new Set();
+      pack.forEach((q) => {
+        if (seen.has(q.q)) { report.ok = false; report.issues.push(name + ' dup: ' + q.q); }
+        seen.add(q.q);
+        const oks = (q.choices || []).filter((c) => c.ok);
+        if (oks.length !== 1) { report.ok = false; report.issues.push(name + ' ' + q.id + ' correct=' + oks.length); }
+        if (!q.fact || !String(q.fact).trim()) { report.ok = false; report.issues.push(name + ' ' + q.id + ' missing fact'); }
+        if (!q.round) { report.ok = false; report.issues.push(name + ' ' + q.id + ' missing round'); }
+      });
+    }
+    check(EASY, 'easy');
+    check(HARD, 'hard');
+    // cross-pack total
+    report.total = EASY.length + HARD.length;
+    if (report.total < 60) { report.ok = false; report.issues.push('total < 60'); }
+    // every round present in both
+    ROUNDS.forEach((r) => {
+      if (!EASY.some((q) => q.round === r.id)) { report.ok = false; report.issues.push('easy missing round ' + r.id); }
+      if (!HARD.some((q) => q.round === r.id)) { report.ok = false; report.issues.push('hard missing round ' + r.id); }
+    });
+    if (ROUNDS.length < 4) { report.ok = false; report.issues.push('rounds < 4'); }
+    return report;
+  }
+  return { ROUNDS, EASY, HARD, forProfile, rounds, byRound, validateAll };
+
+})();
+})();
+/* ==== 53-memory-levels.js ==== */
+;(function(){
+/* Diya Memory Match — symbols + separate ladders per profile */
+DG.MemoryLevels = (() => {
+  const SYMBOLS = [
+    { id: 'diya', emoji: '🪔', name: 'Diya' },
+    { id: 'lotus', emoji: '🪷', name: 'Lotus' },
+    { id: 'ladoo', emoji: '🍬', name: 'Ladoo' },
+    { id: 'kalash', emoji: '🏺', name: 'Kalash' },
+    { id: 'marigold', emoji: '🌼', name: 'Marigold' },
+    { id: 'rangoli', emoji: '🎨', name: 'Rangoli' },
+    { id: 'lantern', emoji: '🏮', name: 'Lantern' },
+    { id: 'modak', emoji: '🍡', name: 'Modak' },
+    { id: 'peacock', emoji: '🦚', name: 'Peacock' },
+    { id: 'moon', emoji: '🌙', name: 'Moon' },
+    { id: 'star', emoji: '⭐', name: 'Star' },
+    { id: 'sparkle', emoji: '✨', name: 'Sparkle' },
+    { id: 'bell', emoji: '🔔', name: 'Bell' },
+    { id: 'sweets', emoji: '🍭', name: 'Mithai' },
+    { id: 'flower', emoji: '🌸', name: 'Flower' }
+  ];
+
+  // Player 1: 3×2 and 4×3 only, peek always, ≥8 levels
+  const EASY = [
+    { id: 1, cols: 3, rows: 2, peekMs: 2200, label: 'Tiny table' },
+    { id: 2, cols: 3, rows: 2, peekMs: 2000, label: 'Warm glow' },
+    { id: 3, cols: 3, rows: 2, peekMs: 1800, label: 'Little lamps' },
+    { id: 4, cols: 4, rows: 3, peekMs: 2600, label: 'Sweet tray' },
+    { id: 5, cols: 4, rows: 3, peekMs: 2400, label: 'Rangoli table' },
+    { id: 6, cols: 4, rows: 3, peekMs: 2200, label: 'Festival night' },
+    { id: 7, cols: 4, rows: 3, peekMs: 2000, label: 'Marigold match' },
+    { id: 8, cols: 4, rows: 3, peekMs: 1800, label: 'Diya party' },
+    { id: 9, cols: 4, rows: 3, peekMs: 1600, label: 'Bright finish' }
+  ];
+
+  // Player 2: grows toward ~6×5, timer + 3 lives, ≥12 levels
+  const HARD = [
+    { id: 1, cols: 3, rows: 2, peekMs: 900, label: 'Warm-up' },
+    { id: 2, cols: 4, rows: 3, peekMs: 1000, label: 'Twelve lights' },
+    { id: 3, cols: 4, rows: 4, peekMs: 1100, label: 'Square feast' },
+    { id: 4, cols: 5, rows: 4, peekMs: 900, label: 'Busy table' },
+    { id: 5, cols: 5, rows: 4, peekMs: 800, label: 'Quick eyes' },
+    { id: 6, cols: 6, rows: 4, peekMs: 800, label: 'Long table' },
+    { id: 7, cols: 6, rows: 4, peekMs: 700, label: 'Lantern row' },
+    { id: 8, cols: 6, rows: 5, peekMs: 700, label: 'Grand match' },
+    { id: 9, cols: 6, rows: 5, peekMs: 600, label: 'Starry board' },
+    { id: 10, cols: 6, rows: 5, peekMs: 500, label: 'Speed glow' },
+    { id: 11, cols: 5, rows: 4, peekMs: 600, label: 'Focus feast' },
+    { id: 12, cols: 6, rows: 5, peekMs: 450, label: 'Master table' },
+    { id: 13, cols: 6, rows: 5, peekMs: 400, label: 'Champion lamps' }
+  ];
+
+  function forProfile(isEasy) {
+    return isEasy ? EASY.slice() : HARD.slice();
+  }
+
+  function get(isEasy, id) {
+    return forProfile(isEasy).find((l) => l.id === id) || null;
+  }
+
+  function symbolPool() {
+    return SYMBOLS.slice();
+  }
+
+  function pairsNeeded(lv) {
+    return (lv.cols * lv.rows) / 2;
+  }
+
+  function buildDeck(lv, rng) {
+    const n = pairsNeeded(lv);
+    if (n !== (n | 0) || n < 1) throw new Error('odd grid');
+    const pool = SYMBOLS.slice();
+    // deterministic shuffle helper
+    const rand = rng || Math.random;
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = (rand() * (i + 1)) | 0;
+      const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+    }
+    const chosen = pool.slice(0, n);
+    const deck = [];
+    chosen.forEach((s, i) => {
+      deck.push({ key: s.id, emoji: s.emoji, name: s.name, pair: i });
+      deck.push({ key: s.id, emoji: s.emoji, name: s.name, pair: i });
+    });
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = (rand() * (i + 1)) | 0;
+      const t = deck[i]; deck[i] = deck[j]; deck[j] = t;
+    }
+    return deck.map((c, idx) => Object.assign({ idx }, c));
+  }
+
+  function validateAll() {
+    const issues = [];
+    [true, false].forEach((easy) => {
+      const pack = forProfile(easy);
+      const min = easy ? 8 : 12;
+      if (pack.length < min) issues.push((easy ? 'easy' : 'hard') + ' pack < ' + min);
+      const ids = new Set();
+      pack.forEach((lv) => {
+        if (ids.has(lv.id)) issues.push('dup id ' + lv.id);
+        ids.add(lv.id);
+        const cells = lv.cols * lv.rows;
+        if (cells % 2) issues.push('odd cells L' + lv.id);
+        if (pairsNeeded(lv) > SYMBOLS.length) issues.push('not enough symbols L' + lv.id);
+        if (easy) {
+          const ok = (lv.cols === 3 && lv.rows === 2) || (lv.cols === 4 && lv.rows === 3);
+          if (!ok) issues.push('easy grid not 3x2/4x3 L' + lv.id);
+        } else {
+          if (lv.cols * lv.rows > 30) issues.push('hard grid >6x5 L' + lv.id);
+        }
+        try {
+          const d = buildDeck(lv, () => 0.42);
+          if (d.length !== cells) issues.push('deck size L' + lv.id);
+          const counts = {};
+          d.forEach((c) => { counts[c.key] = (counts[c.key] || 0) + 1; });
+          Object.keys(counts).forEach((k) => {
+            if (counts[k] !== 2) issues.push('pair count ' + k + ' L' + lv.id);
+          });
+        } catch (e) {
+          issues.push(String(e.message || e));
+        }
+      });
+    });
+    return { ok: issues.length === 0, issues, easy: EASY.length, hard: HARD.length, symbols: SYMBOLS.length };
+  }
+
+  return { SYMBOLS, forProfile, get, buildDeck, pairsNeeded, symbolPool, validateAll, EASY, HARD };
+})();
+
+})();
+/* ==== 54-phuljhadi-songs.js ==== */
+;(function(){
+/* Phuljhadi Pop — song charts (separate ladders). Times in beats from song start. */
+DG.PhuljhadiSongs = (() => {
+  // Scale degrees → relative freqs (gentle festive pentatonic-ish)
+  const DEG = [1, 9 / 8, 5 / 4, 3 / 2, 5 / 3, 2];
+
+  /**
+   * Build a chart of notes: { id, beat, lane, kind:'sparkler'|'firework' }
+   * pattern: string of tokens per 8th-note: '.' rest, '0'..'3' lane sparkler, 'A'..'D' firework lanes
+   * Or array of bar strings.
+   */
+  function buildChart(song) {
+    const notes = [];
+    let id = 0;
+    const bars = song.bars || song.pattern;
+    const stepsPerBar = song.stepsPerBar || 8; // 8th notes in 4/4
+    bars.forEach((bar, bi) => {
+      const tokens = bar.replace(/\s+/g, '').split('');
+      for (let s = 0; s < stepsPerBar; s++) {
+        const tok = tokens[s] || '.';
+        if (tok === '.' || tok === '-') continue;
+        const beat = bi * 4 + (s * 4) / stepsPerBar; // quarter-note beats
+        let lane = 0;
+        let kind = 'sparkler';
+        if (tok >= '0' && tok <= '9') {
+          lane = tok.charCodeAt(0) - 48;
+          kind = 'sparkler';
+        } else {
+          const up = tok.toUpperCase();
+          lane = up.charCodeAt(0) - 65; // A=0
+          kind = 'firework';
+        }
+        lane = DG.clamp(lane, 0, song.lanes - 1);
+        notes.push({ id: id++, beat, lane, kind });
+      }
+    });
+    return notes;
+  }
+
+  function durationBeats(song) {
+    return (song.bars || song.pattern).length * 4 + 0.5;
+  }
+
+  function beatToSec(beat, bpm) {
+    return (beat * 60) / bpm;
+  }
+
+  // Player 1 — slow, 1–2 lanes, generous windows, ≥5 songs
+  const EASY = [
+    {
+      id: 1, name: 'Soft Sparks', bpm: 68, lanes: 1, windowMs: 360, approachBeats: 2.2,
+      melody: [0, 2, 4, 2, 0, 2, 5, 4],
+      bars: ['0...0...', '0...0...', '0.0.0...', '0...0...']
+    },
+    {
+      id: 2, name: 'Tiny Phuljhadi', bpm: 72, lanes: 1, windowMs: 340, approachBeats: 2.0,
+      melody: [0, 0, 2, 4, 2, 0, 4, 5],
+      bars: ['0...0.0.', '0...0...', '0.0..0..', '0...0.0.', '0...0...']
+    },
+    {
+      id: 3, name: 'Two Glow Lanes', bpm: 76, lanes: 2, windowMs: 330, approachBeats: 2.0,
+      melody: [0, 2, 0, 4, 2, 5, 4, 2],
+      bars: ['0...1...', '0...1...', '0.1.0.1.', '0...1...', '01..01..']
+    },
+    {
+      id: 4, name: 'Marigold Beat', bpm: 78, lanes: 2, windowMs: 320, approachBeats: 1.9,
+      melody: [2, 0, 4, 2, 5, 4, 2, 0],
+      bars: ['0...1.0.', '1...0.1.', '0.1.0.1.', 'A...1...', '0.1.0.1.', '0...1...']
+    },
+    {
+      id: 5, name: 'Lantern Waltz', bpm: 70, lanes: 2, windowMs: 340, approachBeats: 2.1,
+      melody: [0, 4, 2, 5, 4, 2, 0, 2],
+      bars: ['0.....1.', '..0...1.', '0.1.0...', '1.0.1.0.', '0...1...', 'A.0.1.0.']
+    },
+    {
+      id: 6, name: 'Diya Night Pop', bpm: 80, lanes: 2, windowMs: 300, approachBeats: 1.8,
+      melody: [0, 2, 4, 5, 4, 2, 0, 4],
+      bars: ['0.1.0.1.', '0...1...', '01.A.01.', '1.0.1.0.', '0.1.0.1.', '0.1.A.1.', '0...1...']
+    }
+  ];
+
+  // Player 2 — faster, 3–4 lanes, tighter windows, combos + 3 lives, ≥5 songs
+  const HARD = [
+    {
+      id: 1, name: 'Warm-up Sky', bpm: 100, lanes: 3, windowMs: 160, approachBeats: 1.6,
+      melody: [0, 2, 4, 2, 5, 4, 2, 0],
+      bars: ['0.1.2...', '0...1.2.', '0.1.2.0.', 'A.1.2.0.', '0.1.2.0.']
+    },
+    {
+      id: 2, name: 'Spark Street', bpm: 108, lanes: 3, windowMs: 150, approachBeats: 1.5,
+      melody: [0, 4, 2, 5, 4, 0, 2, 4],
+      bars: ['0.1.2.0.', '1.2.0.1.', '0.1.A.2.', '2.1.0.2.', '0.1.2.1.', 'A.0.1.2.']
+    },
+    {
+      id: 3, name: 'Four-Lane Fest', bpm: 112, lanes: 4, windowMs: 140, approachBeats: 1.45,
+      melody: [0, 2, 4, 5, 4, 2, 5, 4],
+      bars: ['0.1.2.3.', '0.1.2...', '0.1.A.3.', '3.2.1.0.', '0.1.2.3.', 'A.1.2.B.']
+    },
+    {
+      id: 4, name: 'Rocket Garden', bpm: 118, lanes: 4, windowMs: 135, approachBeats: 1.4,
+      melody: [4, 2, 0, 5, 4, 2, 5, 4],
+      bars: ['0.2.1.3.', 'A.1.2.3.', '0.1.2.B.', '3.2.1.0.', '0.A.2.3.', '1.2.3.0.', '0.1.2.3.']
+    },
+    {
+      id: 5, name: 'Combo Night', bpm: 124, lanes: 4, windowMs: 128, approachBeats: 1.35,
+      melody: [0, 2, 5, 4, 2, 0, 4, 5],
+      bars: ['0.1.2.3.', '0.1.A.3.', '1.2.3.0.', 'B.2.1.0.', '0.1.2.3.', '0.A.2.B.', '3.2.1.0.', '0.1.2.3.']
+    },
+    {
+      id: 6, name: 'Grand Phuljhadi', bpm: 130, lanes: 4, windowMs: 120, approachBeats: 1.3,
+      melody: [0, 4, 2, 5, 4, 2, 5, 4],
+      bars: [
+        '0.1.2.3.', 'A.1.2.3.', '0.B.2.3.', '0.1.2.C.',
+        '3.2.1.0.', '0.1.A.B.', '0.1.2.3.', 'A.B.2.3.',
+        '0.1.2.3.'
+      ]
+    }
+  ];
+
+  // Fix bars that may be wrong length — normalize each bar to stepsPerBar chars
+  function normalizeSong(song) {
+    const steps = song.stepsPerBar || 8;
+    const bars = (song.bars || []).map((b) => {
+      let s = b.replace(/\s+/g, '');
+      if (s.length < steps) s = s + '.'.repeat(steps - s.length);
+      if (s.length > steps) s = s.slice(0, steps);
+      return s;
+    });
+    return Object.assign({}, song, { bars, stepsPerBar: steps });
+  }
+
+  const EASY_N = EASY.map(normalizeSong);
+  const HARD_N = HARD.map(normalizeSong);
+
+  function forProfile(isEasy) {
+    return isEasy ? EASY_N.slice() : HARD_N.slice();
+  }
+
+  function get(isEasy, id) {
+    return forProfile(isEasy).find((s) => s.id === id) || null;
+  }
+
+  function validateAll() {
+    const issues = [];
+    [true, false].forEach((easy) => {
+      const pack = forProfile(easy);
+      if (pack.length < 5) issues.push((easy ? 'easy' : 'hard') + ' songs <5');
+      const ids = new Set();
+      pack.forEach((s) => {
+        if (ids.has(s.id)) issues.push('dup id ' + s.id);
+        ids.add(s.id);
+        if (s.lanes < 1 || s.lanes > 4) issues.push('lanes ' + s.id);
+        if (easy && s.lanes > 2) issues.push('easy lanes>2 id=' + s.id);
+        if (!easy && s.lanes < 3) issues.push('hard lanes<3 id=' + s.id);
+        if (s.bpm < 50 || s.bpm > 180) issues.push('bpm ' + s.id);
+        const chart = buildChart(s);
+        if (chart.length < 4) issues.push('short chart ' + s.id);
+        chart.forEach((n) => {
+          if (n.lane < 0 || n.lane >= s.lanes) issues.push('lane oob ' + s.id);
+        });
+      });
+    });
+    return {
+      ok: issues.length === 0,
+      issues,
+      easy: EASY_N.length,
+      hard: HARD_N.length,
+      deg: DEG.length
+    };
+  }
+
+  return {
+    forProfile,
+    get,
+    buildChart,
+    durationBeats,
+    beatToSec,
+    DEG,
+    validateAll
+  };
+})();
+
+})();
+/* ==== 55-sweets-levels.js ==== */
+;(function(){
+/* Sweet Shop Sort — orders + coin change; separate ladders */
+DG.SweetsLevels = (() => {
+  const LIST = [
+    { id: 'ladoo', emoji: '🍬', name: 'Ladoo' },
+    { id: 'barfi', emoji: '🧈', name: 'Barfi' },
+    { id: 'jalebi', emoji: '🍥', name: 'Jalebi' },
+    { id: 'jamun', emoji: '🍡', name: 'Gulab jamun' },
+    { id: 'peda', emoji: '🟡', name: 'Peda' },
+    { id: 'mysore', emoji: '🟧', name: 'Mysore pak' },
+    { id: 'kaju', emoji: '🔺', name: 'Kaju katli' },
+    { id: 'rasgulla', emoji: '⚪', name: 'Rasgulla' }
+  ];
+
+  // Player 1: count ≤10, picture orders, ≥10 levels, no fail
+  const EASY = [
+    { id: 1, label: 'One ladoo', order: { ladoo: 1 } },
+    { id: 2, label: 'Two sweets', order: { ladoo: 2 } },
+    { id: 3, label: 'Three jalebis', order: { jalebi: 3 } },
+    { id: 4, label: 'Mix of 4', order: { ladoo: 2, barfi: 2 } },
+    { id: 5, label: 'Five pedas', order: { peda: 5 } },
+    { id: 6, label: 'Box of 6', order: { jamun: 3, ladoo: 3 } },
+    { id: 7, label: 'Seven treats', order: { jalebi: 4, barfi: 3 } },
+    { id: 8, label: 'Festival 8', order: { ladoo: 3, peda: 3, kaju: 2 } },
+    { id: 9, label: 'Nine bites', order: { rasgulla: 4, jamun: 5 } },
+    { id: 10, label: 'Ten to go', order: { ladoo: 4, jalebi: 3, barfi: 3 } },
+    { id: 11, label: 'Sweet ten', order: { mysore: 5, peda: 5 } },
+    { id: 12, label: 'Party tray', order: { ladoo: 2, barfi: 2, jalebi: 2, jamun: 2, peda: 2 } }
+  ];
+
+  function coinBag(vals, counts) {
+    return vals.map((v, i) => ({ v, n: counts[i] }));
+  }
+
+  // Player 2: pack/add, grid multiply, change — ≥15, timer + 3 lives in game
+  const HARD = [
+    { id: 1, kind: 'pack', label: '3+2 ladoos', order: { ladoo: 5 }, hint: '3 + 2' },
+    { id: 2, kind: 'pack', label: '4+3 barfis', order: { barfi: 7 }, hint: '4 + 3' },
+    { id: 3, kind: 'pack', label: 'Mixed add', order: { ladoo: 4, jalebi: 5 }, hint: '4 + 5' },
+    { id: 4, kind: 'grid', label: '2×3 tray', sweet: 'ladoo', rows: 2, cols: 3 },
+    { id: 5, kind: 'grid', label: '3×3 box', sweet: 'peda', rows: 3, cols: 3 },
+    { id: 6, kind: 'pack', label: 'Twin trays', order: { jamun: 6, barfi: 4 }, hint: '6 + 4' },
+    { id: 7, kind: 'change', label: 'Small change', due: 12, paid: 20, coins: coinBag([10, 5, 2, 1], [1, 2, 2, 3]) },
+    { id: 8, kind: 'grid', label: '2×5 box', sweet: 'jalebi', rows: 2, cols: 5 },
+    { id: 9, kind: 'pack', label: 'Dozen mix', order: { ladoo: 5, kaju: 4, rasgulla: 3 }, hint: '5+4+3' },
+    { id: 10, kind: 'change', label: 'Pay ₹50', due: 35, paid: 50, coins: coinBag([20, 10, 5, 2, 1], [1, 2, 2, 2, 4]) },
+    { id: 11, kind: 'grid', label: '3×4 mithai', sweet: 'barfi', rows: 3, cols: 4 },
+    { id: 12, kind: 'change', label: 'Note + coins', due: 48, paid: 100, coins: coinBag([50, 20, 10, 5, 1], [1, 2, 2, 2, 5]) },
+    { id: 13, kind: 'pack', label: 'Big order', order: { jalebi: 8, jamun: 7 }, hint: '8 + 7' },
+    { id: 14, kind: 'grid', label: '4×4 feast', sweet: 'mysore', rows: 4, cols: 4 },
+    { id: 15, kind: 'change', label: 'Exact ₹27', due: 73, paid: 100, coins: coinBag([20, 10, 5, 2, 1], [2, 2, 2, 3, 5]) },
+    { id: 16, kind: 'pack', label: 'Triple add', order: { ladoo: 6, peda: 5, kaju: 4 }, hint: '6+5+4' },
+    { id: 17, kind: 'change', label: 'Tricky ₹19', due: 81, paid: 100, coins: coinBag([10, 5, 2, 1], [1, 2, 3, 4]) },
+    { id: 18, kind: 'grid', label: '3×5 tray', sweet: 'rasgulla', rows: 3, cols: 5 }
+  ];
+
+  function sweetById(id) {
+    return LIST.find((s) => s.id === id) || LIST[0];
+  }
+
+  function orderTotal(order) {
+    return Object.keys(order || {}).reduce((a, k) => a + (order[k] | 0), 0);
+  }
+
+  function gridNeed(lv) {
+    return (lv.rows | 0) * (lv.cols | 0);
+  }
+
+  function changeNeeded(lv) {
+    return (lv.paid | 0) - (lv.due | 0);
+  }
+
+  function canMakeChange(amount, coins) {
+    if (amount < 0) return false;
+    if (amount === 0) return true;
+    const bag = [];
+    (coins || []).forEach((c) => {
+      for (let i = 0; i < (c.n | 0); i++) bag.push(c.v | 0);
+    });
+    const reach = new Uint8Array(amount + 1);
+    reach[0] = 1;
+    for (let i = 0; i < bag.length; i++) {
+      const v = bag[i];
+      for (let s = amount; s >= v; s--) if (reach[s - v]) reach[s] = 1;
+    }
+    return !!reach[amount];
+  }
+
+  function forProfile(isEasy) { return isEasy ? EASY.slice() : HARD.slice(); }
+  function get(isEasy, id) { return forProfile(isEasy).find((l) => l.id === id) || null; }
+
+  function validateAll() {
+    const issues = [];
+    if (EASY.length < 10) issues.push('easy <10');
+    if (HARD.length < 15) issues.push('hard <15');
+    EASY.forEach((lv) => {
+      const t = orderTotal(lv.order);
+      if (t < 1 || t > 10) issues.push('easy total ' + lv.id + '=' + t);
+      Object.keys(lv.order).forEach((k) => {
+        if (!LIST.some((s) => s.id === k)) issues.push('unknown sweet ' + k);
+      });
+    });
+    HARD.forEach((lv) => {
+      if (lv.kind === 'pack') {
+        if (orderTotal(lv.order) < 1) issues.push('pack empty ' + lv.id);
+      } else if (lv.kind === 'grid') {
+        const n = gridNeed(lv);
+        if (n < 1 || n > 20) issues.push('grid size ' + lv.id);
+        if (!LIST.some((s) => s.id === lv.sweet)) issues.push('grid sweet ' + lv.id);
+      } else if (lv.kind === 'change') {
+        const need = changeNeeded(lv);
+        if (need <= 0) issues.push('change <=0 ' + lv.id);
+        if (!canMakeChange(need, lv.coins)) issues.push('unsolvable change ' + lv.id + ' need=' + need);
+      } else issues.push('bad kind ' + lv.id);
+    });
+    return { ok: issues.length === 0, issues, easy: EASY.length, hard: HARD.length, sweets: LIST.length };
+  }
+
+  return {
+    SWEETS: LIST, forProfile, get, sweetById, orderTotal, gridNeed, changeNeeded, canMakeChange, validateAll
+  };
+})();
+
+})();
+/* ==== 56-spot-levels.js ==== */
+;(function(){
+/* Spot the Diya — scene packs + difference specs (norm coords 0–1) */
+DG.SpotLevels = (() => {
+  const SCENES = [
+    { id: 'home', label: 'Diya home', emoji: '🏠' },
+    { id: 'rangoli', label: 'Rangoli court', emoji: '🎨' },
+    { id: 'sweets', label: 'Sweet shop', emoji: '🍬' },
+    { id: 'boats', label: 'Ayodhya boats', emoji: '⛵' },
+    { id: 'rooftop', label: 'Firework roof', emoji: '🎆' },
+    { id: 'market', label: 'Lantern market', emoji: '🏮' }
+  ];
+
+  const EASY = [
+    { id:1, scene:'home', seed:11, label:'Warm porch', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.450, r:0.120, what:'diya' },
+      { id:'b', kind:'color', x:0.660, y:0.450, r:0.120, what:'petal' },
+      { id:'c', kind:'flip', x:0.160, y:0.720, r:0.120, what:'lantern' }
+    ]},
+    { id:2, scene:'rangoli', seed:28, label:'Courtyard glow', diffs:[
+      { id:'a', kind:'missing', x:0.660, y:0.820, r:0.120, what:'lantern' },
+      { id:'b', kind:'color', x:0.160, y:0.220, r:0.120, what:'window' },
+      { id:'c', kind:'flip', x:0.500, y:0.220, r:0.120, what:'boat' }
+    ]},
+    { id:3, scene:'sweets', seed:45, label:'Counter lights', diffs:[
+      { id:'a', kind:'missing', x:0.160, y:0.580, r:0.120, what:'center' },
+      { id:'b', kind:'color', x:0.500, y:0.580, r:0.120, what:'awning' },
+      { id:'c', kind:'flip', x:0.840, y:0.580, r:0.120, what:'lantern' }
+    ]},
+    { id:4, scene:'boats', seed:62, label:'River lamps', diffs:[
+      { id:'a', kind:'missing', x:0.500, y:0.220, r:0.120, what:'barfi' },
+      { id:'b', kind:'color', x:0.840, y:0.220, r:0.120, what:'jar' },
+      { id:'c', kind:'flip', x:0.160, y:0.320, r:0.120, what:'boat' }
+    ]},
+    { id:5, scene:'rooftop', seed:79, label:'Roof sparkles', diffs:[
+      { id:'a', kind:'missing', x:0.840, y:0.580, r:0.120, what:'diya' },
+      { id:'b', kind:'color', x:0.160, y:0.720, r:0.120, what:'moon' },
+      { id:'c', kind:'flip', x:0.500, y:0.720, r:0.120, what:'lantern' }
+    ]},
+    { id:6, scene:'market', seed:96, label:'Bazaar night', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.320, r:0.120, what:'lantern' },
+      { id:'b', kind:'color', x:0.660, y:0.320, r:0.120, what:'spark' },
+      { id:'c', kind:'flip', x:0.160, y:0.580, r:0.120, what:'boat' }
+    ]},
+    { id:7, scene:'home', seed:113, label:'Window glow', diffs:[
+      { id:'a', kind:'missing', x:0.660, y:0.720, r:0.120, what:'center' },
+      { id:'b', kind:'color', x:0.160, y:0.820, r:0.120, what:'crate' },
+      { id:'c', kind:'flip', x:0.160, y:0.220, r:0.120, what:'lantern' }
+    ]},
+    { id:8, scene:'rangoli', seed:130, label:'Petal puzzle', diffs:[
+      { id:'a', kind:'missing', x:0.160, y:0.450, r:0.120, what:'barfi' },
+      { id:'b', kind:'color', x:0.500, y:0.450, r:0.120, what:'marigold' },
+      { id:'c', kind:'flip', x:0.840, y:0.450, r:0.120, what:'boat' }
+    ]},
+    { id:9, scene:'sweets', seed:147, label:'Jar swap', diffs:[
+      { id:'a', kind:'missing', x:0.500, y:0.820, r:0.120, what:'diya' },
+      { id:'b', kind:'color', x:0.840, y:0.820, r:0.120, what:'lantern' },
+      { id:'c', kind:'flip', x:0.160, y:0.220, r:0.120, what:'lantern' }
+    ]},
+    { id:10, scene:'boats', seed:164, label:'Twin sails', diffs:[
+      { id:'a', kind:'missing', x:0.840, y:0.450, r:0.120, what:'lantern' },
+      { id:'b', kind:'color', x:0.160, y:0.580, r:0.120, what:'petal' },
+      { id:'c', kind:'flip', x:0.500, y:0.580, r:0.120, what:'boat' }
+    ]},
+    { id:11, scene:'rooftop', seed:181, label:'Sky dots', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.220, r:0.120, what:'center' },
+      { id:'b', kind:'color', x:0.660, y:0.220, r:0.120, what:'window' },
+      { id:'c', kind:'flip', x:0.160, y:0.450, r:0.120, what:'lantern' }
+    ]},
+    { id:12, scene:'market', seed:198, label:'Stall lights', diffs:[
+      { id:'a', kind:'missing', x:0.660, y:0.580, r:0.120, what:'barfi' },
+      { id:'b', kind:'color', x:0.160, y:0.720, r:0.120, what:'awning' },
+      { id:'c', kind:'flip', x:0.840, y:0.820, r:0.120, what:'boat' }
+    ]}
+  ];
+
+  const HARD = [
+    { id:1, scene:'home', seed:201, label:'Quiet porch', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.720, r:0.085, what:'diya' },
+      { id:'b', kind:'color', x:0.660, y:0.720, r:0.085, what:'petal' },
+      { id:'c', kind:'flip', x:0.160, y:0.220, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.500, y:0.220, r:0.085, what:'barfi' },
+      { id:'e', kind:'color', x:0.840, y:0.220, r:0.085, what:'jar' }
+    ]},
+    { id:2, scene:'rangoli', seed:220, label:'Soft petals', diffs:[
+      { id:'a', kind:'missing', x:0.160, y:0.450, r:0.085, what:'lantern' },
+      { id:'b', kind:'color', x:0.500, y:0.450, r:0.085, what:'window' },
+      { id:'c', kind:'flip', x:0.840, y:0.450, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.160, y:0.720, r:0.085, what:'spark' },
+      { id:'e', kind:'color', x:0.500, y:0.720, r:0.085, what:'moon' }
+    ]},
+    { id:3, scene:'sweets', seed:239, label:'Shelf check', diffs:[
+      { id:'a', kind:'missing', x:0.840, y:0.820, r:0.085, what:'center' },
+      { id:'b', kind:'color', x:0.160, y:0.220, r:0.085, what:'awning' },
+      { id:'c', kind:'flip', x:0.500, y:0.220, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.840, y:0.220, r:0.085, what:'boat' },
+      { id:'e', kind:'color', x:0.160, y:0.450, r:0.085, what:'spark' },
+      { id:'f', kind:'extra', x:0.500, y:0.450, r:0.085, what:'marigold' }
+    ]},
+    { id:4, scene:'boats', seed:258, label:'River hush', diffs:[
+      { id:'a', kind:'missing', x:0.660, y:0.580, r:0.085, what:'barfi' },
+      { id:'b', kind:'color', x:0.160, y:0.720, r:0.085, what:'jar' },
+      { id:'c', kind:'flip', x:0.840, y:0.720, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.500, y:0.820, r:0.085, what:'lantern' },
+      { id:'e', kind:'color', x:0.160, y:0.220, r:0.085, what:'crate' },
+      { id:'f', kind:'extra', x:0.500, y:0.220, r:0.085, what:'diya' }
+    ]},
+    { id:5, scene:'rooftop', seed:277, label:'Roofline', diffs:[
+      { id:'a', kind:'missing', x:0.500, y:0.320, r:0.085, what:'diya' },
+      { id:'b', kind:'color', x:0.840, y:0.320, r:0.085, what:'moon' },
+      { id:'c', kind:'flip', x:0.160, y:0.450, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.340, y:0.580, r:0.085, what:'marigold' },
+      { id:'e', kind:'color', x:0.660, y:0.580, r:0.085, what:'marigold' },
+      { id:'f', kind:'extra', x:0.160, y:0.720, r:0.085, what:'ladoo' },
+      { id:'g', kind:'missing', x:0.840, y:0.720, r:0.085, what:'center' }
+    ]},
+    { id:6, scene:'market', seed:296, label:'Lane lamps', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.820, r:0.085, what:'lantern' },
+      { id:'b', kind:'color', x:0.660, y:0.820, r:0.085, what:'spark' },
+      { id:'c', kind:'flip', x:0.160, y:0.220, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.500, y:0.220, r:0.085, what:'diya' },
+      { id:'e', kind:'color', x:0.840, y:0.220, r:0.085, what:'lantern' }
+    ]},
+    { id:7, scene:'home', seed:315, label:'Doorstep', diffs:[
+      { id:'a', kind:'missing', x:0.160, y:0.580, r:0.085, what:'center' },
+      { id:'b', kind:'color', x:0.500, y:0.580, r:0.085, what:'crate' },
+      { id:'c', kind:'flip', x:0.840, y:0.580, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.160, y:0.820, r:0.085, what:'ladoo' },
+      { id:'e', kind:'color', x:0.500, y:0.820, r:0.085, what:'petal' },
+      { id:'f', kind:'extra', x:0.840, y:0.820, r:0.085, what:'spark' }
+    ]},
+    { id:8, scene:'rangoli', seed:334, label:'Pattern pick', diffs:[
+      { id:'a', kind:'missing', x:0.840, y:0.220, r:0.085, what:'barfi' },
+      { id:'b', kind:'color', x:0.160, y:0.320, r:0.085, what:'marigold' },
+      { id:'c', kind:'flip', x:0.500, y:0.320, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.840, y:0.450, r:0.085, what:'barfi' },
+      { id:'e', kind:'color', x:0.160, y:0.580, r:0.085, what:'window' },
+      { id:'f', kind:'extra', x:0.500, y:0.580, r:0.085, what:'boat' },
+      { id:'g', kind:'missing', x:0.840, y:0.720, r:0.085, what:'lantern' }
+    ]},
+    { id:9, scene:'sweets', seed:353, label:'Tray detail', diffs:[
+      { id:'a', kind:'missing', x:0.660, y:0.720, r:0.085, what:'diya' },
+      { id:'b', kind:'color', x:0.160, y:0.820, r:0.085, what:'lantern' },
+      { id:'c', kind:'flip', x:0.160, y:0.220, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.500, y:0.220, r:0.085, what:'spark' },
+      { id:'e', kind:'color', x:0.840, y:0.220, r:0.085, what:'awning' }
+    ]},
+    { id:10, scene:'boats', seed:372, label:'Ripple hunt', diffs:[
+      { id:'a', kind:'missing', x:0.500, y:0.450, r:0.085, what:'lantern' },
+      { id:'b', kind:'color', x:0.840, y:0.450, r:0.085, what:'petal' },
+      { id:'c', kind:'flip', x:0.160, y:0.580, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.340, y:0.720, r:0.085, what:'boat' },
+      { id:'e', kind:'color', x:0.660, y:0.720, r:0.085, what:'jar' },
+      { id:'f', kind:'extra', x:0.160, y:0.220, r:0.085, what:'marigold' }
+    ]},
+    { id:11, scene:'rooftop', seed:391, label:'Night edge', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.220, r:0.085, what:'center' },
+      { id:'b', kind:'color', x:0.660, y:0.220, r:0.085, what:'window' },
+      { id:'c', kind:'flip', x:0.160, y:0.450, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.500, y:0.450, r:0.085, what:'lantern' },
+      { id:'e', kind:'color', x:0.840, y:0.450, r:0.085, what:'moon' },
+      { id:'f', kind:'extra', x:0.160, y:0.720, r:0.085, what:'diya' },
+      { id:'g', kind:'missing', x:0.500, y:0.720, r:0.085, what:'diya' }
+    ]},
+    { id:12, scene:'market', seed:410, label:'Crowded lane', diffs:[
+      { id:'a', kind:'missing', x:0.160, y:0.720, r:0.085, what:'barfi' },
+      { id:'b', kind:'color', x:0.500, y:0.720, r:0.085, what:'awning' },
+      { id:'c', kind:'flip', x:0.840, y:0.720, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.160, y:0.220, r:0.085, what:'marigold' },
+      { id:'e', kind:'color', x:0.500, y:0.220, r:0.085, what:'spark' },
+      { id:'f', kind:'extra', x:0.840, y:0.220, r:0.085, what:'ladoo' }
+    ]},
+    { id:13, scene:'home', seed:429, label:'Eave watch', diffs:[
+      { id:'a', kind:'missing', x:0.840, y:0.320, r:0.085, what:'diya' },
+      { id:'b', kind:'color', x:0.160, y:0.450, r:0.085, what:'jar' },
+      { id:'c', kind:'flip', x:0.500, y:0.450, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.840, y:0.580, r:0.085, what:'diya' },
+      { id:'e', kind:'color', x:0.160, y:0.720, r:0.085, what:'crate' },
+      { id:'f', kind:'extra', x:0.500, y:0.720, r:0.085, what:'barfi' },
+      { id:'g', kind:'missing', x:0.840, y:0.820, r:0.085, what:'center' }
+    ]},
+    { id:14, scene:'rangoli', seed:448, label:'Ring hunt', diffs:[
+      { id:'a', kind:'missing', x:0.660, y:0.820, r:0.085, what:'lantern' },
+      { id:'b', kind:'color', x:0.160, y:0.220, r:0.085, what:'moon' },
+      { id:'c', kind:'flip', x:0.500, y:0.220, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.840, y:0.220, r:0.085, what:'ladoo' },
+      { id:'e', kind:'color', x:0.160, y:0.450, r:0.085, what:'marigold' },
+      { id:'f', kind:'extra', x:0.500, y:0.450, r:0.085, what:'spark' }
+    ]},
+    { id:15, scene:'sweets', seed:467, label:'Box corners', diffs:[
+      { id:'a', kind:'missing', x:0.500, y:0.580, r:0.085, what:'center' },
+      { id:'b', kind:'color', x:0.840, y:0.580, r:0.085, what:'spark' },
+      { id:'c', kind:'flip', x:0.160, y:0.720, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.500, y:0.820, r:0.085, what:'barfi' },
+      { id:'e', kind:'color', x:0.840, y:0.820, r:0.085, what:'lantern' },
+      { id:'f', kind:'extra', x:0.160, y:0.220, r:0.085, what:'boat' }
+    ]},
+    { id:16, scene:'boats', seed:486, label:'Ferry find', diffs:[
+      { id:'a', kind:'missing', x:0.340, y:0.320, r:0.085, what:'barfi' },
+      { id:'b', kind:'color', x:0.660, y:0.320, r:0.085, what:'crate' },
+      { id:'c', kind:'flip', x:0.160, y:0.450, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.840, y:0.450, r:0.085, what:'spark' },
+      { id:'e', kind:'color', x:0.340, y:0.580, r:0.085, what:'petal' },
+      { id:'f', kind:'extra', x:0.660, y:0.580, r:0.085, what:'lantern' }
+    ]},
+    { id:17, scene:'rooftop', seed:505, label:'Spark count', diffs:[
+      { id:'a', kind:'missing', x:0.160, y:0.820, r:0.085, what:'diya' },
+      { id:'b', kind:'color', x:0.500, y:0.820, r:0.085, what:'marigold' },
+      { id:'c', kind:'flip', x:0.840, y:0.820, r:0.085, what:'lantern' },
+      { id:'d', kind:'extra', x:0.160, y:0.220, r:0.085, what:'boat' },
+      { id:'e', kind:'color', x:0.500, y:0.220, r:0.085, what:'window' },
+      { id:'f', kind:'extra', x:0.840, y:0.220, r:0.085, what:'marigold' },
+      { id:'g', kind:'missing', x:0.160, y:0.450, r:0.085, what:'center' }
+    ]},
+    { id:18, scene:'market', seed:524, label:'Last stall', diffs:[
+      { id:'a', kind:'missing', x:0.840, y:0.450, r:0.085, what:'lantern' },
+      { id:'b', kind:'color', x:0.160, y:0.580, r:0.085, what:'lantern' },
+      { id:'c', kind:'flip', x:0.500, y:0.580, r:0.085, what:'boat' },
+      { id:'d', kind:'extra', x:0.840, y:0.720, r:0.085, what:'lantern' },
+      { id:'e', kind:'color', x:0.160, y:0.820, r:0.085, what:'awning' },
+      { id:'f', kind:'extra', x:0.500, y:0.820, r:0.085, what:'diya' },
+      { id:'g', kind:'missing', x:0.160, y:0.220, r:0.085, what:'barfi' }
+    ]}
+  ];
+
+  const REF_MIN = 280;
+  const MIN_HIT = 44;
+
+  function forProfile(isEasy) { return isEasy ? EASY.slice() : HARD.slice(); }
+  function get(isEasy, id) { return forProfile(isEasy).find((l) => l.id === id) || null; }
+  function sceneById(id) { return SCENES.find((s) => s.id === id) || SCENES[0]; }
+
+  function hitPx(diff, sceneW) {
+    return Math.max(MIN_HIT, Math.round(diff.r * 2 * sceneW));
+  }
+
+  function overlaps(a, b) {
+    const dx = a.x - b.x, dy = a.y - b.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    return dist < (a.r + b.r + 0.02);
+  }
+
+  function validateAll() {
+    const issues = [];
+    if (EASY.length < 10) issues.push('easy <10');
+    if (HARD.length < 15) issues.push('hard <15');
+    function checkPack(pack, name, wantMin, wantMax) {
+      pack.forEach((lv) => {
+        const n = (lv.diffs || []).length;
+        if (n < wantMin || n > wantMax) issues.push(name + ' #' + lv.id + ' diffs=' + n);
+        if (!SCENES.some((s) => s.id === lv.scene)) issues.push(name + ' bad scene ' + lv.id);
+        (lv.diffs || []).forEach((d, i) => {
+          if (d.x < 0.08 || d.x > 0.92 || d.y < 0.08 || d.y > 0.92)
+            issues.push(name + ' #' + lv.id + ' edge ' + d.id);
+          const px = hitPx(d, REF_MIN);
+          if (px < MIN_HIT) issues.push(name + ' #' + lv.id + ' hit ' + d.id + '=' + px);
+          for (let j = i + 1; j < lv.diffs.length; j++) {
+            if (overlaps(d, lv.diffs[j]))
+              issues.push(name + ' #' + lv.id + ' overlap ' + d.id + '/' + lv.diffs[j].id);
+          }
+        });
+      });
+    }
+    checkPack(EASY, 'easy', 3, 3);
+    checkPack(HARD, 'hard', 5, 7);
+    return { ok: issues.length === 0, issues, easy: EASY.length, hard: HARD.length, scenes: SCENES.length };
+  }
+
+  return {
+    SCENES, forProfile, get, sceneById, hitPx, MIN_HIT, REF_MIN, validateAll, overlaps
+  };
+})();
+
+})();
 /* ==== 60-ui.js ==== */
 ;(function(){
 /* Screens: profiles, hub, confirm */
@@ -961,7 +1908,7 @@ DG.UI = (() => {
   function startBg() {
     cancelAnimationFrame(bgRaf);
     const tick = (t) => {
-      if (DG.screen === 'hub' || DG.screen === 'profiles' || DG.screen === 'diyapath-select') {
+      if (DG.screen === 'hub' || DG.screen === 'profiles' || DG.screen === 'diyapath-select' || DG.screen === 'quiz-rounds' || DG.screen === 'memory-select' || DG.screen === 'phuljhadi-select' || DG.screen === 'sweets-select' || DG.screen === 'spot-select') {
         DG.fitCanvas();
         DG.Art.drawHubBg(DG.ctx, DG.W, DG.H, t);
         bgRaf = requestAnimationFrame(tick);
@@ -1040,6 +1987,11 @@ DG.UI = (() => {
           DG.Audio.click();
           if (g.id === 'rangoli') DG.Rangoli.open();
           else if (g.id === 'diyapath') DG.DiyaPath.open();
+          else if (g.id === 'quiz') DG.Quiz.open();
+          else if (g.id === 'memory') DG.Memory.open();
+          else if (g.id === 'fireworks') DG.Phuljhadi.open();
+          else if (g.id === 'sweets') DG.Sweets.open();
+          else if (g.id === 'spot') DG.Spot.open();
         });
       } else {
         DG.bindTap(tile, () => {
@@ -2084,6 +3036,2202 @@ DG.DiyaPath = (() => {
 })();
 
 })();
+/* ==== 72-quiz.js ==== */
+;(function(){
+/* Diwali Quiz Quest — storybook quiz with separate packs per profile */
+DG.Quiz = (() => {
+  const P1_LIVES = Infinity;
+  const P2_LIVES = 3;
+
+  let roundId = null;
+  let queue = [];
+  let qi = 0;
+  let lives = P2_LIVES;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let awaitingFact = false;
+  let lastStars = 0;
+
+  function easy() { return DG.isEasy(); }
+  function Data() { return DG.QuizData; }
+  function ov() { return DG.overlay; }
+
+  function progress() {
+    const p = DG.Save.profile();
+    if (!p.quiz) p.quiz = { rounds: {}, stars: {}, badges: 0, totalCorrect: 0 };
+    if (!p.quiz.rounds) p.quiz.rounds = {};
+    if (!p.quiz.stars) p.quiz.stars = {};
+    return p.quiz;
+  }
+
+  function open() {
+    awaitingFact = false;
+    DG.screen = 'quiz-rounds';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const isP1 = easy();
+    const prog = progress();
+    const scr = document.createElement('div');
+    scr.className = 'screen quiz-screen landscape-tight' + (isP1 ? ' p1-mode' : '');
+    const sub = isP1
+      ? 'Storybook quiz · big picture answers · try as many times as you like!'
+      : 'Storybook quiz · harder questions · 3 lives each round';
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.4vw,28px)">📖 Quiz Quest</div>
+          <div class="sub">${sub}</div>
+        </div>
+        <div class="sub" id="quizProg"></div>
+      </div>
+      <div class="quiz-story">Pick a chapter to begin…</div>
+      <div class="quiz-rounds" id="rounds"></div>`;
+    el.appendChild(scr);
+    const box = scr.querySelector('#rounds');
+    Data().rounds().forEach((r) => {
+      const done = !!(prog.rounds && prog.rounds[r.id]);
+      const stars = prog.stars[r.id] || 0;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'quiz-round-card' + (isP1 ? ' p1' : '') + (done ? ' done' : '');
+      b.dataset.round = r.id;
+      b.innerHTML = `<span class="emoji">${r.emoji}</span>
+        <span class="name">${r.title}</span>
+        <span class="story">${r.story}</span>
+        <span class="stars">${done ? '⭐'.repeat(stars) + (stars ? '' : '✓') : 'Tap to open'}</span>`;
+      DG.bindTap(b, () => { DG.Audio.click(); startRound(r.id); });
+      box.appendChild(b);
+    });
+    const cleared = Data().rounds().filter((r) => prog.rounds[r.id]).length;
+    scr.querySelector('#quizProg').textContent = `${cleared}/${Data().rounds().length} chapters`;
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.UI.startBg();
+  }
+
+  function startRound(id) {
+    roundId = id;
+    queue = Data().byRound(easy(), id);
+    qi = 0;
+    lives = easy() ? P1_LIVES : P2_LIVES;
+    correctCount = 0;
+    wrongCount = 0;
+    awaitingFact = false;
+    if (!queue.length) {
+      DG.toast('Chapter coming soon');
+      return open();
+    }
+    showQuestion();
+  }
+
+  function lifeTxt() {
+    if (easy()) return '∞ tries';
+    return '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - lives));
+  }
+
+  function showQuestion() {
+    awaitingFact = false;
+    DG.screen = 'quiz-play';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const isP1 = easy();
+    const q = queue[qi];
+    const round = Data().rounds().find((r) => r.id === roundId) || { title: 'Chapter', emoji: '📖' };
+    const scr = document.createElement('div');
+    scr.className = 'screen quiz-screen quiz-play' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Chapters</button>
+        <div>
+          <div class="title" style="font-size:clamp(16px,3vw,24px)">${round.emoji} ${round.title}</div>
+          <div class="sub">Question ${qi + 1} / ${queue.length} · ${lifeTxt()}</div>
+        </div>
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnHub">Hub</button>
+      </div>
+      <div class="quiz-page" id="page">
+        <div class="quiz-q ${isP1 ? 'p1' : ''}">${q.q}</div>
+        <div class="quiz-choices ${isP1 ? 'p1' : ''}" id="choices"></div>
+      </div>`;
+    el.appendChild(scr);
+    const box = scr.querySelector('#choices');
+    q.choices.forEach((c, idx) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'quiz-choice' + (isP1 ? ' p1' : '');
+      b.dataset.idx = String(idx);
+      b.innerHTML = isP1
+        ? `<span class="emoji">${c.e || '✨'}</span><span class="label">${c.t}</span>`
+        : `<span class="emoji">${c.e || '✨'}</span><span class="label">${c.t}</span>`;
+      DG.bindTap(b, () => onPick(idx));
+      box.appendChild(b);
+    });
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); open(); });
+    DG.bindTap(scr.querySelector('#btnHub'), () => { DG.Audio.click(); DG.UI.showHub(); });
+  }
+
+  function onPick(idx) {
+    if (awaitingFact) return;
+    const q = queue[qi];
+    const choice = q.choices[idx];
+    const buttons = [...document.querySelectorAll('.quiz-choice')];
+    if (!choice) return;
+    if (choice.ok) {
+      buttons.forEach((b) => { b.disabled = true; });
+      if (buttons[idx]) buttons[idx].classList.add('correct');
+      DG.Audio.win();
+      correctCount += 1;
+      awaitingFact = true;
+      showFact(q);
+    } else {
+      if (buttons[idx]) {
+        buttons[idx].classList.add('wrong');
+        setTimeout(() => buttons[idx] && buttons[idx].classList.remove('wrong'), 450);
+      }
+      DG.Audio.blocked();
+      wrongCount += 1;
+      if (easy()) {
+        DG.toast('Try again! You can do it 🌟');
+      } else {
+        lives -= 1;
+        if (lives <= 0) {
+          DG.toast('Out of lives — gently restarting this chapter 📖');
+          setTimeout(() => startRound(roundId), 700);
+          return;
+        }
+        DG.toast('Not quite — ❤️ ' + lives + ' left');
+        // refresh life display
+        const sub = document.querySelector('.quiz-play .sub');
+        if (sub) sub.textContent = `Question ${qi + 1} / ${queue.length} · ${lifeTxt()}`;
+      }
+    }
+  }
+
+  function showFact(q) {
+    const page = document.getElementById('page');
+    if (!page) return;
+    const isP1 = easy();
+    const fact = document.createElement('div');
+    fact.className = 'quiz-fact' + (isP1 ? ' p1' : '');
+    fact.innerHTML = `<div class="fact-title">✨ Did you know?</div>
+      <div class="fact-body">${q.fact}</div>
+      <button class="btn big ${isP1 ? 'p1' : ''}" id="btnNext">${qi + 1 >= queue.length ? 'Finish chapter ⭐' : 'Next page →'}</button>`;
+    page.appendChild(fact);
+    DG.bindTap(fact.querySelector('#btnNext'), () => {
+      DG.Audio.click();
+      awaitingFact = false;
+      qi += 1;
+      if (qi >= queue.length) finishRound();
+      else showQuestion();
+    });
+  }
+
+  function starsForRound() {
+    if (easy()) {
+      // infinite tries: stars by finishing + low wrongs
+      if (wrongCount <= 1) return 3;
+      if (wrongCount <= 4) return 2;
+      return 1;
+    }
+    // lives remaining: 3/2/1
+    if (lives >= 3) return 3;
+    if (lives === 2) return 2;
+    return 1;
+  }
+
+  function finishRound() {
+    const stars = starsForRound();
+    lastStars = stars;
+    const prog = progress();
+    const prev = prog.stars[roundId] || 0;
+    prog.stars[roundId] = Math.max(prev, stars);
+    prog.rounds[roundId] = true;
+    prog.totalCorrect = (prog.totalCorrect || 0) + correctCount;
+    const p = DG.Save.profile();
+    if (!p.badges.includes('quiz')) p.badges.push('quiz');
+    DG.Save.addSticker('📖');
+    const allDone = Data().rounds().every((r) => prog.rounds[r.id]);
+    if (allDone) {
+      DG.Save.addSticker('🪔');
+      if (!p.badges.includes('quiz-diya')) p.badges.push('quiz-diya');
+    }
+    DG.Save.save();
+
+    DG.screen = 'quiz-result';
+    const el = ov();
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const isP1 = easy();
+    const round = Data().rounds().find((r) => r.id === roundId) || { title: 'Chapter', emoji: '📖' };
+    const scr = document.createElement('div');
+    scr.className = 'screen quiz-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="quiz-page result">
+        <div class="title">${round.emoji} Chapter complete!</div>
+        <div class="sub">${round.title}</div>
+        <div class="quiz-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <div class="sub">You got ${correctCount} shining answers${allDone ? ' · Diya badge earned! 🪔' : ''}</div>
+        <div class="row">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnChapters">Chapters</button>
+          <button class="btn big ${isP1 ? 'p1' : ''}" id="btnHub">Hub</button>
+        </div>
+      </div>`;
+    el.appendChild(scr);
+    DG.Audio.lantern();
+    DG.bindTap(scr.querySelector('#btnChapters'), () => { DG.Audio.click(); open(); });
+    DG.bindTap(scr.querySelector('#btnHub'), () => { DG.Audio.click(); DG.UI.showHub(); });
+  }
+
+  function autoPlay(targetRound) {
+    const rounds = Data().rounds();
+    const rid = targetRound || (rounds[0] && rounds[0].id);
+    if (!rid) return { ok: false, reason: 'no-round' };
+    startRound(rid);
+    // Instantly answer correctly through the queue without UI waits
+    const qs = queue.slice();
+    let answered = 0;
+    qs.forEach((q) => {
+      const idx = q.choices.findIndex((c) => c.ok);
+      if (idx < 0) return;
+      // simulate success path without fact UI
+      correctCount += 1;
+      answered += 1;
+    });
+    qi = qs.length;
+    lives = easy() ? P1_LIVES : Math.max(1, lives);
+    finishRound();
+    return { ok: answered === qs.length && answered > 0, answered, round: rid, stars: lastStars, pack: easy() ? 'easy' : 'hard' };
+  }
+
+  return {
+    open,
+    startRound,
+    autoPlay,
+    getLives: () => lives,
+    getRound: () => roundId,
+    getQueue: () => queue.slice(),
+    getIndex: () => qi,
+    progress
+  };
+})();
+
+})();
+/* ==== 73-memory.js ==== */
+;(function(){
+/* Diya Memory Match — flip-card table, separate ladders per profile */
+DG.Memory = (() => {
+  const P1_LIVES = Infinity;
+  const P2_LIVES = 3;
+  const Levels = () => DG.MemoryLevels;
+
+  let level = null;
+  let cards = []; // {idx,key,emoji,name,pair,state:'down'|'up'|'matched'}
+  let first = null;
+  let lock = false;
+  let lives = P2_LIVES;
+  let mismatches = 0;
+  let matches = 0;
+  let peeking = false;
+  let timerOn = false;
+  let t0 = 0;
+  let elapsed = 0;
+  let timerId = 0;
+  let lastStars = 0;
+  let won = false;
+
+  function easy() { return DG.isEasy(); }
+  function pack() { return Levels().forProfile(easy()); }
+  function progress() {
+    const p = DG.Save.profile();
+    if (!p.memory) p.memory = { maxCleared: 0, stars: {}, cleared: {}, bestMs: {} };
+    if (!p.memory.stars) p.memory.stars = {};
+    if (!p.memory.cleared) p.memory.cleared = {};
+    if (!p.memory.bestMs) p.memory.bestMs = {};
+    return p.memory;
+  }
+
+  function open() { showSelect(); }
+
+  function showSelect() {
+    stopTimer();
+    DG.screen = 'memory-select';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const list = pack();
+    const prog = progress();
+    const scr = document.createElement('div');
+    scr.className = 'screen memory-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.4vw,28px)">🃏 Diya Memory</div>
+          <div class="sub">${isP1
+            ? 'Flip cards · peek at the start · ∞ tries'
+            : 'Bigger tables · timer · 3 mismatch lives'}</div>
+        </div>
+        <span class="sub" id="memProg"></span>
+      </div>
+      <div class="level-grid" id="lvls"></div>`;
+    ov.appendChild(scr);
+    const grid = scr.querySelector('#lvls');
+    list.forEach((lv) => {
+      const unlocked = lv.id === 1 || prog.maxCleared >= lv.id - 1 || prog.cleared[lv.id];
+      const stars = prog.stars[lv.id] || 0;
+      const best = prog.bestMs[lv.id];
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'level-card' + (unlocked ? '' : ' locked') + (isP1 ? ' p1' : '');
+      b.dataset.level = String(lv.id);
+      const timeTxt = (!isP1 && best != null) ? formatMs(best) : '';
+      b.innerHTML = `<span class="num">${lv.id}</span>
+        <span class="meta">${lv.cols}×${lv.rows}${timeTxt ? ' · ' + timeTxt : ''}</span>
+        <span class="stars">${unlocked ? '⭐'.repeat(stars) + (stars ? '' : '·') : '🔒'}</span>`;
+      if (unlocked) DG.bindTap(b, () => { DG.Audio.click(); startLevel(lv.id); });
+      grid.appendChild(b);
+    });
+    const cleared = list.filter((l) => prog.cleared[l.id]).length;
+    scr.querySelector('#memProg').textContent = `${cleared}/${list.length} lit`;
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.UI.startBg();
+  }
+
+  function formatMs(ms) {
+    const s = Math.max(0, Math.round(ms / 1000));
+    const m = (s / 60) | 0;
+    const r = s % 60;
+    return m + ':' + String(r).padStart(2, '0');
+  }
+
+  function startLevel(id) {
+    level = Levels().get(easy(), id);
+    if (!level) return;
+    cards = Levels().buildDeck(level).map((c) => Object.assign({}, c, { state: 'down' }));
+    first = null;
+    lock = true;
+    peeking = true;
+    lives = easy() ? P1_LIVES : P2_LIVES;
+    mismatches = 0;
+    matches = 0;
+    elapsed = 0;
+    t0 = 0;
+    timerOn = false;
+    won = false;
+    stopTimer();
+    renderPlay();
+    // gentle reveal-peek
+    cards.forEach((c) => { c.state = 'up'; });
+    paintCards();
+    const peek = level.peekMs || (easy() ? 2000 : 800);
+    setTimeout(() => {
+      if (won || !level || level.id !== id) return;
+      cards.forEach((c) => { if (c.state !== 'matched') c.state = 'down'; });
+      peeking = false;
+      lock = false;
+      paintCards();
+      if (!easy()) startTimer();
+      const sub = document.querySelector('.memory-play .sub');
+      if (sub) sub.textContent = statusLine();
+    }, peek);
+  }
+
+  function statusLine() {
+    if (easy()) return `Pairs ${matches}/${cards.length / 2} · ∞ tries · peek ${peeking ? '👀' : 'go!'}`;
+    const hearts = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - lives));
+    return `Pairs ${matches}/${cards.length / 2} · ${hearts} · ${formatMs(elapsed)}`;
+  }
+
+  function startTimer() {
+    stopTimer();
+    timerOn = true;
+    t0 = performance.now() - elapsed;
+    timerId = setInterval(() => {
+      if (!timerOn) return;
+      elapsed = performance.now() - t0;
+      const sub = document.querySelector('.memory-play .sub');
+      if (sub) sub.textContent = statusLine();
+      const clock = document.getElementById('memClock');
+      if (clock) clock.textContent = formatMs(elapsed);
+    }, 200);
+  }
+
+  function stopTimer() {
+    timerOn = false;
+    if (timerId) { clearInterval(timerId); timerId = 0; }
+  }
+
+  function renderPlay() {
+    DG.screen = 'memory-play';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen memory-screen memory-play' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Levels</button>
+        <div>
+          <div class="title" style="font-size:clamp(16px,3vw,24px)">🃏 Level ${level.id} · ${level.cols}×${level.rows}</div>
+          <div class="sub">${statusLine()}</div>
+        </div>
+        <div class="row" style="gap:6px">
+          ${isP1 ? '' : `<span class="mem-clock" id="memClock">${formatMs(elapsed)}</span>`}
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnHub">Hub</button>
+        </div>
+      </div>
+      <div class="mem-table" id="table" style="--cols:${level.cols};--rows:${level.rows}"></div>`;
+    ov.appendChild(scr);
+    const table = scr.querySelector('#table');
+    cards.forEach((c) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mem-card' + (isP1 ? ' p1' : '');
+      b.dataset.idx = String(c.idx);
+      b.setAttribute('aria-label', 'Memory card');
+      b.innerHTML = `<span class="face back">🪔</span><span class="face front">${c.emoji}</span>`;
+      DG.bindTap(b, () => onFlip(c.idx));
+      table.appendChild(b);
+    });
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); stopTimer(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnHub'), () => { DG.Audio.click(); stopTimer(); DG.UI.showHub(); });
+    paintCards();
+  }
+
+  function paintCards() {
+    cards.forEach((c) => {
+      const el = document.querySelector(`.mem-card[data-idx="${c.idx}"]`);
+      if (!el) return;
+      el.classList.toggle('up', c.state === 'up' || c.state === 'matched');
+      el.classList.toggle('matched', c.state === 'matched');
+      el.disabled = c.state === 'matched' || peeking || lock;
+    });
+  }
+
+  function onFlip(idx) {
+    if (lock || peeking || won) return;
+    const card = cards.find((c) => c.idx === idx);
+    if (!card || card.state !== 'down') return;
+    DG.Audio.click();
+    card.state = 'up';
+    paintCards();
+    if (first == null) {
+      first = card;
+      return;
+    }
+    // second card
+    lock = true;
+    const a = first;
+    const b = card;
+    first = null;
+    if (a.key === b.key && a.idx !== b.idx) {
+      a.state = 'matched';
+      b.state = 'matched';
+      matches += 1;
+      DG.Audio.soft();
+      paintCards();
+      const sub = document.querySelector('.memory-play .sub');
+      if (sub) sub.textContent = statusLine();
+      lock = false;
+      if (matches >= cards.length / 2) finishLevel();
+    } else {
+      mismatches += 1;
+      DG.Audio.blocked();
+      setTimeout(() => {
+        if (a.state === 'up') a.state = 'down';
+        if (b.state === 'up') b.state = 'down';
+        paintCards();
+        if (!easy()) {
+          lives -= 1;
+          if (lives <= 0) {
+            DG.toast('Out of lives — gently restarting 🃏');
+            stopTimer();
+            setTimeout(() => startLevel(level.id), 600);
+            return;
+          }
+          DG.toast('Not a match — ❤️ ' + lives + ' left');
+        } else {
+          DG.toast('Try again! You can do it 🌟');
+        }
+        const sub = document.querySelector('.memory-play .sub');
+        if (sub) sub.textContent = statusLine();
+        lock = false;
+      }, easy() ? 700 : 550);
+    }
+  }
+
+  function starsForClear() {
+    if (easy()) {
+      if (mismatches <= 2) return 3;
+      if (mismatches <= 6) return 2;
+      return 1;
+    }
+    if (lives >= 3) return 3;
+    if (lives === 2) return 2;
+    return 1;
+  }
+
+  function finishLevel() {
+    if (won) return;
+    won = true;
+    lock = true;
+    stopTimer();
+    if (!easy() && t0) elapsed = performance.now() - t0;
+    const stars = starsForClear();
+    lastStars = stars;
+    const prog = progress();
+    const id = level.id;
+    prog.cleared[id] = true;
+    prog.maxCleared = Math.max(prog.maxCleared || 0, id);
+    prog.stars[id] = Math.max(prog.stars[id] || 0, stars);
+    if (!easy()) {
+      const prev = prog.bestMs[id];
+      if (prev == null || elapsed < prev) prog.bestMs[id] = Math.round(elapsed);
+    }
+    const p = DG.Save.profile();
+    if (!p.badges.includes('memory')) p.badges.push('memory');
+    DG.Save.addSticker('🃏');
+    const allDone = pack().every((lv) => prog.cleared[lv.id]);
+    if (allDone) {
+      DG.Save.addSticker('🪔');
+      if (!p.badges.includes('memory-diya')) p.badges.push('memory-diya');
+    }
+    DG.Save.save();
+    DG.Audio.win();
+
+    DG.screen = 'memory-result';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const best = prog.bestMs[id];
+    const scr = document.createElement('div');
+    scr.className = 'screen memory-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="mem-result">
+        <div class="title">✨ Table cleared!</div>
+        <div class="sub">Level ${id} · ${level.cols}×${level.rows}</div>
+        <div class="quiz-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <div class="sub">${isP1
+          ? `Nice matching! ${mismatches} mix-ups`
+          : `Time ${formatMs(elapsed)}${best != null ? ' · Best ' + formatMs(best) : ''}`}${allDone ? ' · Diya badge! 🪔' : ''}</div>
+        <div class="row">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnLevels">Levels</button>
+          <button class="btn big ${isP1 ? 'p1' : ''}" id="btnNext">${pack().some((l) => l.id === id + 1) ? 'Next →' : 'Hub'}</button>
+        </div>
+      </div>`;
+    ov.appendChild(scr);
+    DG.Audio.lantern();
+    DG.bindTap(scr.querySelector('#btnLevels'), () => { DG.Audio.click(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnNext'), () => {
+      DG.Audio.click();
+      const next = pack().find((l) => l.id === id + 1);
+      if (next) startLevel(next.id);
+      else DG.UI.showHub();
+    });
+  }
+
+  function autoPlay(targetId) {
+    const list = pack();
+    const id = targetId || 1;
+    const lv = Levels().get(easy(), id);
+    if (!lv) return { ok: false, reason: 'no-level' };
+    // Simulate a perfect clear without UI waits
+    level = lv;
+    cards = Levels().buildDeck(lv, () => 0.37).map((c) => Object.assign({}, c, { state: 'matched' }));
+    matches = cards.length / 2;
+    mismatches = 0;
+    lives = easy() ? P1_LIVES : P2_LIVES;
+    elapsed = easy() ? 0 : 12000 + id * 1000;
+    peeking = false;
+    lock = true;
+    won = false;
+    finishLevel();
+    return { ok: true, level: id, stars: lastStars, pack: easy() ? 'easy' : 'hard', pairs: matches };
+  }
+
+  return {
+    open,
+    startLevel,
+    autoPlay,
+    getLives: () => lives,
+    getLevel: () => level,
+    getCards: () => cards.slice(),
+    getMatches: () => matches,
+    progress,
+    formatMs
+  };
+})();
+
+})();
+/* ==== 74-phuljhadi.js ==== */
+;(function(){
+/* Phuljhadi Pop — fireworks rhythm, audio-clock timing, photosensitivity-safe */
+DG.Phuljhadi = (() => {
+  const P2_LIVES = 3;
+  const Songs = () => DG.PhuljhadiSongs;
+  const BASE_FREQ = 262; // gentle C4
+
+  let song = null;
+  let chart = [];
+  let noteState = []; // pending|hit|miss
+  let lives = P2_LIVES;
+  let combo = 0;
+  let maxCombo = 0;
+  let hits = 0;
+  let misses = 0;
+  let perfects = 0;
+  let playing = false;
+  let finished = false;
+  let audioOrigin = 0; // ctx.currentTime at beat 0
+  let perfOrigin = 0;  // performance.now() fallback ms at beat 0
+  let raf = 0;
+  let lastStars = 0;
+  let pops = []; // soft particles {x,y,t,emoji,life}
+  let countdown = 0;
+  let laneEls = [];
+  let trackEl = null;
+  let statusEl = null;
+  let keyHandler = null;
+
+  function easy() { return DG.isEasy(); }
+  function pack() { return Songs().forProfile(easy()); }
+  function progress() {
+    const p = DG.Save.profile();
+    if (!p.phuljhadi) p.phuljhadi = { maxCleared: 0, stars: {}, cleared: {}, bestCombo: {} };
+    if (!p.phuljhadi.stars) p.phuljhadi.stars = {};
+    if (!p.phuljhadi.cleared) p.phuljhadi.cleared = {};
+    if (!p.phuljhadi.bestCombo) p.phuljhadi.bestCombo = {};
+    return p.phuljhadi;
+  }
+
+  function open() { showSelect(); }
+
+  function showSelect() {
+    stopRun(true);
+    DG.screen = 'phuljhadi-select';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const list = pack();
+    const prog = progress();
+    const scr = document.createElement('div');
+    scr.className = 'screen phul-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.4vw,28px)">🎆 Phuljhadi Pop</div>
+          <div class="sub">${isP1
+            ? 'Slow sparks · big taps · no fail'
+            : 'Faster songs · combos · 3 miss lives'}</div>
+        </div>
+        <span class="sub" id="phProg"></span>
+      </div>
+      <div class="level-grid" id="lvls"></div>`;
+    ov.appendChild(scr);
+    const grid = scr.querySelector('#lvls');
+    list.forEach((lv) => {
+      const unlocked = lv.id === 1 || prog.maxCleared >= lv.id - 1 || prog.cleared[lv.id];
+      const stars = prog.stars[lv.id] || 0;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'level-card' + (unlocked ? '' : ' locked') + (isP1 ? ' p1' : '');
+      b.dataset.level = String(lv.id);
+      b.innerHTML = `<span class="num">${lv.id}</span>
+        <span class="meta">${lv.name}<br>${lv.bpm}♪ · ${lv.lanes} lane${lv.lanes > 1 ? 's' : ''}</span>
+        <span class="stars">${unlocked ? '⭐'.repeat(stars) + (stars ? '' : '·') : '🔒'}</span>`;
+      if (unlocked) DG.bindTap(b, () => { DG.Audio.click(); startSong(lv.id); });
+      grid.appendChild(b);
+    });
+    const cleared = list.filter((l) => prog.cleared[l.id]).length;
+    scr.querySelector('#phProg').textContent = `${cleared}/${list.length} songs`;
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.UI.startBg();
+  }
+
+  function songTimeSec() {
+    // Prefer audio clock; fall back to performance for muted/autoplay without ctx
+    const ctx = DG.Audio.getCtx && DG.Audio.getCtx();
+    if (ctx && audioOrigin > 0) return ctx.currentTime - audioOrigin;
+    if (perfOrigin > 0) return (performance.now() - perfOrigin) / 1000;
+    return -1;
+  }
+
+  function beatNow() {
+    if (!song) return 0;
+    const t = songTimeSec();
+    if (t < 0) return -1;
+    return (t * song.bpm) / 60;
+  }
+
+  function startSong(id) {
+    song = Songs().get(easy(), id);
+    if (!song) return;
+    chart = Songs().buildChart(song);
+    noteState = chart.map(() => 'pending');
+    lives = easy() ? Infinity : P2_LIVES;
+    combo = 0;
+    maxCombo = 0;
+    hits = 0;
+    misses = 0;
+    perfects = 0;
+    finished = false;
+    playing = false;
+    pops = [];
+    audioOrigin = 0;
+    perfOrigin = 0;
+    countdown = 3;
+    renderPlay();
+    // countdown then arm audio clock
+    const tick = () => {
+      if (finished || !song || song.id !== id) return;
+      const el = document.getElementById('phCount');
+      if (countdown > 0) {
+        if (el) el.textContent = String(countdown);
+        DG.Audio.soft();
+        countdown -= 1;
+        setTimeout(tick, 700);
+      } else {
+        if (el) el.textContent = 'Go!';
+        setTimeout(() => {
+          if (el) el.classList.add('hidden');
+          armAndPlay();
+        }, 280);
+      }
+    };
+    setTimeout(tick, 200);
+  }
+
+  function armAndPlay() {
+    DG.Audio.unlock();
+    const ctx = DG.Audio.getCtx();
+    const lead = 0.08;
+    if (ctx) {
+      audioOrigin = ctx.currentTime + lead;
+      perfOrigin = performance.now() + lead * 1000;
+      scheduleTune(audioOrigin);
+    } else {
+      audioOrigin = 0;
+      perfOrigin = performance.now() + lead * 1000;
+    }
+    playing = true;
+    loop();
+  }
+
+  function scheduleTune(origin) {
+    if (!song) return;
+    const deg = Songs().DEG;
+    const mel = song.melody || [0, 2, 4, 2];
+    const bars = song.bars.length;
+    // soft downbeat + melody; volume capped inside scheduleTone
+    for (let b = 0; b < bars * 4; b++) {
+      const when = origin + Songs().beatToSec(b, song.bpm);
+      const isDown = b % 4 === 0;
+      const degIdx = mel[b % mel.length] % deg.length;
+      const freq = BASE_FREQ * deg[degIdx];
+      DG.Audio.scheduleTone(freq, when, isDown ? 0.18 : 0.11, 'sine', isDown ? 0.055 : 0.04);
+      if (isDown) {
+        DG.Audio.scheduleTone(freq * 0.5, when, 0.22, 'triangle', 0.03);
+      }
+    }
+  }
+
+  function renderPlay() {
+    stopRaf();
+    unbindKeys();
+    DG.screen = 'phuljhadi-play';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen phul-screen phul-play' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Songs</button>
+        <div>
+          <div class="title" style="font-size:clamp(15px,2.8vw,22px)">🎆 ${song.name}</div>
+          <div class="sub" id="phStatus">${statusLine()}</div>
+        </div>
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnHub">Hub</button>
+      </div>
+      <div class="phul-stage" id="stage">
+        <div class="phul-count" id="phCount">3</div>
+        <div class="phul-track" id="track" style="--lanes:${song.lanes}"></div>
+        <div class="phul-pads" id="pads" style="--lanes:${song.lanes}"></div>
+        <div class="phul-pops" id="pops" aria-hidden="true"></div>
+      </div>`;
+    ov.appendChild(scr);
+    statusEl = scr.querySelector('#phStatus');
+    trackEl = scr.querySelector('#track');
+    const pads = scr.querySelector('#pads');
+    laneEls = [];
+    for (let i = 0; i < song.lanes; i++) {
+      const col = document.createElement('div');
+      col.className = 'phul-lane';
+      col.dataset.lane = String(i);
+      trackEl.appendChild(col);
+      laneEls.push(col);
+
+      const pad = document.createElement('button');
+      pad.type = 'button';
+      pad.className = 'phul-pad' + (isP1 ? ' p1' : '');
+      pad.dataset.lane = String(i);
+      pad.setAttribute('aria-label', 'Lane ' + (i + 1));
+      pad.innerHTML = i % 2 === 0 ? '✨' : '🎇';
+      // Use pointerdown for lower latency; bypass bindTap lock for rhythm
+      pad.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        DG.Audio.unlock();
+        onTap(i);
+      });
+      pads.appendChild(pad);
+    }
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); stopRun(true); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnHub'), () => { DG.Audio.click(); stopRun(true); DG.UI.showHub(); });
+    keyHandler = (e) => {
+      const map = { '1': 0, '2': 1, '3': 2, '4': 3, a: 0, s: 1, d: 2, f: 3 };
+      if (map[e.key] != null) onTap(map[e.key]);
+    };
+    window.addEventListener('keydown', keyHandler);
+  }
+
+  function statusLine() {
+    if (easy()) return `Hits ${hits}/${chart.length} · ∞ tries · soft sky`;
+    const hearts = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - Math.max(0, lives)));
+    return `${hearts} · combo ${combo} · ${hits}/${chart.length}`;
+  }
+
+  function onTap(lane) {
+    if (!playing || finished || !song) return;
+    if (lane < 0 || lane >= song.lanes) return;
+    const beat = beatNow();
+    const windowBeats = (song.windowMs / 1000) * (song.bpm / 60);
+    // find closest pending note in this lane within window
+    let best = -1;
+    let bestAbs = Infinity;
+    for (let i = 0; i < chart.length; i++) {
+      if (noteState[i] !== 'pending') continue;
+      const n = chart[i];
+      if (n.lane !== lane) continue;
+      const d = Math.abs(n.beat - beat);
+      if (d < bestAbs) { bestAbs = d; best = i; }
+    }
+    const pad = document.querySelector(`.phul-pad[data-lane="${lane}"]`);
+    if (pad) {
+      pad.classList.remove('flash');
+      void pad.offsetWidth;
+      pad.classList.add('flash');
+    }
+    if (best < 0 || bestAbs > windowBeats) {
+      // empty tap — soft tick only; does not cost a life
+      DG.Audio.click();
+      return;
+    }
+    const perfectCut = windowBeats * 0.45;
+    noteState[best] = 'hit';
+    hits += 1;
+    combo += 1;
+    if (combo > maxCombo) maxCombo = combo;
+    if (bestAbs <= perfectCut) perfects += 1;
+    DG.Audio.sparkle();
+    spawnPop(lane, chart[best].kind === 'firework' ? '🎆' : '✨');
+    if (statusEl) statusEl.textContent = statusLine();
+    maybeEnd();
+  }
+
+  function checkMisses() {
+    if (!playing || finished) return;
+    const beat = beatNow();
+    const windowBeats = (song.windowMs / 1000) * (song.bpm / 60);
+    const grace = windowBeats + 0.05;
+    for (let i = 0; i < chart.length; i++) {
+      if (noteState[i] !== 'pending') continue;
+      if (beat - chart[i].beat > grace) {
+        noteState[i] = 'miss';
+        misses += 1;
+        combo = 0;
+        if (!easy()) {
+          lives -= 1;
+          DG.Audio.blocked();
+          if (lives <= 0) {
+            DG.toast('Out of lives — gently restarting 🎆');
+            const id = song.id;
+            stopRun(false);
+            setTimeout(() => startSong(id), 650);
+            return;
+          }
+          DG.toast('Miss — ❤️ ' + lives + ' left');
+        }
+        if (statusEl) statusEl.textContent = statusLine();
+      }
+    }
+  }
+
+  function spawnPop(lane, emoji) {
+    // Soft local particle only — no full-screen flash (photosensitivity-safe)
+    if (pops.length > 14) pops.shift();
+    pops.push({
+      lane,
+      emoji: emoji || '✨',
+      life: 1,
+      born: performance.now()
+    });
+  }
+
+  function paint() {
+    if (!trackEl || !song) return;
+    const beat = beatNow();
+    const approach = song.approachBeats;
+    // clear lane contents
+    laneEls.forEach((col) => { col.innerHTML = ''; });
+    for (let i = 0; i < chart.length; i++) {
+      if (noteState[i] === 'hit') continue;
+      const n = chart[i];
+      const dt = n.beat - beat;
+      if (dt > approach || dt < -0.35) continue;
+      const y = 1 - (dt / approach); // 0 top → 1 hit line
+      const el = document.createElement('div');
+      el.className = 'phul-note' + (n.kind === 'firework' ? ' boom' : '') + (noteState[i] === 'miss' ? ' missed' : '');
+      el.style.top = (DG.clamp(y, 0, 1.05) * 100) + '%';
+      el.textContent = n.kind === 'firework' ? '🎆' : '✨';
+      if (laneEls[n.lane]) laneEls[n.lane].appendChild(el);
+    }
+    // soft pops
+    const popBox = document.getElementById('pops');
+    if (popBox) {
+      const now = performance.now();
+      pops = pops.filter((p) => now - p.born < 500);
+      popBox.innerHTML = pops.map((p) => {
+        const age = (now - p.born) / 500;
+        const op = (0.4 * (1 - age)).toFixed(2); // max opacity 0.4 — no harsh flashes
+        const left = ((p.lane + 0.5) / song.lanes) * 100;
+        return `<span class="phul-pop" style="left:${left}%;opacity:${op}">${p.emoji}</span>`;
+      }).join('');
+    }
+  }
+
+  function maybeEnd() {
+    if (finished) return;
+    const allDone = noteState.every((s) => s !== 'pending');
+    const dur = Songs().durationBeats(song);
+    if (allDone || beatNow() > dur + 0.4) finishSong();
+  }
+
+  function loop() {
+    stopRaf();
+    const step = () => {
+      if (!playing || finished) return;
+      checkMisses();
+      paint();
+      maybeEnd();
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  }
+
+  function starsForClear() {
+    const total = chart.length || 1;
+    const acc = hits / total;
+    if (easy()) {
+      if (acc >= 0.85) return 3;
+      if (acc >= 0.55) return 2;
+      return 1; // always at least 1 for finishing — no fail
+    }
+    if (lives >= 3 && acc >= 0.9) return 3;
+    if (lives >= 2 && acc >= 0.7) return 2;
+    return 1;
+  }
+
+  function finishSong() {
+    if (finished) return;
+    finished = true;
+    playing = false;
+    stopRaf();
+    unbindKeys();
+    const stars = starsForClear();
+    lastStars = stars;
+    const prog = progress();
+    const id = song.id;
+    prog.cleared[id] = true;
+    prog.maxCleared = Math.max(prog.maxCleared || 0, id);
+    prog.stars[id] = Math.max(prog.stars[id] || 0, stars);
+    prog.bestCombo[id] = Math.max(prog.bestCombo[id] || 0, maxCombo);
+    const p = DG.Save.profile();
+    if (!p.badges.includes('phuljhadi')) p.badges.push('phuljhadi');
+    DG.Save.addSticker('🎆');
+    const allDone = pack().every((lv) => prog.cleared[lv.id]);
+    if (allDone) {
+      DG.Save.addSticker('🎇');
+      if (!p.badges.includes('phuljhadi-sky')) p.badges.push('phuljhadi-sky');
+    }
+    DG.Save.save();
+    DG.Audio.win();
+
+    DG.screen = 'phuljhadi-result';
+    const ov = DG.overlay;
+    ov.innerHTML = '';
+    ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen phul-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="phul-result">
+        <div class="title">✨ Sky lit!</div>
+        <div class="sub">${song.name}</div>
+        <div class="quiz-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <div class="sub">Hits ${hits}/${chart.length} · combo ${maxCombo}${allDone ? ' · Sky badge! 🎇' : ''}</div>
+        <div class="row">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnLevels">Songs</button>
+          <button class="btn big ${isP1 ? 'p1' : ''}" id="btnNext">${pack().some((l) => l.id === id + 1) ? 'Next →' : 'Hub'}</button>
+        </div>
+      </div>`;
+    ov.appendChild(scr);
+    DG.Audio.lantern();
+    DG.bindTap(scr.querySelector('#btnLevels'), () => { DG.Audio.click(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnNext'), () => {
+      DG.Audio.click();
+      const next = pack().find((l) => l.id === id + 1);
+      if (next) startSong(next.id);
+      else DG.UI.showHub();
+    });
+  }
+
+  function stopRaf() {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  function unbindKeys() {
+    if (keyHandler) {
+      window.removeEventListener('keydown', keyHandler);
+      keyHandler = null;
+    }
+  }
+
+  function stopRun(clearUi) {
+    playing = false;
+    finished = true;
+    stopRaf();
+    unbindKeys();
+    audioOrigin = 0;
+    perfOrigin = 0;
+    if (clearUi) finished = false;
+  }
+
+  /** Perfect-run hook: mark every note hit, award stars, show result. */
+  function autoPlay(targetId) {
+    const id = targetId || 1;
+    const lv = Songs().get(easy(), id);
+    if (!lv) return { ok: false, reason: 'no-song' };
+    stopRun(true);
+    song = lv;
+    chart = Songs().buildChart(lv);
+    noteState = chart.map(() => 'hit');
+    hits = chart.length;
+    misses = 0;
+    perfects = chart.length;
+    combo = chart.length;
+    maxCombo = chart.length;
+    lives = easy() ? Infinity : P2_LIVES;
+    finished = false;
+    playing = false;
+    // Ensure overlay exists for result UI
+    if (!DG.overlay) return { ok: false, reason: 'no-overlay' };
+    finishSong();
+    return {
+      ok: true,
+      song: id,
+      stars: lastStars,
+      hits,
+      pack: easy() ? 'easy' : 'hard',
+      lanes: lv.lanes,
+      bpm: lv.bpm
+    };
+  }
+
+  return {
+    open,
+    startSong,
+    autoPlay,
+    getLives: () => lives,
+    getSong: () => song,
+    getCombo: () => combo,
+    getHits: () => hits,
+    progress,
+    songTimeSec,
+    beatNow
+  };
+})();
+
+})();
+/* ==== 75-sweets.js ==== */
+;(function(){
+/* Sweet Shop Sort — warm counter; drag/tap pack; P2 change + patience */
+DG.Sweets = (() => {
+  const P2_LIVES = 3;
+  const Levels = () => DG.SweetsLevels;
+  const PATIENCE = { pack: 45000, grid: 40000, change: 50000 };
+
+  let level = null, box = {}, coinPick = {}, coinLeft = {};
+  let lives = P2_LIVES, mistakes = 0, won = false, lastStars = 0;
+  let timerOn = false, tLeft = 0, timerId = 0;
+  let drag = null, skipClick = false;
+
+  function easy() { return DG.isEasy(); }
+  function packList() { return Levels().forProfile(easy()); }
+  function progress() {
+    const p = DG.Save.profile();
+    if (!p.sweets) p.sweets = { maxCleared: 0, stars: {}, cleared: {} };
+    if (!p.sweets.stars) p.sweets.stars = {};
+    if (!p.sweets.cleared) p.sweets.cleared = {};
+    return p.sweets;
+  }
+
+  function open() { showSelect(); }
+
+  function showSelect() {
+    stopTimer(); clearDrag();
+    DG.screen = 'sweets-select';
+    const ov = DG.overlay; ov.innerHTML = ''; ov.classList.remove('hidden');
+    const isP1 = easy(), list = packList(), prog = progress();
+    const scr = document.createElement('div');
+    scr.className = 'screen sweets-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.4vw,28px)">🍬 Sweet Shop</div>
+          <div class="sub">${isP1 ? 'Picture orders · count to 10 · drag or tap'
+            : 'Add · rows×cols · change · 3 lives'}</div>
+        </div>
+        <span class="sub" id="swProg"></span>
+      </div>
+      <div class="level-grid" id="lvls"></div>`;
+    ov.appendChild(scr);
+    const grid = scr.querySelector('#lvls');
+    list.forEach((lv) => {
+      const unlocked = lv.id === 1 || prog.maxCleared >= lv.id - 1 || prog.cleared[lv.id];
+      const stars = prog.stars[lv.id] || 0;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'level-card' + (unlocked ? '' : ' locked') + (isP1 ? ' p1' : '');
+      b.dataset.level = String(lv.id);
+      const meta = easy() ? ('×' + Levels().orderTotal(lv.order))
+        : (lv.kind === 'grid' ? lv.rows + '×' + lv.cols : lv.kind === 'change' ? '₹' : 'add');
+      b.innerHTML = `<span class="num">${lv.id}</span><span class="meta">${lv.label}<br>${meta}</span>
+        <span class="stars">${unlocked ? '⭐'.repeat(stars) + (stars ? '' : '·') : '🔒'}</span>`;
+      if (unlocked) DG.bindTap(b, () => { DG.Audio.click(); startLevel(lv.id); });
+      grid.appendChild(b);
+    });
+    scr.querySelector('#swProg').textContent =
+      list.filter((l) => prog.cleared[l.id]).length + '/' + list.length + ' orders';
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.UI.startBg();
+  }
+
+  function resetBox() {
+    box = {}; coinPick = {}; coinLeft = {};
+    if (!level) return;
+    if (level.kind === 'change') {
+      (level.coins || []).forEach((c) => { coinLeft[c.v] = c.n; coinPick[c.v] = 0; });
+    } else if (level.kind === 'grid') box[level.sweet] = 0;
+    else Object.keys(level.order || {}).forEach((k) => { box[k] = 0; });
+  }
+
+  function startLevel(id) {
+    level = Levels().get(easy(), id);
+    if (!level) return;
+    mistakes = 0; lives = easy() ? Infinity : P2_LIVES; won = false;
+    resetBox(); clearDrag(); stopTimer();
+    renderPlay();
+    if (!easy()) {
+      tLeft = PATIENCE[level.kind] || 45000;
+      startTimer();
+    }
+  }
+
+  function statusLine() {
+    if (easy()) {
+      const need = Levels().orderTotal(level.order);
+      const have = Object.values(box).reduce((a, n) => a + n, 0);
+      return `In box ${have}/${need} · ∞ tries · drag or tap`;
+    }
+    const hearts = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - Math.max(0, lives)));
+    const sec = Math.ceil(Math.max(0, tLeft) / 1000);
+    if (level.kind === 'change') {
+      const need = Levels().changeNeeded(level);
+      const got = sumCoins(coinPick);
+      return `${hearts} · change ₹${got}/₹${need} · ${sec}s`;
+    }
+    if (level.kind === 'grid') {
+      const need = Levels().gridNeed(level);
+      return `${hearts} · ${level.rows}×${level.cols}=${need} · ${box[level.sweet] || 0} · ${sec}s`;
+    }
+    const need = Levels().orderTotal(level.order);
+    const have = Object.values(box).reduce((a, n) => a + n, 0);
+    return `${hearts} · ${have}/${need}${level.hint ? ' · ' + level.hint : ''} · ${sec}s`;
+  }
+
+  function sumCoins(pick) {
+    return Object.keys(pick).reduce((a, v) => a + (+v) * (pick[v] || 0), 0);
+  }
+
+  function startTimer() {
+    stopTimer();
+    timerOn = true;
+    let last = performance.now();
+    timerId = setInterval(() => {
+      if (!timerOn || won) return;
+      const now = performance.now();
+      tLeft -= now - last; last = now;
+      refreshStatus();
+      const bar = document.getElementById('swPatience');
+      if (bar) {
+        const base = PATIENCE[level.kind] || 45000;
+        bar.style.width = Math.max(0, (tLeft / base) * 100) + '%';
+      }
+      if (tLeft <= 0) loseLife('Customer got tired — try again 🍬');
+    }, 200);
+  }
+  function stopTimer() {
+    timerOn = false;
+    if (timerId) { clearInterval(timerId); timerId = 0; }
+  }
+  function refreshStatus() {
+    const sub = document.getElementById('swStatus');
+    if (sub) sub.textContent = statusLine();
+  }
+
+  function loseLife(msg) {
+    if (easy() || won) return;
+    lives -= 1; mistakes += 1;
+    DG.Audio.blocked();
+    if (lives <= 0) {
+      DG.toast('Out of lives — gently restarting 🍬');
+      stopTimer();
+      setTimeout(() => startLevel(level.id), 600);
+      return;
+    }
+    DG.toast(msg || ('Oops — ❤️ ' + lives + ' left'));
+    resetBox();
+    tLeft = PATIENCE[level.kind] || 45000;
+    paintAll();
+    refreshStatus();
+  }
+
+  function renderPlay() {
+    DG.screen = 'sweets-play';
+    const ov = DG.overlay; ov.innerHTML = ''; ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen sweets-screen sweets-play' + (isP1 ? ' p1-mode' : '');
+    const change = level.kind === 'change';
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Orders</button>
+        <div>
+          <div class="title" style="font-size:clamp(15px,2.8vw,22px)">🍬 ${level.label}</div>
+          <div class="sub" id="swStatus">${statusLine()}</div>
+        </div>
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnHub">Hub</button>
+      </div>
+      ${isP1 ? '' : '<div class="sw-patience"><div id="swPatience"></div></div>'}
+      <div class="sw-counter">
+        <div class="sw-order-card">
+          <div class="sw-order-title">${change
+            ? 'Customer pays ₹' + level.paid
+            : (isP1 ? 'Please pack' : (level.hint ? 'Order · ' + level.hint : 'Order'))}</div>
+          <div class="sw-order-pics">${change
+            ? ('Bill ₹' + level.due + ' · give ₹' + Levels().changeNeeded(level) + ' change')
+            : orderPictures()}</div>
+        </div>
+        <div class="sw-box${change ? ' change' : ''}" id="swBox" data-drop="1">
+          <div class="sw-box-label">${change ? 'Change tray' : 'Box'}</div>
+          <div class="sw-box-bits" id="boxBits"></div>
+        </div>
+        <div class="sw-shelf" id="shelf"></div>
+        <div class="row" style="gap:8px;margin-top:4px">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnClear">${change ? 'Clear' : 'Clear box'}</button>
+          <button class="btn big ${isP1 ? 'p1' : ''}" id="btnCheck">${change ? 'Give change ✓' : 'Ready ✓'}</button>
+        </div>
+      </div>`;
+    ov.appendChild(scr);
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); stopTimer(); clearDrag(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnHub'), () => { DG.Audio.click(); stopTimer(); clearDrag(); DG.UI.showHub(); });
+    DG.bindTap(scr.querySelector('#btnClear'), () => {
+      DG.Audio.click(); resetBox(); paintAll(); refreshStatus();
+    });
+    DG.bindTap(scr.querySelector('#btnCheck'), () => trySubmit());
+    paintAll();
+  }
+
+  function orderPictures() {
+    if (level.kind === 'grid') {
+      const s = Levels().sweetById(level.sweet);
+      return `<span class="sw-need">${s.emoji} × ${Levels().gridNeed(level)}</span>
+        <span class="sub">(${level.rows}×${level.cols})</span>`;
+    }
+    return Object.keys(level.order || {}).map((k) => {
+      const s = Levels().sweetById(k);
+      return `<span class="sw-need">${s.emoji}<small>×${level.order[k]}</small></span>`;
+    }).join(' ');
+  }
+
+  function paintAll() {
+    if (level && level.kind === 'change') { paintCoinBits(); paintCoinShelf(); }
+    else { paintBox(); paintShelf(); }
+  }
+
+  function paintBox() {
+    const bits = document.getElementById('boxBits');
+    if (!bits) return;
+    bits.innerHTML = '';
+    Object.keys(box).forEach((k) => {
+      const s = Levels().sweetById(k);
+      for (let i = 0; i < (box[k] || 0); i++) {
+        const el = document.createElement('span');
+        el.className = 'sw-bit'; el.textContent = s.emoji; bits.appendChild(el);
+      }
+    });
+  }
+
+  function paintCoinBits() {
+    const bits = document.getElementById('boxBits');
+    if (!bits) return;
+    bits.innerHTML = '';
+    Object.keys(coinPick).sort((a, b) => b - a).forEach((v) => {
+      for (let i = 0; i < (coinPick[v] || 0); i++) {
+        const s = document.createElement('span');
+        s.className = 'sw-bit coin'; s.textContent = '₹' + v; bits.appendChild(s);
+      }
+    });
+  }
+
+  function paintShelf() {
+    const shelf = document.getElementById('shelf');
+    if (!shelf) return;
+    const isP1 = easy();
+    shelf.innerHTML = '';
+    const sweets = level.kind === 'grid'
+      ? [Levels().sweetById(level.sweet)]
+      : Object.keys(level.order || {}).map((k) => Levels().sweetById(k));
+    sweets.forEach((s) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sw-sweet' + (isP1 ? ' p1' : '');
+      b.dataset.sweet = s.id;
+      b.innerHTML = `<span class="em">${s.emoji}</span><span class="nm">${s.name}</span>`;
+      b.addEventListener('pointerdown', (e) => {
+        if (e.button != null && e.button !== 0) return;
+        e.preventDefault();
+        DG.Audio.unlock();
+        beginDrag(s, e);
+      });
+      b.addEventListener('click', () => {
+        if (skipClick) { skipClick = false; return; }
+        DG.Audio.click();
+        addOne(s.id);
+      });
+      shelf.appendChild(b);
+    });
+  }
+
+  function paintCoinShelf() {
+    const shelf = document.getElementById('shelf');
+    if (!shelf) return;
+    shelf.innerHTML = '';
+    (level.coins || []).forEach((c) => {
+      const left = coinLeft[c.v] || 0;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sw-coin' + (left <= 0 ? ' empty' : '');
+      b.disabled = left <= 0;
+      b.innerHTML = `<span class="em">₹${c.v}</span><span class="nm">×${left}</span>`;
+      DG.bindTap(b, () => {
+        if ((coinLeft[c.v] || 0) <= 0) return;
+        coinLeft[c.v] -= 1;
+        coinPick[c.v] = (coinPick[c.v] || 0) + 1;
+        DG.Audio.click();
+        paintAll(); refreshStatus();
+      });
+      shelf.appendChild(b);
+    });
+  }
+
+  function addOne(sweetId) {
+    if (won || !level || level.kind === 'change') return;
+    if (level.kind === 'grid') {
+      if (sweetId !== level.sweet) return;
+      const need = Levels().gridNeed(level);
+      if (easy() && (box[sweetId] || 0) >= need) { DG.toast('Box is full!'); return; }
+      box[sweetId] = (box[sweetId] || 0) + 1;
+    } else {
+      const want = (level.order || {})[sweetId];
+      if (want == null) return;
+      if (easy() && (box[sweetId] || 0) >= want) {
+        DG.toast('Enough ' + Levels().sweetById(sweetId).name + '!');
+        return;
+      }
+      box[sweetId] = (box[sweetId] || 0) + 1;
+    }
+    DG.Audio.soft();
+    paintBox(); refreshStatus();
+    if (easy() && isComplete()) trySubmit();
+  }
+
+  function beginDrag(sweet, e) {
+    clearDrag();
+    const ghost = document.createElement('div');
+    ghost.className = 'sw-ghost'; ghost.textContent = sweet.emoji;
+    document.body.appendChild(ghost);
+    drag = { sweet, ghost, moved: false, pid: e.pointerId };
+    placeGhost(e.clientX, e.clientY);
+    const onMove = (ev) => {
+      if (!drag || ev.pointerId !== drag.pid) return;
+      drag.moved = true; placeGhost(ev.clientX, ev.clientY);
+    };
+    const onUp = (ev) => {
+      if (!drag || ev.pointerId !== drag.pid) return;
+      const target = document.elementFromPoint(ev.clientX, ev.clientY);
+      const drop = target && target.closest('[data-drop="1"]');
+      const moved = drag.moved;
+      const sid = drag.sweet.id;
+      clearDrag();
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      if (drop) {
+        skipClick = true; // suppress following click
+        addOne(sid);
+      } else if (!moved) {
+        // pure tap: let click handler addOne
+        skipClick = false;
+      } else {
+        skipClick = true; // dragged away — ignore click
+      }
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  }
+
+  function placeGhost(x, y) {
+    if (!drag || !drag.ghost) return;
+    drag.ghost.style.left = x + 'px';
+    drag.ghost.style.top = y + 'px';
+  }
+  function clearDrag() {
+    if (drag && drag.ghost) drag.ghost.remove();
+    drag = null;
+  }
+
+  function isComplete() {
+    if (!level) return false;
+    if (level.kind === 'change') return sumCoins(coinPick) === Levels().changeNeeded(level);
+    if (level.kind === 'grid') return (box[level.sweet] || 0) === Levels().gridNeed(level);
+    const order = level.order || {};
+    return Object.keys(order).every((k) => (box[k] || 0) === order[k]) &&
+      Object.keys(box).every((k) => (box[k] || 0) === (order[k] || 0));
+  }
+
+  function trySubmit() {
+    if (won || !level) return;
+    if (isComplete()) { finishLevel(); return; }
+    if (easy()) { DG.Audio.blocked(); DG.toast('Not yet — check the pictures 🌟'); return; }
+    loseLife('Wrong pack — try again');
+  }
+
+  function starsForClear() {
+    if (easy()) return mistakes <= 0 ? 3 : mistakes <= 2 ? 2 : 1;
+    if (lives >= 3 && tLeft > 8000) return 3;
+    if (lives >= 2) return 2;
+    return 1;
+  }
+
+  function finishLevel() {
+    if (won) return;
+    won = true; stopTimer(); clearDrag();
+    const stars = starsForClear(); lastStars = stars;
+    const prog = progress(); const id = level.id;
+    prog.cleared[id] = true;
+    prog.maxCleared = Math.max(prog.maxCleared || 0, id);
+    prog.stars[id] = Math.max(prog.stars[id] || 0, stars);
+    const p = DG.Save.profile();
+    if (!p.badges.includes('sweets')) p.badges.push('sweets');
+    DG.Save.addSticker('🍬');
+    const allDone = packList().every((lv) => prog.cleared[lv.id]);
+    if (allDone) {
+      DG.Save.addSticker('🧁');
+      if (!p.badges.includes('sweets-master')) p.badges.push('sweets-master');
+    }
+    DG.Save.save(); DG.Audio.win();
+    DG.screen = 'sweets-result';
+    const ov = DG.overlay; ov.innerHTML = ''; ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen sweets-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="sw-result">
+        <div class="title">✨ Order packed!</div>
+        <div class="sub">${level.label}</div>
+        <div class="quiz-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <div class="sub">${allDone ? 'Shop badge! 🧁' : 'Yum — next customer?'}</div>
+        <div class="row">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnLevels">Orders</button>
+          <button class="btn big ${isP1 ? 'p1' : ''}" id="btnNext">${packList().some((l) => l.id === id + 1) ? 'Next →' : 'Hub'}</button>
+        </div>
+      </div>`;
+    ov.appendChild(scr);
+    DG.Audio.lantern();
+    DG.bindTap(scr.querySelector('#btnLevels'), () => { DG.Audio.click(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnNext'), () => {
+      DG.Audio.click();
+      const next = packList().find((l) => l.id === id + 1);
+      if (next) startLevel(next.id); else DG.UI.showHub();
+    });
+  }
+
+  function solveCoins(amount, coins) {
+    const bag = [];
+    (coins || []).forEach((c) => { for (let i = 0; i < (c.n | 0); i++) bag.push(c.v | 0); });
+    const ok = new Uint8Array(amount + 1), parent = new Int16Array(amount + 1), which = new Int16Array(amount + 1);
+    ok[0] = 1; parent.fill(-1); which.fill(-1);
+    for (let i = 0; i < bag.length; i++) {
+      const v = bag[i];
+      for (let s = amount; s >= v; s--) {
+        if (!ok[s] && ok[s - v]) { ok[s] = 1; parent[s] = s - v; which[s] = v; }
+      }
+    }
+    if (!ok[amount]) return null;
+    const res = []; let cur = amount;
+    while (cur > 0) { res.push(which[cur]); cur = parent[cur]; }
+    return res;
+  }
+
+  function autoPlay(targetId) {
+    const id = targetId || 1;
+    const lv = Levels().get(easy(), id);
+    if (!lv) return { ok: false, reason: 'no-level' };
+    stopTimer(); clearDrag();
+    level = lv; lives = easy() ? Infinity : P2_LIVES; mistakes = 0; tLeft = 20000; won = false;
+    if (lv.kind === 'change') {
+      coinPick = {}; coinLeft = {};
+      (solveCoins(Levels().changeNeeded(lv), lv.coins) || []).forEach((v) => {
+        coinPick[v] = (coinPick[v] || 0) + 1;
+      });
+    } else if (lv.kind === 'grid') {
+      box = {}; box[lv.sweet] = Levels().gridNeed(lv);
+    } else box = Object.assign({}, lv.order);
+    finishLevel();
+    return { ok: true, level: id, stars: lastStars, pack: easy() ? 'easy' : 'hard', kind: lv.kind || 'pack' };
+  }
+
+  return {
+    open, startLevel, autoPlay,
+    getLives: () => lives, getLevel: () => level, getBox: () => Object.assign({}, box),
+    progress, isComplete: () => isComplete(), addOne: (id) => addOne(id)
+  };
+})();
+
+})();
+/* ==== 76-spot.js ==== */
+;(function(){
+/* Spot the Diya — dual scenes, tap diffs, P1 hint / P2 timer+lives */
+DG.Spot = (() => {
+  const P2_LIVES = 3;
+  const Levels = () => DG.SpotLevels;
+  const TIMER_MS = 75000;
+
+  let level = null, found = {}, lives = P2_LIVES, mistakes = 0, won = false, lastStars = 0;
+  let timerOn = false, tLeft = 0, timerId = 0, hintId = null, glowOn = false;
+  let leftCv = null, rightCv = null, sceneW = 320, sceneH = 240;
+
+  function easy() { return DG.isEasy(); }
+  function packList() { return Levels().forProfile(easy()); }
+  function progress() {
+    const p = DG.Save.profile();
+    if (!p.spot) p.spot = { maxCleared: 0, stars: {}, cleared: {} };
+    if (!p.spot.stars) p.spot.stars = {};
+    if (!p.spot.cleared) p.spot.cleared = {};
+    return p.spot;
+  }
+
+  function open() { showSelect(); }
+
+  function showSelect() {
+    stopTimer();
+    DG.screen = 'spot-select';
+    const ov = DG.overlay; ov.innerHTML = ''; ov.classList.remove('hidden');
+    const isP1 = easy(), list = packList(), prog = progress();
+    const scr = document.createElement('div');
+    scr.className = 'screen spot-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Hub</button>
+        <div>
+          <div class="title" style="font-size:clamp(18px,3.4vw,28px)">🔍 Spot the Diya</div>
+          <div class="sub">${isP1 ? '3 big differences · hint glow · no fail'
+            : '5–7 subtle · timer · 3 lives'}</div>
+        </div>
+        <span class="sub" id="spProg"></span>
+      </div>
+      <div class="level-grid" id="lvls"></div>`;
+    ov.appendChild(scr);
+    const grid = scr.querySelector('#lvls');
+    list.forEach((lv) => {
+      const unlocked = lv.id === 1 || prog.maxCleared >= lv.id - 1 || prog.cleared[lv.id];
+      const stars = prog.stars[lv.id] || 0;
+      const sc = Levels().sceneById(lv.scene);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'level-card' + (unlocked ? '' : ' locked') + (isP1 ? ' p1' : '');
+      b.dataset.level = String(lv.id);
+      b.innerHTML = `<span class="num">${lv.id}</span><span class="meta">${sc.emoji} ${lv.label}<br>${lv.diffs.length} diffs</span>
+        <span class="stars">${unlocked ? '⭐'.repeat(stars) + (stars ? '' : '·') : '🔒'}</span>`;
+      if (unlocked) DG.bindTap(b, () => { DG.Audio.click(); startLevel(lv.id); });
+      grid.appendChild(b);
+    });
+    scr.querySelector('#spProg').textContent =
+      list.filter((l) => prog.cleared[l.id]).length + '/' + list.length + ' nights';
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); DG.UI.showHub(); });
+    DG.UI.startBg();
+  }
+
+  function startLevel(id) {
+    level = Levels().get(easy(), id);
+    if (!level) return;
+    found = {}; mistakes = 0; lives = easy() ? Infinity : P2_LIVES; won = false;
+    hintId = null; glowOn = false; stopTimer();
+    renderPlay();
+    if (!easy()) { tLeft = TIMER_MS; startTimer(); }
+  }
+
+  function statusLine() {
+    const n = level.diffs.length;
+    const f = Object.keys(found).length;
+    if (easy()) return `Found ${f}/${n} · ∞ · hint ready`;
+    const hearts = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, P2_LIVES - Math.max(0, lives)));
+    return `${hearts} · ${f}/${n} · ${Math.ceil(Math.max(0, tLeft) / 1000)}s`;
+  }
+
+  function startTimer() {
+    stopTimer(); timerOn = true;
+    let last = performance.now();
+    timerId = setInterval(() => {
+      if (!timerOn || won) return;
+      const now = performance.now();
+      tLeft -= now - last; last = now;
+      refreshStatus();
+      if (tLeft <= 0) loseLife('Time’s up — night resets 🌙');
+    }, 200);
+  }
+  function stopTimer() {
+    timerOn = false;
+    if (timerId) { clearInterval(timerId); timerId = 0; }
+  }
+  function refreshStatus() {
+    const el = document.getElementById('spStatus');
+    if (el) el.textContent = statusLine();
+  }
+
+  function loseLife(msg) {
+    if (easy() || won) return;
+    lives -= 1; mistakes += 1;
+    DG.Audio.blocked();
+    if (lives <= 0) {
+      DG.toast('Out of lives — gently restarting 🔍');
+      stopTimer();
+      setTimeout(() => startLevel(level.id), 600);
+      return;
+    }
+    DG.toast(msg || ('Oops — ❤️ ' + lives + ' left'));
+    refreshStatus();
+  }
+
+  function renderPlay() {
+    DG.screen = 'spot-play';
+    const ov = DG.overlay; ov.innerHTML = ''; ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen spot-screen spot-play' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="topbar">
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnBack">← Nights</button>
+        <div>
+          <div class="title" style="font-size:clamp(15px,2.8vw,22px)">🔍 ${level.label}</div>
+          <div class="sub" id="spStatus">${statusLine()}</div>
+        </div>
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnHub">Hub</button>
+      </div>
+      <div class="spot-stage" id="spotStage">
+        <div class="spot-pane" id="paneL"><canvas id="cvL"></canvas><div class="spot-hits" id="hitsL"></div></div>
+        <div class="spot-pane" id="paneR"><canvas id="cvR"></canvas><div class="spot-hits" id="hitsR"></div></div>
+      </div>
+      <div class="row spot-actions">
+        ${isP1 ? '<button class="btn big p1" id="btnHint">💡 Hint</button>' : ''}
+        <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnRestart">Restart</button>
+      </div>`;
+    ov.appendChild(scr);
+    leftCv = scr.querySelector('#cvL');
+    rightCv = scr.querySelector('#cvR');
+    DG.bindTap(scr.querySelector('#btnBack'), () => { DG.Audio.click(); stopTimer(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnHub'), () => { DG.Audio.click(); stopTimer(); DG.UI.showHub(); });
+    DG.bindTap(scr.querySelector('#btnRestart'), () => { DG.Audio.click(); startLevel(level.id); });
+    const hintBtn = scr.querySelector('#btnHint');
+    if (hintBtn) DG.bindTap(hintBtn, () => { DG.Audio.sparkle(); doHint(); });
+    layoutAndDraw();
+    window.addEventListener('resize', onResize);
+    // one-shot cleanup via overlay replace on next screen
+  }
+
+  function onResize() {
+    if (DG.screen !== 'spot-play' || !level) return;
+    layoutAndDraw();
+  }
+
+  function layoutAndDraw() {
+    const stage = document.getElementById('spotStage');
+    if (!stage || !leftCv || !rightCv) return;
+    const stacked = stage.clientWidth < 640 || window.matchMedia('(orientation: portrait)').matches;
+    stage.classList.toggle('stacked', stacked);
+    const pane = document.getElementById('paneL');
+    const pw = Math.max(160, pane.clientWidth);
+    const ph = Math.round(pw * 0.75);
+    sceneW = pw; sceneH = ph;
+    [leftCv, rightCv].forEach((cv) => {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.round(pw * dpr);
+      cv.height = Math.round(ph * dpr);
+      cv.style.width = pw + 'px';
+      cv.style.height = ph + 'px';
+      const ctx = cv.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    });
+    paintScenes();
+    paintHits();
+  }
+
+  function mulberry(seed) {
+    let t = seed >>> 0;
+    return () => {
+      t += 0x6D2B79F5;
+      let r = Math.imul(t ^ (t >>> 15), 1 | t);
+      r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+      return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function paintScenes() {
+    drawScene(leftCv.getContext('2d'), sceneW, sceneH, level, 'L');
+    drawScene(rightCv.getContext('2d'), sceneW, sceneH, level, 'R');
+  }
+
+  function sideMod(diff, side) {
+    // Left is "A" base; right applies the alternate for each diff
+    const alt = side === 'R';
+    if (diff.kind === 'missing') return alt ? 'hide' : 'show';
+    if (diff.kind === 'extra') return alt ? 'show' : 'hide';
+    if (diff.kind === 'flip') return alt ? 'flip' : 'norm';
+    if (diff.kind === 'color') return alt ? 'b' : 'a';
+    return 'a';
+  }
+
+  function drawScene(ctx, w, h, lv, side) {
+    const rnd = mulberry(lv.seed + (side === 'R' ? 99 : 0));
+    ctx.clearRect(0, 0, w, h);
+    // night sky
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#1a1040'); g.addColorStop(1, '#3a2060');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    // stars
+    ctx.fillStyle = 'rgba(255,240,200,.7)';
+    for (let i = 0; i < 28; i++) {
+      const x = rnd() * w, y = rnd() * h * 0.55, r = 0.6 + rnd() * 1.4;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+    }
+    // moon
+    ctx.fillStyle = '#ffe9a8';
+    ctx.beginPath(); ctx.arc(w * 0.85, h * 0.14, Math.min(w, h) * 0.06, 0, 7); ctx.fill();
+
+    const mods = {};
+    lv.diffs.forEach((d) => { mods[d.id] = sideMod(d, side); });
+
+    const drawers = { home: drawHome, rangoli: drawRangoli, sweets: drawSweets, boats: drawBoats, rooftop: drawRooftop, market: drawMarket };
+    (drawers[lv.scene] || drawHome)(ctx, w, h, lv, mods, rnd);
+
+    // found circles drawn in hit layer; optional glow hint
+    if (glowOn && hintId) {
+      const d = lv.diffs.find((x) => x.id === hintId);
+      if (d) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,220,80,.85)';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.arc(d.x * w, d.y * h, Math.max(22, d.r * w), 0, 7);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+
+  function nx(w, x) { return x * w; }
+  function ny(h, y) { return y * h; }
+
+  function drawDiya(ctx, x, y, s, lit) {
+    ctx.fillStyle = '#c47840';
+    ctx.beginPath();
+    ctx.ellipse(x, y + s * 0.15, s * 0.55, s * 0.28, 0, 0, 7);
+    ctx.fill();
+    if (lit) {
+      ctx.fillStyle = '#ffd060';
+      ctx.beginPath();
+      ctx.moveTo(x, y - s * 0.55);
+      ctx.quadraticCurveTo(x + s * 0.25, y - s * 0.1, x, y + s * 0.05);
+      ctx.quadraticCurveTo(x - s * 0.25, y - s * 0.1, x, y - s * 0.55);
+      ctx.fill();
+    }
+  }
+
+  function drawLantern(ctx, x, y, s, color, flip) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (flip) ctx.scale(-1, 1);
+    ctx.strokeStyle = '#e8c070'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(0, -s * 0.55); ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.35, -s * 0.55);
+    ctx.lineTo(s * 0.35, -s * 0.55);
+    ctx.lineTo(s * 0.28, s * 0.35);
+    ctx.lineTo(-s * 0.28, s * 0.35);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffe08a';
+    ctx.fillRect(-s * 0.12, -s * 0.2, s * 0.24, s * 0.3);
+    ctx.restore();
+  }
+
+  function drawMarigold(ctx, x, y, s) {
+    ctx.fillStyle = '#f0a020';
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.ellipse(x + Math.cos(a) * s * 0.35, y + Math.sin(a) * s * 0.35, s * 0.28, s * 0.18, a, 0, 7);
+      ctx.fill();
+    }
+    ctx.fillStyle = '#ffe060';
+    ctx.beginPath(); ctx.arc(x, y, s * 0.2, 0, 7); ctx.fill();
+  }
+
+  function modAt(mods, diffs, kind, what, fallbackId) {
+    const d = diffs.find((x) => x.kind === kind && x.what === what) || diffs.find((x) => x.id === fallbackId);
+    return d ? mods[d.id] : null;
+  }
+
+  function drawHome(ctx, w, h, lv, mods) {
+    // house body
+    ctx.fillStyle = '#5a3060';
+    ctx.fillRect(w * 0.22, h * 0.38, w * 0.56, h * 0.42);
+    ctx.fillStyle = '#8a4050';
+    ctx.beginPath();
+    ctx.moveTo(w * 0.18, h * 0.40); ctx.lineTo(w * 0.50, h * 0.18); ctx.lineTo(w * 0.82, h * 0.40);
+    ctx.closePath(); ctx.fill();
+    // door
+    ctx.fillStyle = '#3a2040';
+    ctx.fillRect(w * 0.44, h * 0.55, w * 0.12, h * 0.25);
+    // windows — may recolor
+    lv.diffs.forEach((d) => {
+      if (d.what === 'window' && d.kind === 'color') {
+        ctx.fillStyle = mods[d.id] === 'b' ? '#80e0ff' : '#ffe080';
+        ctx.fillRect(nx(w, d.x) - w * 0.05, ny(h, d.y) - h * 0.05, w * 0.1, h * 0.1);
+      }
+    });
+    // default windows if none
+    if (!lv.diffs.some((d) => d.what === 'window')) {
+      ctx.fillStyle = '#ffe080';
+      ctx.fillRect(w * 0.28, h * 0.48, w * 0.1, h * 0.1);
+      ctx.fillRect(w * 0.62, h * 0.48, w * 0.1, h * 0.1);
+    }
+    placeProps(ctx, w, h, lv, mods, 0.09);
+  }
+
+  function drawRangoli(ctx, w, h, lv, mods) {
+    ctx.fillStyle = '#2a1840';
+    ctx.fillRect(0, h * 0.55, w, h * 0.45);
+    const cx = w * 0.5, cy = h * 0.55, R = Math.min(w, h) * 0.22;
+    const petalDiff = lv.diffs.find((d) => d.what === 'petal');
+    const cols = petalDiff && mods[petalDiff.id] === 'b'
+      ? ['#ff6080', '#80ffc0', '#80c0ff', '#ffe060']
+      : ['#ff9060', '#ffd060', '#e080ff', '#60e0c0'];
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      ctx.fillStyle = cols[i % cols.length];
+      ctx.beginPath();
+      ctx.ellipse(cx + Math.cos(a) * R * 0.7, cy + Math.sin(a) * R * 0.7, R * 0.35, R * 0.18, a, 0, 7);
+      ctx.fill();
+    }
+    const centerDiff = lv.diffs.find((d) => d.what === 'center');
+    const showCenter = !centerDiff || mods[centerDiff.id] !== 'hide';
+    if (showCenter) {
+      ctx.fillStyle = '#fff0a0';
+      ctx.beginPath(); ctx.arc(cx, cy, R * 0.22, 0, 7); ctx.fill();
+    }
+    placeProps(ctx, w, h, lv, mods, 0.08);
+  }
+
+  function drawSweets(ctx, w, h, lv, mods) {
+    ctx.fillStyle = '#4a2818';
+    ctx.fillRect(0, h * 0.55, w, h * 0.45);
+    ctx.fillStyle = '#6a4020';
+    ctx.fillRect(w * 0.08, h * 0.42, w * 0.84, h * 0.16);
+    // jars / sweets on counter via props
+    placeProps(ctx, w, h, lv, mods, 0.08);
+  }
+
+  function drawBoats(ctx, w, h, lv, mods) {
+    ctx.fillStyle = '#203060';
+    ctx.fillRect(0, h * 0.55, w, h * 0.45);
+    // moon color tweak
+    const moon = lv.diffs.find((d) => d.what === 'moon' && d.kind === 'color');
+    if (moon) {
+      ctx.fillStyle = mods[moon.id] === 'b' ? '#ffb0c0' : '#ffe9a8';
+      ctx.beginPath(); ctx.arc(w * 0.85, h * 0.14, Math.min(w, h) * 0.06, 0, 7); ctx.fill();
+    }
+    placeProps(ctx, w, h, lv, mods, 0.1);
+  }
+
+  function drawRooftop(ctx, w, h, lv, mods) {
+    ctx.fillStyle = '#2a1838';
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.62); ctx.lineTo(w * 0.35, h * 0.48); ctx.lineTo(w * 0.7, h * 0.58); ctx.lineTo(w, h * 0.50);
+    ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fill();
+    placeProps(ctx, w, h, lv, mods, 0.08);
+  }
+
+  function drawMarket(ctx, w, h, lv, mods) {
+    ctx.fillStyle = '#3a2048';
+    ctx.fillRect(0, h * 0.50, w, h * 0.50);
+    // awnings
+    lv.diffs.filter((d) => d.what === 'awning').forEach((d) => {
+      const col = d.kind === 'color' && mods[d.id] === 'b' ? '#60c0ff' : '#e07040';
+      if (d.kind === 'missing' && mods[d.id] === 'hide') return;
+      ctx.fillStyle = col;
+      ctx.fillRect(nx(w, d.x) - w * 0.08, ny(h, d.y) - h * 0.04, w * 0.16, h * 0.08);
+    });
+    placeProps(ctx, w, h, lv, mods, 0.08);
+  }
+
+  function placeProps(ctx, w, h, lv, mods, scale) {
+    const s = Math.min(w, h) * scale;
+    lv.diffs.forEach((d) => {
+      const m = mods[d.id];
+      const x = nx(w, d.x), y = ny(h, d.y);
+      if (d.kind === 'missing' && m === 'hide') return;
+      if (d.kind === 'extra' && m === 'hide') return;
+
+      if (d.what === 'diya' || (d.kind === 'missing' && d.what === 'diya') || (d.kind === 'extra' && d.what === 'diya')) {
+        drawDiya(ctx, x, y, s, true);
+      } else if (d.what === 'lantern' || d.what === 'awning' && d.kind === 'flip') {
+        const col = (d.kind === 'color' && m === 'b') ? '#60e0ff' : '#e06040';
+        drawLantern(ctx, x, y, s * 1.1, col, m === 'flip' || (d.kind === 'flip' && m === 'flip'));
+      } else if (d.what === 'marigold') {
+        drawMarigold(ctx, x, y, s * 0.9);
+      } else if (d.what === 'ladoo') {
+        ctx.fillStyle = '#e0a040';
+        ctx.beginPath(); ctx.arc(x, y, s * 0.45, 0, 7); ctx.fill();
+      } else if (d.what === 'barfi') {
+        ctx.fillStyle = '#f0e0a0';
+        ctx.fillRect(x - s * 0.4, y - s * 0.25, s * 0.8, s * 0.5);
+      } else if (d.what === 'jar') {
+        ctx.fillStyle = (d.kind === 'color' && m === 'b') ? '#80ffc0' : '#c06080';
+        ctx.fillRect(x - s * 0.3, y - s * 0.5, s * 0.6, s * 0.9);
+      } else if (d.what === 'boat') {
+        ctx.save();
+        ctx.translate(x, y);
+        if (m === 'flip' || (d.kind === 'flip' && m === 'flip')) ctx.scale(-1, 1);
+        ctx.fillStyle = (d.kind === 'color' && m === 'b') ? '#80c0ff' : '#c08050';
+        ctx.beginPath();
+        ctx.moveTo(-s, 0); ctx.lineTo(s, 0); ctx.lineTo(s * 0.6, s * 0.4); ctx.lineTo(-s * 0.6, s * 0.4);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#fff0d0';
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -s); ctx.lineTo(s * 0.55, 0); ctx.fill();
+        ctx.restore();
+      } else if (d.what === 'spark') {
+        ctx.fillStyle = (d.kind === 'color' && m === 'b') ? '#80ff80' : '#ffd060';
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(x + Math.cos(a) * s * 0.4, y + Math.sin(a) * s * 0.4, s * 0.12, 0, 7);
+          ctx.fill();
+        }
+      } else if (d.what === 'crate') {
+        ctx.fillStyle = (d.kind === 'color' && m === 'b') ? '#60a0ff' : '#a07040';
+        ctx.fillRect(x - s * 0.45, y - s * 0.35, s * 0.9, s * 0.7);
+      } else if (d.what === 'window') {
+        /* drawn in home */
+      } else if (d.what === 'petal' || d.what === 'center' || d.what === 'moon') {
+        /* scene-level */
+      } else if (d.what === 'awning') {
+        /* market */
+      } else {
+        // fallback marker so every diff is visible somehow
+        ctx.fillStyle = '#ff80c0';
+        ctx.beginPath(); ctx.arc(x, y, s * 0.35, 0, 7); ctx.fill();
+      }
+
+      // color-only lantern already handled; color marigold:
+      if (d.kind === 'color' && d.what === 'marigold') {
+        ctx.save();
+        // redraw tinted
+        drawMarigold(ctx, x, y, s * 0.9);
+        if (m === 'b') {
+          ctx.globalCompositeOperation = 'source-atop';
+        }
+        ctx.restore();
+      }
+    });
+  }
+
+  function paintHits() {
+    ['L', 'R'].forEach((side) => {
+      const box = document.getElementById(side === 'L' ? 'hitsL' : 'hitsR');
+      if (!box) return;
+      box.innerHTML = '';
+      level.diffs.forEach((d) => {
+        const hit = document.createElement('button');
+        hit.type = 'button';
+        hit.className = 'spot-hit' + (found[d.id] ? ' found' : '') + (glowOn && hintId === d.id ? ' glow' : '');
+        hit.dataset.diff = d.id;
+        const size = Math.max(Levels().MIN_HIT, Math.round(d.r * 2 * sceneW));
+        hit.style.width = size + 'px';
+        hit.style.height = size + 'px';
+        hit.style.left = (d.x * 100) + '%';
+        hit.style.top = (d.y * 100) + '%';
+        hit.setAttribute('aria-label', 'difference');
+        hit.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onHit(d.id);
+        });
+        box.appendChild(hit);
+      });
+      // miss catcher
+      const miss = document.createElement('button');
+      miss.type = 'button';
+      miss.className = 'spot-miss';
+      miss.setAttribute('aria-label', 'scene');
+      miss.addEventListener('click', (e) => {
+        // only if click wasn't on a hit (hits stopPropagation)
+        if (won) return;
+        if (easy()) { DG.Audio.soft(); DG.toast('Keep looking 🌟'); return; }
+        loseLife('Not a difference — try again');
+      });
+      box.appendChild(miss);
+    });
+  }
+
+  function onHit(id) {
+    if (won || !level) return;
+    if (found[id]) { DG.Audio.soft(); return; }
+    found[id] = true;
+    if (hintId === id) { hintId = null; glowOn = false; }
+    DG.Audio.sparkle();
+    paintHits();
+    paintScenes();
+    refreshStatus();
+    if (Object.keys(found).length >= level.diffs.length) finishLevel();
+  }
+
+  function doHint() {
+    if (!easy() || won) return;
+    const left = level.diffs.filter((d) => !found[d.id]);
+    if (!left.length) return;
+    hintId = left[0].id;
+    glowOn = true;
+    paintScenes();
+    paintHits();
+    setTimeout(() => {
+      glowOn = false;
+      paintScenes();
+      paintHits();
+    }, 1800);
+  }
+
+  function starsForClear() {
+    if (easy()) return mistakes <= 0 ? 3 : mistakes <= 1 ? 2 : 1;
+    if (lives >= 3 && tLeft > 15000) return 3;
+    if (lives >= 2) return 2;
+    return 1;
+  }
+
+  function finishLevel() {
+    if (won) return;
+    won = true; stopTimer();
+    const stars = starsForClear(); lastStars = stars;
+    const prog = progress(); const id = level.id;
+    prog.cleared[id] = true;
+    prog.maxCleared = Math.max(prog.maxCleared || 0, id);
+    prog.stars[id] = Math.max(prog.stars[id] || 0, stars);
+    const p = DG.Save.profile();
+    if (!p.badges.includes('spot')) p.badges.push('spot');
+    DG.Save.addSticker('🔍');
+    const allDone = packList().every((lv) => prog.cleared[lv.id]);
+    if (allDone) {
+      DG.Save.addSticker('🌙');
+      if (!p.badges.includes('spot-master')) p.badges.push('spot-master');
+    }
+    DG.Save.save(); DG.Audio.win();
+    DG.screen = 'spot-result';
+    const ov = DG.overlay; ov.innerHTML = ''; ov.classList.remove('hidden');
+    const isP1 = easy();
+    const scr = document.createElement('div');
+    scr.className = 'screen spot-screen' + (isP1 ? ' p1-mode' : '');
+    scr.innerHTML = `
+      <div class="spot-result">
+        <div class="title">✨ All differences found!</div>
+        <div class="sub">${level.label}</div>
+        <div class="quiz-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <div class="sub">${allDone ? 'Night owl badge! 🌙' : 'Another glowing night?'}</div>
+        <div class="row">
+          <button class="btn ghost ${isP1 ? 'p1' : ''}" id="btnLevels">Nights</button>
+          <button class="btn big ${isP1 ? 'p1' : ''}" id="btnNext">${packList().some((l) => l.id === id + 1) ? 'Next →' : 'Hub'}</button>
+        </div>
+      </div>`;
+    ov.appendChild(scr);
+    DG.Audio.lantern();
+    DG.bindTap(scr.querySelector('#btnLevels'), () => { DG.Audio.click(); showSelect(); });
+    DG.bindTap(scr.querySelector('#btnNext'), () => {
+      DG.Audio.click();
+      const next = packList().find((l) => l.id === id + 1);
+      if (next) startLevel(next.id); else DG.UI.showHub();
+    });
+  }
+
+  function autoPlay(targetId) {
+    const id = targetId || 1;
+    const lv = Levels().get(easy(), id);
+    if (!lv) return { ok: false, reason: 'no-level' };
+    stopTimer();
+    level = lv; lives = easy() ? Infinity : P2_LIVES; mistakes = 0; tLeft = 30000; won = false;
+    found = {};
+    lv.diffs.forEach((d) => { found[d.id] = true; });
+    finishLevel();
+    return { ok: true, level: id, stars: lastStars, pack: easy() ? 'easy' : 'hard', diffs: lv.diffs.length };
+  }
+
+  return {
+    open, startLevel, autoPlay,
+    getLives: () => lives, getLevel: () => level, getFound: () => Object.assign({}, found),
+    progress
+  };
+})();
+
+})();
 /* ==== 90-boot.js ==== */
 ;(function(){
 /* Boot, chrome buttons, window.__game hook */
@@ -2134,6 +5282,25 @@ function boot() {
     playDiyaPath: (id) => DG.DiyaPath.autoPlay(id),
     diyaValidate: () => DG.DiyaLevels.validateAll(),
     diyaPackSize: (easy) => DG.DiyaLevels.forProfile(!!easy).length,
+    openQuiz: () => DG.Quiz.open(),
+    playQuiz: (roundId) => DG.Quiz.autoPlay(roundId),
+    quizValidate: () => DG.QuizData.validateAll(),
+    openMemory: () => DG.Memory.open(),
+    playMemory: (id) => DG.Memory.autoPlay(id),
+    memoryValidate: () => DG.MemoryLevels.validateAll(),
+    memoryPackSize: (easy) => DG.MemoryLevels.forProfile(!!easy).length,
+    openPhuljhadi: () => DG.Phuljhadi.open(),
+    playPhuljhadi: (id) => DG.Phuljhadi.autoPlay(id),
+    phuljhadiValidate: () => DG.PhuljhadiSongs.validateAll(),
+    phuljhadiPackSize: (easy) => DG.PhuljhadiSongs.forProfile(!!easy).length,
+    openSweets: () => DG.Sweets.open(),
+    playSweets: (id) => DG.Sweets.autoPlay(id),
+    sweetsValidate: () => DG.SweetsLevels.validateAll(),
+    sweetsPackSize: (easy) => DG.SweetsLevels.forProfile(!!easy).length,
+    openSpot: () => DG.Spot.open(),
+    playSpot: (id) => DG.Spot.autoPlay(id),
+    spotValidate: () => DG.SpotLevels.validateAll(),
+    spotPackSize: (easy) => DG.SpotLevels.forProfile(!!easy).length,
     save: () => DG.Save.save(),
     load: () => DG.Save.load(),
     getGallery: () => (DG.Save.profile().gallery || []).length,
@@ -2146,6 +5313,11 @@ function boot() {
     playToWin: async (gameId) => {
       if (gameId === 'rangoli' || !gameId) return DG.Rangoli.autoPlay();
       if (gameId === 'diyapath') return DG.DiyaPath.autoPlay(1);
+      if (gameId === 'quiz') return DG.Quiz.autoPlay();
+      if (gameId === 'memory') return DG.Memory.autoPlay(1);
+      if (gameId === 'fireworks' || gameId === 'phuljhadi') return DG.Phuljhadi.autoPlay(1);
+      if (gameId === 'sweets') return DG.Sweets.autoPlay(1);
+      if (gameId === 'spot') return DG.Spot.autoPlay(1);
       return { ok: false, reason: 'coming-soon' };
     }
   };
