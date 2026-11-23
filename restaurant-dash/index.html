@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2a120c">
+<title>Restaurant Dash</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#1a0c08;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 0%,#6a2e18 0%,#1a0c08 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#3a2218;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+#game.portrait{width:100%;height:auto;max-height:94dvh;max-width:100%;object-fit:contain}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:10}
+#overlay>*{pointer-events:auto}
+/* HUD sits below the top-left Games back button and the top-right icon cluster */
+#hud{position:absolute;left:0;right:0;top:calc(72px + env(safe-area-inset-top));padding:0 12px;display:flex;gap:8px;align-items:center;justify-content:center;pointer-events:none;z-index:5;font-weight:800;flex-wrap:wrap}
+#hud.hidden,#hits.hidden,#coopBar.hidden,#pauseBtn.hidden{display:none!important}
+.icon-btn{position:absolute;z-index:20;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.16);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* ≥12px gaps between Pause, Mute, Fullscreen — all top-right, clear of the Games back button */
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(68px + env(safe-area-inset-right))}
+#pauseBtn{top:calc(8px + env(safe-area-inset-top));right:calc(128px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#2a1450;background:#ffe566;box-shadow:0 4px 0 #d4b000,0 8px 18px rgba(0,0,0,.25);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d4b000,0 4px 10px rgba(0,0,0,.25)}
+.btn.big{font-size:24px;padding:14px 26px;border-radius:22px;min-height:60px}
+.btn.green{background:#7dff9a;box-shadow:0 4px 0 #2db854,0 8px 18px rgba(0,0,0,.25)}
+.btn.blue{background:#9ad0ff;box-shadow:0 4px 0 #3a7fbf,0 8px 18px rgba(0,0,0,.25)}
+.btn.pink{background:#ff9ad4;box-shadow:0 4px 0 #d44f9a,0 8px 18px rgba(0,0,0,.25)}
+.btn.purple{background:#c9a6ff;box-shadow:0 4px 0 #7a4ad0,0 8px 18px rgba(0,0,0,.25)}
+.btn.tomato{background:#ff8a5b;box-shadow:0 4px 0 #c44a22,0 8px 18px rgba(0,0,0,.25)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.panel{background:rgba(28,12,8,.92);border:3px solid rgba(255,220,160,.22);border-radius:28px;padding:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 16px 50px rgba(0,0,0,.45);max-width:min(980px,96vw);max-height:min(94dvh,94vh);overflow:auto}
+.title{font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:.5px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.35);margin-bottom:6px;color:#ffe566}
+.sub{text-align:center;opacity:.9;margin-bottom:14px;font-size:15px;line-height:1.4}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:170px;border-radius:24px;background:linear-gradient(160deg,#8a3a1c,#2a120c);border:4px solid rgba(255,255,255,.2);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px}
+.profile-card .meta{font-size:14px;opacity:.85;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:700;min-height:40px}
+#hits{position:absolute;inset:0;z-index:6;pointer-events:none}
+#hits .hit{position:absolute;pointer-events:auto;min-width:44px;min-height:44px;padding:0;border:2px solid transparent;border-radius:16px;background:transparent;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#hits .hit:focus-visible{border-color:rgba(255,229,102,.85);outline:none}
+#coopBar{position:absolute;inset:0;z-index:7;pointer-events:none}
+.coop-tag{position:absolute;min-width:48px;min-height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;pointer-events:none;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.coop-tag.left{left:calc(12px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));background:#ff9a4a;color:#3a1a00}
+.coop-tag.right{right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));background:#6ad4d0;color:#063230}
+.toast{position:absolute;top:22%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:12px 20px;border-radius:16px;font-weight:800;font-size:18px;z-index:30;pointer-events:none}
+.hidden{display:none!important}
+input.name-in{font-size:20px;padding:12px 14px;border-radius:14px;border:3px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;min-height:48px;width:min(240px,70vw);text-align:center}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;width:100%;max-width:720px;padding:4px}
+.lvl{min-width:80px;min-height:72px;border-radius:16px;border:none;background:rgba(255,255,255,.14);color:#fff;font-weight:900;font-size:16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.lvl span{font-size:11px;font-weight:700;opacity:.85}
+.lvl.done{background:#3dd68c;color:#083018}
+.lvl.locked{opacity:.35;cursor:default}
+.lvl.cur{outline:3px solid #ffe566}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;width:100%;max-width:760px}
+.shop-card{background:rgba(255,255,255,.1);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;min-height:160px}
+.shop-card h3{font-size:18px;margin:0}
+.shop-card p{font-size:13px;opacity:.85;margin:0;line-height:1.3}
+#rotateTip{position:absolute;left:50%;top:calc(128px + env(safe-area-inset-top));transform:translateX(-50%);z-index:40;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 12px;max-width:min(340px,92vw)}
+#rotateTip.hidden{display:none!important}
+#rotateTip .hint-banner{pointer-events:none;background:rgba(28,12,8,.88);border:2px solid rgba(255,229,102,.45);border-radius:16px;padding:10px 14px;font-weight:800;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);line-height:1.3}
+@media (max-height:650px){
+  .profile-card{min-height:140px;width:min(230px,40vw)}
+  .title{font-size:clamp(20px,4.2vw,32px)}
+  .panel{padding:12px;border-radius:20px}
+  .shop-card{min-height:130px;padding:10px}
+}
+@media (orientation:portrait) and (max-width:500px){
+  .profile-card{width:min(300px,80vw)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Restaurant Dash"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="hits" class="hidden" aria-hidden="true"></div>
+  <div id="coopBar" class="hidden" aria-hidden="true">
+    <div class="coop-tag left" id="coopP1">P1</div>
+    <div class="coop-tag right" id="coopP2">P2</div>
+  </div>
+  <div id="overlay"></div>
+  <div id="rotateTip" class="hidden" role="status" aria-live="polite">
+    <div class="hint-banner">Turn sideways for a wider kitchen!</div>
+  </div>
+  <button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause">⏸</button>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Restaurant Dash — core namespace & helpers */
+const RD = window.RD = {
+  VERSION: 1,
+  SAVE_KEY: 'restaurant-dash-v1',
+  W: 1180, H: 600,
+  BASE_W: 1180, BASE_H: 600,
+  profiles: {
+    p1: {
+      id: 'p1', defaultName: 'Player 1', label: 'Gentle',
+      infiniteLives: true, lives: 99,
+      speed: 260, patienceMul: 1.25, cookMul: 0.8, spawnMul: 1.2,
+      thinkMul: 0.85, eatMul: 0.9
+    },
+    p2: {
+      id: 'p2', defaultName: 'Player 2', label: 'Busy Shift',
+      infiniteLives: false, lives: 3,
+      speed: 230, patienceMul: 1.0, cookMul: 1.0, spawnMul: 1.0,
+      thinkMul: 1.0, eatMul: 1.0
+    }
+  },
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  autoplay: false,
+  keys: Object.create(null),
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  hitsEl: null,
+  run: null,
+  portrait: false
+};
+
+RD.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+RD.lerp = (a, b, t) => a + (b - a) * t;
+RD.rand = (a, b) => a + Math.random() * (b - a);
+RD.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+RD.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+RD.now = () => performance.now();
+RD.len = (x, y) => Math.hypot(x, y);
+RD.norm = (x, y) => {
+  const l = Math.hypot(x, y) || 1;
+  return { x: x / l, y: y / l };
+};
+RD.meta = (id) => RD.profiles[id || (RD.run && RD.run.soloProfile) || (RD.state && RD.state.lastProfile) || 'p1'];
+RD.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1400);
+};
+RD.fitCanvas = () => {
+  const c = RD.canvas;
+  if (!c) return;
+  const iw = window.innerWidth || RD.BASE_W;
+  const ih = window.innerHeight || RD.BASE_H;
+  const portrait = ih > iw * 1.05;
+  RD.portrait = portrait;
+  let wantW = RD.BASE_W, wantH = RD.BASE_H;
+  if (portrait) {
+    const targetScale = 0.88;
+    wantW = Math.round(Math.min(520, Math.max(390, iw / targetScale)));
+    wantH = Math.round(wantW * (ih / Math.max(1, iw)));
+    wantH = RD.clamp(wantH, 700, 1200);
+  }
+  if (RD.W !== wantW || RD.H !== wantH) {
+    RD.W = wantW; RD.H = wantH;
+    if (RD.run) RD.Game && RD.Game.reflow && RD.Game.reflow();
+  }
+  if (c.width !== RD.W) c.width = RD.W;
+  if (c.height !== RD.H) c.height = RD.H;
+  c.classList.toggle('portrait', !!portrait);
+  RD.refreshRotateHint && RD.refreshRotateHint();
+};
+RD.clear = (color) => {
+  const ctx = RD.ctx;
+  ctx.fillStyle = color || '#3a2218';
+  ctx.fillRect(0, 0, RD.W, RD.H);
+};
+RD.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+RD.bindTap = (el, fn) => {
+  if (!el) return;
+  let last = 0;
+  const run = (e) => {
+    const t = Date.now();
+    if (t - last < 260) return;
+    last = t;
+    try { e.preventDefault(); } catch (_) {}
+    fn(e);
+  };
+  el.addEventListener('pointerup', run);
+  el.addEventListener('click', run);
+};
+RD.worldToScreen = (x, y) => {
+  const c = RD.canvas;
+  if (!c) return { x: 0, y: 0, scale: 1, left: 0, top: 0 };
+  const r = c.getBoundingClientRect();
+  const scale = Math.min(r.width / Math.max(1, RD.W), r.height / Math.max(1, RD.H));
+  const left = r.left + (r.width - RD.W * scale) / 2;
+  const top = r.top + (r.height - RD.H * scale) / 2;
+  const app = document.getElementById('app').getBoundingClientRect();
+  return {
+    x: left - app.left + x * scale,
+    y: top - app.top + y * scale,
+    scale, left: left - app.left, top: top - app.top
+  };
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* WebAudio SFX — only after first user input */
+RD.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = RD.muted ? 0 : 0.3;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (RD.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.14, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      RD.muted = !!m;
+      if (master) master.gain.value = RD.muted ? 0 : 0.3;
+      try { localStorage.setItem('rd-mute', RD.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = RD.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { RD.muted = localStorage.getItem('rd-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = RD.muted ? '🔇' : '🔊';
+    },
+    click() { tone(360, 0.05, 'triangle', 0.06); },
+    seat() { tone(440, 0.08, 'sine', 0.07); setTimeout(() => tone(560, 0.08, 'sine', 0.06), 50); },
+    order() { tone(620, 0.07, 'triangle', 0.07); },
+    drop() { tone(300, 0.06, 'square', 0.04); },
+    ding() { tone(880, 0.1, 'sine', 0.08); setTimeout(() => tone(1180, 0.12, 'sine', 0.06), 70); },
+    serve() { tone(520, 0.08, 'sine', 0.08); setTimeout(() => tone(780, 0.1, 'sine', 0.07), 40); },
+    coin() { tone(980, 0.07, 'square', 0.05); setTimeout(() => tone(1320, 0.09, 'sine', 0.06), 40); },
+    combo() { [660, 880, 1100].forEach((f, i) => setTimeout(() => tone(f, 0.08, 'sine', 0.07), i * 45)); },
+    clear() { tone(400, 0.06, 'triangle', 0.05); },
+    leave() { tone(200, 0.16, 'sawtooth', 0.06, 90); },
+    win() { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => tone(f, 0.12, 'sine', 0.09), i * 70)); },
+    lose() { tone(220, 0.2, 'sawtooth', 0.07, 90); setTimeout(() => tone(140, 0.25, 'triangle', 0.06, 70), 120); },
+    buy() { tone(540, 0.08, 'triangle', 0.07); setTimeout(() => tone(720, 0.1, 'sine', 0.06), 60); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage per-profile saves with in-memory fallback */
+RD.Save = (() => {
+  function blankUpgrades() {
+    return { shoes: 0, table: 0, decor: 0, dish: 0 };
+  }
+
+  function blankProfile(id) {
+    const meta = RD.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      maxLevel: 1,
+      cleared: {},
+      bestStars: {},
+      starsTotal: 0,
+      bank: 0,
+      upgrades: blankUpgrades(),
+      playSeconds: 0
+    };
+  }
+
+  function blankState() {
+    return {
+      v: RD.VERSION,
+      lastProfile: 'p1',
+      profiles: { p1: blankProfile('p1'), p2: blankProfile('p2') }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(RD.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return RD.memStore;
+  }
+
+  function writeRaw(data) {
+    RD.memStore = data;
+    try {
+      localStorage.setItem(RD.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== RD.VERSION) {
+      RD.state = blankState();
+      save();
+      return RD.state;
+    }
+    for (const id of ['p1', 'p2']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+      if (!raw.profiles[id].bestStars) raw.profiles[id].bestStars = {};
+      raw.profiles[id].upgrades = Object.assign(blankUpgrades(), raw.profiles[id].upgrades || {});
+    }
+    if (!raw.lastProfile) raw.lastProfile = 'p1';
+    RD.state = raw;
+    return RD.state;
+  }
+
+  function save() {
+    if (!RD.state) return false;
+    return writeRaw(RD.state);
+  }
+
+  function profile(id) {
+    if (!RD.state) load();
+    return RD.state.profiles[id || RD.state.lastProfile || 'p1'];
+  }
+
+  function setProfile(id) {
+    RD.state.lastProfile = id;
+    save();
+  }
+
+  function rename(id, name) {
+    const p = profile(id);
+    p.name = String(name || RD.profiles[id].defaultName).slice(0, 16) || RD.profiles[id].defaultName;
+    save();
+  }
+
+  function markCleared(levelId, stars, earned) {
+    const p = profile();
+    p.cleared[levelId] = true;
+    const prev = p.bestStars[levelId] || 0;
+    if (stars > prev) {
+      p.starsTotal = (p.starsTotal || 0) + (stars - prev);
+      p.bestStars[levelId] = stars;
+    }
+    p.bank = (p.bank || 0) + (earned || 0);
+    const list = RD.Levels.forProfile(p.id);
+    if (levelId >= p.maxLevel) p.maxLevel = Math.min(list.length, levelId + 1);
+    save();
+  }
+
+  function buy(kind) {
+    const def = RD.Upgrades[kind];
+    if (!def) return false;
+    const p = profile();
+    const tier = p.upgrades[kind] || 0;
+    if (tier >= def.max) return false;
+    const cost = def.costs[tier];
+    if ((p.bank || 0) < cost) return false;
+    p.bank -= cost;
+    p.upgrades[kind] = tier + 1;
+    save();
+    return true;
+  }
+
+  function resetAll() {
+    RD.state = blankState();
+    save();
+    return RD.state;
+  }
+
+  return { load, save, profile, setProfile, rename, markCleared, buy, resetAll, blankProfile, blankState, readRaw, writeRaw, blankUpgrades };
+})();
+
+})();
+/* ==== 30-levels.js ==== */
+;(function(){
+/* Themed shifts, dishes, and between-level upgrades */
+RD.THEMES = {
+  pizza: {
+    id: 'pizza', name: 'Pizza Place',
+    sky: ['#f7d9b0', '#e8b86d'], floor: '#d9a066', wall: '#c44536',
+    accent: '#fff6e8', wood: '#7a3e22', tileA: '#f4efe6', tileB: '#c44536'
+  },
+  taco: {
+    id: 'taco', name: 'Taco Truck',
+    sky: ['#ffe0a8', '#f4a261'], floor: '#c9843e', wall: '#2d6a4f',
+    accent: '#ffe8c8', wood: '#6b3a1c', tileA: '#f2d6a6', tileB: '#e07a2f'
+  },
+  chaat: {
+    id: 'chaat', name: 'Chaat Stand',
+    sky: ['#ffe5c8', '#ffb4a2'], floor: '#d98a4a', wall: '#2a9d8f',
+    accent: '#fff1d0', wood: '#8a3d1c', tileA: '#ffe8c2', tileB: '#e63956'
+  },
+  cauldron: {
+    id: 'cauldron', name: 'Leaky Cauldron',
+    sky: ['#3d2b1f', '#1a120e'], floor: '#3a2a1e', wall: '#4a3728',
+    accent: '#e8c96a', wood: '#2a1a10', tileA: '#4a3a2c', tileB: '#2e2218'
+  }
+};
+
+RD.DISHES = {
+  pizza: [
+    { id: 'slice', name: 'Pizza Slice', price: 10, tier: 0 },
+    { id: 'pie', name: 'Cheese Pie', price: 12, tier: 0 },
+    { id: 'knots', name: 'Garlic Knots', price: 14, tier: 1 },
+    { id: 'soda', name: 'Fizzy Soda', price: 16, tier: 2 }
+  ],
+  taco: [
+    { id: 'taco', name: 'Crunchy Taco', price: 10, tier: 0 },
+    { id: 'ques', name: 'Quesadilla', price: 12, tier: 0 },
+    { id: 'churro', name: 'Churro', price: 14, tier: 1 },
+    { id: 'agua', name: 'Cool Lime Drink', price: 16, tier: 2 }
+  ],
+  chaat: [
+    { id: 'puri', name: 'Pani Puri', price: 10, tier: 0 },
+    { id: 'samosa', name: 'Samosa', price: 12, tier: 0 },
+    { id: 'bhel', name: 'Bhel Bowl', price: 14, tier: 1 },
+    { id: 'lassi', name: 'Mango Lassi', price: 16, tier: 2 }
+  ],
+  cauldron: [
+    { id: 'beer', name: 'Butterbeer', price: 11, tier: 0 },
+    { id: 'pie', name: 'Pub Pie', price: 13, tier: 0 },
+    { id: 'stew', name: 'Cauldron Stew', price: 15, tier: 1 },
+    { id: 'toffee', name: 'Toffee Pudding', price: 17, tier: 2 }
+  ]
+};
+
+RD.Upgrades = {
+  shoes: { id: 'shoes', name: 'Faster Shoes', desc: 'Dash between tables a little quicker.', costs: [40, 80, 140], max: 3 },
+  table: { id: 'table', name: 'Extra Table', desc: 'Seat one more group of guests.', costs: [50, 90, 140], max: 3 },
+  decor: { id: 'decor', name: 'Cozy Decor', desc: 'Pretty rooms help guests wait longer.', costs: [40, 80, 130], max: 3 },
+  dish: { id: 'dish', name: 'New Dish', desc: 'Unlock a fancy plate that pays more.', costs: [70, 120], max: 2 }
+};
+
+RD.Levels = {
+  p1: [
+    { id: 1,  name: 'First Tables',     title: 'Opening the Pizza Place',  theme: 'pizza',     goal: 24,  tables: 2, patience: 1.00, cook: 1.8, spawn: 5.4, eat: 1.6 },
+    { id: 2,  name: 'Lunch Crowd',      title: 'Pizza Lunch Crowd',        theme: 'pizza',     goal: 36,  tables: 2, patience: 0.98, cook: 1.8, spawn: 5.0, eat: 1.6 },
+    { id: 3,  name: 'Pizza Party',      title: 'Pizza Party Shift',        theme: 'pizza',     goal: 50,  tables: 3, patience: 0.95, cook: 1.7, spawn: 4.7, eat: 1.5 },
+    { id: 4,  name: 'Taco Stop',        title: 'Taco Truck Opens',         theme: 'taco',      goal: 54,  tables: 3, patience: 0.95, cook: 1.7, spawn: 4.5, eat: 1.5 },
+    { id: 5,  name: 'Street Line',      title: 'Street Taco Line',         theme: 'taco',      goal: 66,  tables: 3, patience: 0.92, cook: 1.6, spawn: 4.3, eat: 1.5 },
+    { id: 6,  name: 'Truck Rush',       title: 'Taco Truck Rush',          theme: 'taco',      goal: 80,  tables: 3, patience: 0.90, cook: 1.6, spawn: 4.1, eat: 1.4 },
+    { id: 7,  name: 'Chaat Cart',       title: 'Chaat Cart Opens',         theme: 'chaat',     goal: 84,  tables: 3, patience: 0.90, cook: 1.5, spawn: 4.0, eat: 1.4 },
+    { id: 8,  name: 'Spice Line',       title: 'Spice Line',               theme: 'chaat',     goal: 96,  tables: 4, patience: 0.88, cook: 1.5, spawn: 3.8, eat: 1.4 },
+    { id: 9,  name: 'Festival Hungry',  title: 'Festival Hungry',          theme: 'chaat',     goal: 110, tables: 4, patience: 0.85, cook: 1.4, spawn: 3.6, eat: 1.3 },
+    { id: 10, name: 'Butterbeer Night', title: 'Butterbeer Night',         theme: 'cauldron',  goal: 114, tables: 4, patience: 0.85, cook: 1.4, spawn: 3.5, eat: 1.3 },
+    { id: 11, name: 'Pub Crowd',        title: 'Leaky Cauldron Crowd',     theme: 'cauldron',  goal: 126, tables: 4, patience: 0.82, cook: 1.3, spawn: 3.4, eat: 1.3 },
+    { id: 12, name: 'Closing Time',     title: 'Inn Closing Time',         theme: 'cauldron',  goal: 140, tables: 4, patience: 0.80, cook: 1.3, spawn: 3.2, eat: 1.2 }
+  ],
+  p2: [
+    { id: 1,  name: 'First Seating',    title: 'Pizza Place Opening',      theme: 'pizza',     goal: 30,  tables: 2, patience: 0.90, cook: 2.0, spawn: 4.6, eat: 1.5 },
+    { id: 2,  name: 'Noon Rush',        title: 'Noon Pizza Rush',          theme: 'pizza',     goal: 42,  tables: 2, patience: 0.88, cook: 2.0, spawn: 4.3, eat: 1.5 },
+    { id: 3,  name: 'Extra Chairs',     title: 'Extra Pizza Chairs',       theme: 'pizza',     goal: 58,  tables: 3, patience: 0.85, cook: 1.9, spawn: 4.1, eat: 1.4 },
+    { id: 4,  name: 'Oven Overtime',    title: 'Oven Overtime',            theme: 'pizza',     goal: 72,  tables: 3, patience: 0.82, cook: 1.9, spawn: 3.9, eat: 1.4 },
+    { id: 5,  name: 'Truck Window',     title: 'Taco Truck Window',        theme: 'taco',      goal: 78,  tables: 3, patience: 0.82, cook: 1.8, spawn: 3.8, eat: 1.4 },
+    { id: 6,  name: 'Salsa Line',       title: 'Salsa Line',               theme: 'taco',      goal: 90,  tables: 3, patience: 0.80, cook: 1.8, spawn: 3.6, eat: 1.3 },
+    { id: 7,  name: 'Street Festival',  title: 'Street Taco Festival',     theme: 'taco',      goal: 104, tables: 4, patience: 0.78, cook: 1.7, spawn: 3.5, eat: 1.3 },
+    { id: 8,  name: 'Late Truck',       title: 'Late Night Truck',         theme: 'taco',      goal: 118, tables: 4, patience: 0.75, cook: 1.7, spawn: 3.3, eat: 1.3 },
+    { id: 9,  name: 'Chaat Open',       title: 'Chaat Stand Open',         theme: 'chaat',     goal: 122, tables: 4, patience: 0.75, cook: 1.6, spawn: 3.3, eat: 1.2 },
+    { id: 10, name: 'Puri Pop',         title: 'Pani Puri Pop',            theme: 'chaat',     goal: 134, tables: 4, patience: 0.72, cook: 1.6, spawn: 3.1, eat: 1.2 },
+    { id: 11, name: 'Spice Rush',       title: 'Spice Rush',               theme: 'chaat',     goal: 148, tables: 4, patience: 0.70, cook: 1.5, spawn: 3.0, eat: 1.2 },
+    { id: 12, name: 'Festival Peak',    title: 'Festival Peak',            theme: 'chaat',     goal: 160, tables: 4, patience: 0.68, cook: 1.5, spawn: 2.9, eat: 1.2 },
+    { id: 13, name: 'Sweet Finish',     title: 'Lassi and Sweets',         theme: 'chaat',     goal: 172, tables: 4, patience: 0.66, cook: 1.4, spawn: 2.8, eat: 1.1 },
+    { id: 14, name: 'Inn Doors',        title: 'Leaky Cauldron Doors',     theme: 'cauldron',  goal: 176, tables: 4, patience: 0.66, cook: 1.4, spawn: 2.8, eat: 1.1 },
+    { id: 15, name: 'Butterbeer Tap',   title: 'Butterbeer Tap',           theme: 'cauldron',  goal: 188, tables: 4, patience: 0.64, cook: 1.4, spawn: 2.7, eat: 1.1 },
+    { id: 16, name: 'Pub Packed',       title: 'Pub Packed',               theme: 'cauldron',  goal: 200, tables: 4, patience: 0.62, cook: 1.3, spawn: 2.6, eat: 1.1 },
+    { id: 17, name: 'Night Service',    title: 'Night Service',            theme: 'cauldron',  goal: 214, tables: 4, patience: 0.60, cook: 1.3, spawn: 2.5, eat: 1.0 },
+    { id: 18, name: 'Last Call',        title: 'Last Call at the Inn',     theme: 'cauldron',  goal: 228, tables: 4, patience: 0.58, cook: 1.3, spawn: 2.4, eat: 1.0 }
+  ],
+  forProfile(id) { return RD.Levels[id === 'p2' ? 'p2' : 'p1']; },
+  get(id, profileId) {
+    const list = RD.Levels.forProfile(profileId);
+    return list.find((l) => l.id === id) || list[0];
+  },
+  dishesFor(theme, dishTier) {
+    return (RD.DISHES[theme] || RD.DISHES.pizza).filter((d) => d.tier <= (dishTier || 0));
+  }
+};
+
+})();
+/* ==== 40-art.js ==== */
+;(function(){
+/* Original cartoon art — no copyrighted characters or logos */
+RD.Art = (() => {
+  function circle(ctx, x, y, r, color) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    if (color) ctx.fillStyle = color;
+    ctx.fill();
+  }
+  function ellipse(ctx, x, y, rx, ry, color) {
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    if (color) ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  function drawBg(ctx, theme, t) {
+    const th = RD.THEMES[theme] || RD.THEMES.pizza;
+    const sky = ctx.createLinearGradient(0, 0, 0, RD.H);
+    sky.addColorStop(0, th.sky[0]);
+    sky.addColorStop(1, th.sky[1]);
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, RD.W, RD.H);
+
+    const wallH = Math.max(90, RD.H * 0.22);
+    ctx.fillStyle = th.wall;
+    ctx.fillRect(0, 0, RD.W, wallH);
+
+    // windows / lanterns
+    const nWin = Math.max(2, Math.floor(RD.W / 220));
+    for (let i = 0; i < nWin; i++) {
+      const x = 40 + i * (RD.W / nWin) + 20;
+      const y = wallH * 0.28;
+      if (theme === 'cauldron') {
+        ctx.fillStyle = '#1a120c';
+        RD.roundRect(ctx, x, y, 36, 44, 4); ctx.fill();
+        ctx.fillStyle = 'rgba(255, 200, 80, 0.55)';
+        RD.roundRect(ctx, x + 4, y + 4, 28, 36, 3); ctx.fill();
+        // candle
+        ctx.fillStyle = '#f7e7a8';
+        ctx.fillRect(x + 16, y + 22, 4, 12);
+        circle(ctx, x + 18, y + 18, 4, '#ffd36a');
+      } else {
+        ctx.fillStyle = 'rgba(180, 230, 255, 0.7)';
+        RD.roundRect(ctx, x, y, 46, 34, 6); ctx.fill();
+        ctx.strokeStyle = 'rgba(80,40,20,0.35)';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, 46, 34);
+        ctx.beginPath(); ctx.moveTo(x + 23, y); ctx.lineTo(x + 23, y + 34); ctx.stroke();
+      }
+    }
+
+    // floor
+    ctx.fillStyle = th.floor;
+    ctx.fillRect(0, wallH, RD.W, RD.H - wallH);
+    const tile = theme === 'pizza' || theme === 'chaat' ? 28 : 36;
+    for (let y = wallH, row = 0; y < RD.H; y += tile, row++) {
+      for (let x = 0, col = 0; x < RD.W; x += tile, col++) {
+        if ((row + col) % 2 === 0) {
+          ctx.fillStyle = th.tileA;
+          ctx.globalAlpha = theme === 'cauldron' ? 0.25 : 0.18;
+          ctx.fillRect(x, y, tile, tile);
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
+
+    // baseboard
+    ctx.fillStyle = th.wood;
+    ctx.fillRect(0, wallH - 8, RD.W, 12);
+
+    if (theme === 'cauldron') {
+      // hanging signs / steam motes
+      for (let i = 0; i < 8; i++) {
+        const px = 80 + i * (RD.W / 8);
+        const py = 18 + Math.sin((t || 0) * 1.4 + i) * 4;
+        circle(ctx, px, py, 2, 'rgba(255,220,140,0.35)');
+      }
+    }
+  }
+
+  function drawQueueRail(ctx, slots, theme) {
+    const th = RD.THEMES[theme] || RD.THEMES.pizza;
+    if (!slots.length) return;
+    const xs = slots.map((s) => s.x), ys = slots.map((s) => s.y);
+    const minx = Math.min.apply(null, xs) - 40, maxx = Math.max.apply(null, xs) + 40;
+    const miny = Math.min.apply(null, ys) - 48, maxy = Math.max.apply(null, ys) + 48;
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    RD.roundRect(ctx, minx, miny, maxx - minx, maxy - miny, 16);
+    ctx.fill();
+    ctx.fillStyle = th.accent;
+    ctx.font = '800 13px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Waiting', (minx + maxx) / 2, miny + 16);
+  }
+
+  function drawTable(ctx, table, theme, t) {
+    const th = RD.THEMES[theme] || RD.THEMES.pizza;
+    const x = table.x, y = table.y, w = table.w, h = table.h;
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    RD.roundRect(ctx, x - w / 2 + 4, y - h / 2 + 8, w, h, 12);
+    ctx.fill();
+    // top
+    ctx.fillStyle = table.state === 'dirty' ? '#8a6a4a' : th.wood;
+    RD.roundRect(ctx, x - w / 2, y - h / 2, w, h, 12);
+    ctx.fill();
+    ctx.fillStyle = table.state === 'dirty' ? '#c4a882' : '#e8c9a0';
+    RD.roundRect(ctx, x - w / 2 + 6, y - h / 2 + 6, w - 12, h - 12, 8);
+    ctx.fill();
+    // chairs
+    ctx.fillStyle = th.wall;
+    const cw = 16, ch = 10;
+    ctx.fillRect(x - w / 2 - 4, y - 8, cw, ch + 8);
+    ctx.fillRect(x + w / 2 - cw + 4, y - 8, cw, ch + 8);
+    if (table.state === 'dirty') {
+      // crumbs / dishes
+      circle(ctx, x - 10, y + 2, 5, '#d9d0c4');
+      circle(ctx, x + 8, y - 4, 4, '#c9b8a0');
+      ctx.fillStyle = 'rgba(80,40,20,0.35)';
+      ctx.fillRect(x - 14, y + 8, 10, 3);
+    }
+    if (table.flash && table.flash > 0) {
+      ctx.strokeStyle = `rgba(255,229,102,${Math.min(1, table.flash)})`;
+      ctx.lineWidth = 3;
+      RD.roundRect(ctx, x - w / 2 - 3, y - h / 2 - 3, w + 6, h + 6, 14);
+      ctx.stroke();
+    }
+  }
+
+  function drawKitchen(ctx, kit, theme, t) {
+    const th = RD.THEMES[theme] || RD.THEMES.pizza;
+    const x = kit.x, y = kit.y, w = kit.w, h = kit.h;
+    ctx.fillStyle = th.wood;
+    RD.roundRect(ctx, x - w / 2, y - h / 2, w, h, 16);
+    ctx.fill();
+    ctx.fillStyle = theme === 'cauldron' ? '#2c2418' : '#6d6f76';
+    RD.roundRect(ctx, x - w / 2 + 8, y - h / 2 + 22, w - 16, h - 36, 10);
+    ctx.fill();
+    // stove / cauldron
+    if (theme === 'cauldron') {
+      ellipse(ctx, x, y + 8, 28, 16, '#1a140e');
+      circle(ctx, x, y, 24, '#3a3a42');
+      ellipse(ctx, x, y - 10, 16, 6, '#7dff9a');
+    } else if (theme === 'taco') {
+      ctx.fillStyle = '#f4a261';
+      RD.roundRect(ctx, x - 40, y - 28, 80, 36, 8); ctx.fill();
+      ctx.fillStyle = '#2d6a4f';
+      ctx.fillRect(x - 40, y - 8, 80, 10);
+    } else if (theme === 'chaat') {
+      circle(ctx, x - 16, y, 16, '#e63956');
+      circle(ctx, x + 16, y + 4, 14, '#2a9d8f');
+    } else {
+      ctx.fillStyle = '#c44536';
+      RD.roundRect(ctx, x - 36, y - 18, 72, 40, 8); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.fillRect(x - 22, y - 8, 18, 16);
+      ctx.fillRect(x + 4, y - 8, 18, 16);
+    }
+    // steam
+    const cooking = (kit.queue || []).some((q) => q.cookLeft > 0);
+    if (cooking) {
+      for (let i = 0; i < 3; i++) {
+        const sy = y - 28 - ((t * 30 + i * 12) % 28);
+        circle(ctx, x - 8 + i * 8, sy, 5, 'rgba(255,255,255,0.45)');
+      }
+    }
+    ctx.fillStyle = th.accent;
+    ctx.font = '800 13px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Kitchen', x, y - h / 2 + 16);
+  }
+
+  function drawDish(ctx, dish, x, y, s) {
+    s = s || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    const id = (dish && dish.id) || 'slice';
+    if (id === 'slice' || id === 'pie') {
+      ctx.fillStyle = '#f4d7a8';
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 14, -0.7, 0.7); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#e85d04';
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 11, -0.65, 0.65); ctx.closePath(); ctx.fill();
+      if (id === 'pie') { circle(ctx, 0, 0, 12, '#e85d04'); ctx.fillStyle = '#f4d7a8'; ctx.strokeStyle = '#c44536'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 13, 0, Math.PI * 2); ctx.stroke(); }
+    } else if (id === 'knots') {
+      ctx.strokeStyle = '#e9c46a'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(-4, 0, 7, 0.2, Math.PI * 1.6); ctx.stroke();
+      ctx.beginPath(); ctx.arc(6, 2, 6, -0.4, Math.PI * 1.3); ctx.stroke();
+    } else if (id === 'soda' || id === 'agua' || id === 'lassi' || id === 'beer') {
+      const col = id === 'beer' ? '#e8c96a' : id === 'lassi' ? '#ffcc66' : id === 'agua' ? '#9af0c8' : '#ff6b6b';
+      ctx.fillStyle = '#fff';
+      RD.roundRect(ctx, -8, -14, 16, 26, 4); ctx.fill();
+      ctx.fillStyle = col;
+      RD.roundRect(ctx, -6, -6, 12, 16, 3); ctx.fill();
+      if (id === 'beer') { ellipse(ctx, 0, -8, 7, 4, 'rgba(255,255,255,0.9)'); }
+    } else if (id === 'taco' || id === 'ques') {
+      ctx.fillStyle = '#f4a261';
+      ctx.beginPath(); ctx.arc(0, 4, 14, Math.PI, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#2d6a4f';
+      ctx.beginPath(); ctx.arc(0, 4, 10, Math.PI + 0.2, -0.2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#e63956';
+      circle(ctx, -4, 0, 2.5); circle(ctx, 3, -1, 2.5);
+    } else if (id === 'churro') {
+      ctx.strokeStyle = '#c9843e'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-10, 6); ctx.quadraticCurveTo(0, -12, 10, 6); ctx.stroke();
+    } else if (id === 'puri' || id === 'samosa') {
+      ctx.fillStyle = '#e9c46a';
+      if (id === 'samosa') {
+        ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(14, 10); ctx.lineTo(-14, 10); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#2a9d8f'; ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(6, 6); ctx.lineTo(-6, 6); ctx.closePath(); ctx.fill();
+      } else {
+        circle(ctx, 0, 0, 12, '#f4d7a8');
+        circle(ctx, 0, 0, 7, '#fff6e8');
+      }
+    } else if (id === 'bhel') {
+      ellipse(ctx, 0, 4, 14, 8, '#c44536');
+      ctx.fillStyle = '#2a9d8f'; circle(ctx, -4, 0, 3); circle(ctx, 5, 1, 3);
+      circle(ctx, 0, -4, 3, '#e9c46a');
+    } else if (id === 'stew') {
+      ellipse(ctx, 0, 4, 14, 8, '#4a3728');
+      ellipse(ctx, 0, 2, 11, 6, '#6a8f3a');
+    } else if (id === 'toffee') {
+      ctx.fillStyle = '#7a3e22';
+      RD.roundRect(ctx, -12, -6, 24, 14, 4); ctx.fill();
+      ctx.fillStyle = '#e8c96a';
+      RD.roundRect(ctx, -10, -10, 20, 8, 3); ctx.fill();
+    } else {
+      circle(ctx, 0, 0, 10, '#fff');
+      circle(ctx, 0, 0, 6, '#ff9a4a');
+    }
+    ctx.restore();
+  }
+
+  function drawCustomer(ctx, c, t) {
+    const x = c.x, y = c.y;
+    const bob = Math.sin((t || 0) * 6 + (c.phase || 0)) * (c.walking ? 2.5 : 1);
+    const s = c.scale || 1;
+    ctx.save();
+    ctx.translate(x, y + bob);
+    ctx.scale(s, s);
+    // shadow
+    ellipse(ctx, 0, 18, 12, 5, 'rgba(0,0,0,0.2)');
+    // body
+    ellipse(ctx, 0, 8, 13, 11, c.body || '#6ab0ff');
+    // head
+    circle(ctx, 0, -8, 12, c.skin || '#f6d0b0');
+    // hair
+    ctx.fillStyle = c.hair || '#3a2a1a';
+    ctx.beginPath(); ctx.arc(0, -12, 12, Math.PI, 0); ctx.fill();
+    if (c.hat === 'wiz') {
+      ctx.fillStyle = '#2a1a40';
+      ctx.beginPath(); ctx.moveTo(0, -32); ctx.lineTo(12, -14); ctx.lineTo(-12, -14); ctx.closePath(); ctx.fill();
+      ctx.fillRect(-16, -16, 32, 4);
+    } else if (c.hat === 'cap') {
+      ctx.fillStyle = c.hatColor || '#c44536';
+      ctx.fillRect(-12, -20, 24, 6);
+      ctx.fillRect(4, -24, 12, 6);
+    }
+    // eyes
+    circle(ctx, -4, -9, 2.2, '#2a1a14');
+    circle(ctx, 4, -9, 2.2, '#2a1a14');
+    // smile or frown
+    ctx.strokeStyle = '#2a1a14';
+    ctx.lineWidth = 1.6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    if ((c.patience || 1) < 0.35) {
+      ctx.arc(0, -2, 4, Math.PI * 1.1, Math.PI * 1.9, true);
+    } else {
+      ctx.arc(0, -4, 4, 0.2, Math.PI - 0.2);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // hearts
+    if (c.state && c.state !== 'leaving' && c.state !== 'gone' && c.maxPatience) {
+      drawHearts(ctx, x, y - 36, c.patience, c.maxPatience);
+    }
+    // bubble
+    if (c.bubble) {
+      const by = y - 52;
+      ctx.fillStyle = '#fff';
+      RD.roundRect(ctx, x - 16, by - 16, 32, 28, 10);
+      ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x - 4, by + 12); ctx.lineTo(x + 2, by + 12); ctx.lineTo(x, by + 20); ctx.fill();
+      if (c.bubble === 'order' && c.dish) drawDish(ctx, c.dish, x, by - 2, 0.7);
+      else if (c.bubble === 'pay') {
+        circle(ctx, x, by - 2, 8, '#ffe566');
+        ctx.fillStyle = '#a07400';
+        ctx.font = '800 11px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('$', x, by - 1);
+        ctx.textBaseline = 'alphabetic';
+      } else if (c.bubble === 'ready') {
+        ctx.fillStyle = '#c44536';
+        ctx.font = '800 16px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('!', x, by - 1);
+        ctx.textBaseline = 'alphabetic';
+      }
+    }
+  }
+
+  function drawHearts(ctx, x, y, hp, max) {
+    const n = Math.max(1, max || 4);
+    const filled = Math.ceil((hp / (max || 1)) * n);
+    const start = x - (n * 8) / 2;
+    for (let i = 0; i < n; i++) {
+      const hx = start + i * 10, hy = y;
+      ctx.fillStyle = i < filled ? (hp / max < 0.34 ? '#ff5a5a' : '#ff6b8a') : 'rgba(255,255,255,0.35)';
+      ctx.beginPath();
+      ctx.moveTo(hx, hy + 3);
+      ctx.bezierCurveTo(hx, hy - 1, hx - 6, hy - 1, hx - 6, hy + 3);
+      ctx.bezierCurveTo(hx - 6, hy + 7, hx, hy + 10, hx, hy + 12);
+      ctx.bezierCurveTo(hx, hy + 10, hx + 6, hy + 7, hx + 6, hy + 3);
+      ctx.bezierCurveTo(hx + 6, hy - 1, hx, hy - 1, hx, hy + 3);
+      ctx.fill();
+    }
+  }
+
+  function drawWaiter(ctx, w, t) {
+    const bob = Math.sin((t || 0) * (w.moving ? 12 : 4) + w.id) * (w.moving ? 2.5 : 1);
+    ctx.save();
+    ctx.translate(w.x, w.y + bob);
+    if (w.facing < 0) ctx.scale(-1, 1);
+    ellipse(ctx, 0, 20, 12, 5, 'rgba(0,0,0,0.22)');
+    // legs
+    ctx.fillStyle = '#2a2a40';
+    ctx.fillRect(-8, 10, 6, 12);
+    ctx.fillRect(2, 10, 6, 12);
+    // body / apron
+    ctx.fillStyle = w.shirt || '#3d6adf';
+    RD.roundRect(ctx, -12, -6, 24, 20, 6); ctx.fill();
+    ctx.fillStyle = w.apron || '#fff6e8';
+    RD.roundRect(ctx, -8, 0, 16, 16, 4); ctx.fill();
+    // head
+    circle(ctx, 0, -16, 11, w.skin || '#f6d0b0');
+    ctx.fillStyle = w.hair || '#3a2a1a';
+    ctx.beginPath(); ctx.arc(0, -20, 11, Math.PI, 0); ctx.fill();
+    circle(ctx, -4, -16, 2, '#2a1a14');
+    circle(ctx, 4, -16, 2, '#2a1a14');
+    ctx.strokeStyle = '#2a1a14'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, -13, 3.5, 0.15, Math.PI - 0.15); ctx.stroke();
+    ctx.restore();
+    if (w.holding) {
+      const hx = w.x + (w.facing < 0 ? -16 : 16);
+      const hy = w.y - 6;
+      if (w.holding.type === 'ticket') {
+        ctx.fillStyle = '#fff6e8';
+        ctx.fillRect(hx - 8, hy - 8, 16, 18);
+        ctx.strokeStyle = '#c44536'; ctx.lineWidth = 1; ctx.strokeRect(hx - 8, hy - 8, 16, 18);
+      } else if (w.holding.dish) {
+        drawDish(ctx, w.holding.dish, hx, hy, 0.85);
+      }
+    }
+    // label
+    ctx.fillStyle = w.apron === '#6ad4d0' ? '#6ad4d0' : '#ff9a4a';
+    ctx.font = '800 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(w.id === 0 ? 'P1' : 'P2', w.x, w.y + 32);
+  }
+
+  function drawFx(ctx, fx, t) {
+    const life = 1 - (fx.age / (fx.dur || 0.8));
+    if (life <= 0) return;
+    ctx.globalAlpha = Math.max(0, life);
+    ctx.fillStyle = fx.color || '#ffe566';
+    ctx.font = '800 18px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(fx.text, fx.x, fx.y - fx.age * 40);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawTitleWaiter(ctx, x, y, t) {
+    drawWaiter(ctx, { id: 0, x, y, facing: 1, shirt: '#c44536', apron: '#fff6e8', hair: '#3a2a1a', moving: false }, t);
+  }
+
+  function drawTitleGuest(ctx, x, y, t, i) {
+    const pals = [
+      { body: '#6ab0ff', hair: '#3a2a1a', hat: 'cap', hatColor: '#c44536' },
+      { body: '#7dff9a', hair: '#6b3a1c' },
+      { body: '#c9a6ff', hair: '#1a1a1a', hat: 'wiz' }
+    ];
+    const p = pals[i % pals.length];
+    drawCustomer(ctx, Object.assign({ x, y, phase: i, patience: 1, maxPatience: 0, scale: 1.1 }, p), t);
+  }
+
+  return { drawBg, drawQueueRail, drawTable, drawKitchen, drawDish, drawCustomer, drawWaiter, drawHearts, drawFx, drawTitleWaiter, drawTitleGuest, circle, ellipse };
+})();
+
+})();
+/* ==== 50-game.js ==== */
+;(function(){
+/* Simulation, waiter tasks, autoplay solver */
+RD.Game = (() => {
+  const SKIN = ['#f6d0b0', '#e0a070', '#c48a5a', '#8d5524', '#f3c6a0'];
+  const HAIR = ['#3a2a1a', '#1a1a1a', '#6b3a1c', '#c44b1b', '#d8c070', '#4a2c6a'];
+  const BODY = ['#6ab0ff', '#7dff9a', '#ff9ad4', '#ffb347', '#c9a6ff', '#9ad0ff', '#ffe08a'];
+  const SHIRTS = ['#c44536', '#3d6adf'];
+  const APRONS = ['#ff9a4a', '#6ad4d0'];
+
+  function waiterSpeed(run) {
+    const shoes = (run.upgrades && run.upgrades.shoes) || 0;
+    const base = run.coop ? 250 : (RD.meta(run.soloProfile).speed || 230);
+    return (RD.autoplay ? 1400 : base) + shoes * 70;
+  }
+
+  function patienceMul(run) {
+    const decor = (run.upgrades && run.upgrades.decor) || 0;
+    const meta = RD.meta(run.soloProfile);
+    return (run.level.patience || 1) * (meta.patienceMul || 1) * (1 + decor * 0.18);
+  }
+
+  function dishesOf(run) {
+    return RD.Levels.dishesFor(run.theme, (run.upgrades && run.upgrades.dish) || 0);
+  }
+
+  function layoutSlots(run) {
+    const top = 108;
+    const bot = RD.H - 18;
+    const tableCount = run.tables.length;
+    if (RD.portrait) {
+      const qy = top + 36;
+      run.queueSlots = [0, 1, 2].map((i) => ({ x: RD.W * (0.22 + i * 0.28), y: qy }));
+      const kitH = 110;
+      run.kitchen.x = RD.W * 0.5;
+      run.kitchen.y = bot - kitH / 2 - 8;
+      run.kitchen.w = Math.min(280, RD.W - 40);
+      run.kitchen.h = kitH;
+      const areaY = qy + 70;
+      const areaH = (run.kitchen.y - kitH / 2 - 16) - areaY;
+      const cols = tableCount <= 3 ? Math.min(2, tableCount) : 2;
+      const rows = Math.ceil(tableCount / cols);
+      const tw = 88, th = 64, gapX = 28, gapY = 26;
+      const gridW = cols * tw + (cols - 1) * gapX;
+      const gridH = rows * th + (rows - 1) * gapY;
+      const ox = (RD.W - gridW) / 2 + tw / 2;
+      const oy = areaY + Math.max(0, (areaH - gridH) / 2) + th / 2;
+      run.tables.forEach((tb, i) => {
+        const c = i % cols, r = (i / cols) | 0;
+        tb.x = ox + c * (tw + gapX);
+        tb.y = oy + r * (th + gapY);
+        tb.w = tw; tb.h = th;
+      });
+    } else {
+      run.queueSlots = [0, 1, 2].map((i) => ({ x: 78, y: top + 70 + i * 110 }));
+      run.kitchen.x = RD.W - 130;
+      run.kitchen.y = RD.H * 0.46;
+      run.kitchen.w = 200;
+      run.kitchen.h = 180;
+      const left = 190, right = RD.W - 250;
+      const cols = tableCount <= 3 ? tableCount : Math.ceil(tableCount / 2);
+      const rows = Math.ceil(tableCount / cols);
+      const tw = 100, th = 70, gapX = 32, gapY = 36;
+      const gridW = cols * tw + (cols - 1) * gapX;
+      const gridH = rows * th + (rows - 1) * gapY;
+      const ox = left + (right - left - gridW) / 2 + tw / 2;
+      const oy = top + 40 + (bot - 20 - top - 40 - gridH) / 2 + th / 2;
+      run.tables.forEach((tb, i) => {
+        const c = i % cols, r = (i / cols) | 0;
+        tb.x = ox + c * (tw + gapX);
+        tb.y = oy + r * (th + gapY);
+        tb.w = tw; tb.h = th;
+      });
+    }
+    run.waiters.forEach((w, i) => {
+      if (!w._placed) {
+        w.x = RD.portrait ? RD.W * (0.35 + i * 0.3) : RD.W * 0.52 + i * 40;
+        w.y = RD.portrait ? RD.H * 0.55 : RD.H * 0.72;
+        w._placed = true;
+      }
+    });
+  }
+
+  function makeWaiter(id) {
+    return {
+      id, x: 0, y: 0, facing: 1, moving: false,
+      shirt: SHIRTS[id % 2], apron: APRONS[id % 2],
+      skin: '#f6d0b0', hair: id ? '#1a1a1a' : '#6b3a1c',
+      holding: null, task: null, _placed: false
+    };
+  }
+
+  function makeCustomer(run, rng) {
+    const menu = dishesOf(run);
+    const dish = menu[(rng() * menu.length) | 0];
+    const maxP = 4;
+    return {
+      id: run.nextId++,
+      state: 'waiting',
+      slot: -1,
+      table: null,
+      x: -40, y: RD.H * 0.5,
+      tx: 0, ty: 0,
+      walking: false,
+      dish,
+      patience: 1,
+      maxPatience: maxP,
+      think: 0,
+      eat: 0,
+      body: BODY[(rng() * BODY.length) | 0],
+      skin: SKIN[(rng() * SKIN.length) | 0],
+      hair: HAIR[(rng() * HAIR.length) | 0],
+      hat: run.theme === 'cauldron' && rng() > 0.55 ? 'wiz' : (rng() > 0.7 ? 'cap' : null),
+      hatColor: BODY[(rng() * BODY.length) | 0],
+      phase: rng() * 6,
+      scale: 1,
+      bubble: null,
+      tipMul: 1
+    };
+  }
+
+  function emptyQueueSlot(run) {
+    const used = new Set(run.customers.filter((c) => c.state === 'waiting').map((c) => c.slot));
+    for (let i = 0; i < run.queueSlots.length; i++) if (!used.has(i)) return i;
+    return -1;
+  }
+
+  function spawn(run, rng) {
+    const slot = emptyQueueSlot(run);
+    if (slot < 0) return null;
+    const c = makeCustomer(run, rng);
+    c.slot = slot;
+    const sp = run.queueSlots[slot];
+    c.x = sp.x; c.y = sp.y;
+    run.customers.push(c);
+    return c;
+  }
+
+  function fx(run, text, x, y, color) {
+    run.fx.push({ text, x, y, color: color || '#ffe566', age: 0, dur: 0.8 });
+  }
+
+  function start(levelId, opts) {
+    opts = opts || {};
+    const coop = !!opts.coop;
+    const profileId = coop ? 'p1' : (opts.profile || (RD.state && RD.state.lastProfile) || 'p1');
+    if (!coop) RD.Save.setProfile(profileId);
+    const level = RD.Levels.get(levelId || 1, profileId);
+    const prof = RD.Save.profile(profileId);
+    const upgrades = Object.assign(RD.Save.blankUpgrades(), (opts.upgrades) || (prof && prof.upgrades) || {});
+    if (opts.freshUpgrades) Object.assign(upgrades, RD.Save.blankUpgrades());
+    const meta = RD.profiles[profileId];
+    const extra = Math.min(3, upgrades.table || 0);
+    const tableCount = Math.min(5, (level.tables || 2) + extra);
+    const tables = [];
+    for (let i = 0; i < tableCount; i++) tables.push({ id: i, x: 0, y: 0, w: 100, h: 70, state: 'empty', customer: null, flash: 0 });
+    const run = RD.run = {
+      levelId: level.id,
+      level,
+      theme: level.theme,
+      soloProfile: profileId,
+      mode: coop ? 'coop' : 'solo',
+      coop,
+      upgrades,
+      tables,
+      kitchen: { x: 0, y: 0, w: 200, h: 180, queue: [], ready: [] },
+      queueSlots: [],
+      waiters: coop ? [makeWaiter(0), makeWaiter(1)] : [makeWaiter(0)],
+      customers: [],
+      fx: [],
+      coins: 0,
+      tips: 0,
+      combo: 0,
+      comboT: 0,
+      goal: level.goal,
+      lives: meta.infiniteLives ? 99 : meta.lives,
+      infinite: !!meta.infiniteLives,
+      livesLost: 0,
+      walkouts: 0,
+      served: 0,
+      t: 0,
+      spawnT: 0.15,
+      rng: RD.seeded((level.id * 997 + (profileId === 'p2' ? 13 : 7) + 421) >>> 0),
+      nextId: 1,
+      won: false,
+      lost: false,
+      paused: false,
+      stars: 0,
+      maxCombo: 0,
+      selected: null
+    };
+    layoutSlots(run);
+    spawn(run, run.rng);
+    RD.screen = 'play';
+    RD.autoplay = !!opts.autoplay;
+    RD.UI.showPlayChrome();
+    RD.UI.updateHud();
+    RD.Game.syncHits();
+    return run;
+  }
+
+  function reflow() {
+    if (!RD.run) return;
+    layoutSlots(RD.run);
+    // snap waiting customers to slots
+    RD.run.customers.forEach((c) => {
+      if (c.state === 'waiting' && c.slot >= 0 && RD.run.queueSlots[c.slot]) {
+        c.x = RD.run.queueSlots[c.slot].x;
+        c.y = RD.run.queueSlots[c.slot].y;
+      }
+    });
+    RD.Game.syncHits();
+  }
+
+  function posForTask(run, task) {
+    if (!task) return null;
+    if (task.kind === 'kitchen' || task.kind === 'drop' || task.kind === 'pickup') {
+      return { x: run.kitchen.x, y: run.kitchen.y + run.kitchen.h / 2 - 10 };
+    }
+    if (task.kind === 'greet') {
+      const c = run.customers.find((q) => q.id === task.cid);
+      if (!c) return null;
+      return { x: c.x, y: c.y + 20 };
+    }
+    if (task.tableId != null) {
+      const tb = run.tables[task.tableId];
+      if (!tb) return null;
+      return { x: tb.x, y: tb.y + tb.h / 2 + 8 };
+    }
+    return null;
+  }
+
+  function setTask(run, waiter, task) {
+    waiter.task = task;
+  }
+
+  function nearestIdle(run, x, y) {
+    let best = null, bestD = 1e9;
+    for (const w of run.waiters) {
+      if (w.task) continue;
+      const d = Math.hypot(w.x - x, w.y - y);
+      if (d < bestD) { bestD = d; best = w; }
+    }
+    return best;
+  }
+
+  function firstEmptyTable(run) {
+    return run.tables.find((t) => t.state === 'empty' && !t.reserved);
+  }
+
+  function cancelIfInvalid(run, w) {
+    const task = w.task;
+    if (!task) return;
+    if (task.kind === 'greet' || task.kind === 'seat') {
+      const c = run.customers.find((q) => q.id === task.cid);
+      const tb = run.tables[task.tableId];
+      if (!c || c.state === 'leaving' || c.state === 'gone') { w.task = null; if (tb) tb.reserved = false; }
+    }
+    if (task.kind === 'order' || task.kind === 'serve' || task.kind === 'pay' || task.kind === 'clear') {
+      const tb = run.tables[task.tableId];
+      if (!tb) { w.task = null; return; }
+      if (task.kind === 'order' && (!tb.customer || tb.customer.state !== 'ready')) w.task = null;
+      if (task.kind === 'serve' && (!w.holding || w.holding.type !== 'dish')) w.task = null;
+      if (task.kind === 'pay' && (!tb.customer || tb.customer.state !== 'pay')) w.task = null;
+      if (task.kind === 'clear' && tb.state !== 'dirty') w.task = null;
+    }
+    if (task.kind === 'pickup' && !(run.kitchen.ready && run.kitchen.ready.length)) {
+      if (!w.holding) w.task = null;
+    }
+  }
+
+  function complete(run, w) {
+    const task = w.task;
+    if (!task) return;
+    w.task = null;
+    w.moving = false;
+    if (task.kind === 'greet') {
+      const c = run.customers.find((q) => q.id === task.cid);
+      const tb = run.tables[task.tableId];
+      if (c && tb && (c.state === 'waiting' || c.state === 'follow')) {
+        c.state = 'follow';
+        c.walking = true;
+        c.table = tb;
+        setTask(run, w, { kind: 'seat', cid: c.id, tableId: tb.id });
+      }
+      return;
+    }
+    if (task.kind === 'seat') {
+      const c = run.customers.find((q) => q.id === task.cid);
+      const tb = run.tables[task.tableId];
+      if (c && tb) {
+        tb.state = 'seated';
+        tb.reserved = false;
+        tb.customer = c;
+        c.state = 'think';
+        c.walking = false;
+        c.slot = -1;
+        c.x = tb.x; c.y = tb.y - 8;
+        c.think = (run.level.eat ? 0.9 : 1) * (RD.meta(run.soloProfile).thinkMul || 1);
+        c.bubble = null;
+        RD.Audio.seat();
+        fx(run, 'Have a seat!', tb.x, tb.y - 30, '#fff');
+      }
+      return;
+    }
+    if (task.kind === 'order') {
+      const tb = run.tables[task.tableId];
+      const c = tb && tb.customer;
+      if (c && c.state === 'ready') {
+        c.state = 'ordered';
+        c.bubble = 'order';
+        w.holding = { type: 'ticket', tableId: tb.id, dish: c.dish, cid: c.id };
+        RD.Audio.order();
+        setTask(run, w, { kind: 'drop', tableId: tb.id, dish: c.dish, cid: c.id });
+      }
+      return;
+    }
+    if (task.kind === 'drop') {
+      if (w.holding && w.holding.type === 'ticket') {
+        run.kitchen.queue.push({
+          tableId: w.holding.tableId,
+          cid: w.holding.cid,
+          dish: w.holding.dish,
+          cookLeft: (run.level.cook || 1.8) * (RD.meta(run.soloProfile).cookMul || 1)
+        });
+        w.holding = null;
+        RD.Audio.drop();
+      }
+      return;
+    }
+    if (task.kind === 'pickup') {
+      if (!w.holding && run.kitchen.ready.length) {
+        const idx = (task.readyIndex != null && task.readyIndex < run.kitchen.ready.length) ? task.readyIndex : 0;
+        w.holding = { type: 'dish', ...run.kitchen.ready.splice(idx, 1)[0] };
+        RD.Audio.ding();
+      }
+      return;
+    }
+    if (task.kind === 'serve') {
+      const tb = run.tables[task.tableId];
+      const c = tb && tb.customer;
+      if (c && w.holding && w.holding.type === 'dish' && w.holding.cid === c.id) {
+        c.state = 'eat';
+        c.bubble = null;
+        c.eat = (run.level.eat || 1.5) * (RD.meta(run.soloProfile).eatMul || 1);
+        w.holding = null;
+        run.served++;
+        run.comboT = 3.2;
+        run.combo++;
+        if (run.combo > run.maxCombo) run.maxCombo = run.combo;
+        RD.Audio.serve();
+        if (run.combo >= 2) { RD.Audio.combo(); fx(run, 'Combo x' + run.combo, tb.x, tb.y - 40, '#7dff9a'); }
+        else fx(run, 'Yum!', tb.x, tb.y - 36, '#fff');
+      } else if (w.holding && w.holding.type === 'dish') {
+        RD.toast('Wrong table!');
+        setTask(run, w, { kind: 'serve', tableId: w.holding.tableId, cid: w.holding.cid });
+      }
+      return;
+    }
+    if (task.kind === 'pay') {
+      const tb = run.tables[task.tableId];
+      const c = tb && tb.customer;
+      if (c && c.state === 'pay') {
+        const base = (c.dish && c.dish.price) || 10;
+        const tip = Math.round(base * 0.6 * Math.max(0.15, c.patience) + (run.combo >= 2 ? run.combo : 0) * 2);
+        const gain = base + tip;
+        run.coins += gain;
+        run.tips += tip;
+        fx(run, '+' + gain, tb.x, tb.y - 36, '#ffe566');
+        RD.Audio.coin();
+        c.state = 'leaving';
+        c.walking = true;
+        c.tx = RD.portrait ? c.x : -40;
+        c.ty = RD.portrait ? 40 : c.y;
+        c.bubble = null;
+        tb.customer = null;
+        tb.state = 'dirty';
+        maybeWin(run);
+      }
+      return;
+    }
+    if (task.kind === 'clear') {
+      const tb = run.tables[task.tableId];
+      if (tb && tb.state === 'dirty') {
+        tb.state = 'empty';
+        RD.Audio.clear();
+        fx(run, 'Clear!', tb.x, tb.y - 24, '#9ad0ff');
+      }
+    }
+  }
+
+  function maybeWin(run) {
+    if (run.won || run.lost) return;
+    if (run.coins >= run.goal) {
+      run.won = true;
+      let stars = 1;
+      if (run.walkouts === 0) stars = 2;
+      if (run.walkouts === 0 && run.maxCombo >= 3) stars = 3;
+      run.stars = stars;
+      RD.Audio.win();
+      RD.Save.markCleared(run.levelId, stars, run.coins);
+      if (!RD.autoplay) setTimeout(() => { if (RD.run === run && run.won) RD.UI.showResult(true); }, 500);
+    }
+  }
+
+  function walkout(run, c) {
+    if (c.state === 'leaving' || c.state === 'gone') return;
+    const tb = run.tables.find((t) => t.customer === c);
+    if (tb) {
+      tb.customer = null;
+      tb.reserved = false;
+      tb.state = tb.state === 'seated' || tb.state === 'empty' ? 'empty' : (tb.state === 'dirty' ? 'dirty' : 'empty');
+      if (tb.state !== 'dirty') tb.state = 'empty';
+    }
+    // drop leftover ticket/dish for this customer
+    run.kitchen.queue = run.kitchen.queue.filter((q) => q.cid !== c.id);
+    run.kitchen.ready = run.kitchen.ready.filter((q) => q.cid !== c.id);
+    run.waiters.forEach((w) => {
+      if (w.holding && w.holding.cid === c.id) w.holding = null;
+      if (w.task && w.task.cid === c.id) w.task = null;
+    });
+    c.state = 'leaving';
+    c.walking = true;
+    c.bubble = null;
+    c.tx = RD.portrait ? c.x : -40;
+    c.ty = RD.portrait ? 40 : c.y;
+    run.walkouts++;
+    RD.Audio.leave();
+    fx(run, 'Left…', c.x, c.y - 30, '#ff9ad4');
+    if (!run.infinite) {
+      run.lives = Math.max(0, run.lives - 1);
+      run.livesLost++;
+      if (run.lives <= 0) {
+        run.lost = true;
+        RD.Audio.lose();
+        if (!RD.autoplay) setTimeout(() => { if (RD.run === run && run.lost) RD.UI.showResult(false); }, 400);
+      }
+    }
+  }
+
+  function drainRate(c) {
+    switch (c.state) {
+      case 'waiting': return 0.035;
+      case 'follow': return 0.01;
+      case 'think': return 0.02;
+      case 'ready': return 0.05;
+      case 'ordered': return 0.055;
+      case 'eat': return 0;
+      case 'pay': return 0.04;
+      default: return 0;
+    }
+  }
+
+  function ai(run) {
+    // Build jobs, assign to idle waiters
+    const jobs = [];
+    for (const w of run.waiters) {
+      if (w.holding && w.holding.type === 'dish') {
+        const tb = run.tables[w.holding.tableId];
+        if (tb && tb.customer && (tb.customer.state === 'ordered' || tb.customer.state === 'ready')) {
+          jobs.push({ kind: 'serve', tableId: tb.id, cid: w.holding.cid, waiter: w, pri: 100 });
+        }
+      }
+      if (w.holding && w.holding.type === 'ticket') {
+        jobs.push({ kind: 'drop', tableId: w.holding.tableId, cid: w.holding.cid, waiter: w, pri: 95 });
+      }
+    }
+    if (run.kitchen.ready.length) {
+      const idleHands = run.waiters.filter((w) => !w.holding);
+      if (idleHands.length) {
+        run.kitchen.ready.forEach((pl, i) => {
+          jobs.push({ kind: 'pickup', readyIndex: i, tableId: pl.tableId, cid: pl.cid, pri: 90 });
+        });
+      }
+    }
+    for (const tb of run.tables) {
+      const c = tb.customer;
+      if (c && c.state === 'pay') jobs.push({ kind: 'pay', tableId: tb.id, cid: c.id, pri: 80, x: tb.x, y: tb.y });
+      if (tb.state === 'dirty') jobs.push({ kind: 'clear', tableId: tb.id, pri: 50, x: tb.x, y: tb.y });
+      if (c && c.state === 'ready') jobs.push({ kind: 'order', tableId: tb.id, cid: c.id, pri: 70, x: tb.x, y: tb.y });
+    }
+    const waiting = run.customers.filter((c) => c.state === 'waiting');
+    const empty = run.tables.filter((t) => t.state === 'empty' && !t.reserved && !run.waiters.some((w) => w.task && w.task.tableId === t.id && (w.task.kind === 'greet' || w.task.kind === 'seat')));
+    const nSeat = Math.min(waiting.length, empty.length);
+    for (let i = 0; i < nSeat; i++) {
+      jobs.push({ kind: 'greet', cid: waiting[i].id, tableId: empty[i].id, pri: 60, x: waiting[i].x, y: waiting[i].y });
+    }
+    jobs.sort((a, b) => b.pri - a.pri);
+
+    const claimed = new Set();
+    for (const job of jobs) {
+      if (job.waiter) {
+        if (!job.waiter.task) setTask(run, job.waiter, job);
+        continue;
+      }
+      // don't double-assign the same unique job
+      const key = job.kind + ':' + (job.cid || job.tableId || job.readyIndex);
+      if (claimed.has(key)) continue;
+      if (run.waiters.some((w) => w.task && w.task.kind === job.kind && (job.cid ? w.task.cid === job.cid : w.task.tableId === job.tableId))) continue;
+      const w = nearestIdle(run, job.x || run.kitchen.x, job.y || run.kitchen.y);
+      if (!w) break;
+      if (job.kind === 'pickup' && w.holding) continue;
+      if (job.kind === 'greet') {
+        const tb = run.tables[job.tableId];
+        if (tb) tb.reserved = true;
+      }
+      setTask(run, w, job);
+      claimed.add(key);
+    }
+  }
+
+  function tick(dt) {
+    const run = RD.run;
+    if (!run || run.paused) return;
+    if (run.won || run.lost) {
+      run.fx.forEach((f) => { f.age += dt; });
+      run.fx = run.fx.filter((f) => f.age < f.dur);
+      return;
+    }
+    // cap
+    dt = Math.min(0.05, dt);
+    run.t += dt;
+    if (run.comboT > 0) {
+      run.comboT -= dt;
+      if (run.comboT <= 0) run.combo = 0;
+    }
+    run.tables.forEach((tb) => { if (tb.flash > 0) tb.flash -= dt * 2; });
+
+    const meta = RD.meta(run.soloProfile);
+    run.spawnT -= dt;
+    if (run.spawnT <= 0) {
+      spawn(run, run.rng);
+      run.spawnT = (run.level.spawn || 4) * (meta.spawnMul || 1);
+    }
+
+    if (RD.autoplay) ai(run);
+
+    // waiters
+    const spd = waiterSpeed(run);
+    for (const w of run.waiters) {
+      cancelIfInvalid(run, w);
+      const dest = posForTask(run, w.task);
+      if (!dest) { w.moving = false; continue; }
+      const dx = dest.x - w.x, dy = dest.y - w.y;
+      const dist = Math.hypot(dx, dy);
+      const step = spd * dt;
+      if (dist <= Math.max(16, step)) {
+        w.x = dest.x; w.y = dest.y; w.moving = false;
+        complete(run, w);
+        continue;
+      }
+      w.moving = true;
+      w.facing = dx < 0 ? -1 : 1;
+      w.x += (dx / dist) * step;
+      w.y += (dy / dist) * step;
+    }
+
+    // following customers walk with their waiter
+    for (const c of run.customers) {
+      if (c.state === 'follow') {
+        const w = run.waiters.find((wt) => wt.task && wt.task.cid === c.id);
+        const tb = c.table || (c.tableId != null && run.tables[c.tableId]);
+        const tx = w ? w.x : (tb ? tb.x : c.x);
+        const ty = w ? w.y - 16 : (tb ? tb.y - 8 : c.y);
+        const ddx = tx - c.x, ddy = ty - c.y, dd = Math.hypot(ddx, ddy);
+        const cstep = Math.min(spd, RD.autoplay ? spd : 260) * dt;
+        if (dd <= Math.max(8, cstep)) { c.x = tx; c.y = ty; c.walking = false; }
+        else { c.x += (ddx / dd) * cstep; c.y += (ddy / dd) * cstep; c.walking = true; }
+      }
+      if (c.state === 'leaving') {
+        const ddx = (c.tx - c.x), ddy = (c.ty - c.y), dd = Math.hypot(ddx, ddy);
+        if (dd < 10) c.state = 'gone';
+        else { c.x += (ddx / dd) * 180 * dt; c.y += (ddy / dd) * 180 * dt; }
+      }
+      if (c.state === 'think') {
+        c.think -= dt;
+        if (c.think <= 0) { c.state = 'ready'; c.bubble = 'ready'; }
+      }
+      if (c.state === 'eat') {
+        c.eat -= dt;
+        if (c.eat <= 0) { c.state = 'pay'; c.bubble = 'pay'; }
+      }
+      if (c.state !== 'leaving' && c.state !== 'gone' && c.state !== 'eat' && c.state !== 'follow') {
+        c.patience -= drainRate(c) * dt / Math.max(0.35, patienceMul(run));
+        if (c.patience <= 0) walkout(run, c);
+      }
+    }
+    run.customers = run.customers.filter((c) => c.state !== 'gone');
+
+    // kitchen cook
+    const still = [];
+    for (const q of run.kitchen.queue) {
+      q.cookLeft -= dt;
+      if (q.cookLeft <= 0) {
+        run.kitchen.ready.push({ tableId: q.tableId, cid: q.cid, dish: q.dish });
+        RD.Audio.ding();
+      } else still.push(q);
+    }
+    run.kitchen.queue = still;
+
+    run.fx.forEach((f) => { f.age += dt; });
+    run.fx = run.fx.filter((f) => f.age < f.dur);
+
+    RD.UI.updateHud();
+    RD.Game.syncHits();
+  }
+
+  function waiterForEvent(e) {
+    const run = RD.run;
+    if (!run) return 0;
+    if (!run.coop) return 0;
+    const mid = (window.innerWidth || RD.W) / 2;
+    const x = (e && (e.clientX || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientX))) || mid;
+    return x < mid ? 0 : 1;
+  }
+
+  function issue(run, waiterId, action) {
+    if (!run || run.won || run.lost || run.paused) return false;
+    const w = run.waiters[waiterId] || run.waiters[0];
+    if (!w) return false;
+    if (action.kind === 'greet') {
+      const tb = run.tables[action.tableId];
+      const c = run.customers.find((q) => q.id === action.cid);
+      if (!tb || !c || tb.state !== 'empty' || c.state !== 'waiting') return false;
+      tb.reserved = true;
+    }
+    setTask(run, w, action);
+    return true;
+  }
+
+  function handleHit(role, index, ev) {
+    const run = RD.run;
+    if (!run || run.won || run.lost || run.paused) return;
+    RD.Audio.unlock();
+    const wid = waiterForEvent(ev);
+    if (role === 'queue') {
+      const waiting = run.customers.filter((c) => c.state === 'waiting');
+      const c = waiting[index];
+      const tb = firstEmptyTable(run);
+      if (!c) return;
+      if (!tb) { RD.toast('Clear a table first!'); return; }
+      issue(run, wid, { kind: 'greet', cid: c.id, tableId: tb.id });
+      return;
+    }
+    if (role === 'table') {
+      const tb = run.tables[index];
+      if (!tb) return;
+      const c = tb.customer;
+      const w = run.waiters[wid] || run.waiters[0];
+      if (w.holding && w.holding.type === 'dish') {
+        issue(run, wid, { kind: 'serve', tableId: tb.id, cid: w.holding.cid });
+        return;
+      }
+      if (c && c.state === 'ready') { issue(run, wid, { kind: 'order', tableId: tb.id, cid: c.id }); return; }
+      if (c && c.state === 'pay') { issue(run, wid, { kind: 'pay', tableId: tb.id, cid: c.id }); return; }
+      if (tb.state === 'dirty') { issue(run, wid, { kind: 'clear', tableId: tb.id }); return; }
+      if (tb.state === 'empty') {
+        const c0 = run.customers.find((q) => q.state === 'waiting');
+        if (c0) issue(run, wid, { kind: 'greet', cid: c0.id, tableId: tb.id });
+        else RD.toast('No one is waiting yet');
+      }
+      return;
+    }
+    if (role === 'kitchen') {
+      const w = run.waiters[wid] || run.waiters[0];
+      if (w.holding && w.holding.type === 'ticket') { issue(run, wid, { kind: 'drop' }); return; }
+      if (!w.holding && run.kitchen.ready.length) { issue(run, wid, { kind: 'pickup', readyIndex: 0 }); return; }
+      return;
+    }
+    if (role === 'plate') {
+      issue(run, wid, { kind: 'pickup', readyIndex: index });
+    }
+  }
+
+  function placeHit(el, x, y, w, h) {
+    const s = RD.worldToScreen(x, y);
+    const pw = Math.max(44, w * s.scale);
+    const ph = Math.max(44, h * s.scale);
+    el.style.left = (s.x - pw / 2) + 'px';
+    el.style.top = (s.y - ph / 2) + 'px';
+    el.style.width = pw + 'px';
+    el.style.height = ph + 'px';
+  }
+
+  function ensureHit(id, role, index) {
+    let el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'hit';
+      el.id = id;
+      el.setAttribute('data-role', role);
+      el.setAttribute('data-index', String(index));
+      el.setAttribute('aria-label', role + ' ' + index);
+      el.addEventListener('pointerup', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleHit(role, index, e);
+      });
+      RD.hitsEl.appendChild(el);
+    }
+    return el;
+  }
+
+  function syncHits() {
+    const layer = RD.hitsEl;
+    if (!layer || !RD.run || RD.screen !== 'play') return;
+    const run = RD.run;
+    const keep = new Set();
+    run.customers.filter((c) => c.state === 'waiting').forEach((c, i) => {
+      const id = 'hit-queue-' + i;
+      keep.add(id);
+      const el = ensureHit(id, 'queue', i);
+      placeHit(el, c.x, c.y, 64, 80);
+    });
+    run.tables.forEach((tb, i) => {
+      const id = 'hit-table-' + i;
+      keep.add(id);
+      const el = ensureHit(id, 'table', i);
+      placeHit(el, tb.x, tb.y, Math.max(64, tb.w), Math.max(64, tb.h));
+    });
+    keep.add('hit-kitchen');
+    const k = ensureHit('hit-kitchen', 'kitchen', 0);
+    placeHit(k, run.kitchen.x, run.kitchen.y, Math.max(80, run.kitchen.w * 0.7), Math.max(80, run.kitchen.h * 0.7));
+    run.kitchen.ready.forEach((pl, i) => {
+      const id = 'hit-plate-' + i;
+      keep.add(id);
+      const el = ensureHit(id, 'plate', i);
+      const px = run.kitchen.x + (i - (run.kitchen.ready.length - 1) / 2) * 54;
+      const py = run.kitchen.y - run.kitchen.h / 2 - 28;
+      placeHit(el, px, py, 52, 52);
+    });
+    [...layer.querySelectorAll('.hit')].forEach((el) => { if (!keep.has(el.id)) el.remove(); });
+  }
+
+  function draw() {
+    const run = RD.run;
+    const ctx = RD.ctx;
+    if (!ctx) return;
+    const t = run ? run.t : (RD.lastT || 0) / 1000;
+    const theme = run ? run.theme : 'pizza';
+    RD.Art.drawBg(ctx, theme, t);
+    if (!run) return;
+    RD.Art.drawQueueRail(ctx, run.queueSlots, theme);
+    RD.Art.drawKitchen(ctx, run.kitchen, theme, t);
+    // ready plates
+    run.kitchen.ready.forEach((pl, i) => {
+      const px = run.kitchen.x + (i - (run.kitchen.ready.length - 1) / 2) * 54;
+      const py = run.kitchen.y - run.kitchen.h / 2 - 28;
+      ctx.fillStyle = '#fff6e8';
+      RD.roundRect(ctx, px - 22, py - 22, 44, 44, 10); ctx.fill();
+      RD.Art.drawDish(ctx, pl.dish, px, py, 0.9);
+    });
+    // cooking tickets
+    run.kitchen.queue.forEach((q, i) => {
+      const qx = run.kitchen.x - 50 + i * 22;
+      const qy = run.kitchen.y + run.kitchen.h / 2 - 28;
+      ctx.fillStyle = '#fff6e8';
+      ctx.fillRect(qx, qy, 16, 18);
+    });
+    run.tables.forEach((tb) => RD.Art.drawTable(ctx, tb, theme, t));
+    // customers behind waiters except leaving
+    run.customers.forEach((c) => RD.Art.drawCustomer(ctx, c, t));
+    run.waiters.forEach((w) => RD.Art.drawWaiter(ctx, w, t));
+    run.fx.forEach((f) => RD.Art.drawFx(ctx, f, t));
+    if (run.paused) {
+      ctx.fillStyle = 'rgba(0,0,0,0.28)';
+      ctx.fillRect(0, 0, RD.W, RD.H);
+    }
+  }
+
+  function togglePause() {
+    const run = RD.run;
+    if (!run || RD.screen !== 'play' || run.won || run.lost) return;
+    run.paused = !run.paused;
+    if (run.paused) RD.UI.showPause();
+    else { RD.UI.hideOverlay(); RD.UI.showPlayChrome(); }
+  }
+
+  function fastForward(maxSec) {
+    const run = RD.run;
+    if (!run) return { won: false, lost: false };
+    const prev = RD.autoplay;
+    RD.autoplay = true;
+    const step = 0.05;
+    let t = 0;
+    const cap = maxSec || 180;
+    while (t < cap && !run.won && !run.lost) {
+      tick(step);
+      t += step;
+    }
+    RD.autoplay = prev;
+    return { won: !!run.won, lost: !!run.lost, coins: run.coins, stars: run.stars, walkouts: run.walkouts, t: run.t, levelId: run.levelId, profile: run.soloProfile };
+  }
+
+  function solveAll(profileId, fresh) {
+    const list = RD.Levels.forProfile(profileId);
+    const out = [];
+    for (const lv of list) {
+      start(lv.id, { profile: profileId, autoplay: true, freshUpgrades: !!fresh });
+      const r = fastForward(180);
+      out.push(r);
+      if (!r.won) break;
+    }
+    return out;
+  }
+
+  return { start, tick, draw, reflow, togglePause, handleHit, syncHits, issue, waiterForEvent, fastForward, solveAll, ai, spawn };
+})();
+
+})();
+/* ==== 60-ui.js ==== */
+;(function(){
+/* Menus, HUD, shop, results */
+RD.UI = (() => {
+  function overlayPanel(html) {
+    const el = RD.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const wrap = document.createElement('div');
+    wrap.className = 'panel';
+    wrap.innerHTML = html;
+    el.appendChild(wrap);
+    return wrap;
+  }
+
+  function hideOverlay() {
+    RD.overlay.innerHTML = '';
+  }
+
+  function hidePlayChrome() {
+    RD.hud.classList.add('hidden');
+    if (RD.hitsEl) { RD.hitsEl.classList.add('hidden'); RD.hitsEl.innerHTML = ''; }
+    const cb = document.getElementById('coopBar');
+    if (cb) cb.classList.add('hidden');
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.classList.add('hidden');
+  }
+
+  function showPlayChrome() {
+    hideOverlay();
+    RD.hud.classList.remove('hidden');
+    if (RD.hitsEl) RD.hitsEl.classList.remove('hidden');
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.classList.remove('hidden');
+    const cb = document.getElementById('coopBar');
+    if (cb) cb.classList.toggle('hidden', !(RD.run && RD.run.coop));
+    updateHud();
+  }
+
+  function starsText(n) {
+    n = n || 0;
+    return '★'.repeat(n) + '☆'.repeat(Math.max(0, 3 - n));
+  }
+
+  function title() {
+    RD.screen = 'title';
+    RD.run = null;
+    hidePlayChrome();
+    const p = RD.Save.profile();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Restaurant Dash</div>
+        <div class="sub">Seat guests, take orders, cook and serve before they get grumpy!<br>Tips for speedy service. Combos pay extra.</div>
+        <div class="row">
+          <span class="chip">★ ${p.starsTotal || 0}</span>
+          <span class="chip">${p.bank || 0} coins</span>
+          <span class="chip">${p.name}</span>
+        </div>
+        <div class="row">
+          <button class="btn big green" id="btnPlay" type="button">Play</button>
+          <button class="btn big tomato" id="btnCoop" type="button">2 Players</button>
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="btnProfiles" type="button">Profiles</button>
+          <button class="btn ghost" id="btnHow" type="button">How to Play</button>
+        </div>
+      </div>`);
+    RD.bindTap(panel.querySelector('#btnPlay'), () => { RD.Audio.click(); levels(false); });
+    RD.bindTap(panel.querySelector('#btnCoop'), () => { RD.Audio.click(); levels(true); });
+    RD.bindTap(panel.querySelector('#btnProfiles'), () => { RD.Audio.click(); profiles(); });
+    RD.bindTap(panel.querySelector('#btnHow'), () => { RD.Audio.click(); how(); });
+  }
+
+  function profiles() {
+    RD.screen = 'profiles';
+    hidePlayChrome();
+    const cards = ['p1', 'p2'].map((id) => {
+      const meta = RD.profiles[id];
+      const p = RD.Save.profile(id);
+      const lives = meta.infiniteLives ? 'No fail · slower shifts' : '3 lives · busier kitchen';
+      return `<button class="profile-card" type="button" data-id="${id}">
+        <h2>${p.name}</h2>
+        <div class="meta">${meta.label}<br>${lives}<br>★ ${p.starsTotal || 0} · ${p.bank || 0} coins</div>
+      </button>`;
+    }).join('');
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Profiles</div>
+        <div class="sub">Player 1 is gentler. Player 2 runs a tougher restaurant.</div>
+        <div class="row">${cards}</div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    panel.querySelectorAll('.profile-card').forEach((card) => {
+      RD.bindTap(card, () => {
+        RD.Audio.click();
+        RD.Save.setProfile(card.getAttribute('data-id'));
+        levels(false);
+      });
+    });
+    RD.bindTap(panel.querySelector('#btnBack'), () => { RD.Audio.click(); title(); });
+  }
+
+  function levels(coop) {
+    RD.screen = 'levels';
+    hidePlayChrome();
+    const pid = coop ? 'p1' : (RD.state.lastProfile || 'p1');
+    const p = RD.Save.profile(pid);
+    const list = RD.Levels.forProfile(pid);
+    const easy = RD.profiles[pid].infiniteLives && !coop;
+    const grid = list.map((lv) => {
+      const unlocked = easy || lv.id <= p.maxLevel;
+      const done = !!p.cleared[lv.id];
+      const st = p.bestStars[lv.id] || 0;
+      const cls = !unlocked ? 'lvl locked' : (done ? 'lvl done' : 'lvl');
+      return `<button class="${cls}" type="button" data-id="${lv.id}" ${unlocked ? '' : 'disabled'}>
+        ${lv.id}<span>${done ? starsText(st) : lv.name}</span>
+      </button>`;
+    }).join('');
+    const thName = (list[0] && RD.THEMES[list[0].theme].name) || 'Restaurant';
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${coop ? '2-Player Shifts' : 'Choose a Shift'}</div>
+        <div class="sub">${coop ? 'Two waiters, one kitchen. Left taps move P1, right taps move P2.' : 'Work through pizza, tacos, chaat, and a night at the Leaky Cauldron.'}</div>
+        <div class="row">
+          <span class="chip">${p.name}</span>
+          <span class="chip">${p.bank || 0} coins</span>
+          <button class="btn ghost" id="btnShop" type="button">Upgrades</button>
+        </div>
+        <div class="level-grid">${grid}</div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    panel.querySelectorAll('.lvl:not(.locked)').forEach((btn) => {
+      RD.bindTap(btn, () => {
+        RD.Audio.click();
+        RD.Game.start(Number(btn.getAttribute('data-id')), { profile: pid, coop: !!coop });
+      });
+    });
+    RD.bindTap(panel.querySelector('#btnShop'), () => { RD.Audio.click(); shop(false, coop); });
+    RD.bindTap(panel.querySelector('#btnBack'), () => { RD.Audio.click(); title(); });
+    void thName;
+  }
+
+  function how() {
+    RD.screen = 'how';
+    hidePlayChrome();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">How to Play</div>
+        <div class="sub" style="text-align:left;max-width:560px">
+          1. Tap a waiting guest to seat them at a free table.<br>
+          2. When they are ready, tap the table to take their order.<br>
+          3. Carry the ticket to the kitchen and drop it off.<br>
+          4. When the dish dings, pick it up and serve the same table.<br>
+          5. Tap the coins, then clear the table for the next guests.<br><br>
+          Serve quickly for tips and combos. Keep an eye on the hearts!<br>
+          Player 1 never fails a shift — guests may leave, then more arrive.<br>
+          Player 2 has 3 lives. An angry walkout costs one life.
+        </div>
+        <div class="row"><button class="btn green" id="btnBack" type="button">Got it</button></div>
+      </div>`);
+    RD.bindTap(panel.querySelector('#btnBack'), () => { RD.Audio.click(); title(); });
+  }
+
+  function shop(afterWin, coop) {
+    RD.screen = 'shop';
+    hidePlayChrome();
+    const pid = (RD.state && RD.state.lastProfile) || 'p1';
+    const p = RD.Save.profile(pid);
+    function card(kind) {
+      const def = RD.Upgrades[kind];
+      const tier = p.upgrades[kind] || 0;
+      const maxed = tier >= def.max;
+      const cost = maxed ? 'Max' : def.costs[tier] + ' coins';
+      const can = !maxed && (p.bank || 0) >= def.costs[tier];
+      return `<div class="shop-card">
+        <h3>${def.name}</h3>
+        <p>${def.desc}</p>
+        <span class="chip">Level ${tier}/${def.max}</span>
+        <button class="btn ${can ? 'green' : 'ghost'}" data-up="${kind}" type="button" ${maxed || !can && maxed ? 'disabled' : ''} ${maxed ? 'disabled' : ''}>${cost}</button>
+      </div>`;
+    }
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${afterWin ? 'Nice service!' : 'Upgrades'}</div>
+        <div class="sub">Spend coins between shifts. You have <b>${p.bank || 0}</b> coins.</div>
+        <div class="shop-grid">
+          ${card('shoes')}${card('table')}${card('decor')}${card('dish')}
+        </div>
+        <div class="row">
+          <button class="btn big green" id="btnCont" type="button">${afterWin ? 'Next Shift' : 'Back to Shifts'}</button>
+        </div>
+      </div>`);
+    panel.querySelectorAll('[data-up]').forEach((btn) => {
+      RD.bindTap(btn, () => {
+        const kind = btn.getAttribute('data-up');
+        if (RD.Save.buy(kind)) { RD.Audio.buy(); shop(afterWin, coop); }
+        else RD.toast('Need more coins');
+      });
+    });
+    RD.bindTap(panel.querySelector('#btnCont'), () => {
+      RD.Audio.click();
+      if (afterWin && RD._nextLevel) {
+        const n = RD._nextLevel;
+        RD._nextLevel = null;
+        const list = RD.Levels.forProfile(pid);
+        if (n && list[n - 1]) RD.Game.start(n, { profile: pid, coop: !!coop });
+        else levels(!!coop);
+      } else levels(!!coop);
+    });
+  }
+
+  function updateHud() {
+    const el = RD.hud;
+    if (!el || !RD.run) return;
+    const r = RD.run;
+    const lives = r.infinite ? '∞' : '♥'.repeat(r.lives) + (r.lives < 3 && !r.infinite ? '' : '');
+    const lifeBit = r.infinite ? '<span class="chip">Gentle shift</span>' : `<span class="chip">${lives}</span>`;
+    const theme = RD.THEMES[r.theme] ? RD.THEMES[r.theme].name : '';
+    el.innerHTML = `
+      <span class="chip">${theme}</span>
+      <span class="chip">Shift ${r.levelId}</span>
+      <span class="chip">🪙 ${r.coins}/${r.goal}</span>
+      ${r.combo >= 2 ? `<span class="chip">Combo x${r.combo}</span>` : ''}
+      ${lifeBit}
+    `;
+  }
+
+  function showPause() {
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Paused</div>
+        <div class="row">
+          <button class="btn big green" id="btnResume" type="button">Resume</button>
+          <button class="btn ghost" id="btnMenu" type="button">Menu</button>
+        </div>
+      </div>`);
+    RD.bindTap(panel.querySelector('#btnResume'), () => { RD.Audio.click(); RD.Game.togglePause(); });
+    RD.bindTap(panel.querySelector('#btnMenu'), () => { RD.Audio.click(); if (RD.run) RD.run.paused = false; title(); });
+  }
+
+  function showResult(win) {
+    const run = RD.run;
+    if (!run) return title();
+    RD.screen = 'result';
+    hidePlayChrome();
+    const pid = run.soloProfile;
+    const list = RD.Levels.forProfile(pid);
+    const next = list.find((l) => l.id === run.levelId + 1);
+    RD._nextLevel = next ? next.id : null;
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${win ? 'Shift complete!' : 'Try that shift again'}</div>
+        <div class="sub">${win ? starsText(run.stars) + '<br>Earned ' + run.coins + ' coins' + (run.tips ? ' (tips ' + run.tips + ')' : '') : (run.infinite ? 'Guests wandered off. Ready when you are.' : 'Out of lives. The kitchen is still cheering for you.')}</div>
+        <div class="row">
+          ${win ? `<button class="btn big green" id="btnShop" type="button">Upgrades</button>` : ''}
+          <button class="btn ${win ? 'tomato' : 'green'} big" id="btnAgain" type="button">${win ? 'Replay' : 'Retry'}</button>
+          <button class="btn ghost" id="btnMenu" type="button">Menu</button>
+        </div>
+      </div>`);
+    if (win) RD.bindTap(panel.querySelector('#btnShop'), () => { RD.Audio.click(); shop(true, run.coop); });
+    RD.bindTap(panel.querySelector('#btnAgain'), () => {
+      RD.Audio.click();
+      RD.Game.start(run.levelId, { profile: pid, coop: run.coop });
+    });
+    RD.bindTap(panel.querySelector('#btnMenu'), () => { RD.Audio.click(); levels(!!run.coop); });
+  }
+
+  return { title, profiles, levels, how, shop, showHud: showPlayChrome, updateHud, showPlayChrome, showPause, showResult, hidePlayChrome, hideOverlay };
+})();
+
+})();
+/* ==== 70-boot.js ==== */
+;(function(){
+/* Boot, input, loop, fullscreen, debug hook */
+(function boot() {
+  function loop(t) {
+    const dt = Math.min(0.033, (t - (RD.lastT || t)) / 1000);
+    RD.lastT = t;
+    if (RD._rotateHintTimer > 0) {
+      RD._rotateHintTimer -= dt;
+      if (RD._rotateHintTimer <= 0) {
+        RD._rotateDismissed = true;
+        const tip = document.getElementById('rotateTip');
+        if (tip) tip.classList.add('hidden');
+      }
+    }
+    RD.fitCanvas();
+    if (RD.screen === 'play' && RD.run) {
+      RD.Game.tick(dt);
+      RD.Game.draw();
+    } else {
+      const ctx = RD.ctx;
+      if (ctx) {
+        const sec = t / 1000;
+        const theme = (RD.run && RD.run.theme) || 'pizza';
+        RD.Art.drawBg(ctx, theme, sec);
+        RD.Art.drawTitleWaiter(ctx, RD.W * 0.5, RD.H * 0.66, sec);
+        RD.Art.drawTitleGuest(ctx, RD.W * 0.28, RD.H * 0.68, sec, 0);
+        RD.Art.drawTitleGuest(ctx, RD.W * 0.72, RD.H * 0.70, sec, 2);
+      }
+    }
+    RD.raf = requestAnimationFrame(loop);
+  }
+
+  function bindInput() {
+    window.addEventListener('keydown', (e) => {
+      RD.Audio.unlock();
+      RD.keys[e.key] = true;
+      if (e.code) RD.keys[e.code] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].indexOf(e.key) >= 0) e.preventDefault();
+      if ((e.key === 'p' || e.key === 'P' || e.key === 'Escape') && RD.run && RD.screen === 'play') {
+        RD.Game.togglePause();
+      }
+    }, { passive: false });
+    window.addEventListener('keyup', (e) => {
+      RD.keys[e.key] = false;
+      if (e.code) RD.keys[e.code] = false;
+    });
+    const unlock = () => RD.Audio.unlock();
+    window.addEventListener('pointerdown', unlock);
+    window.addEventListener('touchstart', unlock, { passive: true });
+
+    try {
+      RD._rotateSeenEver = localStorage.getItem('rd-rotate-hint-v1') === '1';
+    } catch (e) { RD._rotateSeenEver = false; }
+    RD._rotateDismissed = !!RD._rotateSeenEver;
+    RD._rotateHintTimer = 0;
+    RD.refreshRotateHint = () => {
+      const tip = document.getElementById('rotateTip');
+      if (!tip) return;
+      const show = !!RD.portrait && !RD._rotateDismissed && RD.screen === 'play';
+      if (show && tip.classList.contains('hidden')) {
+        tip.classList.remove('hidden');
+        RD._rotateHintTimer = 4.0;
+        try { localStorage.setItem('rd-rotate-hint-v1', '1'); RD._rotateSeenEver = true; } catch (err) {}
+      }
+      if (!show) tip.classList.add('hidden');
+    };
+    window.addEventListener('resize', () => {
+      RD.fitCanvas();
+      if (RD.screen === 'play' && RD.run) RD.Game.syncHits();
+    });
+    window.addEventListener('orientationchange', () => setTimeout(() => {
+      RD.fitCanvas();
+      if (RD.screen === 'play' && RD.run) RD.Game.syncHits();
+    }, 50));
+
+    const mute = document.getElementById('muteBtn');
+    if (mute) mute.onclick = () => { RD.Audio.unlock(); RD.Audio.setMuted(!RD.muted); };
+    const fs = document.getElementById('fsBtn');
+    if (fs) fs.onclick = () => {
+      RD.Audio.unlock();
+      const app = document.getElementById('app');
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const req = app.requestFullscreen || app.webkitRequestFullscreen;
+        if (req) req.call(app).catch(() => {});
+      } else {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) ex.call(document);
+      }
+    };
+    const pause = document.getElementById('pauseBtn');
+    if (pause) {
+      pause.classList.add('hidden');
+      pause.onclick = () => { RD.Audio.unlock(); RD.Game.togglePause(); };
+    }
+  }
+
+  function init() {
+    RD.canvas = document.getElementById('game');
+    RD.ctx = RD.canvas.getContext('2d');
+    RD.overlay = document.getElementById('overlay');
+    RD.hud = document.getElementById('hud');
+    RD.hitsEl = document.getElementById('hits');
+    RD.fitCanvas();
+    RD.Save.load();
+    RD.Audio.loadMute();
+    bindInput();
+    RD.screen = 'title';
+    RD.UI.title();
+    RD.raf = requestAnimationFrame(loop);
+
+    window.__game = {
+      RD,
+      start(level, profile, coop) {
+        if (profile && !coop) RD.Save.setProfile(profile);
+        return RD.Game.start(level || 1, { profile: profile, coop: !!coop, autoplay: false });
+      },
+      startCoop(level) { return RD.Game.start(level || 1, { coop: true }); },
+      autoplay(on) { RD.autoplay = on !== false; return RD.autoplay; },
+      state: () => RD.state,
+      run: () => RD.run,
+      screen: () => RD.screen,
+      goTitle: () => RD.UI.title(),
+      goProfiles: () => RD.UI.profiles(),
+      goLevels: (coop) => RD.UI.levels(!!coop),
+      goHow: () => RD.UI.how(),
+      goShop: () => RD.UI.shop(false, false),
+      pause: () => RD.Game.togglePause(),
+      muted: () => RD.muted,
+      hit: (role, index, ev) => RD.Game.handleHit(role, index, ev || { clientX: 10 }),
+      fastForward: (s) => RD.Game.fastForward(s),
+      solveAll: (pid, fresh) => RD.Game.solveAll(pid, fresh !== false),
+      resetSave: () => RD.Save.resetAll()
+    };
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+})();</script>
+
+<!-- Game Night car mode -->
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "restaurant-dash";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>
