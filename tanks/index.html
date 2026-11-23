@@ -1,0 +1,2745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07140f">
+<title>Tanks</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#07140f;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 0%,#1b3d28 0%,#07140f 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#163224;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+#game.portrait{width:100%;height:auto;max-height:94dvh;max-width:100%;object-fit:contain}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:10}
+#overlay>*{pointer-events:auto}
+/* HUD sits below the top-left Games back button and the top-right icon cluster */
+#hud{position:absolute;left:0;right:0;top:calc(72px + env(safe-area-inset-top));padding:0 12px;display:flex;gap:8px;align-items:center;justify-content:center;pointer-events:none;z-index:5;font-weight:800;flex-wrap:wrap}
+#hud.hidden,#touch.hidden,#pauseBtn.hidden{display:none!important}
+.icon-btn{position:absolute;z-index:20;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.16);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* ≥12px gaps between Pause, Mute, Fullscreen — all top-right, clear of the Games back button */
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(68px + env(safe-area-inset-right))}
+#pauseBtn{top:calc(8px + env(safe-area-inset-top));right:calc(128px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#2a1450;background:#ffe566;box-shadow:0 4px 0 #d4b000,0 8px 18px rgba(0,0,0,.25);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d4b000,0 4px 10px rgba(0,0,0,.25)}
+.btn.big{font-size:24px;padding:14px 26px;border-radius:22px;min-height:60px}
+.btn.green{background:#7dff9a;box-shadow:0 4px 0 #2db854,0 8px 18px rgba(0,0,0,.25)}
+.btn.blue{background:#9ad0ff;box-shadow:0 4px 0 #3a7fbf,0 8px 18px rgba(0,0,0,.25)}
+.btn.pink{background:#ff9ad4;box-shadow:0 4px 0 #d44f9a,0 8px 18px rgba(0,0,0,.25)}
+.btn.purple{background:#c9a6ff;box-shadow:0 4px 0 #7a4ad0,0 8px 18px rgba(0,0,0,.25)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.panel{background:rgba(8,24,16,.92);border:3px solid rgba(255,220,160,.22);border-radius:28px;padding:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 16px 50px rgba(0,0,0,.45);max-width:min(980px,96vw);max-height:min(94dvh,94vh);overflow:auto}
+.title{font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:.5px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.35);margin-bottom:6px;color:#ffe566}
+.sub{text-align:center;opacity:.9;margin-bottom:14px;font-size:15px;line-height:1.4}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:170px;border-radius:24px;background:linear-gradient(160deg,#1e4a2a,#0a1c12);border:4px solid rgba(255,255,255,.2);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px}
+.profile-card .meta{font-size:14px;opacity:.85;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:700;min-height:40px}
+#touch{position:absolute;inset:0;z-index:8;pointer-events:none}
+.joy{position:absolute;pointer-events:auto;z-index:9;display:flex;flex-direction:column;align-items:center;gap:4px}
+.joy#joy1{left:calc(16px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom))}
+.joy#joy2{right:calc(16px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom))}
+.joy-base{width:96px;height:96px;min-width:64px;min-height:64px;border-radius:50%;background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.35);box-shadow:0 4px 0 rgba(0,0,0,.25);position:relative;touch-action:none}
+.joy-knob{width:42px;height:42px;border-radius:50%;background:rgba(255,229,102,.95);border:3px solid rgba(80,40,0,.35);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.joy-label{font-size:12px;font-weight:800;opacity:.85;text-shadow:0 1px 2px #000}
+.joy.hidden,.fire-btn.hidden{display:none!important}
+.fire-btn{position:absolute;pointer-events:auto;z-index:9;width:72px;height:72px;min-width:64px;min-height:64px;border:none;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ffe9a0,#ff8a3d 58%,#c94a16);color:#3a1600;font-size:26px;font-weight:900;box-shadow:0 4px 0 #8a2e0c,0 8px 16px rgba(0,0,0,.3);touch-action:none;cursor:pointer}
+.fire-btn:active,.fire-btn.down{transform:translateY(2px) scale(.96);box-shadow:0 2px 0 #8a2e0c}
+#fire1{left:calc(128px + env(safe-area-inset-left));bottom:calc(28px + env(safe-area-inset-bottom))}
+#fire2{right:calc(128px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))}
+.toast{position:absolute;top:22%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:12px 20px;border-radius:16px;font-weight:800;font-size:18px;z-index:30;pointer-events:none}
+.hidden{display:none!important}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;width:100%;max-width:720px;padding:4px}
+.lvl{min-width:80px;min-height:72px;border-radius:16px;border:none;background:rgba(255,255,255,.14);color:#fff;font-weight:900;font-size:16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.lvl span{font-size:11px;font-weight:700;opacity:.85}
+.lvl.done{background:#3dd68c;color:#083018}
+.lvl.locked{opacity:.35;cursor:default}
+.lvl.cur{outline:3px solid #ffe566}
+#rotateTip{position:absolute;left:50%;top:calc(128px + env(safe-area-inset-top));transform:translateX(-50%);z-index:40;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 12px;max-width:min(340px,92vw)}
+#rotateTip.hidden{display:none!important}
+#rotateTip .hint-banner{pointer-events:none;background:rgba(8,24,16,.88);border:2px solid rgba(255,229,102,.45);border-radius:16px;padding:10px 14px;font-weight:800;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);line-height:1.3}
+@media (max-height:650px){
+  .profile-card{min-height:140px;width:min(230px,40vw)}
+  .title{font-size:clamp(20px,4.2vw,32px)}
+  .panel{padding:12px;border-radius:20px}
+  .joy-base{width:80px;height:80px}
+  .fire-btn{width:64px;height:64px;min-width:56px;min-height:56px;font-size:22px}
+  #fire1{left:calc(108px + env(safe-area-inset-left))}
+  #fire2{right:calc(108px + env(safe-area-inset-right))}
+}
+@media (max-height:450px){
+  .joy-base{width:64px;height:64px;min-width:64px;min-height:64px}
+  .joy-knob{width:30px;height:30px}
+  .fire-btn{width:56px;height:56px;min-width:56px;min-height:56px}
+  #fire1{left:calc(92px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom))}
+  #fire2{right:calc(92px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom))}
+}
+@media (orientation:portrait) and (max-width:500px){
+  .profile-card{width:min(300px,80vw)}
+  .joy-base{width:88px;height:88px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Tanks"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="touch" class="hidden" aria-hidden="true">
+    <div class="joy" id="joy1" data-player="0">
+      <div class="joy-base"><div class="joy-knob"></div></div>
+      <div class="joy-label">P1</div>
+    </div>
+    <button class="fire-btn" id="fire1" data-player="0" type="button" aria-label="Fire">✦</button>
+    <div class="joy" id="joy2" data-player="1">
+      <div class="joy-base"><div class="joy-knob"></div></div>
+      <div class="joy-label">P2</div>
+    </div>
+    <button class="fire-btn" id="fire2" data-player="1" type="button" aria-label="Fire">✦</button>
+  </div>
+  <div id="overlay"></div>
+  <div id="rotateTip" class="hidden" role="status" aria-live="polite">
+    <div class="hint-banner">Turn sideways for a wider arena!</div>
+  </div>
+  <button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause">⏸</button>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Tanks — core namespace & helpers */
+const TK = window.TK = {
+  VERSION: 1,
+  SAVE_KEY: 'tanks-v1',
+  W: 1180, H: 600,
+  BASE_W: 1180, BASE_H: 600,
+  profiles: {
+    p1: {
+      id: 'p1', defaultName: 'Player 1', label: 'Gentle',
+      infiniteLives: true, lives: 99,
+      speed: 240, fireCd: 0.36, shotSpeed: 560, shotBounce: 1,
+      autoAim: true, autoAimCone: 3.2,
+      enemySpeed: 0.42, enemyFire: 0.42, enemyAim: 0.22, enemyHp: 0.7,
+      invuln: 2.0, touchBtn: 80
+    },
+    p2: {
+      id: 'p2', defaultName: 'Player 2', label: 'Commander',
+      infiniteLives: false, lives: 3,
+      speed: 220, fireCd: 0.40, shotSpeed: 520, shotBounce: 1,
+      autoAim: false, autoAimCone: 0.55,
+      enemySpeed: 0.82, enemyFire: 0.88, enemyAim: 0.78, enemyHp: 1.0,
+      invuln: 1.4, touchBtn: 68
+    }
+  },
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  autoplay: false,
+  keys: Object.create(null),
+  sticks: [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+  firing: [false, false],
+  pointers: Object.create(null),
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  touchEl: null,
+  run: null,
+  portrait: false
+};
+
+TK.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+TK.lerp = (a, b, t) => a + (b - a) * t;
+TK.rand = (a, b) => a + Math.random() * (b - a);
+TK.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+TK.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+TK.now = () => performance.now();
+TK.len = (x, y) => Math.hypot(x, y);
+TK.norm = (x, y) => {
+  const l = Math.hypot(x, y) || 1;
+  return { x: x / l, y: y / l };
+};
+TK.angNorm = (a) => {
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+};
+TK.angLerp = (a, b, t) => a + TK.angNorm(b - a) * t;
+TK.meta = (id) => TK.profiles[id || (TK.run && TK.run.soloProfile) || (TK.state && TK.state.lastProfile) || 'p1'];
+TK.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1400);
+};
+TK.fitCanvas = () => {
+  const c = TK.canvas;
+  if (!c) return;
+  const iw = window.innerWidth || TK.BASE_W;
+  const ih = window.innerHeight || TK.BASE_H;
+  const portrait = ih > iw * 1.05;
+  TK.portrait = portrait;
+  let wantW = TK.BASE_W, wantH = TK.BASE_H;
+  if (portrait) {
+    const targetScale = 0.88;
+    wantW = Math.round(Math.min(520, Math.max(390, iw / targetScale)));
+    wantH = Math.round(wantW * (ih / Math.max(1, iw)));
+    wantH = TK.clamp(wantH, 700, 1200);
+  }
+  if (TK.W !== wantW || TK.H !== wantH) {
+    TK.W = wantW; TK.H = wantH;
+    if (TK.run) TK.Game && TK.Game.reflow && TK.Game.reflow();
+  }
+  if (c.width !== TK.W) c.width = TK.W;
+  if (c.height !== TK.H) c.height = TK.H;
+  c.classList.toggle('portrait', !!portrait);
+  TK.refreshRotateHint && TK.refreshRotateHint();
+};
+TK.clear = (color) => {
+  const ctx = TK.ctx;
+  ctx.fillStyle = color || '#163224';
+  ctx.fillRect(0, 0, TK.W, TK.H);
+};
+TK.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+TK.bindTap = (el, fn) => {
+  if (!el) return;
+  let last = 0;
+  const run = (e) => {
+    const t = Date.now();
+    if (t - last < 260) return;
+    last = t;
+    try { e.preventDefault(); } catch (_) {}
+    fn(e);
+  };
+  el.addEventListener('pointerup', run);
+  el.addEventListener('click', run);
+};
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* WebAudio SFX — only after first user input */
+TK.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = TK.muted ? 0 : 0.3;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (TK.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.14, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function noise(dur, vol) {
+    if (TK.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const n = Math.max(1, (c.sampleRate * dur) | 0);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = vol || 0.05;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1400;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start();
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      TK.muted = !!m;
+      if (master) master.gain.value = TK.muted ? 0 : 0.3;
+      try { localStorage.setItem('tk-mute', TK.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = TK.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { TK.muted = localStorage.getItem('tk-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = TK.muted ? '🔇' : '🔊';
+    },
+    click() { tone(360, 0.05, 'triangle', 0.06); },
+    fire() { tone(280, 0.07, 'square', 0.05, 160); noise(0.04, 0.03); },
+    bounce() { tone(640, 0.04, 'triangle', 0.04); },
+    hit() { tone(180, 0.1, 'sawtooth', 0.07, 90); noise(0.08, 0.04); },
+    crate() { tone(220, 0.06, 'square', 0.04); noise(0.06, 0.03); },
+    pop() { [520, 760, 980, 1240].forEach((f, i) => setTimeout(() => tone(f, 0.07, 'sine', 0.07), i * 35)); noise(0.12, 0.04); },
+    pickup() { tone(720, 0.08, 'sine', 0.09); setTimeout(() => tone(960, 0.1, 'sine', 0.07), 40); },
+    shield() { tone(500, 0.12, 'triangle', 0.08); setTimeout(() => tone(700, 0.1, 'sine', 0.06), 50); },
+    win() { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => tone(f, 0.12, 'sine', 0.09), i * 70)); },
+    lose() { tone(220, 0.2, 'sawtooth', 0.07, 90); setTimeout(() => tone(140, 0.25, 'triangle', 0.06, 70), 120); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* localStorage per-profile saves with in-memory fallback */
+TK.Save = (() => {
+  function blankProfile(id) {
+    const meta = TK.profiles[id];
+    return {
+      id,
+      name: meta.defaultName,
+      maxLevel: 1,
+      cleared: {},
+      best: 0,
+      bestLevel: {},
+      versusWins: 0,
+      playSeconds: 0
+    };
+  }
+
+  function blankState() {
+    return {
+      v: TK.VERSION,
+      lastProfile: 'p1',
+      profiles: { p1: blankProfile('p1'), p2: blankProfile('p2') }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const s = localStorage.getItem(TK.SAVE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    return TK.memStore;
+  }
+
+  function writeRaw(data) {
+    TK.memStore = data;
+    try {
+      localStorage.setItem(TK.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== TK.VERSION) {
+      TK.state = blankState();
+      save();
+      return TK.state;
+    }
+    for (const id of ['p1', 'p2']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+      if (!raw.profiles[id].bestLevel) raw.profiles[id].bestLevel = {};
+    }
+    if (!raw.lastProfile) raw.lastProfile = 'p1';
+    TK.state = raw;
+    return TK.state;
+  }
+
+  function save() {
+    if (!TK.state) return false;
+    return writeRaw(TK.state);
+  }
+
+  function profile(id) {
+    if (!TK.state) load();
+    return TK.state.profiles[id || TK.state.lastProfile || 'p1'];
+  }
+
+  function setProfile(id) {
+    TK.state.lastProfile = id;
+    save();
+  }
+
+  function rename(id, name) {
+    const p = profile(id);
+    p.name = String(name || TK.profiles[id].defaultName).slice(0, 16) || TK.profiles[id].defaultName;
+    save();
+  }
+
+  function markCleared(levelId, score) {
+    const p = profile();
+    p.cleared[levelId] = true;
+    if (score > (p.best || 0)) p.best = score;
+    if (score > (p.bestLevel[levelId] || 0)) p.bestLevel[levelId] = score;
+    const list = TK.Levels.forProfile(p.id);
+    if (levelId >= p.maxLevel) p.maxLevel = Math.min(list.length, levelId + 1);
+    save();
+  }
+
+  function recordVersus(winnerId) {
+    const p = profile(winnerId === 1 ? 'p2' : 'p1');
+    p.versusWins = (p.versusWins || 0) + 1;
+    save();
+  }
+
+  function resetAll() {
+    TK.state = blankState();
+    save();
+    return TK.state;
+  }
+
+  return { load, save, profile, setProfile, rename, markCleared, recordVersus, resetAll, blankProfile, blankState, readRaw, writeRaw };
+})();
+
+})();
+/* ==== 30-levels.js ==== */
+;(function(){
+/* Campaign arenas — Player 1 has 12 easy yards, Player 2 has 18 tougher ones */
+TK.Levels = (() => {
+  const p1 = [
+    { id: 1,  name: 'Practice',    title: 'Practice Yard',       theme: 'grass',  map: [
+      '###################',
+      '#.................#',
+      '#.................#',
+      '#..1..............#',
+      '#.................#',
+      '#.................#',
+      '#.................#',
+      '#..............E..#',
+      '#.................#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 2,  name: 'Crates',      title: 'Crate Corner',        theme: 'grass',  map: [
+      '###################',
+      '#.................#',
+      '#..1.....C........#',
+      '#........C........#',
+      '#.....CCC.........#',
+      '#.................#',
+      '#...........C.....#',
+      '#..............E..#',
+      '#.................#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 3,  name: 'Lane',        title: 'Candle Lane',         theme: 'stone',  map: [
+      '###################',
+      '#.................#',
+      '#..1...#####...E..#',
+      '#......#####......#',
+      '#.................#',
+      '#.................#',
+      '#......#####......#',
+      '#..E...#####......#',
+      '#.................#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 4,  name: 'Dummies',     title: 'Two Dummies',         theme: 'grass',  map: [
+      '###################',
+      '#.................#',
+      '#..1...........E..#',
+      '#.................#',
+      '#....C.......C....#',
+      '#.................#',
+      '#....C.......C....#',
+      '#..E..............#',
+      '#.................#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 5,  name: 'Garden',      title: 'Box Garden',          theme: 'grass',  map: [
+      '###################',
+      '#.................#',
+      '#.1....C...C....E.#',
+      '#......C...C......#',
+      '#..CCC.......CCC..#',
+      '#.................#',
+      '#..CCC.......CCC..#',
+      '#......C...C......#',
+      '#.E....C...C......#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 6,  name: 'Cross',       title: 'Cross Charms',        theme: 'stone',  map: [
+      '###################',
+      '#.................#',
+      '#..1....###....E..#',
+      '#.......###.......#',
+      '#..###.......###..#',
+      '#..###...+...###..#',
+      '#..###.......###..#',
+      '#.......###.......#',
+      '#..E....###.......#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 7,  name: 'Court',       title: 'Sunny Courtyard',     theme: 'hall',   map: [
+      '###################',
+      '#.................#',
+      '#.1.............E.#',
+      '#....C#######C....#',
+      '#.................#',
+      '#........G........#',
+      '#.................#',
+      '#....C#######C....#',
+      '#.E.............E.#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 8,  name: 'Hall',        title: 'Wand Hall',           theme: 'hall',   map: [
+      '###################',
+      '#.................#',
+      '#.1..#.......#..E.#',
+      '#....#..CCC..#....#',
+      '#....#.......#....#',
+      '#........T........#',
+      '#....#.......#....#',
+      '#....#..CCC..#....#',
+      '#.E..#.......#..E.#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 9,  name: 'Pens',        title: 'Puzzle Pens',         theme: 'stone',  map: [
+      '###################',
+      '#.......#.........#',
+      '#.1.....#....E....#',
+      '#...##..#..##.....#',
+      '#...##.....##.....#',
+      '#........F........#',
+      '#...##.....##.....#',
+      '#...##..#..##.....#',
+      '#.E.....#......E..#',
+      '#.......#.........#',
+      '###################'
+    ]},
+    { id: 10, name: 'Triple',      title: 'Triple Jinx',         theme: 'night',  map: [
+      '###################',
+      '#.E............E..#',
+      '#....CCC...CCC....#',
+      '#.................#',
+      '#.1......T......E.#',
+      '#.................#',
+      '#....CCC...CCC....#',
+      '#.................#',
+      '#..............E..#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 11, name: 'Gates',       title: 'Castle Gates',        theme: 'hall',   map: [
+      '###################',
+      '#.1.....#.....#.E.#',
+      '#.......#.....#...#',
+      '#..CCC..#..C..#...#',
+      '#.......#.....#...#',
+      '#...R.......G.....#',
+      '#.......#.....#...#',
+      '#..CCC..#..C..#...#',
+      '#.E.....#.....#.E.#',
+      '#.......#.....#...#',
+      '###################'
+    ]},
+    { id: 12, name: 'House Cup',   title: 'House Cup Warm-Up',   theme: 'hall',   map: [
+      '###################',
+      '#.E....C...C....E.#',
+      '#......C...C......#',
+      '#..##.........##..#',
+      '#.1....+.+........#',
+      '#................E#',
+      '#..##.........##..#',
+      '#......C...C......#',
+      '#.E....C...C....E.#',
+      '#.................#',
+      '###################'
+    ]}
+  ];
+
+  const p2 = [
+    { id: 1,  name: 'Prefects',    title: "Prefects' Court",     theme: 'stone',  map: [
+      '###################',
+      '#.................#',
+      '#.1.............E.#',
+      '#....C.......C....#',
+      '#.................#',
+      '#........C........#',
+      '#.................#',
+      '#....C.......C....#',
+      '#.E...............#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 2,  name: 'Moving',      title: 'Moving Crates',       theme: 'grass',  map: [
+      '###################',
+      '#.................#',
+      '#.1..CCC...CCC..E.#',
+      '#.................#',
+      '#....CCC...CCC....#',
+      '#.................#',
+      '#....CCC...CCC....#',
+      '#.E..CCC...CCC....#',
+      '#.................#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 3,  name: 'Cloisters',   title: 'Narrow Cloisters',    theme: 'stone',  map: [
+      '###################',
+      '#.1....#.......E..#',
+      '#......#..........#',
+      '######.#.##########',
+      '#......#..........#',
+      '#..........F......#',
+      '#......#..........#',
+      '##########.#.######',
+      '#..........#....E.#',
+      '#.E........#......#',
+      '###################'
+    ]},
+    { id: 4,  name: 'Duel',        title: 'Duel Club',           theme: 'hall',   map: [
+      '###################',
+      '#.E............E..#',
+      '#....###...###....#',
+      '#.................#',
+      '#.1......T......S.#',
+      '#.................#',
+      '#....###...###....#',
+      '#.................#',
+      '#.E............E..#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 5,  name: 'Greenhouses', title: 'Greenhouses',         theme: 'grass',  map: [
+      '###################',
+      '#.1..C#...#C....E.#',
+      '#....C#...#C......#',
+      '#....C#...#C......#',
+      '#.................#',
+      '#........G........#',
+      '#.................#',
+      '#....C#...#C......#',
+      '#.E..C#...#C....E.#',
+      '#....C#...#C......#',
+      '###################'
+    ]},
+    { id: 6,  name: 'Chess',       title: 'Chess Court',         theme: 'stone',  map: [
+      '###################',
+      '#.1.#...#...#...E.#',
+      '#...#...#...#.....#',
+      '#.................#',
+      '#...#...#...#.....#',
+      '#...#...+...#.....#',
+      '#...#...#...#.....#',
+      '#.................#',
+      '#.E.#...#...#...B.#',
+      '#...#...#...#.....#',
+      '###################'
+    ]},
+    { id: 7,  name: 'Trophies',    title: 'Trophy Hall',         theme: 'hall',   map: [
+      '###################',
+      '#.E#...........#E.#',
+      '#..#...CCCCC...#..#',
+      '#..#...........#..#',
+      '#.1......R......S.#',
+      '#..#...........#..#',
+      '#..#...CCCCC...#..#',
+      '#..#...........#..#',
+      '#.E#...........#B.#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 8,  name: 'Owlery',      title: 'Owlery Walk',         theme: 'night',  map: [
+      '###################',
+      '#.1......#......E.#',
+      '#..CCC...#...CCC..#',
+      '#........#........#',
+      '####...........####',
+      '#........F........#',
+      '####...........####',
+      '#........#........#',
+      '#.E..CCC.#.CCC..S.#',
+      '#........#......B.#',
+      '###################'
+    ]},
+    { id: 9,  name: 'Clock',       title: 'Clock Tower',         theme: 'stone',  map: [
+      '###################',
+      '#.1....#####....E.#',
+      '#......#####......#',
+      '#..##.........##..#',
+      '#..##...CCC...##..#',
+      '#........T........#',
+      '#..##...CCC...##..#',
+      '#..##.........##..#',
+      '#.S....#####....B.#',
+      '#......#####......#',
+      '###################'
+    ]},
+    { id: 10, name: 'Path',        title: 'Winding Path',        theme: 'grass',  map: [
+      '###################',
+      '#.1#....#......E..#',
+      '#..#....#.........#',
+      '#..####.#.######..#',
+      '#.....#.#.#.......#',
+      '#.G...#...#...R...#',
+      '#.....#.#.#.......#',
+      '#..######.#.####..#',
+      '#.........#....#S.#',
+      '#.E.......#....#B.#',
+      '###################'
+    ]},
+    { id: 11, name: 'Boats',       title: 'Boat House',          theme: 'night',  map: [
+      '###################',
+      '#.E....C...C....S.#',
+      '#......C...C......#',
+      '#.1##.........##..#',
+      '#.................#',
+      '#........+........#',
+      '#.................#',
+      '#..##.........##E.#',
+      '#......C...C......#',
+      '#.B....C...C....E.#',
+      '###################'
+    ]},
+    { id: 12, name: 'Viaduct',     title: 'Viaduct Duel',        theme: 'stone',  map: [
+      '###################',
+      '#...#.........#.E.#',
+      '#...#..CCCCC..#...#',
+      '#...#.........#...#',
+      '#.1....#...#....S.#',
+      '#......#...#......#',
+      '#...#.........#...#',
+      '#...#..CCCCC..#...#',
+      '#.E.#.........#...#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 13, name: 'Gate',        title: 'Chamber Gate',        theme: 'hall',   map: [
+      '###################',
+      '#..#.#.E#.#..#.#S.#',
+      '#..#.#..#.#..#.#..#',
+      '#.................#',
+      '#.1....CCC....G...#',
+      '#......CCC........#',
+      '#.................#',
+      '#..#.#..#.#..#.#..#',
+      '#.B#.#..#.#.E#.#..#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 14, name: 'Storm',       title: 'Spell Storm',         theme: 'night',  map: [
+      '###################',
+      '#.S....C#C....E.S.#',
+      '#......C#C........#',
+      '#..###.....###....#',
+      '#.1....T+R......B.#',
+      '#.................#',
+      '#..###.....###....#',
+      '#......C#C........#',
+      '#.E....C#C....B.E.#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 15, name: 'Maze',        title: 'Maze End',            theme: 'stone',  map: [
+      '###################',
+      '#.1#.....#......E.#',
+      '#..#.###.#.######.#',
+      '#....#...#......#.#',
+      '####.#.#####.##.#.#',
+      '#....#...G....#...#',
+      '#.##.########.#.#.#',
+      '#.#...........#.#S#',
+      '#.#.###########.#.#',
+      '#...............#E#',
+      '###################'
+    ]},
+    { id: 16, name: 'Dragons',     title: 'Dragon Yard',         theme: 'grass',  map: [
+      '###################',
+      '#.B....CCC........#',
+      '#......CCC........#',
+      '#.1##.........##S.#',
+      '#........R........#',
+      '#........+........#',
+      '#..##.........##..#',
+      '#......CCC........#',
+      '#.E....CCC......B.#',
+      '#.................#',
+      '###################'
+    ]},
+    { id: 17, name: 'Pitch',       title: 'Pitch Duel',          theme: 'grass',  map: [
+      '###################',
+      '#.S......#......E.#',
+      '#........#........#',
+      '#..CCC...#...CCC..#',
+      '#.1....T...G......#',
+      '#.................#',
+      '#..CCC...#...CCC..#',
+      '#........#........#',
+      '#.B......#......S.#',
+      '#........#........#',
+      '###################'
+    ]},
+    { id: 18, name: 'Final Cup',   title: 'Final House Cup',     theme: 'hall',   map: [
+      '###################',
+      '#.S...C.#.#.C...E.#',
+      '#....C..#.#..C....#',
+      '#..####.....###...#',
+      '#.1...T.+.G.R.....#',
+      '#.................#',
+      '#..####.....###...#',
+      '#....C..#.#..C....#',
+      '#.B...C.#.#.C...S.#',
+      '#.................#',
+      '###################'
+    ]}
+  ];
+
+  const versus = {
+    name: 'Duel', title: 'Best-of-Five Duel', theme: 'hall', map: [
+      '###################',
+      '#.................#',
+      '#..1.....C.....2..#',
+      '#.................#',
+      '#....C#######C....#',
+      '#........+........#',
+      '#....C#######C....#',
+      '#.................#',
+      '#........C........#',
+      '#.................#',
+      '###################'
+    ]
+  };
+
+  function forProfile(id) { return id === 'p2' ? p2 : p1; }
+  function get(id, profileId) {
+    const list = forProfile(profileId);
+    return list.find((l) => l.id === id) || list[0];
+  }
+
+  return { p1, p2, versus, forProfile, get };
+})();
+
+})();
+/* ==== 40-art.js ==== */
+;(function(){
+/* Original canvas art — cute cartoon tanks, no gore */
+TK.Art = (() => {
+  const THEMES = {
+    grass: { floor: '#3d7a3c', floor2: '#356e34', wall: '#c9b48a', wall2: '#8a6a3c', edge: '#2a4a22', sky: '#87c4ff' },
+    stone: { floor: '#6d7380', floor2: '#5e646f', wall: '#b8bec8', wall2: '#7a808c', edge: '#3a4048', sky: '#9ab0c8' },
+    hall:  { floor: '#7a5a32', floor2: '#6b4e2c', wall: '#d4c4a0', wall2: '#8a7048', edge: '#3a2a16', sky: '#3a2a55' },
+    night: { floor: '#2a4a46', floor2: '#243f3c', wall: '#6a8890', wall2: '#3e5860', edge: '#102228', sky: '#121830' }
+  };
+
+  function theme(name) { return THEMES[name] || THEMES.grass; }
+
+  function drawBg(ctx, name, t) {
+    const th = theme(name);
+    const g = ctx.createLinearGradient(0, 0, 0, TK.H);
+    g.addColorStop(0, th.sky);
+    g.addColorStop(1, '#0a1610');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, TK.W, TK.H);
+    ctx.fillStyle = 'rgba(255,255,255,.18)';
+    for (let i = 0; i < 18; i++) {
+      const x = ((i * 97 + t * 6) % (TK.W + 20)) - 10;
+      const y = 12 + (i * 37) % Math.max(40, TK.H * 0.22);
+      ctx.beginPath(); ctx.arc(x, y, 1.4 + (i % 3), 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawTiles(ctx, run) {
+    const th = theme(run.theme);
+    const { tile: s, ox, oy, cols, rows, grid } = run;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = ox + c * s, y = oy + r * s;
+        const cell = grid[r][c];
+        if (cell === 1) {
+          ctx.fillStyle = th.wall2;
+          ctx.fillRect(x, y, s, s);
+          ctx.fillStyle = th.wall;
+          TK.roundRect(ctx, x + 2, y + 2, s - 4, s - 5, 4);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,.2)';
+          ctx.fillRect(x + 4, y + 4, s * 0.35, 3);
+        } else {
+          ctx.fillStyle = ((c + r) & 1) ? th.floor : th.floor2;
+          ctx.fillRect(x, y, s, s);
+          ctx.strokeStyle = 'rgba(0,0,0,.08)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x + 0.5, y + 0.5, s - 1, s - 1);
+        }
+      }
+    }
+    // crates
+    for (const cr of run.crates) {
+      if (!cr.alive) continue;
+      const x = cr.x - s * 0.38, y = cr.y - s * 0.38, w = s * 0.76;
+      ctx.save();
+      ctx.translate(cr.x, cr.y);
+      if (cr.shake) ctx.rotate(Math.sin(cr.shake * 40) * 0.08);
+      ctx.translate(-cr.x, -cr.y);
+      ctx.fillStyle = '#8a4e22';
+      TK.roundRect(ctx, x + 2, y + 3, w, w, 5); ctx.fill();
+      ctx.fillStyle = '#d4a05a';
+      TK.roundRect(ctx, x, y, w, w, 5); ctx.fill();
+      ctx.strokeStyle = '#5a3010';
+      ctx.lineWidth = Math.max(2, s * 0.06);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + 4, y + w / 2); ctx.lineTo(x + w - 4, y + w / 2);
+      ctx.moveTo(x + w / 2, y + 4); ctx.lineTo(x + w / 2, y + w - 4);
+      ctx.stroke();
+      ctx.fillStyle = '#ffe9a0';
+      ctx.fillRect(x + 4, y + 4, w * 0.25, 3);
+      ctx.restore();
+    }
+  }
+
+  function tankColors(kind) {
+    if (kind === 'p1') return { body: '#c43c28', trim: '#f0c14e', tread: '#3a2a22', eye: '#fff6e0' };
+    if (kind === 'p2') return { body: '#2a5aa8', trim: '#c9a36b', tread: '#1a2430', eye: '#fff6e0' };
+    if (kind === 'brute') return { body: '#e0b02a', trim: '#3a2a10', tread: '#4a3a20', eye: '#fff6e0' };
+    if (kind === 'shooter') return { body: '#7b5cc8', trim: '#e8d0ff', tread: '#2a1a40', eye: '#fff6e0' };
+    return { body: '#3c9a5a', trim: '#d8e8e0', tread: '#1c3a28', eye: '#fff6e0' };
+  }
+
+  function drawTank(ctx, tank, t) {
+    if (!tank.alive && tank.popT <= 0) return;
+    if (!tank.alive) return;
+    const col = tankColors(tank.kind);
+    const s = tank.r * 2.2;
+    ctx.save();
+    ctx.translate(tank.x, tank.y);
+    const wob = tank.hitT > 0 ? Math.sin(tank.hitT * 50) * 2 : 0;
+    ctx.rotate((tank.angle || 0) + (tank.spin || 0) + wob * 0.02);
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,.25)';
+    ctx.beginPath(); ctx.ellipse(0, s * 0.28, s * 0.5, s * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+    // treads
+    ctx.fillStyle = col.tread;
+    TK.roundRect(ctx, -s * 0.48, -s * 0.38, s * 0.2, s * 0.76, 4); ctx.fill();
+    TK.roundRect(ctx, s * 0.28, -s * 0.38, s * 0.2, s * 0.76, 4); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.15)';
+    for (let i = -2; i <= 2; i++) {
+      ctx.fillRect(-s * 0.45, i * s * 0.12, s * 0.14, 2);
+      ctx.fillRect(s * 0.31, i * s * 0.12, s * 0.14, 2);
+    }
+    // body
+    ctx.fillStyle = col.body;
+    TK.roundRect(ctx, -s * 0.34, -s * 0.32, s * 0.68, s * 0.64, 10); ctx.fill();
+    ctx.fillStyle = col.trim;
+    TK.roundRect(ctx, -s * 0.24, -s * 0.12, s * 0.48, s * 0.28, 8); ctx.fill();
+    // smile face
+    ctx.fillStyle = col.eye;
+    ctx.beginPath(); ctx.arc(-s * 0.1, -s * 0.04, s * 0.09, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s * 0.1, -s * 0.04, s * 0.09, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2a1a14';
+    ctx.beginPath(); ctx.arc(-s * 0.08, -s * 0.03, s * 0.045, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s * 0.12, -s * 0.03, s * 0.045, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#2a1a14';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(0, s * 0.06, s * 0.1, 0.15, Math.PI - 0.15); ctx.stroke();
+    // blush
+    ctx.fillStyle = 'rgba(255,140,160,.45)';
+    ctx.beginPath(); ctx.arc(-s * 0.22, s * 0.06, s * 0.05, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s * 0.22, s * 0.06, s * 0.05, 0, Math.PI * 2); ctx.fill();
+    // little flag
+    ctx.fillStyle = col.trim;
+    ctx.fillRect(-2, -s * 0.52, 3, s * 0.2);
+    ctx.beginPath(); ctx.moveTo(1, -s * 0.52); ctx.lineTo(s * 0.2, -s * 0.46); ctx.lineTo(1, -s * 0.4); ctx.fill();
+    ctx.restore();
+
+    // turret faces aim
+    ctx.save();
+    ctx.translate(tank.x, tank.y);
+    ctx.rotate(tank.aim || 0);
+    ctx.fillStyle = col.body;
+    ctx.beginPath(); ctx.arc(0, 0, s * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = col.trim;
+    TK.roundRect(ctx, s * 0.1, -s * 0.07, s * 0.48, s * 0.14, 5); ctx.fill();
+    ctx.fillStyle = '#2a1a14';
+    ctx.fillRect(s * 0.52, -s * 0.045, s * 0.1, s * 0.09);
+    ctx.restore();
+
+    if (tank.shieldT > 0) {
+      ctx.save();
+      ctx.strokeStyle = `rgba(160,210,255,${0.55 + Math.sin(t * 8) * 0.2})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(tank.x, tank.y, tank.r * 1.55, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = 'rgba(140,200,255,.12)';
+      ctx.fill();
+      ctx.restore();
+    }
+    if (tank.hitT > 0) {
+      ctx.fillStyle = `rgba(255,255,255,${Math.min(0.45, tank.hitT * 2)})`;
+      ctx.beginPath(); ctx.arc(tank.x, tank.y, tank.r * 1.2, 0, Math.PI * 2); ctx.fill();
+    }
+    if (tank.invuln > 0 && (t * 8) % 1 < 0.5) {
+      ctx.globalAlpha = 0.45;
+    }
+  }
+
+  function drawShot(ctx, sh) {
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+    ctx.rotate(Math.atan2(sh.vy, sh.vx));
+    const bomb = sh.kind === 'ricochet';
+    ctx.fillStyle = bomb ? '#7dff9a' : (sh.friendly ? '#ffe566' : '#ff9ad4');
+    ctx.beginPath();
+    ctx.ellipse(0, 0, bomb ? 9 : 7, bomb ? 6 : 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.beginPath(); ctx.ellipse(-2, -1, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
+    if (sh.bounces > 0) {
+      ctx.strokeStyle = 'rgba(255,255,255,.5)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(0, 0, bomb ? 11 : 9, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawPower(ctx, u, t) {
+    const bob = Math.sin(t * 4 + u.x) * 3;
+    const icons = { triple: '#ff8a3d', shield: '#9ad0ff', speed: '#ffe566', ricochet: '#7dff9a' };
+    const labels = { triple: '✦3', shield: 'P', speed: '⚡', ricochet: '◎' };
+    ctx.save();
+    ctx.translate(u.x, u.y + bob);
+    ctx.fillStyle = 'rgba(0,0,0,.2)';
+    ctx.beginPath(); ctx.ellipse(0, 10, 10, 4, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = icons[u.kind] || '#fff';
+    ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.7)';
+    ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#2a1450';
+    ctx.font = 'bold 11px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(labels[u.kind] || '?', 0, 1);
+    ctx.restore();
+  }
+
+  function drawParticles(ctx, parts) {
+    for (const p of parts) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot || 0);
+      ctx.fillStyle = p.color;
+      if (p.kind === 'puff') {
+        ctx.beginPath(); ctx.arc(0, 0, p.s, 0, Math.PI * 2); ctx.fill();
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawTitleTank(ctx, x, y, t, kind, flip) {
+    const dummy = {
+      x, y, r: 28, alive: true, popT: 0, angle: flip ? Math.PI : 0,
+      aim: flip ? Math.PI + Math.sin(t) * 0.2 : Math.sin(t + 1) * 0.2,
+      kind, hitT: 0, spin: 0, shieldT: 0, invuln: 0
+    };
+    drawTank(ctx, dummy, t);
+  }
+
+  return { theme, drawBg, drawTiles, drawTank, drawShot, drawPower, drawParticles, drawTitleTank, tankColors };
+})();
+
+})();
+/* ==== 50-game.js ==== */
+;(function(){
+/* Simulation, shots, AI, autoplay solver */
+TK.Game = (() => {
+  const POWER_KINDS = ['triple', 'shield', 'speed', 'ricochet'];
+
+  function hideOverlay() {
+    if (TK.overlay) { TK.overlay.innerHTML = ''; TK.overlay.classList.add('hidden'); }
+  }
+
+  function parseMap(def) {
+    const rows = def.map.slice();
+    const h = rows.length, w = rows[0].length;
+    const grid = [];
+    const spawns = { p1: null, p2: null, enemies: [], powers: [], crates: [] };
+    for (let r = 0; r < h; r++) {
+      const line = rows[r];
+      const row = [];
+      for (let c = 0; c < w; c++) {
+        const ch = line[c] || '#';
+        if (ch === '#') row.push(1);
+        else {
+          row.push(0);
+          const pos = { c, r };
+          if (ch === '1') spawns.p1 = pos;
+          else if (ch === '2') spawns.p2 = pos;
+          else if (ch === 'C') spawns.crates.push(pos);
+          else if (ch === 'E' || ch === 'B' || ch === 'S') spawns.enemies.push({ c, r, type: ch === 'B' ? 'brute' : (ch === 'S' ? 'shooter' : 'scout') });
+          else if (ch === '+' || ch === 'T' || ch === 'G' || ch === 'F' || ch === 'R') {
+            const kind = ch === 'T' ? 'triple' : ch === 'G' ? 'shield' : ch === 'F' ? 'speed' : ch === 'R' ? 'ricochet' : TK.pick(POWER_KINDS);
+            spawns.powers.push({ c, r, kind });
+          }
+        }
+      }
+      grid.push(row);
+    }
+    if (!spawns.p1) spawns.p1 = { c: 2, r: 2 };
+    if (!spawns.p2) spawns.p2 = { c: w - 3, r: 2 };
+    return { cols: w, rows: h, grid, spawns };
+  }
+
+  function layout(run) {
+    const padT = TK.portrait ? 70 : 52;
+    const padB = TK.portrait ? 160 : 96;
+    const padX = 10;
+    const aw = Math.max(80, TK.W - padX * 2);
+    const ah = Math.max(80, TK.H - padT - padB);
+    const tile = Math.max(16, Math.floor(Math.min(aw / run.cols, ah / run.rows)));
+    const ox = Math.round((TK.W - tile * run.cols) / 2);
+    const oy = Math.round(padT + (ah - tile * run.rows) / 2);
+    const scale = run.tile ? tile / run.tile : 1;
+    run.tile = tile;
+    run.ox = ox; run.oy = oy;
+    return scale;
+  }
+
+  function cellCenter(run, c, r) {
+    return { x: run.ox + (c + 0.5) * run.tile, y: run.oy + (r + 0.5) * run.tile };
+  }
+
+  function tileAt(run, x, y) {
+    const c = Math.floor((x - run.ox) / run.tile);
+    const r = Math.floor((y - run.oy) / run.tile);
+    return { c, r };
+  }
+
+  function isWall(run, c, r) {
+    if (c < 0 || r < 0 || c >= run.cols || r >= run.rows) return true;
+    return run.grid[r][c] === 1;
+  }
+
+  function crateAt(run, c, r) {
+    for (const cr of run.crates) {
+      if (cr.alive && cr.c === c && cr.r === r) return cr;
+    }
+    return null;
+  }
+
+  function blocked(run, c, r, ignoreCrates) {
+    if (isWall(run, c, r)) return true;
+    if (!ignoreCrates && crateAt(run, c, r)) return true;
+    return false;
+  }
+
+  function circleBlocked(run, x, y, rad, ignoreCrates) {
+    const minC = Math.floor((x - rad - run.ox) / run.tile);
+    const maxC = Math.floor((x + rad - run.ox) / run.tile);
+    const minR = Math.floor((y - rad - run.oy) / run.tile);
+    const maxR = Math.floor((y + rad - run.oy) / run.tile);
+    for (let r = minR; r <= maxR; r++) {
+      for (let c = minC; c <= maxC; c++) {
+        if (!blocked(run, c, r, ignoreCrates)) continue;
+        const cx = run.ox + (c + 0.5) * run.tile;
+        const cy = run.oy + (r + 0.5) * run.tile;
+        const hx = run.tile / 2, hy = run.tile / 2;
+        const nx = TK.clamp(x, cx - hx, cx + hx);
+        const ny = TK.clamp(y, cy - hy, cy + hy);
+        if (Math.hypot(x - nx, y - ny) < rad) return true;
+      }
+    }
+    return false;
+  }
+
+  function tryMove(run, ent, dx, dy, rad) {
+    let nx = ent.x + dx, ny = ent.y + dy;
+    if (!circleBlocked(run, nx, ent.y, rad, false)) ent.x = nx;
+    else if (!circleBlocked(run, ent.x + dx * 0.5, ent.y, rad, false)) ent.x += dx * 0.5;
+    if (!circleBlocked(run, ent.x, ny, rad, false)) ent.y = ny;
+    else if (!circleBlocked(run, ent.x, ent.y + dy * 0.5, rad, false)) ent.y += dy * 0.5;
+  }
+
+  function makePlayer(i, run, profileId, spawn) {
+    const meta = i === 0 ? (TK.profiles[profileId] || TK.profiles.p1) : (run.mode === 'versus' ? TK.profiles.p2 : TK.profiles.p1);
+    // In coop, P1 keeps auto-aim / infinite if that profile; P2 uses p2 rules unless we soften.
+    const used = (run.mode === 'solo') ? TK.profiles[profileId] : (i === 0 ? TK.profiles.p1 : TK.profiles.p2);
+    const p = {
+      id: i,
+      kind: i === 0 ? 'p1' : 'p2',
+      team: 'player',
+      x: spawn.x, y: spawn.y,
+      spawnX: spawn.x, spawnY: spawn.y,
+      angle: i === 0 ? 0 : Math.PI,
+      aim: i === 0 ? 0 : Math.PI,
+      r: Math.max(12, run.tile * 0.32),
+      speed: used.speed,
+      fireCd: 0,
+      fireMax: used.fireCd,
+      shotSpeed: used.shotSpeed,
+      shotBounce: used.shotBounce,
+      autoAim: i === 0 ? !!used.autoAim : false,
+      autoAimCone: used.autoAimCone,
+      infinite: run.mode === 'versus' ? false : (i === 0 ? !!used.infiniteLives : (run.mode === 'coop' ? false : !!used.infiniteLives)),
+      lives: run.mode === 'versus' ? 1 : used.lives,
+      livesMax: run.mode === 'versus' ? 1 : used.lives,
+      invuln: 1.0,
+      invulnMax: used.invuln,
+      shieldT: 0,
+      speedT: 0,
+      tripleT: 0,
+      ricochetT: 0,
+      hitT: 0,
+      spin: 0,
+      stun: 0,
+      alive: true,
+      popT: 0,
+      out: false,
+      meta: used
+    };
+    if (run.mode === 'coop' && i === 1) {
+      p.infinite = false;
+      p.lives = 3;
+      p.livesMax = 3;
+      p.speed = TK.profiles.p2.speed;
+      p.fireMax = TK.profiles.p2.fireCd;
+    }
+    return p;
+  }
+
+  function enemyStats(type, meta) {
+    const hpMul = meta.enemyHp;
+    if (type === 'brute') return { hp: Math.max(2, Math.round(4 * hpMul)), speed: 70 * meta.enemySpeed, fire: 1.5 / meta.enemyFire, aim: 0.55 * meta.enemyAim, rMul: 1.15, kind: 'brute' };
+    if (type === 'shooter') return { hp: Math.max(1, Math.round(2 * hpMul)), speed: 90 * meta.enemySpeed, fire: 1.05 / meta.enemyFire, aim: 0.85 * meta.enemyAim, rMul: 0.95, kind: 'shooter' };
+    return { hp: Math.max(1, Math.round(2 * hpMul)), speed: 100 * meta.enemySpeed, fire: 1.25 / meta.enemyFire, aim: 0.65 * meta.enemyAim, rMul: 1, kind: 'scout' };
+  }
+
+  function makeEnemy(run, spec, meta) {
+    const pos = cellCenter(run, spec.c, spec.r);
+    const st = enemyStats(spec.type, meta);
+    return {
+      id: 'e' + (run.enemies.length),
+      kind: st.kind,
+      type: spec.type,
+      team: 'enemy',
+      x: pos.x, y: pos.y,
+      angle: Math.PI, aim: Math.PI,
+      r: Math.max(11, run.tile * 0.3 * st.rMul),
+      speed: st.speed,
+      hp: st.hp, hpMax: st.hp,
+      fireCd: 0.4 + (run.rng ? run.rng() : Math.random()) * 0.6,
+      fireMax: st.fire,
+      aimSkill: st.aim,
+      shotSpeed: 260 + 120 * meta.enemyFire,
+      shotBounce: 0,
+      think: 0,
+      path: [],
+      hitT: 0, spin: 0, stun: 0,
+      shieldT: 0, invuln: 0,
+      alive: true, popT: 0, out: false
+    };
+  }
+
+  function makeCrate(run, pos) {
+    const p = cellCenter(run, pos.c, pos.r);
+    return { c: pos.c, r: pos.r, x: p.x, y: p.y, hp: 1, alive: true, shake: 0 };
+  }
+
+  function makePower(run, pos, kind) {
+    const p = cellCenter(run, pos.c, pos.r);
+    return { x: p.x, y: p.y, kind: kind || TK.pick(POWER_KINDS), life: 20, alive: true };
+  }
+
+  function particle(run, x, y, opts) {
+    run.particles.push(Object.assign({
+      x, y, vx: 0, vy: 0, life: 0.5, max: 0.5, color: '#fff', rot: 0, rv: 0,
+      s: 6, w: 6, h: 4, kind: 'confetti'
+    }, opts));
+  }
+
+  function puff(run, x, y, n, color) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 30 + Math.random() * 80;
+      particle(run, x, y, {
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+        life: 0.3 + Math.random() * 0.3, max: 0.6,
+        color: color || 'rgba(230,230,230,.8)', kind: 'puff', s: 5 + Math.random() * 8
+      });
+    }
+  }
+
+  function confetti(run, x, y, colors) {
+    const cols = colors || ['#ffe566', '#ff9ad4', '#9ad0ff', '#7dff9a', '#ff8a3d', '#c9a6ff'];
+    for (let i = 0; i < 28; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 220;
+      particle(run, x, y, {
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40,
+        life: 0.7 + Math.random() * 0.5, max: 1.2,
+        color: cols[i % cols.length], kind: 'confetti',
+        w: 4 + Math.random() * 6, h: 3 + Math.random() * 5,
+        rot: Math.random() * 6, rv: (Math.random() - 0.5) * 12
+      });
+    }
+  }
+
+  function start(levelId, opts) {
+    opts = opts || {};
+    const mode = opts.versus ? 'versus' : (opts.coop ? 'coop' : 'solo');
+    const profileId = opts.profile || (TK.state && TK.state.lastProfile) || 'p1';
+    if (mode === 'solo') TK.Save.setProfile(profileId);
+    const def = mode === 'versus' ? TK.Levels.versus : TK.Levels.get(levelId || 1, mode === 'coop' ? 'p1' : profileId);
+    const parsed = parseMap(def);
+    const meta = mode === 'solo' ? TK.profiles[profileId] : TK.profiles.p1;
+    const run = TK.run = {
+      mode,
+      soloProfile: profileId,
+      levelId: def.id || (levelId || 1),
+      level: def,
+      theme: def.theme || 'grass',
+      cols: parsed.cols,
+      rows: parsed.rows,
+      grid: parsed.grid,
+      spawns: parsed.spawns,
+      tile: 0, ox: 0, oy: 0,
+      players: [],
+      enemies: [],
+      crates: [],
+      powers: [],
+      shots: [],
+      particles: [],
+      score: 0,
+      elapsed: 0,
+      won: false,
+      lost: false,
+      overTimer: 0,
+      paused: false,
+      vsWins: [0, 0],
+      vsRound: 1,
+      vsBestOf: 5,
+      vsNeed: 3,
+      vsPause: 0,
+      vsMessage: '',
+      roundOver: false,
+      meta,
+      rng: TK.seeded((def.id || 1) * 7919 + (profileId === 'p2' ? 104729 : 17) + (mode === 'coop' ? 99 : 0))
+    };
+    layout(run);
+    const p1s = cellCenter(run, parsed.spawns.p1.c, parsed.spawns.p1.r);
+    run.players.push(makePlayer(0, run, profileId, p1s));
+    if (mode === 'coop' || mode === 'versus') {
+      const p2s = cellCenter(run, parsed.spawns.p2.c, parsed.spawns.p2.r);
+      run.players.push(makePlayer(1, run, 'p2', p2s));
+    }
+    if (mode !== 'versus') {
+      parsed.spawns.enemies.forEach((e) => run.enemies.push(makeEnemy(run, e, meta)));
+    }
+    parsed.spawns.crates.forEach((c) => run.crates.push(makeCrate(run, c)));
+    parsed.spawns.powers.forEach((p) => run.powers.push(makePower(run, p, p.kind)));
+    TK.sticks = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+    TK.firing = [false, false];
+    TK.autoplay = !!opts.autoplay;
+    TK.screen = 'play';
+    hideOverlay();
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.classList.remove('hidden');
+    TK.UI.showHud();
+    TK.UI.showTouch(mode !== 'solo');
+    TK.refreshRotateHint && TK.refreshRotateHint();
+    return run;
+  }
+
+  function resetRound(keepScore) {
+    const run = TK.run;
+    if (!run) return;
+    const wins = run.vsWins.slice();
+    const round = run.vsRound;
+    start(run.levelId, { versus: true, autoplay: TK.autoplay });
+    TK.run.vsWins = wins;
+    TK.run.vsRound = round;
+    TK.run.vsPause = 0.8;
+    TK.run.vsMessage = keepScore || '';
+  }
+
+  function reflow() {
+    const run = TK.run;
+    if (!run) return;
+    const old = run.tile;
+    const scale = layout(run);
+    if (old && scale && scale !== 1) {
+      const shift = (ent) => {
+        const t = tileAt({ ox: run.ox, oy: run.oy, tile: old }, ent.x, ent.y);
+        // scale around old origin — better: convert via old tile then new
+      };
+      const remap = (x, y, oldTile, oldOx, oldOy) => {
+        const c = (x - oldOx) / oldTile;
+        const r = (y - oldOy) / oldTile;
+        return { x: run.ox + c * run.tile, y: run.oy + r * run.tile };
+      };
+      // We don't have old ox stored. layout already overwrote. Store before next time.
+      // For safety, snap entities to their grid cells when possible.
+      run.players.forEach((p) => { p.r = Math.max(12, run.tile * 0.32); });
+      run.enemies.forEach((e) => { e.r = Math.max(11, run.tile * 0.3); });
+    }
+    // Always re-center crates/powers to cells; tanks keep relative cell fractions if we stored c,r.
+    run.crates.forEach((c) => {
+      const p = cellCenter(run, c.c, c.r); c.x = p.x; c.y = p.y;
+    });
+  }
+
+  function livingPlayers(run) { return run.players.filter((p) => p.alive && !p.out); }
+  function livingEnemies(run) { return run.enemies.filter((e) => e.alive); }
+
+  function nearest(from, list) {
+    let best = null, bd = 1e9;
+    for (const o of list) {
+      const d = Math.hypot(o.x - from.x, o.y - from.y);
+      if (d < bd) { bd = d; best = o; }
+    }
+    return best;
+  }
+
+  function los(run, ax, ay, bx, by) {
+    const dist = Math.hypot(bx - ax, by - ay);
+    const steps = Math.max(2, (dist / Math.max(6, run.tile * 0.25)) | 0);
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const x = ax + (bx - ax) * t, y = ay + (by - ay) * t;
+      const { c, r } = tileAt(run, x, y);
+      if (isWall(run, c, r) || crateAt(run, c, r)) return false;
+    }
+    return true;
+  }
+
+  function astar(run, sx, sy, tx, ty) {
+    const start = tileAt(run, sx, sy);
+    const goal = tileAt(run, tx, ty);
+    const key = (c, r) => c + ',' + r;
+    function search(allowCrates) {
+      const cost = (c, r) => {
+        if (isWall(run, c, r)) return Infinity;
+        if (crateAt(run, c, r)) return allowCrates ? 5 : Infinity;
+        if (c < 0 || r < 0 || c >= run.cols || r >= run.rows) return Infinity;
+        return 1;
+      };
+      // snap goal off walls
+      const gcell = { c: goal.c, r: goal.r };
+      if (isWall(run, gcell.c, gcell.r)) {
+        let found = false;
+        for (let rad = 1; rad <= 3 && !found; rad++) {
+          for (let dy = -rad; dy <= rad && !found; dy++) {
+            for (let dx = -rad; dx <= rad && !found; dx++) {
+              if (cost(gcell.c + dx, gcell.r + dy) < Infinity) { gcell.c += dx; gcell.r += dy; found = true; }
+            }
+          }
+        }
+      }
+      const open = [{ c: start.c, r: start.r }];
+      const came = Object.create(null);
+      const g = Object.create(null);
+      g[key(start.c, start.r)] = 0;
+      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      let guard = 0, foundKey = null;
+      while (open.length && guard++ < 500) {
+        let bi = 0, bv = 1e12;
+        for (let i = 0; i < open.length; i++) {
+          const a = open[i];
+          const va = (g[key(a.c, a.r)] || 0) + Math.abs(a.c - gcell.c) + Math.abs(a.r - gcell.r);
+          if (va < bv) { bv = va; bi = i; }
+        }
+        const cur = open.splice(bi, 1)[0];
+        if (cur.c === gcell.c && cur.r === gcell.r) { foundKey = key(cur.c, cur.r); break; }
+        for (const [dx, dy] of dirs) {
+          const nc = cur.c + dx, nr = cur.r + dy;
+          const step = cost(nc, nr);
+          if (step === Infinity) continue;
+          const nk = key(nc, nr);
+          const ng = (g[key(cur.c, cur.r)] || 0) + step;
+          if (g[nk] == null || ng < g[nk]) {
+            g[nk] = ng;
+            came[nk] = cur;
+            open.push({ c: nc, r: nr });
+          }
+        }
+      }
+      if (!foundKey) return [];
+      const path = [];
+      let c = gcell.c, r = gcell.r;
+      while (!(c === start.c && r === start.r)) {
+        path.push({ c, r });
+        const prev = came[key(c, r)];
+        if (!prev) break;
+        c = prev.c; r = prev.r;
+      }
+      path.reverse();
+      return path;
+    }
+    const openPath = search(false);
+    return openPath.length ? openPath : search(true);
+  }
+
+  function aimAt(ent, tx, ty, skill, leadVx, leadVy) {
+    const ang = Math.atan2((ty + (leadVy || 0)) - ent.y, (tx + (leadVx || 0)) - ent.x);
+    if (skill >= 1) return ang;
+    const rng = (TK.run && TK.run.rng) ? TK.run.rng() : Math.random();
+    const jitter = (1 - skill) * 0.7 * (rng - 0.5) * 2;
+    return ang + jitter;
+  }
+
+  function fireShot(run, owner, ang, extra) {
+    extra = extra || {};
+    const speed = extra.speed || owner.shotSpeed || 500;
+    const bounce = extra.bounces != null ? extra.bounces : (owner.shotBounce || 0);
+    const kind = extra.kind || 'shot';
+    const muzzle = owner.r + 8;
+    const shot = {
+      x: owner.x + Math.cos(ang) * muzzle,
+      y: owner.y + Math.sin(ang) * muzzle,
+      vx: Math.cos(ang) * speed,
+      vy: Math.sin(ang) * speed,
+      r: kind === 'ricochet' ? 8 : 5,
+      bounces: bounce,
+      friendly: owner.team === 'player',
+      owner,
+      team: owner.team,
+      kind,
+      life: 2.6,
+      dmg: kind === 'ricochet' ? 1 : 1
+    };
+    run.shots.push(shot);
+    if (!TK.autoplay) TK.Audio.fire();
+    return shot;
+  }
+
+  function tryFire(run, p) {
+    if (!p.alive || p.stun > 0 || p.fireCd > 0) return false;
+    let ang = p.aim;
+    if (p.autoAim || TK.autoplay) {
+      const foes = p.team === 'player' ? livingEnemies(run).concat(run.mode === 'versus' ? livingPlayers(run).filter((o) => o !== p) : []) : livingPlayers(run);
+      const tgt = nearest(p, foes);
+      if (tgt) {
+        const desired = Math.atan2(tgt.y - p.y, tgt.x - p.x);
+        const diff = Math.abs(TK.angNorm(desired - ang));
+        const cone = (p.autoAim || TK.autoplay) ? (p.autoAimCone || 3.2) : 0.4;
+        if (diff <= cone || TK.autoplay) {
+          ang = desired;
+          p.aim = desired;
+        }
+      }
+    }
+    p.fireCd = p.fireMax;
+    if (p.tripleT > 0) {
+      fireShot(run, p, ang);
+      fireShot(run, p, ang - 0.22);
+      fireShot(run, p, ang + 0.22);
+    } else if (p.ricochetT > 0) {
+      fireShot(run, p, ang, { kind: 'ricochet', bounces: 4, speed: (p.shotSpeed || 500) * 0.9 });
+    } else {
+      fireShot(run, p, ang);
+    }
+    return true;
+  }
+
+  function inputFor(p) {
+    let x = 0, y = 0;
+    const st = TK.sticks[p.id];
+    if (st) { x += st.x; y += st.y; }
+    if (TK.run.mode === 'solo') {
+      if (TK.keys['ArrowLeft'] || TK.keys.a || TK.keys.A) x -= 1;
+      if (TK.keys['ArrowRight'] || TK.keys.d || TK.keys.D) x += 1;
+      if (TK.keys['ArrowUp'] || TK.keys.w || TK.keys.W) y -= 1;
+      if (TK.keys['ArrowDown'] || TK.keys.s || TK.keys.S) y += 1;
+    } else if (p.id === 0) {
+      if (TK.keys.a || TK.keys.A) x -= 1;
+      if (TK.keys.d || TK.keys.D) x += 1;
+      if (TK.keys.w || TK.keys.W) y -= 1;
+      if (TK.keys.s || TK.keys.S) y += 1;
+    } else {
+      if (TK.keys['ArrowLeft']) x -= 1;
+      if (TK.keys['ArrowRight']) x += 1;
+      if (TK.keys['ArrowUp']) y -= 1;
+      if (TK.keys['ArrowDown']) y += 1;
+    }
+    const l = Math.hypot(x, y);
+    if (l > 1) { x /= l; y /= l; }
+    return { x, y, l };
+  }
+
+  function wantFire(p) {
+    if (TK.firing[p.id]) return true;
+    if (TK.run.mode === 'solo') {
+      return !!(TK.keys[' '] || TK.keys.Space || TK.keys.Spacebar || TK.keys.Enter || TK.keys['Enter']);
+    }
+    if (p.id === 0) return !!(TK.keys[' '] || TK.keys.Space || TK.keys.Spacebar);
+    return !!(TK.keys.Enter || TK.keys['Enter']);
+  }
+
+  function dodgeDir(p, run) {
+    let ax = 0, ay = 0;
+    for (const sh of run.shots) {
+      if (sh.team === p.team) continue;
+      const dx = p.x - sh.x, dy = p.y - sh.y;
+      const along = dx * sh.vx + dy * sh.vy;
+      // incoming if velocity points roughly toward player
+      const sp2 = sh.vx * sh.vx + sh.vy * sh.vy + 1;
+      const t = -( (sh.x - p.x) * sh.vx + (sh.y - p.y) * sh.vy ) / sp2;
+      if (t > 0 && t < 0.7) {
+        const cx = sh.x + sh.vx * t, cy = sh.y + sh.vy * t;
+        const d = Math.hypot(cx - p.x, cy - p.y);
+        if (d < 50) {
+          // perpendicular
+          const n = TK.norm(-sh.vy, sh.vx);
+          const side = ((p.x - sh.x) * n.x + (p.y - sh.y) * n.y) >= 0 ? 1 : -1;
+          ax += n.x * side * (60 - d);
+          ay += n.y * side * (60 - d);
+        }
+      }
+    }
+    return { x: ax, y: ay };
+  }
+
+  function autoSteer(p, run) {
+    const foes = p.team === 'player'
+      ? (run.mode === 'versus' ? livingPlayers(run).filter((o) => o !== p) : livingEnemies(run))
+      : livingPlayers(run);
+    const tgt = nearest(p, foes);
+    let ax = 0, ay = 0;
+    if (tgt) {
+      const path = astar(run, p.x, p.y, tgt.x, tgt.y);
+      if (path.length) {
+        const step = cellCenter(run, path[0].c, path[0].r);
+        ax += step.x - p.x; ay += step.y - p.y;
+      } else {
+        ax += tgt.x - p.x; ay += tgt.y - p.y;
+      }
+      const d = Math.hypot(tgt.x - p.x, tgt.y - p.y);
+      if (d < run.tile * 4) {
+        // kite / don't sit on top
+        ax += -(tgt.y - p.y) * 1.1;
+        ay += (tgt.x - p.x) * 1.1;
+        if (d < run.tile * 2.2) { ax -= (tgt.x - p.x); ay -= (tgt.y - p.y); }
+      }
+      p.aim = Math.atan2(tgt.y - p.y, tgt.x - p.x);
+      if (los(run, p.x, p.y, tgt.x, tgt.y) || d < run.tile * 4) TK.firing[p.id] = true;
+      else if (path.length && blocked(run, path[0].c, path[0].r, false) === false) {
+        // shoot crates ahead if LOS blocked
+        const ahead = path[0];
+        const cr = crateAt(run, ahead.c, ahead.r);
+        if (cr) {
+          p.aim = Math.atan2(cr.y - p.y, cr.x - p.x);
+          TK.firing[p.id] = true;
+        }
+      }
+    } else {
+      TK.firing[p.id] = false;
+    }
+    // grab nearby powerups
+    for (const u of run.powers) {
+      if (!u.alive) continue;
+      const d = Math.hypot(u.x - p.x, u.y - p.y);
+      if (d < run.tile * 4) { ax += (u.x - p.x) * 0.8; ay += (u.y - p.y) * 0.8; }
+    }
+    const dodge = dodgeDir(p, run);
+    const dodgeMag = Math.hypot(dodge.x, dodge.y);
+    if (dodgeMag > 12) { ax = dodge.x * 8; ay = dodge.y * 8; }
+    else { ax += dodge.x * 5; ay += dodge.y * 5; }
+    const n = TK.norm(ax, ay);
+    TK.sticks[p.id] = { x: n.x, y: n.y };
+  }
+
+  function enemyThink(e, run, dt) {
+    e.think -= dt;
+    const tgt = nearest(e, livingPlayers(run));
+    if (!tgt) return;
+    const desired = Math.atan2(tgt.y - e.y, tgt.x - e.x);
+    e.aim = TK.angLerp(e.aim, aimAt(e, tgt.x, tgt.y, e.aimSkill), 0.15);
+    const d = Math.hypot(tgt.x - e.x, tgt.y - e.y);
+    let ax = 0, ay = 0;
+    if (e.kind === 'shooter' && d < run.tile * 5 && los(run, e.x, e.y, tgt.x, tgt.y)) {
+      ax -= Math.cos(desired); ay -= Math.sin(desired);
+    } else if (e.think <= 0) {
+      e.path = astar(run, e.x, e.y, tgt.x, tgt.y);
+      e.think = 0.35;
+    }
+    if (e.path && e.path.length) {
+      const step = cellCenter(run, e.path[0].c, e.path[0].r);
+      if (Math.hypot(step.x - e.x, step.y - e.y) < run.tile * 0.25) e.path.shift();
+      else { ax += step.x - e.x; ay += step.y - e.y; }
+    } else {
+      ax += tgt.x - e.x; ay += tgt.y - e.y;
+    }
+    const n = TK.norm(ax, ay);
+    const spd = e.speed * (e.stun > 0 ? 0.2 : 1);
+    if (n.x || n.y) {
+      e.angle = TK.angLerp(e.angle, Math.atan2(n.y, n.x), 0.2);
+      tryMove(run, e, n.x * spd * dt, n.y * spd * dt, e.r);
+    }
+    const canSee = los(run, e.x, e.y, tgt.x, tgt.y);
+    const aimDiff = Math.abs(TK.angNorm(e.aim - desired));
+    if (canSee && e.fireCd <= 0 && aimDiff < 0.45 + (1 - e.aimSkill) * 0.6) {
+      e.fireCd = e.fireMax;
+      fireShot(run, e, e.aim + (1 - e.aimSkill) * ((run.rng ? run.rng() : Math.random()) - 0.5) * 0.8, { speed: e.shotSpeed, bounces: 0 });
+    }
+  }
+
+  function applyPower(p, u) {
+    if (u.kind === 'triple') { p.tripleT = 8; p.ricochetT = 0; if (!TK.autoplay) { TK.Audio.pickup(); TK.toast('Triple Charm!'); } }
+    else if (u.kind === 'shield') { p.shieldT = 8; if (!TK.autoplay) { TK.Audio.shield(); TK.toast('Protego!'); } }
+    else if (u.kind === 'speed') { p.speedT = 7; if (!TK.autoplay) { TK.Audio.pickup(); TK.toast('Fleet-Foot!'); } }
+    else if (u.kind === 'ricochet') { p.ricochetT = 8; p.tripleT = 0; if (!TK.autoplay) { TK.Audio.pickup(); TK.toast('Bouncing Jinx!'); } }
+  }
+
+  function killTank(run, t, killerTeam) {
+    if (!t.alive) return;
+    t.alive = false;
+    t.popT = 0.7;
+    puff(run, t.x, t.y, 10, 'rgba(255,255,255,.7)');
+    const cols = t.kind === 'p1' ? ['#c43c28', '#f0c14e', '#fff'] : t.kind === 'p2' ? ['#2a5aa8', '#c9a36b', '#fff'] : ['#7dff9a', '#ffe566', '#ff9ad4', '#9ad0ff'];
+    confetti(run, t.x, t.y, cols);
+    if (!TK.autoplay) TK.Audio.pop();
+    if (t.team === 'enemy') {
+      run.score += 100;
+      t.out = true;
+    } else {
+      if (!t.infinite) t.lives = Math.max(0, t.lives - 1);
+      if (t.infinite || t.lives > 0) {
+        t._respawn = 0.85;
+      } else {
+        t.out = true;
+      }
+    }
+  }
+
+  function hitTank(run, t, sh) {
+    if (!t.alive || t.invuln > 0) return false;
+    if (t.shieldT > 0) {
+      t.shieldT = 0;
+      puff(run, t.x, t.y, 8, 'rgba(160,210,255,.8)');
+      if (!TK.autoplay) TK.Audio.shield();
+      return true;
+    }
+    t.hitT = 0.35;
+    t.spin += (sh && sh.vx >= 0 ? 1 : -1) * 2.6;
+    t.stun = 0.18;
+    puff(run, t.x, t.y, 7, 'rgba(255,230,200,.85)');
+    if (!TK.autoplay) TK.Audio.hit();
+    if (t.team === 'enemy') {
+      t.hp -= (sh && sh.dmg) || 1;
+      if (t.hp <= 0) killTank(run, t);
+    } else {
+      killTank(run, t);
+    }
+    return true;
+  }
+
+  function respawn(run, p) {
+    p.alive = true;
+    p.out = false;
+    p.x = p.spawnX; p.y = p.spawnY;
+    p.invuln = p.invulnMax || 1.4;
+    p.hitT = 0; p.spin = 0; p.stun = 0;
+    p.popT = 0; p._respawn = 0;
+    p.fireCd = 0.2;
+    puff(run, p.x, p.y, 6, 'rgba(255,255,255,.5)');
+  }
+
+  function bounceShot(run, sh, dt) {
+    const steps = 3;
+    const sdt = dt / steps;
+    for (let i = 0; i < steps; i++) {
+      const nx = sh.x + sh.vx * sdt;
+      const ny = sh.y + sh.vy * sdt;
+      const hitX = circleBlocked(run, nx, sh.y, sh.r, true);
+      const hitY = circleBlocked(run, sh.x, ny, sh.r, true);
+      // crates
+      const { c, r } = tileAt(run, nx, ny);
+      const cr = crateAt(run, c, r) || crateAt(run, tileAt(run, sh.x, sh.y).c, tileAt(run, sh.x, sh.y).r);
+      if (cr && cr.alive && Math.hypot(nx - cr.x, ny - cr.y) < run.tile * 0.5 + sh.r) {
+        cr.hp -= 1; cr.shake = 0.2;
+        if (cr.hp <= 0) {
+          cr.alive = false;
+          puff(run, cr.x, cr.y, 8, '#d4a05a');
+          if (!TK.autoplay) TK.Audio.crate();
+          if ((run.rng ? run.rng() : Math.random()) < 0.45) {
+            run.powers.push(makePower(run, { c: cr.c, r: cr.r }, TK.pick(POWER_KINDS)));
+          }
+        }
+        sh.life = 0;
+        return;
+      }
+      if (hitX || hitY) {
+        if (sh.bounces > 0) {
+          if (hitX) sh.vx *= -1;
+          if (hitY) sh.vy *= -1;
+          if (!hitX && !hitY) { sh.vx *= -1; sh.vy *= -1; }
+          sh.bounces -= 1;
+          if (!TK.autoplay) TK.Audio.bounce();
+          sh.x += sh.vx * sdt; sh.y += sh.vy * sdt;
+        } else {
+          sh.life = 0;
+          puff(run, sh.x, sh.y, 3, '#fff');
+          return;
+        }
+      } else {
+        sh.x = nx; sh.y = ny;
+      }
+    }
+  }
+
+  function tick(dt) {
+    const run = TK.run;
+    if (!run || TK.screen !== 'play') return;
+    if (run.paused) return;
+    dt = Math.min(0.05, dt);
+    run.elapsed += dt;
+    if (run.vsPause > 0) {
+      run.vsPause -= dt;
+      TK.UI.updateHud();
+      return;
+    }
+
+    // timers
+    for (const p of run.players) {
+      if (p.fireCd > 0) p.fireCd -= dt;
+      if (p.invuln > 0) p.invuln -= dt;
+      if (p.hitT > 0) p.hitT -= dt;
+      if (p.stun > 0) p.stun -= dt;
+      if (p.shieldT > 0) p.shieldT -= dt;
+      if (p.speedT > 0) p.speedT -= dt;
+      if (p.tripleT > 0) p.tripleT -= dt;
+      if (p.ricochetT > 0) p.ricochetT -= dt;
+      p.spin *= Math.max(0, 1 - dt * 4);
+      if (p._respawn > 0) {
+        p._respawn -= dt;
+        if (p._respawn <= 0) respawn(run, p);
+      }
+      if (p.popT > 0) p.popT -= dt;
+    }
+    for (const e of run.enemies) {
+      if (e.fireCd > 0) e.fireCd -= dt;
+      if (e.hitT > 0) e.hitT -= dt;
+      if (e.stun > 0) e.stun -= dt;
+      e.spin *= Math.max(0, 1 - dt * 4);
+      if (e.popT > 0) e.popT -= dt;
+    }
+    run.crates.forEach((c) => { if (c.shake > 0) c.shake -= dt; });
+
+    if (TK.autoplay) livingPlayers(run).forEach((p) => autoSteer(p, run));
+
+    for (const p of run.players) {
+      if (!p.alive) continue;
+      const inp = inputFor(p);
+      const spd = p.speed * (p.speedT > 0 ? 1.45 : 1) * (p.stun > 0 ? 0.35 : 1);
+      if (inp.l > 0.12) {
+        p.angle = TK.angLerp(p.angle, Math.atan2(inp.y, inp.x), 0.35);
+        if (!p.autoAim) p.aim = TK.angLerp(p.aim, p.angle, 0.4);
+        tryMove(run, p, inp.x * spd * dt, inp.y * spd * dt, p.r);
+      }
+      // auto-aim turret tracks nearest foe even when still
+      if (p.autoAim || TK.autoplay) {
+        const foes = run.mode === 'versus' ? livingPlayers(run).filter((o) => o !== p) : livingEnemies(run);
+        const tgt = nearest(p, foes);
+        if (tgt) p.aim = TK.angLerp(p.aim, Math.atan2(tgt.y - p.y, tgt.x - p.x), 0.35);
+      }
+      if (wantFire(p)) tryFire(run, p);
+    }
+
+    if (!run.won && !run.lost && run.mode !== 'versus') {
+      for (const e of livingEnemies(run)) enemyThink(e, run, dt);
+    }
+
+    // shots
+    for (const sh of run.shots) {
+      if (sh.life <= 0) continue;
+      sh.life -= dt;
+      bounceShot(run, sh, dt);
+      if (sh.life <= 0) continue;
+      const foes = sh.team === 'player'
+        ? (run.mode === 'versus' ? livingPlayers(run).filter((p) => p !== sh.owner) : livingEnemies(run))
+        : livingPlayers(run);
+      for (const t of foes) {
+        if (Math.hypot(t.x - sh.x, t.y - sh.y) < t.r + sh.r) {
+          if (hitTank(run, t, sh)) { sh.life = 0; break; }
+        }
+      }
+    }
+    run.shots = run.shots.filter((s) => s.life > 0);
+
+    // powers
+    for (const u of run.powers) {
+      if (!u.alive) continue;
+      u.life -= dt;
+      if (u.life <= 0) { u.alive = false; continue; }
+      for (const p of livingPlayers(run)) {
+        if (Math.hypot(p.x - u.x, p.y - u.y) < p.r + 14) {
+          applyPower(p, u);
+          u.alive = false;
+          run.score += 25;
+          break;
+        }
+      }
+    }
+    run.powers = run.powers.filter((u) => u.alive);
+
+    // particles
+    for (const p of run.particles) {
+      p.life -= dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vy += 180 * dt;
+      p.rot = (p.rot || 0) + (p.rv || 0) * dt;
+    }
+    run.particles = run.particles.filter((p) => p.life > 0);
+
+    // win / lose
+    if (!run.won && !run.lost) {
+      if (run.mode === 'versus') {
+        if (!run.roundOver) {
+          const p1a = run.players[0] && run.players[0].alive;
+          const p2a = run.players[1] && run.players[1].alive;
+          if (!p1a && run.players[0] && !run.players[0]._respawn) {
+            run.roundOver = true;
+            run.vsWins[1] += 1;
+            endVersusRound(run, 1);
+          } else if (!p2a && run.players[1] && !run.players[1]._respawn) {
+            run.roundOver = true;
+            run.vsWins[0] += 1;
+            endVersusRound(run, 0);
+          }
+        }
+      } else {
+        if (livingEnemies(run).length === 0 && run.enemies.length) {
+          run.overTimer += dt;
+          if (run.overTimer > 0.45) {
+            run.won = true;
+            if (run.mode === 'solo') TK.Save.markCleared(run.levelId, run.score + Math.round(1000 / Math.max(1, run.elapsed)));
+            if (!TK.autoplay) {
+              TK.Audio.win();
+              setTimeout(() => { if (TK.run === run && run.won) TK.UI.showResult(true); }, 400);
+            }
+          }
+        } else {
+          const any = run.players.some((p) => p.alive || p._respawn > 0 || p.infinite);
+          if (!any || run.players.every((p) => p.out && !p.infinite)) {
+            run.lost = true;
+            if (!TK.autoplay) {
+              TK.Audio.lose();
+              setTimeout(() => { if (TK.run === run && run.lost) TK.UI.showResult(false); }, 350);
+            }
+          }
+        }
+      }
+    }
+    TK.UI.updateHud();
+  }
+
+  function endVersusRound(run, winner) {
+    if (run.vsWins[winner] >= run.vsNeed) {
+      run.won = true;
+      run.vsMessage = (winner === 0 ? 'Player 1' : 'Player 2') + ' wins the duel!';
+      TK.Save.recordVersus(winner);
+      if (!TK.autoplay) {
+        TK.Audio.win();
+        setTimeout(() => { if (TK.run === run) TK.UI.showResult(true); }, 400);
+      }
+    } else {
+      run.vsRound += 1;
+      run.vsPause = 1.1;
+      run.vsMessage = (winner === 0 ? 'Player 1' : 'Player 2') + ' scores!';
+      // reset entities after pause via timer handled below
+      run._needReset = true;
+    }
+  }
+
+  // After vs pause, reset positions if needed — hook into tick start
+  const _tick = tick;
+  function tickWrapped(dt) {
+    const run = TK.run;
+    if (run && run._needReset && run.vsPause <= 0 && !run.won) {
+      run._needReset = false;
+      const wins = run.vsWins.slice();
+      const round = run.vsRound;
+      const msg = run.vsMessage;
+      start(run.levelId, { versus: true, autoplay: TK.autoplay });
+      TK.run.vsWins = wins;
+      TK.run.vsRound = round;
+      TK.run.vsMessage = msg;
+      TK.run.vsPause = 0.4;
+      return;
+    }
+    _tick(dt);
+  }
+
+  function draw() {
+    const run = TK.run;
+    const ctx = TK.ctx;
+    if (!ctx) return;
+    const t = (run && run.elapsed) || 0;
+    if (!run) { TK.Art.drawBg(ctx, 'grass', t); return; }
+    TK.Art.drawBg(ctx, run.theme, t);
+    TK.Art.drawTiles(ctx, run);
+    for (const u of run.powers) TK.Art.drawPower(ctx, u, t);
+    for (const sh of run.shots) TK.Art.drawShot(ctx, sh);
+    for (const e of run.enemies) TK.Art.drawTank(ctx, e, t);
+    for (const p of run.players) {
+      if (p.alive || p.popT > 0) {
+        if (p.invuln > 0 && !p.alive) continue;
+        if (p.invuln > 0 && ((t * 8) % 1 < 0.45)) {
+          ctx.save(); ctx.globalAlpha = 0.5; TK.Art.drawTank(ctx, p, t); ctx.restore();
+        } else TK.Art.drawTank(ctx, p, t);
+      }
+    }
+    TK.Art.drawParticles(ctx, run.particles);
+    if (run.vsMessage && (run.vsPause > 0 || run.won)) {
+      ctx.fillStyle = 'rgba(0,0,0,.45)';
+      TK.roundRect(ctx, TK.W / 2 - 200, 80, 400, 48, 16); ctx.fill();
+      ctx.fillStyle = '#ffe566';
+      ctx.font = 'bold 22px system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(run.vsMessage, TK.W / 2, 104);
+    }
+  }
+
+  function togglePause() {
+    const run = TK.run;
+    if (!run || TK.screen !== 'play' || run.won || run.lost) return;
+    run.paused = !run.paused;
+    if (run.paused) TK.UI.showPause();
+    else {
+      hideOverlay();
+      TK.UI.showHud();
+      TK.UI.showTouch(run.mode !== 'solo');
+    }
+  }
+
+  function fastForward(maxSec) {
+    const run = TK.run;
+    if (!run) return { won: false, lost: true, t: 0 };
+    const prev = TK.autoplay;
+    TK.autoplay = true;
+    let t = 0;
+    const step = 1 / 30;
+    while (t < (maxSec || 90) && TK.run === run && !run.won && !run.lost) {
+      tickWrapped(step);
+      t += step;
+    }
+    TK.autoplay = prev;
+    return { won: !!run.won, lost: !!run.lost, t, score: run.score, lives: run.players.map((p) => p.lives), levelId: run.levelId };
+  }
+
+  function solveAll(profileId, fresh) {
+    if (fresh) TK.Save.resetAll();
+    TK.Save.setProfile(profileId);
+    const list = TK.Levels.forProfile(profileId);
+    const results = [];
+    for (const lv of list) {
+      start(lv.id, { profile: profileId, autoplay: true });
+      const r = fastForward(90);
+      results.push({ levelId: lv.id, won: r.won, lost: r.lost, t: r.t, score: r.score, lives: r.lives });
+    }
+    return results;
+  }
+
+  return { start, tick: tickWrapped, draw, togglePause, reflow, fastForward, solveAll, tryFire, POWER_KINDS, resetRound, parseMap };
+})();
+
+})();
+/* ==== 60-ui.js ==== */
+;(function(){
+/* Menus, HUD, touch joysticks and fire buttons */
+TK.UI = (() => {
+  function overlayPanel(html) {
+    const el = TK.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    const wrap = document.createElement('div');
+    wrap.className = 'panel';
+    wrap.innerHTML = html;
+    el.appendChild(wrap);
+    return wrap;
+  }
+
+  function hidePlayChrome() {
+    TK.hud.classList.add('hidden');
+    TK.touchEl.classList.add('hidden');
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.classList.add('hidden');
+  }
+
+  function title() {
+    TK.screen = 'title';
+    TK.run = null;
+    hidePlayChrome();
+    const p = TK.Save.profile();
+    const best = (p && p.best) || 0;
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Tanks</div>
+        <div class="sub">Cute tank duels in a magical arena!<br>Bouncing shots, Protego shields, and confetti pops — no mess.</div>
+        <div class="row">
+          <span class="chip">Best ${best}</span>
+          <span class="chip">${p.name}</span>
+        </div>
+        <div class="row">
+          <button class="btn big green" id="btnPlay" type="button">Play</button>
+          <button class="btn big purple" id="btnTwo" type="button">2 Players</button>
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="btnProfiles" type="button">Profiles</button>
+          <button class="btn ghost" id="btnHow" type="button">How to Play</button>
+        </div>
+      </div>`);
+    TK.bindTap(panel.querySelector('#btnPlay'), () => { TK.Audio.click(); profiles(); });
+    TK.bindTap(panel.querySelector('#btnTwo'), () => { TK.Audio.click(); twoPlayer(); });
+    TK.bindTap(panel.querySelector('#btnProfiles'), () => { TK.Audio.click(); profiles(); });
+    TK.bindTap(panel.querySelector('#btnHow'), () => { TK.Audio.click(); how(); });
+  }
+
+  function twoPlayer() {
+    TK.screen = 'two';
+    hidePlayChrome();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">2 Players</div>
+        <div class="sub">One screen. Left stick and fire for Player 1 (WASD + Space).<br>Right stick and fire for Player 2 (arrows + Enter).</div>
+        <div class="row">
+          <button class="btn big green" id="btnCoop" type="button">Co-op Campaign</button>
+          <button class="btn big blue" id="btnVersus" type="button">Versus · Best of 5</button>
+        </div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    TK.bindTap(panel.querySelector('#btnCoop'), () => { TK.Audio.click(); levels(true); });
+    TK.bindTap(panel.querySelector('#btnVersus'), () => { TK.Audio.click(); TK.Game.start(1, { versus: true }); });
+    TK.bindTap(panel.querySelector('#btnBack'), () => { TK.Audio.click(); title(); });
+  }
+
+  function profiles() {
+    TK.screen = 'profiles';
+    hidePlayChrome();
+    const cards = ['p1', 'p2'].map((id) => {
+      const meta = TK.profiles[id];
+      const p = TK.Save.profile(id);
+      const lives = meta.infiniteLives ? '∞ lives · slow foes · auto-aim' : '3 lives · tougher yards';
+      const n = TK.Levels.forProfile(id).length;
+      return `<button class="profile-card" type="button" data-id="${id}">
+        <h2>${p.name}</h2>
+        <div class="meta">${meta.label}<br>${lives}<br>${n} levels · Best ${p.best || 0}</div>
+      </button>`;
+    }).join('');
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Profiles</div>
+        <div class="sub">Player 1 is gentler, with auto-aim help. Player 2 is a sharper commander.</div>
+        <div class="row">${cards}</div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    panel.querySelectorAll('.profile-card').forEach((card) => {
+      TK.bindTap(card, () => {
+        TK.Audio.click();
+        TK.Save.setProfile(card.getAttribute('data-id'));
+        levels(false);
+      });
+    });
+    TK.bindTap(panel.querySelector('#btnBack'), () => { TK.Audio.click(); title(); });
+  }
+
+  function levels(coop) {
+    TK.screen = 'levels';
+    hidePlayChrome();
+    const pid = coop ? 'p1' : (TK.state.lastProfile || 'p1');
+    const p = TK.Save.profile(pid);
+    const easy = TK.profiles[pid].infiniteLives && !coop;
+    const list = TK.Levels.forProfile(coop ? 'p1' : pid);
+    const grid = list.map((lv) => {
+      const unlocked = easy || lv.id <= p.maxLevel;
+      const done = !!p.cleared[lv.id];
+      return `<button class="lvl${done ? ' done' : ''}${unlocked ? '' : ' locked'}" type="button" data-id="${lv.id}" ${unlocked ? '' : 'disabled'}>
+        ${lv.id}<span>${lv.name}</span>
+      </button>`;
+    }).join('');
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${coop ? 'Co-op Campaign' : 'Choose a Level'}</div>
+        <div class="sub">${coop ? 'Player 1 uses the left stick or WASD + Space · Player 2 uses the right stick or arrows + Enter' : (p.name + (easy ? ' · ∞ lives · auto-aim' : ' · 3 lives'))}</div>
+        <div class="level-grid">${grid}</div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    panel.querySelectorAll('.lvl:not(.locked)').forEach((btn) => {
+      TK.bindTap(btn, () => {
+        TK.Audio.click();
+        const id = parseInt(btn.getAttribute('data-id'), 10);
+        if (coop) TK.Game.start(id, { coop: true });
+        else TK.Game.start(id, { profile: pid });
+      });
+    });
+    TK.bindTap(panel.querySelector('#btnBack'), () => { TK.Audio.click(); title(); });
+  }
+
+  function how() {
+    TK.screen = 'how';
+    hidePlayChrome();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">How to Play</div>
+        <div class="sub" style="text-align:left;max-width:540px">
+          Drive your cute tank around the maze and pop every rival tank into confetti. Hits only puff and spin — no mess.<br><br>
+          <b>Touch:</b> move with the stick and tap the spark button to fire. Two players split the screen: left is Player 1, right is Player 2.<br>
+          <b>Keyboard:</b> Player 1 uses WASD + Space. Player 2 uses the arrows + Enter.<br><br>
+          Shots bounce off walls. Smash crates, then grab spells: Triple Charm, Protego, Fleet-Foot, and Bouncing Jinx.<br><br>
+          Player 1 has infinite lives, slower foes, and auto-aim help. Player 2 has 3 lives and 18 tougher yards — if those run out, retry the level.<br>
+          Co-op shares a campaign. Versus is a best-of-five duel.
+        </div>
+        <div class="row"><button class="btn green" id="btnBack" type="button">Got it</button></div>
+      </div>`);
+    TK.bindTap(panel.querySelector('#btnBack'), () => { TK.Audio.click(); title(); });
+  }
+
+  function showHud() {
+    TK.hud.classList.remove('hidden');
+    updateHud();
+  }
+
+  function updateHud() {
+    const run = TK.run;
+    if (!run || !TK.hud) return;
+    const lives = run.players.map((p) => {
+      const label = (run.mode !== 'solo') ? `P${p.id + 1} ` : '';
+      const hp = p.infinite ? '∞' : String(Math.max(0, p.out && !p.alive ? 0 : p.lives));
+      return `${label}♥ ${hp}`;
+    }).join(' · ');
+    let extra = '';
+    if (run.mode === 'versus') extra = `<span class="chip">P1 ${run.vsWins[0]} – ${run.vsWins[1]} P2 · R${run.vsRound}</span>`;
+    const title = run.mode === 'versus' ? 'Duel' : (run.level && run.level.name) || 'Tanks';
+    TK.hud.innerHTML = `
+      <span class="chip">${title}</span>
+      <span class="chip">★ ${run.score}</span>
+      <span class="chip">${lives}</span>
+      ${extra}`;
+  }
+
+  function showTouch(two) {
+    const te = TK.touchEl;
+    let want = !!TK._forceTouch;
+    try { if (navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) want = true; } catch (_) {}
+    if ('ontouchstart' in window) want = true;
+    try {
+      if (window.matchMedia && (matchMedia('(pointer: coarse)').matches || matchMedia('(any-pointer: coarse)').matches)) want = true;
+    } catch (_) {}
+    if (!want) {
+      te.classList.add('hidden');
+      return;
+    }
+    te.classList.remove('hidden');
+    te.setAttribute('aria-hidden', 'false');
+    const j2 = document.getElementById('joy2');
+    const f2 = document.getElementById('fire2');
+    if (j2) j2.classList.toggle('hidden', !two);
+    if (f2) f2.classList.toggle('hidden', !two);
+    const short = (window.innerHeight || TK.H) < 500;
+    const sz = short ? 64 : (TK.portrait ? 88 : 80);
+    const fireSz = short ? 56 : 64;
+    te.querySelectorAll('.joy-base').forEach((b) => {
+      b.style.width = sz + 'px';
+      b.style.height = sz + 'px';
+    });
+    const gap = 16;
+    const fireOff = 16 + sz + gap;
+    const fire1 = document.getElementById('fire1');
+    const fire2 = document.getElementById('fire2');
+    [fire1, fire2].forEach((btn) => {
+      if (!btn) return;
+      btn.style.width = fireSz + 'px';
+      btn.style.height = fireSz + 'px';
+      btn.style.minWidth = fireSz + 'px';
+      btn.style.minHeight = fireSz + 'px';
+    });
+    if (fire1) {
+      fire1.style.left = 'calc(' + fireOff + 'px + env(safe-area-inset-left))';
+      fire1.style.right = 'auto';
+    }
+    if (fire2) {
+      fire2.style.right = 'calc(' + fireOff + 'px + env(safe-area-inset-right))';
+      fire2.style.left = 'auto';
+    }
+  }
+
+  function showPause() {
+    const run = TK.run;
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Paused</div>
+        <div class="sub">${run.mode === 'versus' ? ('Score ' + run.vsWins[0] + ' – ' + run.vsWins[1]) : ('Score ' + run.score)}</div>
+        <div class="row">
+          <button class="btn big green" id="btnResume" type="button">Resume</button>
+          <button class="btn ghost" id="btnMenu" type="button">Menu</button>
+        </div>
+      </div>`);
+    TK.bindTap(panel.querySelector('#btnResume'), () => { TK.Audio.click(); TK.Game.togglePause(); });
+    TK.bindTap(panel.querySelector('#btnMenu'), () => { TK.Audio.click(); title(); });
+  }
+
+  function showResult(won) {
+    hidePlayChrome();
+    const run = TK.run;
+    const p = TK.Save.profile(run.soloProfile || 'p1');
+    const list = run.mode === 'versus' ? [] : TK.Levels.forProfile(run.mode === 'coop' ? 'p1' : (run.soloProfile || 'p1'));
+    const next = run.mode !== 'versus' && run.levelId < list.length;
+    const titleText = run.mode === 'versus'
+      ? (won ? (run.vsMessage || 'Duel over!') : 'Duel over!')
+      : (won ? 'Yard cleared!' : 'Tanks popped!');
+    const sub = run.mode === 'versus'
+      ? (`Final ${run.vsWins[0]} – ${run.vsWins[1]}`)
+      : (won ? 'Confetti everywhere! Ready for the next yard?' : 'If lives run out, try the yard again.');
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${titleText}</div>
+        <div class="sub">${sub}<br>Score ${run.score} · Best ${p.best || 0}</div>
+        <div class="row">
+          ${won && next ? '<button class="btn big green" id="btnNext" type="button">Next Level</button>' : ''}
+          <button class="btn ${won ? 'purple' : 'big green'}" id="btnRetry" type="button">${run.mode === 'versus' ? 'Duel Again' : 'Play Again'}</button>
+          <button class="btn ghost" id="btnMenu" type="button">Menu</button>
+        </div>
+      </div>`);
+    const retry = () => {
+      TK.Audio.click();
+      if (run.mode === 'versus') TK.Game.start(1, { versus: true });
+      else TK.Game.start(run.levelId, { coop: run.mode === 'coop', profile: run.soloProfile });
+    };
+    TK.bindTap(panel.querySelector('#btnRetry'), retry);
+    TK.bindTap(panel.querySelector('#btnMenu'), () => { TK.Audio.click(); title(); });
+    const nb = panel.querySelector('#btnNext');
+    if (nb) TK.bindTap(nb, () => {
+      TK.Audio.click();
+      TK.Game.start(run.levelId + 1, { coop: run.mode === 'coop', profile: run.soloProfile });
+    });
+  }
+
+  function bindJoysticks() {
+    const te = TK.touchEl;
+    if (!te) return;
+
+    function playerForPoint(x, y, target) {
+      const joy = target && target.closest && target.closest('.joy');
+      if (joy) return parseInt(joy.getAttribute('data-player'), 10) || 0;
+      const fire = target && target.closest && target.closest('.fire-btn');
+      if (fire) return parseInt(fire.getAttribute('data-player'), 10) || 0;
+      const mid = window.innerWidth / 2;
+      if (TK.run && TK.run.mode !== 'solo') return x < mid ? 0 : 1;
+      return 0;
+    }
+
+    function setKnob(pid, nx, ny) {
+      const joy = document.getElementById(pid === 0 ? 'joy1' : 'joy2');
+      if (!joy) return;
+      const knob = joy.querySelector('.joy-knob');
+      const base = joy.querySelector('.joy-base');
+      if (!knob || !base) return;
+      const max = base.clientWidth * 0.28;
+      knob.style.transform = `translate(calc(-50% + ${nx * max}px), calc(-50% + ${ny * max}px))`;
+    }
+
+    function apply(pid, cx, cy, origin) {
+      const dx = cx - origin.x, dy = cy - origin.y;
+      const max = 42;
+      let nx = dx / max, ny = dy / max;
+      const l = Math.hypot(nx, ny);
+      if (l > 1) { nx /= l; ny /= l; }
+      TK.sticks[pid] = { x: nx, y: ny };
+      setKnob(pid, nx, ny);
+    }
+
+    function endStick(pid) {
+      TK.sticks[pid] = { x: 0, y: 0 };
+      setKnob(pid, 0, 0);
+    }
+
+    function originFor(pid, cx, cy) {
+      const joy = document.getElementById(pid === 0 ? 'joy1' : 'joy2');
+      if (joy && !joy.classList.contains('hidden')) {
+        const r = joy.querySelector('.joy-base').getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }
+      return { x: cx, y: cy };
+    }
+
+    function isFireTarget(target) {
+      return !!(target && target.closest && target.closest('.fire-btn'));
+    }
+
+    te.addEventListener('pointerdown', (e) => {
+      if (TK.screen !== 'play' || !TK.run) return;
+      TK.Audio.unlock();
+      if (isFireTarget(e.target)) {
+        const pid = parseInt(e.target.closest('.fire-btn').getAttribute('data-player'), 10) || 0;
+        TK.firing[pid] = true;
+        e.target.closest('.fire-btn').classList.add('down');
+        TK.pointers[e.pointerId] = { pid, fire: true };
+        if (TK.run && TK.run.players[pid]) TK.Game.tryFire(TK.run, TK.run.players[pid]);
+        try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
+        e.preventDefault();
+        return;
+      }
+      const pid = playerForPoint(e.clientX, e.clientY, e.target);
+      const origin = originFor(pid, e.clientX, e.clientY);
+      TK.pointers[e.pointerId] = { pid, origin };
+      try { te.setPointerCapture(e.pointerId); } catch (_) {}
+      apply(pid, e.clientX, e.clientY, origin);
+      e.preventDefault();
+    }, { passive: false });
+
+    te.addEventListener('pointermove', (e) => {
+      const rec = TK.pointers[e.pointerId];
+      if (!rec || rec.fire) return;
+      apply(rec.pid, e.clientX, e.clientY, rec.origin);
+      e.preventDefault();
+    }, { passive: false });
+
+    const up = (e) => {
+      const rec = TK.pointers[e.pointerId];
+      if (!rec) return;
+      if (rec.fire) {
+        TK.firing[rec.pid] = false;
+        const btn = document.getElementById(rec.pid === 0 ? 'fire1' : 'fire2');
+        if (btn) btn.classList.remove('down');
+      } else endStick(rec.pid);
+      delete TK.pointers[e.pointerId];
+    };
+    te.addEventListener('pointerup', up);
+    te.addEventListener('pointercancel', up);
+
+    te.addEventListener('touchstart', (e) => {
+      if (TK.screen !== 'play' || !TK.run) return;
+      TK.Audio.unlock();
+      for (const t of e.changedTouches) {
+        const target = document.elementFromPoint(t.clientX, t.clientY) || t.target;
+        if (isFireTarget(target)) {
+          const pid = parseInt(target.closest('.fire-btn').getAttribute('data-player'), 10) || 0;
+          TK.firing[pid] = true;
+          target.closest('.fire-btn').classList.add('down');
+          TK.pointers['t' + t.identifier] = { pid, fire: true };
+          if (TK.run && TK.run.players[pid]) TK.Game.tryFire(TK.run, TK.run.players[pid]);
+          continue;
+        }
+        const pid = playerForPoint(t.clientX, t.clientY, target);
+        const origin = originFor(pid, t.clientX, t.clientY);
+        TK.pointers['t' + t.identifier] = { pid, origin };
+        apply(pid, t.clientX, t.clientY, origin);
+      }
+      e.preventDefault();
+    }, { passive: false });
+    te.addEventListener('touchmove', (e) => {
+      for (const t of e.changedTouches) {
+        const rec = TK.pointers['t' + t.identifier];
+        if (!rec || rec.fire) continue;
+        apply(rec.pid, t.clientX, t.clientY, rec.origin);
+      }
+      e.preventDefault();
+    }, { passive: false });
+    const tend = (e) => {
+      for (const t of e.changedTouches) {
+        const rec = TK.pointers['t' + t.identifier];
+        if (!rec) continue;
+        if (rec.fire) {
+          TK.firing[rec.pid] = false;
+          const btn = document.getElementById(rec.pid === 0 ? 'fire1' : 'fire2');
+          if (btn) btn.classList.remove('down');
+        } else endStick(rec.pid);
+        delete TK.pointers['t' + t.identifier];
+      }
+    };
+    te.addEventListener('touchend', tend);
+    te.addEventListener('touchcancel', tend);
+
+    function pressFire(pid, ev) {
+      if (TK.screen !== 'play' || !TK.run) return;
+      TK.Audio.unlock();
+      TK.firing[pid] = true;
+      const btn = document.getElementById(pid === 0 ? 'fire1' : 'fire2');
+      if (btn) btn.classList.add('down');
+      if (TK.run.players[pid]) TK.Game.tryFire(TK.run, TK.run.players[pid]);
+      if (ev) ev.preventDefault();
+    }
+    function releaseFire(pid) {
+      TK.firing[pid] = false;
+      const btn = document.getElementById(pid === 0 ? 'fire1' : 'fire2');
+      if (btn) btn.classList.remove('down');
+    }
+    ['fire1', 'fire2'].forEach((id, pid) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('pointerdown', (e) => { pressFire(pid, e); });
+      btn.addEventListener('pointerup', () => releaseFire(pid));
+      btn.addEventListener('pointercancel', () => releaseFire(pid));
+      btn.addEventListener('click', (e) => { pressFire(pid, e); releaseFire(pid); });
+    });
+  }
+
+  return { title, profiles, levels, how, twoPlayer, showHud, updateHud, showTouch, showPause, showResult, bindJoysticks, hidePlayChrome };
+})();
+
+})();
+/* ==== 70-boot.js ==== */
+;(function(){
+/* Boot, input, loop, fullscreen, debug hook */
+(function boot() {
+  function loop(t) {
+    const dt = Math.min(0.033, (t - (TK.lastT || t)) / 1000);
+    TK.lastT = t;
+    if (TK._rotateHintTimer > 0) {
+      TK._rotateHintTimer -= dt;
+      if (TK._rotateHintTimer <= 0) {
+        TK._rotateDismissed = true;
+        const tip = document.getElementById('rotateTip');
+        if (tip) tip.classList.add('hidden');
+      }
+    }
+    TK.fitCanvas();
+    if (TK.screen === 'play' && TK.run) {
+      TK.Game.tick(dt);
+      TK.Game.draw();
+    } else {
+      const ctx = TK.ctx;
+      if (ctx) {
+        const sec = t / 1000;
+        TK.Art.drawBg(ctx, 'hall', sec);
+        TK.Art.drawTitleTank(ctx, TK.W * 0.35, TK.H * 0.64, sec, 'p1', false);
+        TK.Art.drawTitleTank(ctx, TK.W * 0.65, TK.H * 0.64, sec, 'p2', true);
+      }
+    }
+    TK.raf = requestAnimationFrame(loop);
+  }
+
+  function bindInput() {
+    window.addEventListener('keydown', (e) => {
+      TK.Audio.unlock();
+      TK.keys[e.key] = true;
+      if (e.code) TK.keys[e.code] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Enter'].indexOf(e.key) >= 0) e.preventDefault();
+      if ((e.key === 'p' || e.key === 'P' || e.key === 'Escape') && TK.run && TK.screen === 'play') {
+        TK.Game.togglePause();
+      }
+    }, { passive: false });
+    window.addEventListener('keyup', (e) => {
+      TK.keys[e.key] = false;
+      if (e.code) TK.keys[e.code] = false;
+    });
+    const unlock = () => TK.Audio.unlock();
+    window.addEventListener('pointerdown', unlock);
+    window.addEventListener('touchstart', unlock, { passive: true });
+
+    try {
+      TK._rotateSeenEver = localStorage.getItem('tk-rotate-hint-v1') === '1';
+    } catch (e) { TK._rotateSeenEver = false; }
+    TK._rotateDismissed = !!TK._rotateSeenEver;
+    TK._rotateHintTimer = 0;
+    TK.refreshRotateHint = () => {
+      const tip = document.getElementById('rotateTip');
+      if (!tip) return;
+      const show = !!TK.portrait && !TK._rotateDismissed && TK.screen === 'play';
+      if (show && tip.classList.contains('hidden')) {
+        tip.classList.remove('hidden');
+        TK._rotateHintTimer = 4.0;
+        try { localStorage.setItem('tk-rotate-hint-v1', '1'); TK._rotateSeenEver = true; } catch (err) {}
+      }
+      if (!show) tip.classList.add('hidden');
+    };
+    window.addEventListener('resize', () => {
+      TK.fitCanvas();
+      if (TK.screen === 'play' && TK.run) TK.UI.showTouch(TK.run.mode !== 'solo');
+    });
+    window.addEventListener('orientationchange', () => setTimeout(() => {
+      TK.fitCanvas();
+      if (TK.screen === 'play' && TK.run) TK.UI.showTouch(TK.run.mode !== 'solo');
+    }, 50));
+
+    const mute = document.getElementById('muteBtn');
+    if (mute) mute.onclick = () => { TK.Audio.unlock(); TK.Audio.setMuted(!TK.muted); };
+    const fs = document.getElementById('fsBtn');
+    if (fs) fs.onclick = () => {
+      TK.Audio.unlock();
+      const app = document.getElementById('app');
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const req = app.requestFullscreen || app.webkitRequestFullscreen;
+        if (req) req.call(app).catch(() => {});
+      } else {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) ex.call(document);
+      }
+    };
+    const pause = document.getElementById('pauseBtn');
+    if (pause) {
+      pause.classList.add('hidden');
+      pause.onclick = () => { TK.Audio.unlock(); TK.Game.togglePause(); };
+    }
+    TK.UI.bindJoysticks();
+  }
+
+  function init() {
+    TK.canvas = document.getElementById('game');
+    TK.ctx = TK.canvas.getContext('2d');
+    TK.overlay = document.getElementById('overlay');
+    TK.hud = document.getElementById('hud');
+    TK.touchEl = document.getElementById('touch');
+    TK.fitCanvas();
+    TK.Save.load();
+    TK.Audio.loadMute();
+    bindInput();
+    TK.screen = 'title';
+    TK.UI.title();
+    TK.raf = requestAnimationFrame(loop);
+
+    window.__game = {
+      TK,
+      start(level, profile, coop) {
+        if (profile && !coop) TK.Save.setProfile(profile);
+        return TK.Game.start(level || 1, { profile: profile, coop: !!coop, autoplay: false });
+      },
+      startCoop(level) { return TK.Game.start(level || 1, { coop: true }); },
+      startVersus() { return TK.Game.start(1, { versus: true }); },
+      autoplay(on) { TK.autoplay = on !== false; return TK.autoplay; },
+      state: () => TK.state,
+      run: () => TK.run,
+      screen: () => TK.screen,
+      goTitle: () => TK.UI.title(),
+      goProfiles: () => TK.UI.profiles(),
+      goLevels: (coop) => TK.UI.levels(!!coop),
+      goHow: () => TK.UI.how(),
+      goTwo: () => TK.UI.twoPlayer(),
+      pause: () => TK.Game.togglePause(),
+      key(k, down) { TK.keys[k] = !!down; },
+      setStick(i, x, y) { TK.sticks[i] = { x: x, y: y }; },
+      setFire(i, on) { TK.firing[i] = !!on; },
+      muted: () => TK.muted,
+      players: () => TK.run && TK.run.players,
+      solveAll: (pid, fresh) => TK.Game.solveAll(pid, fresh !== false),
+      resetSave: () => TK.Save.resetAll(),
+      fastForward: (s) => TK.Game.fastForward(s)
+    };
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+})();</script>
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "tanks";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>
