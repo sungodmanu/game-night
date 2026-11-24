@@ -1,0 +1,2802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230e121b%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2718%27 fill=%27%23ffd77a%27/%3E%3Ccircle cx=%2740%27 cy=%2726%27 r=%2716%27 fill=%27%230e121b%27/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1020">
+<title>Death Valley Chase</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#1a1020;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(ellipse at 50% 0%,#5a2a28 0%,#1a1020 70%)}
+#game{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#c4844a;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+#game.portrait{width:100%;height:auto;max-height:94dvh;max-width:100%;object-fit:contain}
+#overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:10}
+#overlay>*{pointer-events:auto}
+#overlay.sheet{align-items:flex-end;justify-content:center}
+#overlay.sheet .panel{max-width:none;width:100%;height:auto;max-height:48%;border-radius:0;background:transparent;border:none;box-shadow:none;padding:0;overflow:visible;display:flex;flex-direction:column;justify-content:flex-end;backdrop-filter:none;-webkit-backdrop-filter:none}
+/* HUD sits below the top-left Games back button and the top-right icon cluster */
+#hud{position:absolute;left:0;right:0;top:calc(72px + env(safe-area-inset-top));padding:0 12px;display:flex;gap:8px;align-items:center;justify-content:center;pointer-events:none;z-index:5;font-weight:800;flex-wrap:wrap}
+#hud.hidden,#touch.hidden,#pauseBtn.hidden{display:none!important}
+.hud-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(20,10,16,.62);border:2px solid rgba(255,224,150,.35);font-size:15px;text-shadow:0 1px 2px #000;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.icon-btn{position:absolute;z-index:20;width:48px;height:48px;min-width:48px;min-height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.16);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* ≥12px gaps between Pause, Mute, Fullscreen — all top-right, clear of the Games back button */
+#fsBtn{top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+#muteBtn{top:calc(8px + env(safe-area-inset-top));right:calc(68px + env(safe-area-inset-right))}
+#pauseBtn{top:calc(8px + env(safe-area-inset-top));right:calc(128px + env(safe-area-inset-right))}
+.icon-btn:active{transform:scale(.94)}
+.btn{min-width:48px;min-height:48px;padding:12px 22px;border:none;border-radius:18px;font-size:20px;font-weight:800;cursor:pointer;color:#3a1a10;background:#ffe09a;box-shadow:0 4px 0 #c48a2a,0 8px 18px rgba(0,0,0,.25);touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #c48a2a,0 4px 10px rgba(0,0,0,.25)}
+.btn.big{font-size:24px;padding:14px 26px;border-radius:22px;min-height:60px}
+.btn.green{background:#9ee07a;box-shadow:0 4px 0 #3d8a2a,0 8px 18px rgba(0,0,0,.25)}
+.btn.blue{background:#9ad8ff;box-shadow:0 4px 0 #2a6a9a,0 8px 18px rgba(0,0,0,.25)}
+.btn.pink{background:#ffb0c8;box-shadow:0 4px 0 #c45a7a,0 8px 18px rgba(0,0,0,.25)}
+.btn.orange{background:#ffb060;box-shadow:0 4px 0 #c46a18,0 8px 18px rgba(0,0,0,.25)}
+.btn.purple{background:#d4b0ff;box-shadow:0 4px 0 #7a4ab0,0 8px 18px rgba(0,0,0,.25)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.panel{background:rgba(36,18,22,.92);border:3px solid rgba(255,210,140,.28);border-radius:28px;padding:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 16px 50px rgba(0,0,0,.45);max-width:min(980px,96vw);max-height:min(94dvh,94vh);overflow:auto}
+.title{font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:.5px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.35);margin-bottom:6px;color:#ffe09a}
+.sub{text-align:center;opacity:.92;margin-bottom:14px;font-size:15px;line-height:1.4}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center}
+.profile-card{width:min(280px,42vw);min-height:170px;border-radius:24px;background:linear-gradient(160deg,#7a3a22,#2a1418);border:4px solid rgba(255,255,255,.2);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.profile-card:active{transform:scale(.97)}
+.profile-card h2{font-size:22px}
+.profile-card .meta{font-size:14px;opacity:.85;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:700;min-height:40px}
+#touch{position:absolute;inset:0;z-index:8;pointer-events:none}
+.lane-btn,.jump-btn{position:absolute;pointer-events:auto;z-index:9;border:none;color:#3a1a10;font-weight:900;cursor:pointer;touch-action:none;box-shadow:0 4px 0 rgba(0,0,0,.28),0 8px 16px rgba(0,0,0,.25)}
+.lane-btn{width:64px;height:64px;min-width:48px;min-height:48px;border-radius:18px;background:rgba(255,224,154,.9);font-size:26px}
+.jump-btn{width:72px;height:72px;min-width:56px;min-height:56px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ffe9a0,#ff8a3d 58%,#c94a16);font-size:26px}
+.lane-btn:active,.lane-btn.down,.jump-btn:active,.jump-btn.down{transform:translateY(2px) scale(.96);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+#laneLeft{left:calc(16px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom))}
+#laneRight{left:calc(88px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom))}
+#jump1{right:calc(16px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom))}
+#laneLeft2,#laneRight2,#jump2{display:none}
+#touch.coop #laneLeft2,#touch.coop #laneRight2,#touch.coop #jump2{display:block}
+#touch.coop #laneLeft{left:calc(16px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom))}
+#touch.coop #laneRight{left:calc(88px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom))}
+#touch.coop #jump1{left:calc(160px + env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom));right:auto}
+#touch.coop #laneLeft2{right:calc(88px + env(safe-area-inset-right));left:auto;bottom:calc(16px + env(safe-area-inset-bottom))}
+#touch.coop #laneRight2{right:calc(16px + env(safe-area-inset-right));left:auto;bottom:calc(16px + env(safe-area-inset-bottom))}
+#touch.coop #jump2{right:calc(160px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom))}
+.toast{position:absolute;top:22%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:12px 20px;border-radius:16px;font-weight:800;font-size:18px;z-index:30;pointer-events:none;text-align:center;max-width:80%}
+.hidden{display:none!important}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;width:100%;max-width:820px;padding:4px}
+.lvl{min-width:56px;min-height:52px;border-radius:14px;border:none;background:rgba(255,255,255,.14);color:#fff;font-weight:900;font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.lvl span{font-size:10px;font-weight:700;opacity:.85}
+.lvl.done{background:#e8b84a;color:#3a1a10}
+.lvl.locked{opacity:.35;cursor:default}
+.lvl.cur{outline:3px solid #ffe09a}
+.meter{height:10px;border-radius:999px;background:rgba(0,0,0,.35);overflow:hidden;width:100%;border:1px solid rgba(255,255,255,.2)}
+.meter>i{display:block;height:100%;border-radius:999px}
+.meter.food>i{background:#8fd36a}
+.meter.water>i{background:#6ec4ff}
+.meter.health>i{background:#ff8aa0}
+.care-card{width:min(100%,920px);background:rgba(20,10,16,.88);border:2px solid rgba(255,224,150,.28);border-radius:20px;padding:8px 14px;margin:8px auto calc(10px + env(safe-area-inset-bottom));max-height:42dvh;overflow:auto}
+.animal-list{display:flex;gap:8px;overflow:auto;padding:4px 0;width:100%;max-height:80px}
+.animal-chip{min-width:64px;min-height:64px;border-radius:16px;border:3px solid transparent;background:rgba(255,255,255,.12);color:#fff;font-weight:800;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px}
+.animal-chip.sel{border-color:#ffe09a;background:rgba(255,224,154,.22)}
+.animal-chip.sad{outline:2px solid #ff8aa0}
+#rotateTip{position:absolute;left:50%;top:calc(128px + env(safe-area-inset-top));transform:translateX(-50%);z-index:40;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 12px;max-width:min(340px,92vw)}
+#rotateTip.hidden{display:none!important}
+#rotateTip .hint-banner{pointer-events:none;background:rgba(36,18,22,.88);border:2px solid rgba(255,224,154,.45);border-radius:16px;padding:10px 14px;font-weight:800;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);line-height:1.3}
+.care-card .btn{min-height:48px;padding:8px 14px;font-size:16px}
+@media (max-width:500px){
+  .care-card{max-height:48dvh}
+  .care-card .btn{min-height:44px;padding:8px 12px;font-size:15px}
+  .animal-chip{min-width:56px;min-height:56px;font-size:10px}
+}
+@media (max-height:650px){
+  .profile-card{min-height:140px;width:min(230px,40vw)}
+  .title{font-size:clamp(20px,4.2vw,32px)}
+  .panel{padding:12px;border-radius:20px}
+  .lane-btn{width:56px;height:56px}
+  .jump-btn{width:64px;height:64px;min-width:56px;min-height:56px;font-size:22px}
+  #laneRight{left:calc(80px + env(safe-area-inset-left))}
+  #touch.coop #jump1{left:calc(144px + env(safe-area-inset-left))}
+  #touch.coop #jump2{right:calc(144px + env(safe-area-inset-right))}
+  #touch.coop #laneLeft2{right:calc(80px + env(safe-area-inset-right))}
+}
+@media (max-height:450px){
+  .lane-btn{width:48px;height:48px;min-width:48px;min-height:48px;font-size:20px;border-radius:14px}
+  .jump-btn{width:56px;height:56px;min-width:56px;min-height:56px}
+  #laneRight{left:calc(70px + env(safe-area-inset-left))}
+  #touch.coop #jump1{left:calc(124px + env(safe-area-inset-left))}
+  #touch.coop #jump2{right:calc(124px + env(safe-area-inset-right))}
+  #touch.coop #laneLeft2{right:calc(70px + env(safe-area-inset-right))}
+}
+@media (orientation:portrait) and (max-width:500px){
+  .profile-card{width:min(300px,80vw)}
+  .lane-btn{width:64px;height:64px}
+  .jump-btn{width:72px;height:72px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="1180" height="600" aria-label="Death Valley Chase"></canvas>
+  <div id="hud" class="hidden"></div>
+  <div id="touch" class="hidden" aria-hidden="true">
+    <button class="lane-btn" id="laneLeft" data-player="0" data-dir="-1" type="button" aria-label="Left">◀</button>
+    <button class="lane-btn" id="laneRight" data-player="0" data-dir="1" type="button" aria-label="Right">▶</button>
+    <button class="jump-btn" id="jump1" data-player="0" type="button" aria-label="Jump">⬆</button>
+    <button class="lane-btn p2" id="laneLeft2" data-player="1" data-dir="-1" type="button" aria-label="P2 Left">◀</button>
+    <button class="lane-btn p2" id="laneRight2" data-player="1" data-dir="1" type="button" aria-label="P2 Right">▶</button>
+    <button class="jump-btn p2" id="jump2" data-player="1" type="button" aria-label="P2 Jump">⬆</button>
+  </div>
+  <div id="overlay"></div>
+  <div id="rotateTip" class="hidden" role="status" aria-live="polite">
+    <div class="hint-banner">Turn sideways for a wider trail!</div>
+  </div>
+  <button id="pauseBtn" class="icon-btn" type="button" aria-label="Pause">⏸</button>
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">🔊</button>
+  <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">⛶</button>
+</div>
+<script>"use strict";
+/* ==== 00-core.js ==== */
+;(function(){
+/* Death Valley Chase — core namespace & helpers */
+const DV = window.DV = {
+  VERSION: 1,
+  SAVE_KEY: 'death-valley-chase-v1',
+  W: 1180, H: 600,
+  BASE_W: 1180, BASE_H: 600,
+  LEVELS_PER_AREA: 70,
+  BADGES_PER_UPGRADE: 10,
+  LANES: 3,
+  profiles: {
+    p1: {
+      id: 'p1', defaultName: 'Player 1', label: 'Junior Ranger',
+      infiniteLives: true, lives: 99,
+      speed: 240, gapScale: 1.45, density: 0.72,
+      invuln: 2.1, magnet: 90, jumpV: 620,
+      touchBtn: 80, animals: 0.85
+    },
+    p2: {
+      id: 'p2', defaultName: 'Player 2', label: 'Park Ranger',
+      infiniteLives: false, lives: 3,
+      speed: 330, gapScale: 1.0, density: 1.0,
+      invuln: 1.25, magnet: 24, jumpV: 660,
+      touchBtn: 68, animals: 1.0
+    }
+  },
+  memStore: null,
+  state: null,
+  screen: 'boot',
+  raf: 0,
+  lastT: 0,
+  muted: false,
+  autoplay: false,
+  keys: Object.create(null),
+  jumpHold: [false, false],
+  laneHold: [0, 0],
+  pointers: Object.create(null),
+  canvas: null,
+  ctx: null,
+  overlay: null,
+  hud: null,
+  touchEl: null,
+  run: null,
+  portrait: false,
+  shelterSel: 0,
+  passportPage: 0
+};
+
+DV.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+DV.lerp = (a, b, t) => a + (b - a) * t;
+DV.rand = (a, b) => a + Math.random() * (b - a);
+DV.pick = (arr) => arr[(Math.random() * arr.length) | 0];
+DV.seeded = (seed) => {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+};
+DV.hash = (...parts) => {
+  let h = 2166136261;
+  const s = parts.join('|');
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+};
+DV.now = () => performance.now();
+DV.meta = (id) => DV.profiles[id || (DV.run && DV.run.soloProfile) || (DV.state && DV.state.lastProfile) || 'p1'];
+DV.toast = (msg, ms) => {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('app').appendChild(el);
+  setTimeout(() => el.remove(), ms || 1600);
+};
+DV.fitCanvas = () => {
+  const c = DV.canvas;
+  if (!c) return;
+  const iw = window.innerWidth || DV.BASE_W;
+  const ih = window.innerHeight || DV.BASE_H;
+  const portrait = ih > iw * 1.05;
+  DV.portrait = portrait;
+  let wantW = DV.BASE_W, wantH = DV.BASE_H;
+  if (portrait) {
+    const targetScale = 0.88;
+    wantW = Math.round(Math.min(520, Math.max(390, iw / targetScale)));
+    wantH = Math.round(wantW * (ih / Math.max(1, iw)));
+    wantH = DV.clamp(wantH, 700, 1200);
+  }
+  if (DV.W !== wantW || DV.H !== wantH) {
+    DV.W = wantW; DV.H = wantH;
+    if (DV.run && DV.Game && DV.Game.reflow) DV.Game.reflow();
+  }
+  if (c.width !== DV.W) c.width = DV.W;
+  if (c.height !== DV.H) c.height = DV.H;
+  c.classList.toggle('portrait', !!portrait);
+  DV.refreshRotateHint && DV.refreshRotateHint();
+};
+DV.clear = (color) => {
+  const ctx = DV.ctx;
+  ctx.fillStyle = color || '#c4844a';
+  ctx.fillRect(0, 0, DV.W, DV.H);
+};
+DV.roundRect = (ctx, x, y, w, h, r) => {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+};
+DV.bindTap = (el, fn) => {
+  if (!el) return;
+  let last = 0;
+  const run = (e) => {
+    const t = Date.now();
+    if (t - last < 260) return;
+    last = t;
+    try { e.preventDefault(); } catch (_) {}
+    fn(e);
+  };
+  el.addEventListener('pointerup', run);
+  el.addEventListener('click', run);
+};
+DV.laneY = (lane) => {
+  const ground = DV.H * (DV.portrait ? 0.70 : 0.78);
+  const spacing = DV.portrait ? 78 : 90;
+  return ground - lane * spacing;
+};
+DV.trackTop = () => DV.laneY(DV.LANES - 1) - 70;
+DV.groundY = () => DV.laneY(0) + 28;
+
+})();
+/* ==== 10-audio.js ==== */
+;(function(){
+/* WebAudio SFX — only after first user input */
+DV.Audio = (() => {
+  let ctx = null, master = null, unlocked = false;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = DV.muted ? 0 : 0.3;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+
+  function unlock() {
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume().catch(() => {});
+    unlocked = true;
+  }
+
+  function tone(freq, dur, type, vol, slide) {
+    if (DV.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const t0 = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.14, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function noise(dur, vol) {
+    if (DV.muted) return;
+    const c = ensure();
+    if (!c || !unlocked) return;
+    const n = Math.max(1, (c.sampleRate * dur) | 0);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = vol || 0.05;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1400;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start();
+  }
+
+  return {
+    unlock,
+    setMuted(m) {
+      DV.muted = !!m;
+      if (master) master.gain.value = DV.muted ? 0 : 0.3;
+      try { localStorage.setItem('dvc-mute', DV.muted ? '1' : '0'); } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DV.muted ? '🔇' : '🔊';
+    },
+    loadMute() {
+      try { DV.muted = localStorage.getItem('dvc-mute') === '1'; } catch (_) {}
+      const btn = document.getElementById('muteBtn');
+      if (btn) btn.textContent = DV.muted ? '🔇' : '🔊';
+    },
+    click() { tone(360, 0.05, 'triangle', 0.06); },
+    jump() { tone(420, 0.09, 'sine', 0.07, 280); },
+    hit() { tone(180, 0.1, 'sawtooth', 0.07, 90); noise(0.08, 0.04); },
+    rescue() { tone(620, 0.08, 'sine', 0.09); setTimeout(() => tone(880, 0.12, 'sine', 0.07), 50); },
+    coin() { tone(880, 0.06, 'square', 0.05); setTimeout(() => tone(1180, 0.07, 'square', 0.04), 40); },
+    badge() { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => tone(f, 0.11, 'sine', 0.08), i * 70)); },
+    care() { tone(520, 0.08, 'triangle', 0.07); setTimeout(() => tone(660, 0.1, 'sine', 0.06), 40); },
+    baby() { [660, 790, 990].forEach((f, i) => setTimeout(() => tone(f, 0.09, 'sine', 0.08), i * 60)); },
+    stamp() { tone(240, 0.08, 'square', 0.06); noise(0.06, 0.04); setTimeout(() => tone(540, 0.12, 'triangle', 0.08), 80); },
+    win() { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => tone(f, 0.12, 'sine', 0.09), i * 70)); },
+    lose() { tone(220, 0.2, 'sawtooth', 0.07, 90); setTimeout(() => tone(140, 0.25, 'triangle', 0.06, 70), 120); },
+    whoosh() { noise(0.1, 0.03); tone(200, 0.08, 'sine', 0.03, 80); }
+  };
+})();
+
+})();
+/* ==== 20-save.js ==== */
+;(function(){
+/* Save / load — localStorage in try/catch, in-memory fallback */
+DV.Save = (() => {
+  const NAMES = ['Pip', 'Sandy', 'Cinder', 'Hazel', 'Rusty', 'Mango', 'Pebble', 'Juniper',
+    'Canyon', 'Dune', 'Pepper', 'Maple', 'Scout', 'Wisp', 'Acorn', 'Puddle', 'Ember',
+    'Quill', 'Nibble', 'Velvet', 'Saffron', 'Pinto', 'Cedar', 'Biscuit', 'Willow',
+    'Copper', 'Daisy', 'Pogo', 'Mica', 'Taffy', 'Sunny', 'Bramble', 'Clover', 'Puff'];
+
+  function blankAnimal(spec, opts) {
+    opts = opts || {};
+    const rng = opts.rng || Math.random;
+    const id = opts.id || ('a' + Date.now().toString(36) + Math.floor(rng() * 1e6).toString(36));
+    return {
+      id,
+      species: spec,
+      name: opts.name || NAMES[Math.floor(rng() * NAMES.length)],
+      age: opts.age || 'adult',
+      rescuedWithBaby: !!opts.withBaby,
+      baby: !!opts.baby,
+      parentId: opts.parentId || null,
+      hunger: opts.hunger == null ? 86 : opts.hunger,
+      thirst: opts.thirst == null ? 88 : opts.thirst,
+      health: opts.health == null ? (opts.age === 'old' ? 70 : 92) : opts.health,
+      careStreak: 0,
+      park: opts.park || 'death-valley',
+      area: opts.area || 'furnace-creek',
+      rescuedLevel: opts.level || 1,
+      tint: Math.floor(rng() * 5),
+      bornAt: opts.bornAt || 0
+    };
+  }
+
+  function blankProfile(id) {
+    return {
+      id,
+      name: DV.profiles[id].defaultName,
+      badges: 0,
+      coins: 0,
+      shelterLevel: 0,
+      maxLevel: 1,
+      currentLevel: 1,
+      cleared: {},
+      animals: [],
+      stamps: {},
+      areaStickers: {},
+      seenAreas: {},
+      best: 0,
+      levelsPlayed: 0,
+      picnic: 0
+    };
+  }
+
+  function blankState() {
+    return {
+      v: DV.VERSION,
+      lastProfile: 'p1',
+      profiles: { p1: blankProfile('p1'), p2: blankProfile('p2') }
+    };
+  }
+
+  function readRaw() {
+    try {
+      const t = localStorage.getItem(DV.SAVE_KEY);
+      if (t) {
+        const data = JSON.parse(t);
+        DV.memStore = data;
+        return data;
+      }
+    } catch (_) {}
+    return DV.memStore;
+  }
+
+  function writeRaw(data) {
+    DV.memStore = data;
+    try {
+      localStorage.setItem(DV.SAVE_KEY, JSON.stringify(data));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function load() {
+    const raw = readRaw();
+    if (!raw || raw.v !== DV.VERSION) {
+      DV.state = blankState();
+      save();
+      return DV.state;
+    }
+    for (const id of ['p1', 'p2']) {
+      raw.profiles[id] = Object.assign(blankProfile(id), raw.profiles[id] || {});
+      if (!raw.profiles[id].cleared) raw.profiles[id].cleared = {};
+      if (!raw.profiles[id].animals) raw.profiles[id].animals = [];
+      if (!raw.profiles[id].stamps) raw.profiles[id].stamps = {};
+      if (!raw.profiles[id].areaStickers) raw.profiles[id].areaStickers = {};
+      if (!raw.profiles[id].seenAreas) raw.profiles[id].seenAreas = {};
+    }
+    if (!raw.lastProfile) raw.lastProfile = 'p1';
+    DV.state = raw;
+    return DV.state;
+  }
+
+  function save() {
+    if (!DV.state) return false;
+    return writeRaw(DV.state);
+  }
+
+  function profile(id) {
+    if (!DV.state) load();
+    return DV.state.profiles[id || DV.state.lastProfile || 'p1'];
+  }
+
+  function setProfile(id) {
+    DV.state.lastProfile = id;
+    save();
+  }
+
+  function rename(id, name) {
+    const p = profile(id);
+    p.name = String(name || DV.profiles[id].defaultName).slice(0, 16) || DV.profiles[id].defaultName;
+    save();
+  }
+
+  function shelterLevelFor(badges) {
+    return Math.floor((badges || 0) / DV.BADGES_PER_UPGRADE);
+  }
+
+  function tickCare(p, times) {
+    times = times == null ? 1 : times;
+    const news = [];
+    for (let n = 0; n < times; n++) {
+      for (const a of p.animals) {
+        if (a.baby) {
+          a.hunger = DV.clamp(a.hunger - 5, 8, 100);
+          a.thirst = DV.clamp(a.thirst - 6, 8, 100);
+          a.health = DV.clamp(a.health - (a.hunger < 30 || a.thirst < 30 ? 3 : 0.4), 12, 100);
+          continue;
+        }
+        const old = a.age === 'old' ? 1.35 : 1;
+        a.hunger = DV.clamp(a.hunger - 7 * old, 8, 100);
+        a.thirst = DV.clamp(a.thirst - 8 * old, 8, 100);
+        let drop = 1.2 * (a.age === 'old' ? 1.4 : 1);
+        if (a.hunger < 35 || a.thirst < 35) drop += 4;
+        a.health = DV.clamp(a.health - drop, 12, 100);
+        if (a.hunger >= 75 && a.thirst >= 75 && a.health >= 70) a.careStreak = (a.careStreak || 0) + 1;
+        else a.careStreak = 0;
+        const spec = DV.SPECIES[a.species];
+        if (spec && spec.canBaby && a.age !== 'old' && !a.baby && a.careStreak >= 8) {
+          const already = p.animals.some((b) => b.parentId === a.id);
+          if (!already) {
+            const baby = blankAnimal(a.species, {
+              name: a.name + ' Jr',
+              age: 'young',
+              baby: true,
+              parentId: a.id,
+              park: a.park,
+              area: a.area,
+              level: p.currentLevel,
+              hunger: 90, thirst: 90, health: 95,
+              bornAt: p.levelsPlayed
+            });
+            news.push(baby);
+            a.careStreak = 0;
+          }
+        }
+      }
+      if (news.length) {
+        p.animals.push(...news);
+        news.length = 0;
+      }
+    }
+    return p.animals.filter((a) => a.bornAt === p.levelsPlayed && a.baby);
+  }
+
+  function addRescues(p, world) {
+    const added = [];
+    const rng = DV.seeded(world.seed ^ 0x9e3779b9);
+    for (const an of world.animals) {
+      const a = blankAnimal(an.species, {
+        id: an.saveId || an.id,
+        name: an.name,
+        age: an.old ? 'old' : (an.baby ? 'young' : 'adult'),
+        withBaby: !!an.withBaby,
+        baby: !!an.baby,
+        park: world.park.id,
+        area: world.area.id,
+        level: world.globalLevel,
+        rng
+      });
+      added.push(a);
+      if (an.withBaby) {
+        added.push(blankAnimal(an.species, {
+          name: a.name + ' Jr',
+          age: 'young',
+          baby: true,
+          parentId: a.id,
+          park: world.park.id,
+          area: world.area.id,
+          level: world.globalLevel,
+          rng
+        }));
+      }
+    }
+    p.animals.push(...added);
+    return added;
+  }
+
+  function applyWin(p, world, stats) {
+    const lvl = world.globalLevel;
+    const first = !p.cleared[lvl];
+    p.cleared[lvl] = true;
+    p.levelsPlayed = (p.levelsPlayed || 0) + 1;
+    if (first) {
+      p.badges += 1;
+      p.coins += world.coinsReward + (stats && stats.bonus || 0);
+    } else {
+      p.coins += Math.max(3, Math.floor((world.coinsReward + (stats && stats.bonus || 0)) / 2));
+    }
+    if (lvl >= p.maxLevel) p.maxLevel = lvl + 1;
+    if (p.currentLevel <= lvl) p.currentLevel = lvl + 1;
+    if (lvl > (p.best || 0)) p.best = lvl;
+    p.shelterLevel = shelterLevelFor(p.badges);
+    addRescues(p, world);
+    if (p.animals.length > 80) p.animals = p.animals.slice(-80);
+    const babies = tickCare(p, 1);
+    const loc = DV.World.locate(lvl);
+    p.areaStickers[loc.area.id + (loc.remix ? '-r' + loc.remix : '')] = true;
+    if (loc.areaIndex === loc.park.areas.length - 1 && loc.localLevel === DV.LEVELS_PER_AREA) {
+      const key = loc.park.id + (loc.remix ? '-r' + loc.remix : '');
+      if (!p.stamps[key]) {
+        p.stamps[key] = { park: loc.park.id, remix: loc.remix || 0, at: p.levelsPlayed, level: lvl };
+      }
+    }
+    save();
+    return { first, babies, shelterLevel: p.shelterLevel, stamps: p.stamps, badges: p.badges, coins: p.coins };
+  }
+
+  function completeUpTo(n, pid) {
+    const p = profile(pid);
+    const out = { stamped: [], babies: 0, last: null };
+    const already = Object.keys(p.cleared).length;
+    // Fast path for big jumps: award badges/stamps without simulating every animal.
+    const first = (i) => !p.cleared[i];
+    let newBadges = 0;
+    for (let i = 1; i <= n; i++) {
+      if (first(i)) {
+        p.cleared[i] = true;
+        newBadges++;
+        const loc = DV.World.locate(i);
+        p.areaStickers[loc.area.id + (loc.remix ? '-r' + loc.remix : '')] = true;
+        if (loc.localLevel === DV.LEVELS_PER_AREA) {
+          p.areaStickers[loc.area.id] = true;
+        }
+        if (loc.areaIndex === loc.park.areas.length - 1 && loc.localLevel === DV.LEVELS_PER_AREA) {
+          const key = loc.park.id + (loc.remix ? '-r' + loc.remix : '');
+          if (!p.stamps[key]) {
+            p.stamps[key] = { park: loc.park.id, remix: loc.remix || 0, at: p.levelsPlayed + newBadges, level: i };
+            out.stamped.push(loc.park.id);
+          }
+        }
+        p.coins += 8 + Math.floor((loc.localLevel || 1) / 8);
+      }
+    }
+    p.badges += newBadges;
+    p.levelsPlayed = (p.levelsPlayed || 0) + newBadges;
+    p.shelterLevel = shelterLevelFor(p.badges);
+    if (n >= p.maxLevel) p.maxLevel = n + 1;
+    if (p.currentLevel <= n) p.currentLevel = n + 1;
+    if (n > (p.best || 0)) p.best = n;
+    // Add a few representative animals from the latest level so shelter tests have friends
+    if (newBadges) {
+      const world = DV.World.generate(n, p.id);
+      addRescues(p, world);
+      if (p.animals.length > 80) p.animals = p.animals.slice(-80);
+      const babies = tickCare(p, Math.min(4, 1 + Math.floor(newBadges / 20)));
+      out.babies = babies ? babies.length : 0;
+    }
+    out.last = { badges: p.badges, coins: p.coins, shelterLevel: p.shelterLevel, stamps: p.stamps };
+    save();
+    return out;
+  }
+
+  function care(p, animalId, kind) {
+    const a = p.animals.find((x) => x.id === animalId);
+    if (!a) return { ok: false, reason: 'missing' };
+    const cost = kind === 'med' ? 10 : 6;
+    if (p.coins < cost) return { ok: false, reason: 'coins', cost };
+    p.coins -= cost;
+    if (kind === 'food') a.hunger = DV.clamp(a.hunger + 48, 0, 100);
+    else if (kind === 'water') a.thirst = DV.clamp(a.thirst + 48, 0, 100);
+    else if (kind === 'med') a.health = DV.clamp(a.health + 42, 0, 100);
+    save();
+    return { ok: true, cost, animal: a, coins: p.coins };
+  }
+
+  function careAll(p, kind) {
+    const list = p.animals;
+    if (!list.length) return { ok: false, reason: 'none' };
+    const unit = kind === 'med' ? 8 : 5;
+    const cost = Math.max(unit, unit * list.length);
+    if (p.coins < cost) return { ok: false, reason: 'coins', cost };
+    p.coins -= cost;
+    for (const a of list) {
+      if (kind === 'food') a.hunger = DV.clamp(a.hunger + 48, 0, 100);
+      else if (kind === 'water') a.thirst = DV.clamp(a.thirst + 48, 0, 100);
+      else if (kind === 'med') a.health = DV.clamp(a.health + 42, 0, 100);
+    }
+    save();
+    return { ok: true, cost, coins: p.coins };
+  }
+
+  function resetAll() {
+    DV.state = blankState();
+    save();
+    return DV.state;
+  }
+
+  return {
+    load, save, profile, setProfile, rename, resetAll,
+    blankProfile, blankState, blankAnimal, readRaw, writeRaw,
+    shelterLevelFor, tickCare, addRescues, applyWin, completeUpTo, care, careAll, NAMES
+  };
+})();
+
+})();
+/* ==== 30-world.js ==== */
+;(function(){
+/* Parks, animals, facts, and a seeded winnable level generator */
+DV.SPECIES = {
+  tortoise: { name: 'Desert Tortoise', canBaby: true, size: 0.95, color: '#c4a05a', shell: '#7a5a32' },
+  kitfox: { name: 'Kit Fox', canBaby: true, size: 0.85, color: '#e0b882', ear: true },
+  bighorn: { name: 'Bighorn Sheep', canBaby: true, size: 1.15, color: '#d4c0a0', horns: true },
+  roadrunner: { name: 'Roadrunner', canBaby: true, size: 0.9, color: '#8a9aaa', crest: true },
+  jackrabbit: { name: 'Jackrabbit', canBaby: true, size: 0.9, color: '#c8b090', ears: 'long' },
+  coyote: { name: 'Coyote', canBaby: true, size: 1.0, color: '#d2a86a', tail: 'bushy' },
+  pupfish: { name: 'Desert Pupfish', canBaby: false, size: 0.7, color: '#5aa0d0', bucket: true },
+  burro: { name: 'Burro', canBaby: true, size: 1.2, color: '#b8a090', mane: true },
+  raven: { name: 'Raven', canBaby: true, size: 0.8, color: '#2a2a38' },
+  chuckwalla: { name: 'Chuckwalla', canBaby: true, size: 0.8, color: '#7a8a4a' },
+  kangaroo: { name: 'Kangaroo Rat', canBaby: true, size: 0.7, color: '#d0b080' },
+  deer: { name: 'Mule Deer', canBaby: true, size: 1.15, color: '#c89a5a' },
+  bear: { name: 'Black Bear', canBaby: true, size: 1.2, color: '#3a2a22' },
+  jay: { name: "Steller's Jay", canBaby: true, size: 0.75, color: '#3a5aaa' },
+  marmot: { name: 'Marmot', canBaby: true, size: 0.85, color: '#b8894a' },
+  raccoon: { name: 'Raccoon', canBaby: true, size: 0.9, color: '#8a8680' },
+  chickaree: { name: 'Chickaree', canBaby: true, size: 0.7, color: '#c45a32' },
+  condor: { name: 'California Condor', canBaby: false, size: 1.15, color: '#3a3230' },
+  lizard: { name: 'Collared Lizard', canBaby: true, size: 0.7, color: '#4aaa6a' },
+  squirrel: { name: 'Ground Squirrel', canBaby: true, size: 0.7, color: '#c4a06a' },
+  bison: { name: 'Bison Calf', canBaby: false, size: 1.15, color: '#6a4a28' },
+  elk: { name: 'Elk', canBaby: true, size: 1.2, color: '#b07a40' },
+  wolf: { name: 'Wolf Pup', canBaby: false, size: 0.85, color: '#9aa0aa' },
+  otter: { name: 'River Otter', canBaby: true, size: 0.9, color: '#6a5040' },
+  swan: { name: 'Trumpeter Swan', canBaby: true, size: 1.0, color: '#f4f0e8' },
+  turkey: { name: 'Wild Turkey', canBaby: true, size: 1.0, color: '#6a4a32' },
+  ringtail: { name: 'Ringtail', canBaby: true, size: 0.8, color: '#c4a882' },
+  wren: { name: 'Canyon Wren', canBaby: true, size: 0.65, color: '#c06a40' }
+};
+
+DV.SHELTER_UPGRADES = [
+  { at: 10, name: 'Rescue Shelter', desc: 'A fenced camp with shady pens and a water trough.' },
+  { at: 20, name: 'Wellness Hut', desc: 'A little hut where tired animals get checkups and kind care.' },
+  { at: 30, name: 'Cool Pond', desc: 'A sparkling pond for splashing, drinking, and pupfish visits.' },
+  { at: 40, name: 'Shade Sails', desc: 'Big canvas sails and palo verde trees for cool naps.' },
+  { at: 50, name: 'Nursery Nook', desc: 'A soft, safe nook where babies can bounce and snooze.' },
+  { at: 60, name: 'Garden Kitchen', desc: 'A garden and hay barn for tasty dinners.' },
+  { at: 70, name: 'Lantern Path', desc: 'Warm lanterns and a path for evening visits.' },
+  { at: 80, name: 'Climbing Rocks', desc: 'Gentle climbing rocks for bighorns and curious climbers.' },
+  { at: 90, name: 'Big Barn', desc: 'A roomy barn for storms, naps, and cozy stories.' },
+  { at: 100, name: 'Welcome Fountain', desc: 'A bubbling fountain and a bench for junior rangers.' }
+];
+
+DV.PARKS = [
+  {
+    id: 'death-valley', name: 'Death Valley', short: 'Death Valley',
+    stamp: { title: 'Death Valley', icon: 'cactus', color: '#e8b84a' },
+    animals: ['tortoise', 'kitfox', 'bighorn', 'roadrunner', 'jackrabbit', 'coyote', 'pupfish', 'burro', 'raven', 'chuckwalla', 'kangaroo'],
+    areas: [
+      { id: 'furnace-creek', name: 'Furnace Creek', fact: 'Furnace Creek is one of the hottest places on Earth — a visitor center here sits below sea level.', obstacles: ['rock', 'cactus', 'tumbleweed', 'washout'], palette: { skyTop: '#f4c07a', skyBot: '#f0a050', far: '#c47a4a', mid: '#d89058', ground: '#e0a060', accent: '#7aaa4a', sun: '#ffe9a0' } },
+      { id: 'badwater', name: 'Badwater Basin', fact: 'Badwater Basin sits 282 feet below sea level — the lowest point in North America.', obstacles: ['salt', 'puddle', 'shimmer', 'rock'], palette: { skyTop: '#9ad0f0', skyBot: '#e8d0a0', far: '#c8b898', mid: '#e8e0d0', ground: '#f4f0e4', accent: '#c8d0d4', sun: '#fff6c8' } },
+      { id: 'mesquite', name: 'Mesquite Flat Sand Dunes', fact: 'On quiet days these dunes can sing or boom when dry sand slides down the slopes.', obstacles: ['berm', 'tumbleweed', 'devil', 'rock'], palette: { skyTop: '#f0c878', skyBot: '#e89850', far: '#d4a060', mid: '#e8c080', ground: '#f0d09a', accent: '#c4a068', sun: '#ffe8a8' } },
+      { id: 'zabriskie', name: 'Zabriskie Point', fact: 'The golden badlands at Zabriskie Point were once the floor of an ancient lake.', obstacles: ['spire', 'rock', 'washout', 'gravel'], palette: { skyTop: '#7eb8e8', skyBot: '#f0c070', far: '#d49448', mid: '#e8b060', ground: '#f0c878', accent: '#c47a38', sun: '#ffe8a0' } },
+      { id: 'palette', name: "Artist's Palette", fact: 'The pinks, greens and lavenders of Artist\'s Palette come from colorful mineral salts in the hills.', obstacles: ['mound', 'cactus', 'devil', 'rock'], palette: { skyTop: '#c8a0e0', skyBot: '#f0a878', far: '#e8789a', mid: '#d0c068', ground: '#e8b090', accent: '#7aba8a', sun: '#ffd0e0' } },
+      { id: 'ubehebe', name: 'Ubehebe Crater', fact: 'Ubehebe Crater was blasted open by steam and magma about 2,000 years ago.', obstacles: ['cinder', 'crack', 'rock', 'devil'], palette: { skyTop: '#5a6a88', skyBot: '#c07848', far: '#4a3a38', mid: '#6a4a40', ground: '#5a4038', accent: '#c06038', sun: '#f0c070' } }
+    ]
+  },
+  {
+    id: 'joshua-tree', name: 'Joshua Tree', short: 'Joshua Tree',
+    stamp: { title: 'Joshua Tree', icon: 'joshua', color: '#c4d46a' },
+    animals: ['tortoise', 'jackrabbit', 'roadrunner', 'coyote', 'bighorn', 'lizard', 'raven'],
+    areas: [
+      { id: 'hidden-valley', name: 'Hidden Valley', fact: 'Joshua trees aren\'t really trees — they are a kind of yucca that blooms in bunches of creamy flowers.', obstacles: ['yucca', 'rock', 'cactus', 'tumbleweed'], palette: { skyTop: '#7ec8f0', skyBot: '#f0d080', far: '#c8b07a', mid: '#d8c080', ground: '#e0c888', accent: '#8aaa4a', sun: '#ffe8a0' } },
+      { id: 'jumbo-rocks', name: 'Jumbo Rocks', fact: 'The giant boulders here were shaped over ages as wind and rare rain rounded the granite.', obstacles: ['rock', 'berm', 'cactus', 'gravel'], palette: { skyTop: '#f0b878', skyBot: '#e89058', far: '#c49068', mid: '#d8a070', ground: '#e8b888', accent: '#a0aa60', sun: '#ffd890' } },
+      { id: 'cholla', name: 'Cholla Cactus Garden', fact: 'Teddy-bear cholla can glow like gold in low sun — pretty to look at, spiky to hug!', obstacles: ['cactus', 'yucca', 'tumbleweed', 'shimmer'], palette: { skyTop: '#f0c070', skyBot: '#e87840', far: '#c07040', mid: '#d88850', ground: '#e0a060', accent: '#d0d060', sun: '#ffe0a0' } }
+    ]
+  },
+  {
+    id: 'yosemite', name: 'Yosemite', short: 'Yosemite',
+    stamp: { title: 'Yosemite', icon: 'dome', color: '#8ab0d8' },
+    animals: ['deer', 'bear', 'jay', 'marmot', 'raccoon', 'squirrel'],
+    areas: [
+      { id: 'yo-valley', name: 'Yosemite Valley', fact: 'El Capitan is one of the tallest granite cliffs in the world, rising more than 3,000 feet.', obstacles: ['log', 'rock', 'bush', 'root'], palette: { skyTop: '#7eb8f0', skyBot: '#c0d8a0', far: '#8aa0b8', mid: '#6a8a58', ground: '#7aaa60', accent: '#3a6a38', sun: '#fff0b0' } },
+      { id: 'glacier', name: 'Glacier Point', fact: 'From Glacier Point you can look almost straight down at the valley and across to Half Dome.', obstacles: ['rock', 'log', 'snow', 'root'], palette: { skyTop: '#8ac0f0', skyBot: '#e8f0f8', far: '#a0b0c4', mid: '#c8d0d8', ground: '#d8e0e4', accent: '#7a9ab0', sun: '#fff8e0' } },
+      { id: 'tuolumne', name: 'Tuolumne Meadows', fact: 'Tuolumne Meadows is a high Sierra meadow that bursts with wildflowers after the snow melts.', obstacles: ['bush', 'log', 'rock', 'puddle'], palette: { skyTop: '#6aa8e8', skyBot: '#c8e090', far: '#88a070', mid: '#a0c070', ground: '#b8d878', accent: '#e888b0', sun: '#ffe8a8' } }
+    ]
+  },
+  {
+    id: 'sequoia', name: 'Sequoia', short: 'Sequoia',
+    stamp: { title: 'Sequoia', icon: 'tree', color: '#5a8a48' },
+    animals: ['bear', 'deer', 'chickaree', 'marmot', 'raccoon'],
+    areas: [
+      { id: 'giant-forest', name: 'Giant Forest', fact: 'Giant sequoias are the largest living trees on Earth by volume — some are thousands of years old.', obstacles: ['log', 'root', 'bush', 'rock'], palette: { skyTop: '#88b8e0', skyBot: '#c8d0a0', far: '#4a6a40', mid: '#3a5a32', ground: '#5a7a40', accent: '#8a4a28', sun: '#ffe8b0' } },
+      { id: 'moro', name: 'Moro Rock', fact: 'Moro Rock is a granite dome with a stairway to a view of the Great Western Divide.', obstacles: ['rock', 'gravel', 'log', 'root'], palette: { skyTop: '#90c0f0', skyBot: '#e0c090', far: '#b09070', mid: '#c8a880', ground: '#d8c0a0', accent: '#5a7a48', sun: '#ffe8a0' } },
+      { id: 'crescent', name: 'Crescent Meadow', fact: 'John Muir called Crescent Meadow the "gem of the Sierra" for its soft grass and sequoia edges.', obstacles: ['bush', 'log', 'puddle', 'root'], palette: { skyTop: '#80c0a8', skyBot: '#d0e890', far: '#68a060', mid: '#88c070', ground: '#a0d080', accent: '#e8b0d0', sun: '#fff0b8' } }
+    ]
+  },
+  {
+    id: 'grand-canyon', name: 'Grand Canyon', short: 'Grand Canyon',
+    stamp: { title: 'Grand Canyon', icon: 'canyon', color: '#d07848' },
+    animals: ['condor', 'bighorn', 'lizard', 'squirrel', 'raven', 'coyote'],
+    areas: [
+      { id: 'south-rim', name: 'South Rim', fact: 'The Colorado River carved the Grand Canyon over millions of years, layer by colorful layer.', obstacles: ['rock', 'crack', 'cactus', 'gravel'], palette: { skyTop: '#6aa0d8', skyBot: '#f0b070', far: '#c06040', mid: '#d87848', ground: '#e09058', accent: '#a05038', sun: '#ffe0a0' } },
+      { id: 'bright-angel', name: 'Bright Angel', fact: 'Bright Angel Trail follows an old path used for centuries by Native peoples of the canyon.', obstacles: ['rock', 'washout', 'cactus', 'crack'], palette: { skyTop: '#88b8e8', skyBot: '#e8a068', far: '#b85838', mid: '#c87048', ground: '#d88858', accent: '#6a8a48', sun: '#ffe8a8' } },
+      { id: 'desert-view', name: 'Desert View', fact: 'The Desert View Watchtower was designed to honor the architecture of the Puebloan people.', obstacles: ['rock', 'cactus', 'shimmer', 'devil'], palette: { skyTop: '#f0a068', skyBot: '#e07040', far: '#c05030', mid: '#d06840', ground: '#e08050', accent: '#f0c070', sun: '#ffd080' } }
+    ]
+  },
+  {
+    id: 'yellowstone', name: 'Yellowstone', short: 'Yellowstone',
+    stamp: { title: 'Yellowstone', icon: 'geyser', color: '#48a0c8' },
+    animals: ['bison', 'elk', 'wolf', 'otter', 'swan', 'squirrel'],
+    areas: [
+      { id: 'old-faithful', name: 'Old Faithful', fact: 'Yellowstone has more geysers than anywhere else on Earth, and Old Faithful is the most famous.', obstacles: ['steam', 'puddle', 'log', 'rock'], palette: { skyTop: '#7ab0d8', skyBot: '#d8e0c0', far: '#80a070', mid: '#c8d0a8', ground: '#b8c898', accent: '#e8e0c0', sun: '#fff0c0' } },
+      { id: 'hayden', name: 'Hayden Valley', fact: 'Hayden Valley is a wide, grassy home for bison herds and visiting elk and wolves.', obstacles: ['bush', 'log', 'puddle', 'rock'], palette: { skyTop: '#88c0e8', skyBot: '#d0e0a0', far: '#88a868', mid: '#a0c070', ground: '#b8d080', accent: '#d0a060', sun: '#ffe8b0' } },
+      { id: 'mammoth', name: 'Mammoth Hot Springs', fact: 'The white terraces at Mammoth are built by hot water leaving behind layers of mineral steps.', obstacles: ['steam', 'rock', 'puddle', 'gravel'], palette: { skyTop: '#90c8e8', skyBot: '#e8f0e0', far: '#d0d8d0', mid: '#e0e8e0', ground: '#f0f4ec', accent: '#c0d0c0', sun: '#fff8e0' } }
+    ]
+  },
+  {
+    id: 'zion', name: 'Zion', short: 'Zion',
+    stamp: { title: 'Zion', icon: 'arch', color: '#e07060' },
+    animals: ['turkey', 'deer', 'bighorn', 'ringtail', 'wren', 'lizard'],
+    areas: [
+      { id: 'zion-canyon', name: 'Zion Canyon', fact: 'The Virgin River carved Zion\'s tall sandstone cliffs, glowing red and gold in the sun.', obstacles: ['rock', 'bush', 'washout', 'root'], palette: { skyTop: '#70b0e8', skyBot: '#f0b080', far: '#d06050', mid: '#e07860', ground: '#e89070', accent: '#4a8a50', sun: '#ffe0a0' } },
+      { id: 'angels', name: 'Angels Lookout', fact: 'Angels Landing is a famous high trail — we\'ll keep to a friendlier lookout with the same huge views.', obstacles: ['rock', 'crack', 'gravel', 'bush'], palette: { skyTop: '#88c0f0', skyBot: '#f0c090', far: '#c05848', mid: '#d07058', ground: '#e08868', accent: '#f0d080', sun: '#ffe8b0' } },
+      { id: 'narrows', name: 'River Walk', fact: 'In the Narrows, the Virgin River is the trail, winding between cool, close canyon walls.', obstacles: ['puddle', 'rock', 'log', 'washout'], palette: { skyTop: '#4a6a88', skyBot: '#88a0a8', far: '#a05048', mid: '#c06858', ground: '#8ab0a8', accent: '#d88870', sun: '#f0d0a0' } }
+    ]
+  }
+];
+
+DV.World = (() => {
+  function officialCount() {
+    let n = 0;
+    for (const p of DV.PARKS) n += p.areas.length * DV.LEVELS_PER_AREA;
+    return n;
+  }
+
+  const OFFICIAL = officialCount();
+
+  function locate(level) {
+    const lvl = Math.max(1, level | 0);
+    const cycle = OFFICIAL;
+    const remix = Math.floor((lvl - 1) / cycle);
+    let rem = ((lvl - 1) % cycle) + 1;
+    for (let pi = 0; pi < DV.PARKS.length; pi++) {
+      const park = DV.PARKS[pi];
+      const span = park.areas.length * DV.LEVELS_PER_AREA;
+      if (rem <= span) {
+        const areaIndex = Math.floor((rem - 1) / DV.LEVELS_PER_AREA);
+        const localLevel = ((rem - 1) % DV.LEVELS_PER_AREA) + 1;
+        const area = park.areas[areaIndex];
+        return {
+          globalLevel: lvl, parkIndex: pi, park, areaIndex, area, localLevel,
+          remix, official: remix === 0, cycle
+        };
+      }
+      rem -= span;
+    }
+    return locate(1);
+  }
+
+  function remixPalette(pal, remix) {
+    if (!remix) return pal;
+    const out = Object.assign({}, pal);
+    const mode = remix % 3;
+    if (mode === 1) { // twilight
+      out.skyTop = '#2a2050'; out.skyBot = '#c06050'; out.sun = '#ffb070';
+    } else if (mode === 2) { // spring cool
+      out.skyTop = '#8ad0f0'; out.skyBot = '#d0f0c0'; out.sun = '#fff8d0';
+    } else { // night lantern
+      out.skyTop = '#12182a'; out.skyBot = '#2a3050'; out.sun = '#f0e0a0';
+    }
+    return out;
+  }
+
+  function difficulty(loc, meta) {
+    const t = (loc.localLevel - 1) / (DV.LEVELS_PER_AREA - 1);
+    const parkBump = Math.min(0.35, loc.parkIndex * 0.05 + (loc.remix || 0) * 0.06);
+    const cap = 1.0;
+    const d = DV.clamp(0.35 + t * 0.55 + parkBump, 0.3, cap);
+    const speed = meta.speed * (0.92 + d * 0.22);
+    const gap = (220 + 90 * (1 - d)) * meta.gapScale;
+    return { d, speed: Math.min(speed, meta.id === 'p1' ? 305 : 420), gap: Math.max(gap, meta.id === 'p1' ? 260 : 190) };
+  }
+
+  function nameFor(rng, species, i) {
+    const pool = DV.Save.NAMES;
+    return pool[Math.floor(rng() * pool.length) % pool.length] + (i > 8 ? ' ' + (i + 1) : '');
+  }
+
+  function generate(globalLevel, profileId) {
+    const loc = locate(globalLevel);
+    const meta = DV.meta(profileId);
+    const seed = DV.hash('dvc', loc.park.id, loc.area.id, globalLevel, profileId || 'p1', loc.remix || 0);
+    const rng = DV.seeded(seed);
+    const diff = difficulty(loc, meta);
+    const pal = remixPalette(loc.area.palette, loc.remix);
+    const kinds = loc.area.obstacles.slice();
+    const speciesList = loc.park.animals;
+
+    // Path: start mid lane, walk forward, sometimes change lane or plan a jump
+    const path = []; // {x, lane, jump}
+    let x = 0;
+    let lane = 1;
+    const startPad = 420;
+    const events = [];
+    const wantAnimals = Math.round(DV.clamp(3 + loc.localLevel / 14 + loc.parkIndex * 0.3, 3, 8) * meta.animals);
+    const wantObs = Math.round((8 + loc.localLevel / 6 + loc.parkIndex) * meta.density);
+    const lengthHint = startPad + wantObs * diff.gap + 700;
+    const jumpableSet = { rock: 1, cactus: 1, tumbleweed: 1, salt: 1, puddle: 1, berm: 1, gravel: 1, mound: 1, cinder: 1, log: 1, root: 1, yucca: 1, bush: 1, snow: 1, steam: 1 };
+    const tallSet = { devil: 1, shimmer: 1, spire: 1, crack: 1, washout: 0 };
+
+    function laneAt(px) {
+      let L = 1, j = false;
+      for (let i = 0; i < path.length; i++) {
+        if (path[i].x <= px) { L = path[i].lane; j = !!path[i].jump; }
+        else break;
+      }
+      return { lane: L, jump: j };
+    }
+
+    path.push({ x: 0, lane, jump: false });
+    x = startPad;
+    let obsCount = 0;
+    const obstacles = [];
+    const animals = [];
+    const coins = [];
+    const decorations = [];
+
+    while (obsCount < wantObs) {
+      x += diff.gap * (0.85 + rng() * 0.35);
+      const doJump = rng() < 0.38;
+      const change = rng() < 0.7;
+      let nextLane = lane;
+      if (change) {
+        const dir = rng() < 0.5 ? -1 : 1;
+        nextLane = DV.clamp(lane + dir, 0, 2);
+        if (nextLane === lane) nextLane = DV.clamp(lane - dir, 0, 2);
+      }
+      // telegraph lane change slightly before the obstacle
+      const changeX = x - Math.min(180, diff.gap * 0.42);
+      if (nextLane !== lane) path.push({ x: changeX, lane: nextLane, jump: false });
+      if (doJump) path.push({ x: x - 20, lane: nextLane, jump: true });
+      path.push({ x: x, lane: nextLane, jump: doJump });
+
+      const kind = kinds[Math.floor(rng() * kinds.length)];
+      const jumpable = !!jumpableSet[kind] && (doJump || rng() < 0.5);
+      // Place obstacle: if path jumps here, can place jumpable on path; always fill other lanes sometimes
+      const fill = [0, 1, 2].filter((L) => L !== nextLane);
+      // Maybe 1 or 2 off-path obstacles
+      const extra = rng() < (0.35 + diff.d * 0.4) ? 2 : 1;
+      const off = fill.sort(() => rng() - 0.5).slice(0, Math.min(extra, 2));
+      if (doJump && jumpable) {
+        obstacles.push({ x, lane: nextLane, kind, jumpable: true, h: 56 + rng() * 18 });
+        obsCount++;
+      }
+      for (const L of off) {
+        const k2 = kinds[Math.floor(rng() * kinds.length)];
+        const tall = !!tallSet[k2];
+        obstacles.push({ x: x + (rng() * 30 - 10), lane: L, kind: k2, jumpable: !tall && !!jumpableSet[k2], h: tall ? 150 : 58 + rng() * 22 });
+        obsCount++;
+      }
+      // Never block all 3 unjumpably at same x — path lane is always open or jumpable
+      lane = nextLane;
+    }
+
+    const courseEnd = x + 80;
+    // Animals on the path, in gaps between obstacles
+    const usedX = obstacles.map((o) => o.x);
+    let placed = 0;
+    let tryX = startPad + 160;
+    while (placed < wantAnimals && tryX < courseEnd - 40) {
+      tryX += 140 + rng() * 160;
+      const at = laneAt(tryX);
+      const blocked = obstacles.some((o) => o.lane === at.lane && Math.abs(o.x - tryX) < 90);
+      if (blocked) continue;
+      const sp = speciesList[Math.floor(rng() * speciesList.length)];
+      const old = rng() < 0.18;
+      const withBaby = !old && rng() < 0.16 && DV.SPECIES[sp].canBaby;
+      const babyOnly = false;
+      animals.push({
+        id: 'an' + placed,
+        saveId: 's' + seed.toString(16) + '-' + placed,
+        x: tryX,
+        lane: at.lane,
+        species: sp,
+        name: nameFor(rng, sp, placed),
+        old, withBaby, baby: babyOnly
+      });
+      placed++;
+    }
+    // Coins along path
+    for (let cx = startPad + 80; cx < courseEnd; cx += 130 + rng() * 90) {
+      const at = laneAt(cx);
+      if (obstacles.some((o) => o.lane === at.lane && Math.abs(o.x - cx) < 60)) continue;
+      if (rng() < 0.7) coins.push({ x: cx, lane: at.lane, v: 1 });
+    }
+
+    // Calm rescue cove: missed animals will be re-placed here at runtime; pre-open space
+    const rescueX = courseEnd + 200;
+    const finishX = rescueX + 280 + wantAnimals * 20;
+
+    // decorations
+    for (let dx = 80; dx < finishX; dx += 90 + rng() * 120) {
+      decorations.push({ x: dx, lane: Math.floor(rng() * 3), kind: 'plant', s: 0.7 + rng() * 0.6 });
+    }
+
+    path.push({ x: finishX + 40, lane, jump: false });
+
+    const title = loc.remix
+      ? loc.area.name + (loc.remix % 3 === 1 ? ' · Twilight' : loc.remix % 3 === 2 ? ' · Spring' : ' · Night')
+      : loc.area.name;
+    const fact = loc.area.fact + (loc.remix ? ' A new light falls on a familiar trail.' : '');
+
+    return {
+      seed, globalLevel, loc, park: loc.park, area: loc.area, localLevel: loc.localLevel,
+      title, fact, palette: pal, remix: loc.remix || 0,
+      length: finishX + 200, startPad, courseEnd, rescueX, finishX,
+      speed: diff.speed, gap: diff.gap, difficulty: diff.d,
+      obstacles, animals, coins, decorations, path,
+      coinsReward: 8 + Math.floor(loc.localLevel / 8) + loc.parkIndex,
+      vehicle: loc.areaIndex + loc.parkIndex > 0 || loc.localLevel > 12
+    };
+  }
+
+  function pathAt(world, px) {
+    const path = world.path;
+    let lane = 1, jump = false;
+    for (let i = 0; i < path.length; i++) {
+      if (path[i].x <= px) { lane = path[i].lane; jump = !!path[i].jump; }
+      else break;
+    }
+    return { lane, jump };
+  }
+
+  function solve(world, profileId) {
+    const meta = DV.meta(profileId);
+    const magnet = meta.magnet || 0;
+    const got = new Set();
+    const near = (laneA, laneB, xGap) => {
+      if (laneA === laneB) return true;
+      if (Math.abs(laneA - laneB) === 1 && Math.abs(xGap) < magnet) return true;
+      return false;
+    };
+    // Follow path, collect animals if on/near path
+    for (const an of world.animals) {
+      const at = pathAt(world, an.x);
+      if (near(at.lane, an.lane, 0) || Math.abs(at.lane - an.lane) === 0) got.add(an.id);
+      // magnet: P1 can grab adjacent if close in x — path is same x
+      if (magnet >= 80 && Math.abs(at.lane - an.lane) <= 1) got.add(an.id);
+    }
+    // Rescue cove catches the rest
+    const missed = world.animals.filter((a) => !got.has(a.id));
+    // cove is always clear; solver walks through it
+    missed.forEach((a) => got.add(a.id));
+    // Verify path never hits an unjumpable on its lane
+    let hit = 0;
+    for (const o of world.obstacles) {
+      const at = pathAt(world, o.x);
+      if (at.lane === o.lane && !(o.jumpable && at.jump)) hit++;
+    }
+    return {
+      won: got.size === world.animals.length && hit === 0,
+      rescued: got.size,
+      need: world.animals.length,
+      hits: hit
+    };
+  }
+
+  function solveRange(pid, from, to, extra) {
+    const results = [];
+    let failed = 0;
+    for (let i = from; i <= to; i++) {
+      const w = generate(i, pid);
+      const r = solve(w, pid);
+      if (!r.won) { failed++; results.push({ level: i, r }); }
+    }
+    if (extra && extra.length) {
+      for (const i of extra) {
+        const w = generate(i, pid);
+        const r = solve(w, pid);
+        if (!r.won) { failed++; results.push({ level: i, r }); }
+      }
+    }
+    return { failed, results, from, to, extra: (extra || []).length };
+  }
+
+  return { locate, generate, pathAt, solve, solveRange, officialCount: () => OFFICIAL, remixPalette };
+})();
+
+})();
+/* ==== 40-art.js ==== */
+;(function(){
+/* Cute original canvas art — backgrounds, ranger, animals, obstacles, shelter, passport */
+DV.Art = (() => {
+  function sun(ctx, pal, t, remix) {
+    const w = DV.W, h = DV.H;
+    const sx = w * 0.82, sy = h * (remix % 3 === 0 && remix ? 0.22 : 0.18);
+    const r = 42 + Math.sin(t * 0.4) * 2;
+    const g = ctx.createRadialGradient(sx, sy, 4, sx, sy, r * 3);
+    g.addColorStop(0, pal.sun || '#ffe8a0');
+    g.addColorStop(0.4, (pal.sun || '#ffe8a0') + '00');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = pal.sun || '#ffe8a0';
+    ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
+    if (remix % 3 === 0 && remix) {
+      ctx.fillStyle = 'rgba(255,255,230,.85)';
+      for (let i = 0; i < 12; i++) {
+        const a = i / 12 * Math.PI * 2 + t * 0.05;
+        ctx.beginPath();
+        ctx.arc(sx + Math.cos(a) * (r + 14), sy + Math.sin(a) * (r + 14), 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function mountains(ctx, pal, cam, t, areaId) {
+    const w = DV.W, h = DV.H;
+    const base = h * (DV.portrait ? 0.42 : 0.46);
+    const shift = -((cam * 0.15) % 400);
+    ctx.fillStyle = pal.far;
+    ctx.beginPath();
+    ctx.moveTo(-80 + shift, h);
+    ctx.lineTo(-80 + shift, base + 30);
+    for (let i = -1; i < 14; i++) {
+      const x = i * 160 + shift;
+      const jitter = ((i * 17 + areaId.length * 13) % 70);
+      const mesa = (i % 4 === 2);
+      const peak = base - (mesa ? 36 : 54) - jitter * 0.7;
+      ctx.lineTo(x + 30, peak + (mesa ? 16 : 0));
+      ctx.lineTo(x + 70, peak);
+      ctx.lineTo(x + 110, peak + (mesa ? 10 : 22));
+    }
+    ctx.lineTo(w + 80, h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = pal.mid;
+    ctx.beginPath();
+    ctx.moveTo(-80 + shift * 1.4, h);
+    ctx.lineTo(-80 + shift * 1.4, base + 50);
+    for (let i = -1; i < 16; i++) {
+      const x = i * 140 + shift * 1.4;
+      const peak = base + 18 - ((i * 29) % 36);
+      ctx.lineTo(x + 40, peak + 12);
+      ctx.lineTo(x + 80, peak);
+      ctx.lineTo(x + 120, peak + 16);
+    }
+    ctx.lineTo(w + 80, h);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawSky(ctx, pal, t, cam, world) {
+    const w = DV.W, h = DV.H;
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, pal.skyTop);
+    g.addColorStop(1, pal.skyBot);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    sun(ctx, pal, t, world && world.remix);
+    // soft clouds
+    ctx.fillStyle = 'rgba(255,255,255,.28)';
+    const cshift = -((cam * 0.08 + t * 8) % 700);
+    for (let i = 0; i < 5; i++) {
+      const x = i * 240 + cshift, y = 40 + (i * 37) % 70, s = 28 + (i % 3) * 10;
+      ctx.beginPath(); ctx.ellipse(x, y, s * 1.6, s * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x + 20, y - 8, s, s * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    mountains(ctx, pal, cam, t, (world && world.area && world.area.id) || 'furnace-creek');
+  }
+
+  function drawGround(ctx, pal, cam, t, world) {
+    const w = DV.W, h = DV.H;
+    const top = DV.trackTop();
+    const g = ctx.createLinearGradient(0, top - 30, 0, h);
+    g.addColorStop(0, pal.mid);
+    g.addColorStop(0.4, pal.ground);
+    g.addColorStop(1, pal.ground);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, top - 20, w, h - top + 20);
+    // lane stripes
+    for (let L = 0; L < 3; L++) {
+      const y = DV.laneY(L) + 26;
+      ctx.strokeStyle = 'rgba(255,255,255,.22)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([18, 16]);
+      ctx.lineDashOffset = -cam * 0.8;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // heat shimmer
+    if (world && (world.area.id === 'badwater' || world.area.id === 'furnace-creek' || world.area.id === 'desert-view')) {
+      ctx.save();
+      ctx.globalAlpha = 0.12;
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < 8; i++) {
+        const y = top + 20 + i * 16 + Math.sin(t * 3 + i) * 3;
+        ctx.fillRect(0, y, w, 3);
+      }
+      ctx.restore();
+    }
+  }
+
+  function cactus(ctx, x, y, s, t) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+    ctx.fillStyle = '#3d8a46';
+    DV.roundRect(ctx, -10, -46, 20, 50, 8); ctx.fill();
+    DV.roundRect(ctx, -26, -34, 16, 10, 5); ctx.fill();
+    DV.roundRect(ctx, -26, -34, 10, 22, 5); ctx.fill();
+    DV.roundRect(ctx, 10, -28, 16, 10, 5); ctx.fill();
+    DV.roundRect(ctx, 16, -28, 10, 18, 5); ctx.fill();
+    ctx.fillStyle = '#e8a0b8';
+    ctx.beginPath(); ctx.arc(0, -48, 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function rock(ctx, x, y, s, shade) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+    ctx.fillStyle = shade || '#8a7460';
+    ctx.beginPath(); ctx.moveTo(-22, 8); ctx.lineTo(-16, -16); ctx.lineTo(4, -24); ctx.lineTo(22, -8); ctx.lineTo(18, 10); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.18)';
+    ctx.beginPath(); ctx.moveTo(-8, -8); ctx.lineTo(4, -18); ctx.lineTo(8, -6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  function tumbleweed(ctx, x, y, s, t) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(t * 4); ctx.scale(s, s);
+    ctx.strokeStyle = '#8a6a38'; ctx.lineWidth = 3;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath(); ctx.arc(0, 0, 8 + (i % 3) * 5, i, i + 2.2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function devil(ctx, x, y, s, t) {
+    ctx.save(); ctx.translate(x, y);
+    ctx.strokeStyle = 'rgba(200,180,150,.55)'; ctx.lineWidth = 3;
+    for (let i = 0; i < 5; i++) {
+      const w = 6 + i * 5 + Math.sin(t * 6 + i) * 3;
+      const yy = -i * 18;
+      ctx.beginPath(); ctx.ellipse(Math.sin(t * 4 + i) * 4, yy, w, 6, 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(180,150,110,.35)';
+    ctx.beginPath(); ctx.ellipse(0, 6, 16 * s, 5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function puddle(ctx, x, y, s, t) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+    ctx.fillStyle = 'rgba(80,150,190,.65)';
+    ctx.beginPath(); ctx.ellipse(0, 4, 28, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    ctx.beginPath(); ctx.ellipse(-6, 2, 8, 3, 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawObstacle(ctx, o, sx, sy, t) {
+    const s = o.h ? o.h / 60 : 1;
+    switch (o.kind) {
+      case 'cactus': case 'yucca': cactus(ctx, sx, sy, 1.05 * s, t); break;
+      case 'tumbleweed': tumbleweed(ctx, sx, sy - 10, 1.2, t + o.x); break;
+      case 'devil': devil(ctx, sx, sy, 1, t); break;
+      case 'puddle': case 'washout': puddle(ctx, sx, sy + 8, 1.1, t); if (o.kind === 'washout') { ctx.fillStyle = '#8a6038'; DV.roundRect(ctx, sx - 30, sy + 10, 60, 10, 4); ctx.fill(); } break;
+      case 'shimmer':
+        ctx.save(); ctx.globalAlpha = 0.4 + Math.sin(t * 8) * 0.15; ctx.fillStyle = '#fff6c0';
+        for (let i = 0; i < 5; i++) { ctx.fillRect(sx - 12 + Math.sin(t * 6 + i) * 6, sy - 70 + i * 16, 8, 14); }
+        ctx.restore(); break;
+      case 'salt':
+        ctx.fillStyle = '#f4f0e4'; DV.roundRect(ctx, sx - 24, sy - 16, 48, 28, 8); ctx.fill();
+        ctx.strokeStyle = '#d8d0c0'; ctx.stroke(); break;
+      case 'berm': case 'mound': case 'cinder': case 'gravel': case 'snow':
+        ctx.fillStyle = o.kind === 'snow' ? '#f4f8fc' : o.kind === 'cinder' ? '#4a3834' : '#d2b080';
+        ctx.beginPath(); ctx.ellipse(sx, sy, 28, 16, 0, 0, Math.PI * 2); ctx.fill(); break;
+      case 'spire':
+        ctx.fillStyle = '#e0a858';
+        ctx.beginPath(); ctx.moveTo(sx - 16, sy + 10); ctx.lineTo(sx, sy - 80); ctx.lineTo(sx + 16, sy + 10); ctx.fill(); break;
+      case 'crack':
+        ctx.strokeStyle = '#3a2018'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(sx - 20, sy + 8); ctx.lineTo(sx - 4, sy - 8); ctx.lineTo(sx + 16, sy + 10); ctx.stroke(); break;
+      case 'log': case 'root':
+        ctx.fillStyle = '#6a4430'; DV.roundRect(ctx, sx - 32, sy - 12, 64, 18, 8); ctx.fill();
+        ctx.fillStyle = '#c8a07a'; ctx.beginPath(); ctx.arc(sx + 32, sy - 3, 8, 0, Math.PI * 2); ctx.fill(); break;
+      case 'bush':
+        ctx.fillStyle = '#3d8a46';
+        ctx.beginPath(); ctx.arc(sx - 10, sy - 6, 14, 0, Math.PI * 2); ctx.arc(sx + 10, sy - 8, 16, 0, Math.PI * 2); ctx.arc(sx, sy - 16, 12, 0, Math.PI * 2); ctx.fill(); break;
+      case 'steam':
+        ctx.fillStyle = 'rgba(230,240,245,.55)';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath(); ctx.arc(sx + Math.sin(t * 3 + i) * 8, sy - 20 - i * 16 - (t * 20 % 16), 10 + i, 0, Math.PI * 2); ctx.fill();
+        }
+        break;
+      default:
+        rock(ctx, sx, sy, s, o.kind === 'cinder' ? '#4a3834' : '#8a7460');
+    }
+  }
+
+  function eyes(ctx, x, y, blink, sad) {
+    const h = blink > 0.86 ? 1.2 : 5;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(x - 5, y, 4.2, h, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + 5, y, 4.2, h, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2a1810';
+    if (h > 2) {
+      ctx.beginPath(); ctx.arc(x - 4.2, y + (sad ? 1 : 0), 2.1, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + 5.8, y + (sad ? 1 : 0), 2.1, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function bandage(ctx, x, y, ang) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang || -0.4);
+    ctx.fillStyle = '#f4f0e0'; DV.roundRect(ctx, -8, -4, 16, 8, 2); ctx.fill();
+    ctx.fillStyle = '#e8a0a8'; ctx.fillRect(-2, -4, 4, 8);
+    ctx.restore();
+  }
+
+  function drawAnimal(ctx, an, x, y, t, st) {
+    st = st || {};
+    const spec = DV.SPECIES[an.species] || DV.SPECIES.tortoise;
+    const sad = st.sad || (an.hunger < 35 || an.thirst < 35 || an.health < 40);
+    const baby = an.baby || st.baby;
+    const sc = (baby ? 0.68 : (an.old ? 1.0 : 1.12)) * (spec.size || 1) * (st.scale || 1);
+    const bob = Math.sin((st.limp ? t * 6 : t * 8) + (an.x || 0)) * (st.limp ? 2 : 3);
+    const blink = (Math.sin(t * 2.2 + (an.tint || 0)) + 1) / 2;
+    ctx.save();
+    ctx.translate(x, y - bob);
+    if (st.flip) ctx.scale(-1, 1);
+    ctx.scale(sc, sc);
+
+    if (spec.bucket) {
+      ctx.fillStyle = 'rgba(160,210,230,.55)';
+      DV.roundRect(ctx, -16, -8, 32, 24, 4); ctx.fill();
+      ctx.strokeStyle = '#8aa0b0'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.fillStyle = spec.color;
+      ctx.beginPath(); ctx.ellipse(0, 4, 10, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-3, 3, 1.4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#c07040'; DV.roundRect(ctx, -18, -12, 8, 6, 2); ctx.fill();
+      ctx.restore();
+      if (an.old) { ctx.fillStyle = '#eee'; ctx.font = '10px system-ui'; ctx.fillText('old', x - 10, y + 26); }
+      return;
+    }
+
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,.18)';
+    ctx.beginPath(); ctx.ellipse(0, 18, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+    // body
+    ctx.fillStyle = spec.color;
+    ctx.beginPath(); ctx.ellipse(0, 4, 18, 13, 0, 0, Math.PI * 2); ctx.fill();
+    // legs
+    ctx.fillStyle = spec.color;
+    const leg = Math.sin(t * (st.limp ? 5 : 10)) * 4;
+    ctx.fillRect(-12, 10, 5, 8 + leg);
+    ctx.fillRect(-2, 10, 5, 8 - leg);
+    ctx.fillRect(6, 10, 5, 8 + leg * 0.6);
+    // head
+    ctx.beginPath(); ctx.ellipse(14, -6, 11, 10, 0, 0, Math.PI * 2); ctx.fill();
+    // species extras
+    if (an.species === 'tortoise') {
+      ctx.fillStyle = spec.shell || '#7a5a32';
+      ctx.beginPath(); ctx.ellipse(-2, 0, 16, 14, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#5a3a18'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(-10, -6, 8, 7); ctx.strokeRect(-1, -6, 8, 7); ctx.strokeRect(-6, 2, 8, 7);
+    } else if (an.species === 'kitfox' || an.species === 'jackrabbit' || an.species === 'burro') {
+      ctx.fillStyle = spec.color;
+      const eh = an.species === 'jackrabbit' ? 22 : 16;
+      ctx.beginPath(); ctx.ellipse(-2, -22, 4, eh / 2, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(8, -24, 4, eh / 2 + 2, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f0c0c8';
+      ctx.beginPath(); ctx.ellipse(-2, -22, 2, eh / 3, -0.2, 0, Math.PI * 2); ctx.fill();
+    } else if (an.species === 'bighorn') {
+      ctx.strokeStyle = '#c8b090'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(8, -8, 10, Math.PI, Math.PI * 1.8); ctx.stroke();
+      ctx.beginPath(); ctx.arc(18, -6, 10, Math.PI * 0.2, Math.PI * 1.1); ctx.stroke();
+    } else if (an.species === 'roadrunner' || an.species === 'jay' || an.species === 'raven' || an.species === 'wren' || an.species === 'turkey' || an.species === 'swan' || an.species === 'condor') {
+      ctx.fillStyle = spec.color;
+      ctx.beginPath(); ctx.moveTo(8, -16); ctx.lineTo(14, -26); ctx.lineTo(18, -14); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-8, 0); ctx.quadraticCurveTo(-28, -10, -34, 6); ctx.quadraticCurveTo(-16, 8, -6, 6); ctx.fill();
+      ctx.fillStyle = '#f0c040';
+      ctx.beginPath(); ctx.moveTo(24, -6); ctx.lineTo(32, -2); ctx.lineTo(24, 0); ctx.fill();
+    } else if (an.species === 'coyote' || an.species === 'wolf' || an.species === 'ringtail') {
+      ctx.beginPath(); ctx.moveTo(-16, 0); ctx.quadraticCurveTo(-30, -16, -22, 8); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(8, -16); ctx.lineTo(4, -24); ctx.lineTo(14, -16); ctx.fill();
+    } else if (an.species === 'bear' || an.species === 'bison') {
+      ctx.beginPath(); ctx.arc(6, -14, 6, 0, Math.PI * 2); ctx.arc(18, -12, 6, 0, Math.PI * 2); ctx.fill();
+    } else if (an.species === 'deer' || an.species === 'elk') {
+      ctx.strokeStyle = '#5a3a20'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(10, -14); ctx.lineTo(6, -28); ctx.lineTo(0, -24); ctx.moveTo(16, -14); ctx.lineTo(22, -28); ctx.lineTo(26, -22); ctx.stroke();
+    }
+
+    eyes(ctx, 16, -8, blink, sad);
+    if (sad) {
+      ctx.strokeStyle = '#5a3040'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(16, -2, 5, 0.15, Math.PI - 0.15); ctx.stroke();
+    } else {
+      ctx.strokeStyle = '#5a3040'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(16, -3, 4, 0.2, Math.PI - 0.2, true); ctx.stroke();
+    }
+    if (st.limp || an._injured !== false) bandage(ctx, 2, 2, -0.3);
+    if (an.old) {
+      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(12, -8, 6, 0, Math.PI * 2); ctx.arc(20, -8, 6, 0, Math.PI * 2); ctx.stroke();
+    }
+    if (st.heart) {
+      ctx.fillStyle = '#ff6a8a';
+      ctx.beginPath(); ctx.moveTo(0, -28); ctx.bezierCurveTo(-8, -36, -14, -24, 0, -18); ctx.bezierCurveTo(14, -24, 8, -36, 0, -28); ctx.fill();
+    }
+    ctx.restore();
+    if (an.withBaby && !st.noBaby) {
+      drawAnimal(ctx, { species: an.species, baby: true, tint: an.tint }, x - 26, y + 8, t, { baby: true, limp: false, scale: 1, noBaby: true });
+    }
+  }
+
+  function drawRanger(ctx, p, t, opts) {
+    opts = opts || {};
+    const x = p.sx, y = p.sy - (p.z || 0);
+    const run = p.grounded === false ? 0 : Math.sin(t * 14);
+    const bob = p.grounded === false ? 0 : Math.sin(t * 14) * 2;
+    ctx.save();
+    ctx.translate(x, y + bob);
+    if (opts.flip) ctx.scale(-1, 1);
+    const sc = opts.scale || (DV.portrait ? 1.15 : 1);
+    ctx.scale(sc, sc);
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,.22)';
+    ctx.beginPath(); ctx.ellipse(0, 28 + (p.z || 0), 16, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+    if (opts.buggy) {
+      // jeep body
+      ctx.fillStyle = '#5a7a3a';
+      DV.roundRect(ctx, -30, 2, 58, 22, 6); ctx.fill();
+      ctx.fillStyle = '#d8e8c8';
+      DV.roundRect(ctx, -8, -8, 24, 14, 4); ctx.fill();
+      ctx.fillStyle = '#2a2a2a';
+      ctx.beginPath(); ctx.arc(-16, 24, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(16, 24, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f0d0b0';
+      ctx.beginPath(); ctx.arc(4, -12, 8, 0, Math.PI * 2); ctx.fill();
+      hat(ctx, 4, -20, 0);
+      ctx.restore();
+      return;
+    }
+
+    // legs
+    ctx.strokeStyle = '#3a5a88'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-4, 8); ctx.lineTo(-8 - run * 6, 24); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4, 8); ctx.lineTo(8 + run * 6, 24); ctx.stroke();
+    ctx.fillStyle = '#5a3a22';
+    ctx.beginPath(); ctx.ellipse(-10 - run * 6, 26, 6, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(10 + run * 6, 26, 6, 3, 0, 0, Math.PI * 2); ctx.fill();
+    // body
+    ctx.fillStyle = '#d8c06a';
+    DV.roundRect(ctx, -11, -10, 22, 22, 6); ctx.fill();
+    // pack
+    ctx.fillStyle = '#6a4a28';
+    DV.roundRect(ctx, -16, -8, 8, 14, 3); ctx.fill();
+    // arms
+    ctx.strokeStyle = '#f0d0b0'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-10, -2); ctx.lineTo(-16 + run * 5, 10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(10, -2); ctx.lineTo(16 - run * 5, 8); ctx.stroke();
+    // head
+    ctx.fillStyle = '#f0d0b0';
+    ctx.beginPath(); ctx.arc(0, -20, 10, 0, Math.PI * 2); ctx.fill();
+    eyes(ctx, 1, -20, (Math.sin(t * 2) + 1) / 2, false);
+    hat(ctx, 0, -28, Math.sin(t * 10) * 0.05);
+    // bandana
+    ctx.fillStyle = p.color || '#d4453a';
+    ctx.beginPath(); ctx.arc(0, -12, 8, 0.15, Math.PI - 0.15); ctx.fill();
+    ctx.restore();
+  }
+
+  function hat(ctx, x, y, ang) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang || 0);
+    ctx.fillStyle = '#c4a05a';
+    ctx.beginPath(); ctx.ellipse(0, 4, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
+    DV.roundRect(ctx, -8, -6, 16, 10, 3); ctx.fill();
+    ctx.fillStyle = '#3d6a3a';
+    ctx.fillRect(-8, 0, 16, 3);
+    ctx.fillStyle = '#e8c84a';
+    ctx.beginPath(); ctx.arc(0, -2, 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBg(ctx, world, cam, t) {
+    const pal = (world && world.palette) || DV.PARKS[0].areas[0].palette;
+    drawSky(ctx, pal, t, cam, world);
+    drawGround(ctx, pal, cam, t, world);
+  }
+
+  function titleScene(ctx, t) {
+    const world = { palette: DV.PARKS[0].areas[0].palette, area: { id: 'furnace-creek' }, remix: 0 };
+    drawBg(ctx, world, t * 30, t);
+    // wandering friends
+    drawAnimal(ctx, { species: 'tortoise', x: 1, _injured: false }, DV.W * 0.18, DV.laneY(0) + 10, t, { limp: false });
+    drawAnimal(ctx, { species: 'kitfox', x: 2 }, DV.W * 0.28, DV.laneY(1), t, { limp: true });
+    drawRanger(ctx, { sx: DV.W * 0.52, sy: DV.laneY(1), z: 0, grounded: true, color: '#d4453a' }, t, {});
+    cactus(ctx, DV.W * 0.74, DV.laneY(0) + 16, 1.3, t);
+    rock(ctx, DV.W * 0.86, DV.laneY(2) + 8, 1.1);
+  }
+
+  function upgradeBits(level) {
+    return {
+      fence: level >= 1, hut: level >= 1, trough: level >= 1,
+      vet: level >= 2, pond: level >= 3, sails: level >= 4,
+      nursery: level >= 5, garden: level >= 6, lanterns: level >= 7,
+      rocks: level >= 8, barn: level >= 9, fountain: level >= 10
+    };
+  }
+
+  function drawShelter(ctx, p, t, selId) {
+    const w = DV.W, h = DV.H;
+    const pal = { skyTop: '#f0c878', skyBot: '#f0a060', far: '#c47a4a', mid: '#d89058', ground: '#e8b870', accent: '#7aaa4a', sun: '#ffe9a0' };
+    drawSky(ctx, pal, t, 0, { remix: 0, area: { id: 'furnace-creek' } });
+    ctx.fillStyle = pal.ground;
+    ctx.fillRect(0, h * 0.42, w, h * 0.58);
+    ctx.fillStyle = '#c8b06a';
+    ctx.fillRect(0, h * 0.70, w, h * 0.30);
+    ctx.fillStyle = 'rgba(122,160,74,.35)';
+    ctx.fillRect(0, h * 0.68, w, 18);
+    const u = upgradeBits(p.shelterLevel);
+    const cx = w / 2, cy = h * 0.62;
+    if (u.fence) {
+      ctx.strokeStyle = '#6a4a28'; ctx.lineWidth = 5;
+      DV.roundRect(ctx, 40, h * 0.46, w - 80, h * 0.42, 16); ctx.stroke();
+      for (let i = 0; i < 10; i++) {
+        ctx.fillStyle = '#8a5a30';
+        ctx.fillRect(50 + i * ((w - 120) / 9), h * 0.46, 8, h * 0.1);
+      }
+    }
+    if (u.sails) {
+      ctx.fillStyle = 'rgba(255,230,160,.55)';
+      ctx.beginPath(); ctx.moveTo(80, h * 0.48); ctx.lineTo(240, h * 0.42); ctx.lineTo(260, h * 0.56); ctx.lineTo(90, h * 0.58); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(w - 80, h * 0.48); ctx.lineTo(w - 240, h * 0.42); ctx.lineTo(w - 260, h * 0.56); ctx.lineTo(w - 90, h * 0.58); ctx.fill();
+    }
+    if (u.pond) {
+      ctx.fillStyle = '#5aa0c8';
+      ctx.beginPath(); ctx.ellipse(w * 0.18, h * 0.57, 64, 24, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.3)';
+      ctx.beginPath(); ctx.ellipse(w * 0.16, h * 0.56, 18, 7, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    if (u.vet) {
+      ctx.fillStyle = '#f4f0e8';
+      DV.roundRect(ctx, w * 0.72, h * 0.48, 90, 64, 8); ctx.fill();
+      ctx.fillStyle = '#c45a4a';
+      ctx.fillRect(w * 0.72, h * 0.48, 90, 14);
+      ctx.fillStyle = '#3d8a46';
+      ctx.fillRect(w * 0.72 + 38, h * 0.62, 14, 8);
+      ctx.fillRect(w * 0.72 + 41, h * 0.59, 8, 14);
+    }
+    if (u.barn) {
+      ctx.fillStyle = '#a05038';
+      ctx.fillRect(w * 0.08, h * 0.50, 100, 70);
+      ctx.beginPath(); ctx.moveTo(w * 0.08 - 6, h * 0.50); ctx.lineTo(w * 0.08 + 50, h * 0.40); ctx.lineTo(w * 0.08 + 106, h * 0.50); ctx.fill();
+    }
+    if (u.hut || p.shelterLevel >= 1) {
+      ctx.fillStyle = '#c4a06a';
+      DV.roundRect(ctx, cx - 40, h * 0.50, 80, 54, 6); ctx.fill();
+      ctx.fillStyle = '#8a4a28';
+      ctx.beginPath(); ctx.moveTo(cx - 50, h * 0.50); ctx.lineTo(cx, h * 0.40); ctx.lineTo(cx + 50, h * 0.50); ctx.fill();
+    }
+    if (u.trough) {
+      ctx.fillStyle = '#8aa0b0';
+      DV.roundRect(ctx, cx + 50, h * 0.70, 50, 14, 4); ctx.fill();
+      ctx.fillStyle = '#6ec4ff';
+      DV.roundRect(ctx, cx + 54, h * 0.71, 42, 8, 3); ctx.fill();
+    }
+    if (u.garden) {
+      ctx.fillStyle = '#6aaa40';
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath(); ctx.arc(w * 0.38 + i * 18, h * 0.62, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = i % 2 ? '#e8c84a' : '#e8789a';
+        ctx.beginPath(); ctx.arc(w * 0.38 + i * 18, h * 0.615, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#6aaa40';
+      }
+    }
+    if (u.nursery) {
+      ctx.fillStyle = '#f0c8d8';
+      DV.roundRect(ctx, w * 0.58, h * 0.57, 54, 28, 8); ctx.fill();
+      ctx.strokeStyle = '#d080a0'; ctx.stroke();
+    }
+    if (u.rocks) {
+      rock(ctx, w * 0.86, h * 0.72, 1.2, '#b09080');
+      rock(ctx, w * 0.90, h * 0.74, 0.8, '#c0a090');
+    }
+    if (u.fountain) {
+      ctx.fillStyle = '#d0d8e0';
+      ctx.beginPath(); ctx.arc(cx, h * 0.64, 16, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#7ec8f0';
+      ctx.beginPath(); ctx.arc(cx, h * 0.62, 6, 0, Math.PI * 2); ctx.fill();
+    }
+    if (u.lanterns) {
+      for (let i = 0; i < 5; i++) {
+        const lx = 70 + i * ((w - 140) / 4);
+        ctx.fillStyle = '#5a3a20';
+        ctx.fillRect(lx, h * 0.48, 4, 36);
+        ctx.fillStyle = 'rgba(255,200,80,.85)';
+        ctx.beginPath(); ctx.arc(lx + 2, h * 0.48, 6, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    if (p.shelterLevel < 1) {
+      ctx.fillStyle = 'rgba(40,20,16,.55)';
+      DV.roundRect(ctx, w / 2 - 180, h * 0.48, 360, 90, 16); ctx.fill();
+      ctx.fillStyle = '#ffe09a';
+      ctx.font = '700 20px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('A shade tent for now… ' + p.badges + '/10 badges to build the shelter!', w / 2, h * 0.55);
+    }
+
+    // place animals
+    const list = p.animals || [];
+    const n = list.length;
+    for (let i = 0; i < n; i++) {
+      const a = list[i];
+      const col = i % 6, row = Math.floor(i / 6) % 3;
+      const ax = 90 + col * ((w - 160) / 5) + Math.sin(t * 0.8 + i) * 8;
+      const ay = h * 0.46 + row * 44 + Math.cos(t * 0.6 + i * 1.3) * 4;
+      const sad = a.hunger < 35 || a.thirst < 35 || a.health < 40;
+      const sel = selId && a.id === selId;
+      if (sel) {
+        ctx.strokeStyle = '#ffe09a'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(ax, ay - 8, 28, 0, Math.PI * 2); ctx.stroke();
+      }
+      drawAnimal(ctx, a, ax, ay, t + i, { limp: false, sad, heart: !sad && Math.sin(t + i) > 0.7, noBaby: true });
+    }
+  }
+
+  function drawPassport(ctx, p, page, t) {
+    const w = DV.W, h = DV.H;
+    ctx.fillStyle = '#3a2a20';
+    ctx.fillRect(0, 0, w, h);
+    // book
+    const reserved = DV.portrait ? 170 : 130;
+    const bw = Math.min(w * 0.9, 1000), bh = Math.min(h - reserved - 16, 540);
+    const bx = (w - bw) / 2, by = 12;
+    ctx.fillStyle = '#6a2030';
+    DV.roundRect(ctx, bx - 10, by - 10, bw + 20, bh + 20, 16); ctx.fill();
+    ctx.fillStyle = '#f4ead0';
+    DV.roundRect(ctx, bx, by, bw / 2 - 4, bh, 4); ctx.fill();
+    DV.roundRect(ctx, bx + bw / 2 + 4, by, bw / 2 - 4, bh, 4); ctx.fill();
+    ctx.strokeStyle = 'rgba(80,40,20,.15)'; ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      ctx.beginPath(); ctx.moveTo(bx + 20, by + 50 + i * 28); ctx.lineTo(bx + bw / 2 - 20, by + 50 + i * 28); ctx.stroke();
+    }
+    ctx.fillStyle = '#6a2030';
+    ctx.font = '800 26px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('Junior Ranger Passport', bx + bw / 4, by + 36);
+
+    const parks = DV.PARKS;
+    const perPage = 4;
+    const start = page * perPage;
+    const slice = parks.slice(start, start + perPage);
+    slice.forEach((park, i) => {
+      const col = i % 2, row = Math.floor(i / 2);
+      const px = bx + bw / 2 + 4 + 20 + col * ((bw / 2 - 30) / 2);
+      const py = by + 30 + row * (bh / 2 - 10);
+      const sw = (bw / 2 - 50) / 2, sh = bh / 2 - 40;
+      const stamped = !!(p.stamps[park.id] || Object.keys(p.stamps).some((k) => k === park.id || k.startsWith(park.id + '-')));
+      ctx.save();
+      ctx.translate(px + sw / 2, py + sh / 2);
+      ctx.rotate(stamped ? -0.08 : 0);
+      ctx.strokeStyle = stamped ? park.stamp.color : 'rgba(80,40,20,.35)';
+      ctx.lineWidth = 4;
+      ctx.setLineDash(stamped ? [] : [8, 6]);
+      ctx.beginPath(); ctx.arc(0, 0, Math.min(sw, sh) * 0.32, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      if (stamped) {
+        ctx.fillStyle = park.stamp.color;
+        ctx.globalAlpha = 0.9;
+        stampIcon(ctx, park.stamp.icon, 0, -6, 1);
+        ctx.globalAlpha = 1;
+      }
+      ctx.fillStyle = stamped ? '#6a2030' : 'rgba(80,40,20,.45)';
+      ctx.font = '700 13px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(park.stamp.title, 0, Math.min(sw, sh) * 0.42);
+      ctx.restore();
+    });
+    // area stickers on left
+    ctx.fillStyle = '#6a2030';
+    ctx.font = '700 14px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText('Area stickers', bx + 24, by + 70);
+    const stickers = Object.keys(p.areaStickers || {});
+    ctx.font = '700 11px system-ui';
+    if (!stickers.length) ctx.fillText('Earn one for every area you finish.', bx + 24, by + 94);
+    else {
+      const unique = [];
+      for (const id of stickers) {
+        const raw = id.replace(/-r\d+$/, '');
+        if (unique.indexOf(raw) < 0) unique.push(raw);
+      }
+      unique.slice(0, 12).forEach((id, i) => {
+        let label = id.replace(/-/g, ' ');
+        for (const park of DV.PARKS) {
+          const a = park.areas.find((x) => x.id === id);
+          if (a) { label = a.name; break; }
+        }
+        ctx.fillStyle = ['#e8b84a', '#d07848', '#7aaa4a', '#5aa0c8', '#c4a0e0', '#e07060'][i % 6];
+        const sx = bx + 24 + (i % 3) * 148, sy = by + 96 + Math.floor(i / 3) * 34;
+        DV.roundRect(ctx, sx, sy, 140, 26, 8); ctx.fill();
+        ctx.fillStyle = '#3a1a10';
+        ctx.fillText(label, sx + 8, sy + 17);
+      });
+    }
+  }
+
+  function stampIcon(ctx, icon, x, y, s) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+    ctx.fillStyle = ctx.strokeStyle;
+    if (icon === 'cactus') cactus(ctx, 0, 10, 0.9, 0);
+    else if (icon === 'joshua') { cactus(ctx, 0, 10, 0.8, 0); cactus(ctx, 10, 14, 0.5, 0); }
+    else if (icon === 'dome') { ctx.beginPath(); ctx.arc(0, 8, 16, Math.PI, 0); ctx.fill(); }
+    else if (icon === 'tree') { ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(16, 16); ctx.lineTo(-16, 16); ctx.fill(); }
+    else if (icon === 'canyon') { ctx.fillRect(-18, -4, 12, 20); ctx.fillRect(-4, 0, 10, 16); ctx.fillRect(8, -8, 12, 24); }
+    else if (icon === 'geyser') { ctx.beginPath(); ctx.moveTo(-8, 16); ctx.lineTo(0, -16); ctx.lineTo(8, 16); ctx.fill(); }
+    else if (icon === 'arch') { ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(0, 8, 14, Math.PI, 0); ctx.stroke(); }
+    ctx.restore();
+  }
+
+  function coin(ctx, x, y, t) {
+    ctx.save(); ctx.translate(x, y - Math.sin(t * 6) * 4);
+    const sq = Math.abs(Math.cos(t * 4));
+    ctx.fillStyle = '#f0c84a';
+    ctx.beginPath(); ctx.ellipse(0, 0, 10 * sq + 2, 12, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#a07020'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
+  }
+
+  function finishFlag(ctx, x, y, t) {
+    ctx.fillStyle = '#5a3a20';
+    ctx.fillRect(x, y - 80, 6, 90);
+    ctx.fillStyle = '#e8b84a';
+    ctx.beginPath(); ctx.moveTo(x + 6, y - 80); ctx.lineTo(x + 46 + Math.sin(t * 4) * 4, y - 64); ctx.lineTo(x + 6, y - 48); ctx.fill();
+  }
+
+  return {
+    drawBg, titleScene, drawObstacle, drawAnimal, drawRanger, drawShelter, drawPassport,
+    cactus, rock, tumbleweed, devil, puddle, coin, finishFlag, sun, upgradeBits, stampIcon
+  };
+})();
+
+})();
+/* ==== 50-game.js ==== */
+;(function(){
+/* Runner gameplay, collisions, autoplay, pause, win/lose */
+DV.Game = (() => {
+  const GRAVITY = 1750;
+  const JUMP_LOCK = 0.12;
+
+  function playerFrom(meta, idx, coop) {
+    return {
+      i: idx,
+      profile: meta.id,
+      meta,
+      lane: 1,
+      laneF: 1,
+      z: 0,
+      vz: 0,
+      grounded: true,
+      invuln: 0,
+      lives: meta.infiniteLives ? 99 : meta.lives,
+      infinite: meta.infiniteLives,
+      color: idx === 0 ? '#d4453a' : '#3a6ad4',
+      sx: 0, sy: 0,
+      worldX: 0,
+      jumping: false,
+      jumpCd: 0,
+      hitFlash: 0,
+      rescued: 0
+    };
+  }
+
+  function start(level, opts) {
+    opts = opts || {};
+    const coop = !!opts.coop;
+    const pid = opts.profile || DV.state.lastProfile || 'p1';
+    if (!coop) DV.Save.setProfile(pid);
+    const world = DV.World.generate(level || 1, coop ? 'p2' : pid);
+    // coop uses a blended difficulty? slightly easier than p2 by generating with p1 if we want... use p2 gen for tighter but p1 lives stay infinite. Generate with host profile.
+    const host = coop ? (opts.profile || 'p1') : pid;
+    const w = coop ? DV.World.generate(level || 1, host) : world;
+    const players = [playerFrom(DV.meta(coop ? 'p1' : pid), 0, coop)];
+    if (coop) players.push(playerFrom(DV.meta('p2'), 1, true));
+    DV.run = {
+      mode: coop ? 'coop' : 'solo',
+      soloProfile: host,
+      world: w,
+      players,
+      cam: 0,
+      time: 0,
+      paused: false,
+      over: false,
+      won: false,
+      intro: opts.skipIntro ? 0 : 2.6,
+      result: null,
+      fx: [],
+      missed: [],
+      covePlaced: false,
+      coinsGot: 0,
+      bonus: 0,
+      hits: 0,
+      autoplay: !!opts.autoplay || DV.autoplay
+    };
+    DV.screen = DV.run.intro > 0 ? 'intro' : 'play';
+    if (DV.run.intro > 0) DV.UI.intro(w);
+    else DV.UI.playHud();
+    return DV.run;
+  }
+
+  function reflow() {}
+
+  function wantJump(p) {
+    if (p.jumpCd > 0 || !p.grounded) return false;
+    if (DV.jumpHold[p.i]) return true;
+    const keys = DV.keys;
+    if (p.i === 0) {
+      if (keys.w || keys.W || keys.ArrowUp && !isCoopOrSoloArrow(p) || keys[' '] || keys.Space) return true;
+    }
+    if (p.i === 1 || (p.i === 0 && DV.run && DV.run.mode === 'solo')) {
+      if (p.i === 1 && (keys.ArrowUp || keys.Enter)) return true;
+    }
+    if (p.i === 0 && DV.run && DV.run.mode === 'solo' && (keys.ArrowUp || keys.w || keys.W || keys[' '] || keys.Space)) return true;
+    return false;
+  }
+
+  function isCoopOrSoloArrow(p) {
+    return DV.run && DV.run.mode === 'coop' && p.i === 0;
+  }
+
+  function wantLane(p) {
+    let d = DV.laneHold[p.i] || 0;
+    const keys = DV.keys;
+    if (p.i === 0) {
+      if (keys.a || keys.A || (DV.run.mode === 'solo' && keys.ArrowLeft)) d = -1;
+      if (keys.d || keys.D || (DV.run.mode === 'solo' && keys.ArrowRight)) d = 1;
+    }
+    if (p.i === 1) {
+      if (keys.ArrowLeft) d = -1;
+      if (keys.ArrowRight) d = 1;
+    }
+    return d;
+  }
+
+  function autoplayFollow(p, dt) {
+    const run = DV.run;
+    const x = run.cam + 40;
+    const look = DV.World.pathAt(run.world, x + 70);
+    if (look.lane > p.lane + 0.4) p.lane = Math.min(2, p.lane + 1);
+    else if (look.lane < p.lane - 0.4) p.lane = Math.max(0, p.lane - 1);
+    const near = DV.World.pathAt(run.world, x + 50);
+    if (near.jump && p.grounded) doJump(p);
+    // grab nearby animals
+    for (const an of run.world.animals) {
+      if (an.got) continue;
+      if (Math.abs((an.x) - x) < 80 && Math.abs(an.lane - p.lane) <= 1) {
+        if (an.lane !== p.lane) p.lane = an.lane;
+      }
+    }
+  }
+
+  function doJump(p) {
+    if (!p.grounded || p.jumpCd > 0) return;
+    p.vz = p.meta.jumpV;
+    p.grounded = false;
+    p.jumping = true;
+    p.jumpCd = JUMP_LOCK;
+    DV.Audio.jump();
+  }
+
+  function collectAnimal(run, an, p) {
+    if (an.got) return;
+    an.got = true;
+    p.rescued++;
+    run.fx.push({ kind: 'heart', x: an.x, y: DV.laneY(an.lane) - 20, t: 0, life: 0.8 });
+    DV.Audio.rescue();
+  }
+
+  function hitPlayer(run, p) {
+    if (p.invuln > 0) return;
+    run.hits++;
+    p.hitFlash = 0.4;
+    p.invuln = p.meta.invuln;
+    DV.Audio.hit();
+    run.fx.push({ kind: 'bump', x: run.cam + 200, y: p.sy, t: 0, life: 0.4 });
+    if (!p.infinite) {
+      p.lives -= 1;
+      if (p.lives <= 0) {
+        lose(run);
+      }
+    }
+  }
+
+  function win(run) {
+    if (run.over) return;
+    run.over = true;
+    run.won = true;
+    const bonus = Math.max(0, 6 - run.hits) + run.coinsGot;
+    run.bonus = bonus;
+    const p = DV.Save.profile(run.soloProfile);
+    run.result = DV.Save.applyWin(p, run.world, { bonus });
+    DV.Audio.win();
+    DV.Audio.badge();
+    DV.screen = 'win';
+    DV.UI.win(run);
+  }
+
+  function lose(run) {
+    if (run.over) return;
+    run.over = true;
+    run.won = false;
+    DV.Audio.lose();
+    DV.screen = 'lose';
+    DV.UI.lose(run);
+  }
+
+  function maybeCove(run) {
+    if (run.covePlaced) return;
+    if (run.cam < run.world.courseEnd - 20) return;
+    run.covePlaced = true;
+    const missed = run.world.animals.filter((a) => !a.got);
+    missed.forEach((a, i) => {
+      a.x = run.world.rescueX + 40 + i * 70;
+      a.lane = 1;
+      a.cove = true;
+    });
+  }
+
+  function tick(dt) {
+    const run = DV.run;
+    if (!run || run.paused || run.over) return;
+    if (run.intro > 0) {
+      run.intro -= dt;
+      if (run.intro <= 0) {
+        run.intro = 0;
+        DV.screen = 'play';
+        DV.UI.playHud();
+      }
+      return;
+    }
+    const world = run.world;
+    run.time += dt;
+    run.cam += world.speed * dt;
+    maybeCove(run);
+
+    for (const p of run.players) {
+      if (p.invuln > 0) p.invuln -= dt;
+      if (p.hitFlash > 0) p.hitFlash -= dt;
+      if (p.jumpCd > 0) p.jumpCd -= dt;
+      if (run.autoplay) autoplayFollow(p, dt);
+      else {
+        const ld = wantLane(p);
+        if (ld < 0 && p.laneF - p.lane < 0.15) p.lane = Math.max(0, Math.round(p.lane) - (p.laneF <= p.lane + 0.05 && Math.round(p.laneF) === p.lane ? 1 : 0));
+        // simpler lane change: on press edge we handle in input; here poll hold and keyboard
+        if (!run._laneWas) run._laneWas = [0, 0];
+        const now = ld;
+        const was = run._laneWas[p.i];
+        if (now && now !== was) p.lane = DV.clamp(Math.round(p.laneF) + now, 0, 2);
+        run._laneWas[p.i] = now;
+        if (wantJump(p)) doJump(p);
+      }
+      p.laneF = DV.lerp(p.laneF, p.lane, 1 - Math.pow(0.0008, dt));
+      if (!p.grounded) {
+        p.vz -= GRAVITY * dt;
+        p.z += p.vz * dt;
+        if (p.z <= 0) { p.z = 0; p.vz = 0; p.grounded = true; p.jumping = false; }
+      }
+      const baseX = 210 + p.i * 70;
+      p.sx = baseX;
+      p.sy = DV.laneY(p.laneF);
+      p.worldX = run.cam + baseX;
+      collide(run, p);
+    }
+
+    // finish
+    if (!run.over && run.cam + 240 >= world.finishX) {
+      const all = world.animals.every((a) => a.got);
+      if (all) win(run);
+      else if (run.cam + 210 >= world.finishX + 40) {
+        // still missing after cove? should not happen if cove worked; give them anyway if they reached end of cove
+        const missed = world.animals.filter((a) => !a.got);
+        if (missed.length && run.cam + 210 >= world.finishX) {
+          // if player passed the cove animals without grabbing (unlikely), fail gently by extending? Auto-rescue if close
+          missed.forEach((a) => { a.got = true; });
+          win(run);
+        }
+      }
+    }
+
+    for (const fx of run.fx) fx.t += dt;
+    run.fx = run.fx.filter((f) => f.t < f.life);
+    DV.UI.refreshHud();
+  }
+
+  function collide(run, p) {
+    const wx = p.worldX;
+    const lane = Math.round(p.laneF);
+    const z = p.z;
+    for (const o of run.world.obstacles) {
+      if (o.hit) continue;
+      if (Math.abs(o.lane - lane) > 0.4) continue;
+      if (Math.abs(o.x - wx) > 42) continue;
+      const clearJump = o.jumpable && z > 36;
+      if (clearJump) continue;
+      o.hit = true;
+      hitPlayer(run, p);
+    }
+    for (const an of run.world.animals) {
+      if (an.got) continue;
+      const mag = p.meta.magnet;
+      const laneOk = Math.abs(an.lane - p.laneF) <= 0.55 || (mag >= 80 && Math.abs(an.lane - p.laneF) <= 1.05 && Math.abs(an.x - wx) < 70);
+      if (!laneOk) continue;
+      if (Math.abs(an.x - wx) > 46 + (mag > 50 ? 20 : 0)) continue;
+      collectAnimal(run, an, p);
+    }
+    for (const c of run.world.coins) {
+      if (c.got) continue;
+      if (Math.abs(c.lane - p.laneF) > 0.55) continue;
+      if (Math.abs(c.x - wx) > 36) continue;
+      c.got = true;
+      run.coinsGot += c.v || 1;
+      DV.Audio.coin();
+      run.fx.push({ kind: 'coin', x: c.x, y: DV.laneY(c.lane) - 20, t: 0, life: 0.5 });
+    }
+  }
+
+  function draw() {
+    const ctx = DV.ctx;
+    const run = DV.run;
+    const t = (run ? run.time : DV.lastT / 1000) || 0;
+    if (!run) {
+      DV.Art.titleScene(ctx, t);
+      return;
+    }
+    const cam = run.cam;
+    DV.Art.drawBg(ctx, run.world, cam, t);
+    const toSX = (wx) => wx - cam;
+
+    // decorations
+    for (const d of run.world.decorations) {
+      const sx = toSX(d.x);
+      if (sx < -60 || sx > DV.W + 60) continue;
+      DV.Art.cactus(ctx, sx, DV.laneY(d.lane) + 20, 0.45 * d.s, t);
+    }
+    // items by lane back to front
+    const stuff = [];
+    for (const o of run.world.obstacles) stuff.push({ z: o.lane, k: 'o', o });
+    for (const a of run.world.animals) if (!a.got) stuff.push({ z: a.lane, k: 'a', a });
+    for (const c of run.world.coins) if (!c.got) stuff.push({ z: c.lane, k: 'c', c });
+    stuff.sort((a, b) => b.z - a.z);
+    for (const s of stuff) {
+      if (s.k === 'o') {
+        const sx = toSX(s.o.x);
+        if (sx < -80 || sx > DV.W + 80) continue;
+        DV.Art.drawObstacle(ctx, s.o, sx, DV.laneY(s.o.lane), t);
+      } else if (s.k === 'a') {
+        const sx = toSX(s.a.x);
+        if (sx < -80 || sx > DV.W + 80) continue;
+        DV.Art.drawAnimal(ctx, s.a, sx, DV.laneY(s.a.lane), t, { limp: true });
+      } else {
+        const sx = toSX(s.c.x);
+        if (sx < -40 || sx > DV.W + 40) continue;
+        DV.Art.coin(ctx, sx, DV.laneY(s.c.lane) - 10, t);
+      }
+    }
+    DV.Art.finishFlag(ctx, toSX(run.world.finishX), DV.laneY(1), t);
+
+    for (const p of run.players) {
+      ctx.save();
+      if (p.invuln > 0 && Math.floor(run.time * 16) % 2 === 0) ctx.globalAlpha = 0.45;
+      DV.Art.drawRanger(ctx, p, t, { buggy: run.world.vehicle && p.i === 0, flip: false, scale: DV.portrait ? 1.2 : 1 });
+      ctx.restore();
+    }
+    for (const fx of run.fx) {
+      const sx = toSX(fx.x);
+      ctx.globalAlpha = 1 - fx.t / fx.life;
+      if (fx.kind === 'heart') {
+        ctx.fillStyle = '#ff6a8a';
+        ctx.beginPath();
+        ctx.moveTo(sx, fx.y - fx.t * 40);
+        ctx.bezierCurveTo(sx - 10, fx.y - 16 - fx.t * 40, sx - 16, fx.y - fx.t * 40, sx, fx.y + 8 - fx.t * 40);
+        ctx.bezierCurveTo(sx + 16, fx.y - fx.t * 40, sx + 10, fx.y - 16 - fx.t * 40, sx, fx.y - fx.t * 40);
+        ctx.fill();
+      } else if (fx.kind === 'coin') {
+        ctx.fillStyle = '#ffe09a';
+        ctx.font = '800 16px system-ui';
+        ctx.fillText('+' + 1, sx, fx.y - fx.t * 50);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function togglePause() {
+    const run = DV.run;
+    if (!run || run.over || run.intro > 0) return;
+    run.paused = !run.paused;
+    if (run.paused) DV.UI.pause();
+    else DV.UI.playHud();
+  }
+
+  function fastForward(seconds) {
+    const step = 1 / 60;
+    let left = seconds;
+    while (left > 0 && DV.run && !DV.run.over) {
+      tick(Math.min(step, left));
+      left -= step;
+    }
+  }
+
+  function autoSolveCurrent() {
+    const run = DV.run;
+    if (!run) return null;
+    run.autoplay = true;
+    // Simulate quickly
+    let guard = 0;
+    while (run && !run.over && guard++ < 20000) tick(1 / 30);
+    return { won: !!(run && run.won), over: !!(run && run.over), guard };
+  }
+
+  return { start, tick, draw, togglePause, reflow, fastForward, autoSolveCurrent, doJump, wantLane };
+})();
+
+})();
+/* ==== 60-ui.js ==== */
+;(function(){
+/* Menus, HUD, touch, shelter and passport screens */
+DV.UI = (() => {
+  function overlayPanel(html, sheet) {
+    const el = DV.overlay;
+    el.innerHTML = '';
+    el.classList.remove('hidden');
+    el.classList.toggle('sheet', !!sheet);
+    const wrap = document.createElement('div');
+    wrap.className = 'panel';
+    wrap.innerHTML = html;
+    el.appendChild(wrap);
+    return wrap;
+  }
+
+  function hidePlayChrome() {
+    if (DV.hud) DV.hud.classList.add('hidden');
+    if (DV.touchEl) DV.touchEl.classList.add('hidden');
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.classList.add('hidden');
+  }
+
+  function showPlayChrome() {
+    if (DV.hud) DV.hud.classList.remove('hidden');
+    const pb = document.getElementById('pauseBtn');
+    if (pb) pb.classList.remove('hidden');
+    showTouch(DV.run && DV.run.mode === 'coop');
+  }
+
+  function needsTouch() {
+    if (DV._forceTouch) return true;
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const touch = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
+    return !!(coarse || touch);
+  }
+
+  function showTouch(coop) {
+    const el = DV.touchEl;
+    if (!el) return;
+    if (!needsTouch() || DV.screen !== 'play') { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    el.classList.toggle('coop', !!coop);
+    const hideP2 = !coop;
+    ['laneLeft2', 'laneRight2', 'jump2'].forEach((id) => {
+      const b = document.getElementById(id);
+      if (b) b.classList.toggle('hidden', hideP2);
+    });
+  }
+
+  function title() {
+    DV.screen = 'title';
+    DV.run = null;
+    hidePlayChrome();
+    const p = DV.Save.profile();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Death Valley Chase</div>
+        <div class="sub">Dodge the desert, rescue every injured animal, and grow a kind little shelter.<br>Earn badges, tend your friends, and stamp your ranger passport.</div>
+        <div class="row">
+          <span class="chip">Badges ${p.badges || 0}</span>
+          <span class="chip">Coins ${p.coins || 0}</span>
+          <span class="chip">${p.name}</span>
+        </div>
+        <div class="row">
+          <button class="btn big green" id="btnPlay" type="button">Play</button>
+          <button class="btn big purple" id="btnTwo" type="button">2 Players</button>
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="btnProfiles" type="button">Profiles</button>
+          <button class="btn orange" id="btnShelter" type="button">Shelter</button>
+          <button class="btn blue" id="btnPass" type="button">Passport</button>
+          <button class="btn ghost" id="btnHow" type="button">How to Play</button>
+        </div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnPlay'), () => { DV.Audio.click(); profiles(); });
+    DV.bindTap(panel.querySelector('#btnTwo'), () => { DV.Audio.click(); twoPlayer(); });
+    DV.bindTap(panel.querySelector('#btnProfiles'), () => { DV.Audio.click(); profiles(); });
+    DV.bindTap(panel.querySelector('#btnShelter'), () => { DV.Audio.click(); shelter(); });
+    DV.bindTap(panel.querySelector('#btnPass'), () => { DV.Audio.click(); passport(); });
+    DV.bindTap(panel.querySelector('#btnHow'), () => { DV.Audio.click(); how(); });
+  }
+
+  function twoPlayer() {
+    DV.screen = 'two';
+    hidePlayChrome();
+    const p = DV.Save.profile();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">2 Players</div>
+        <div class="sub">One screen, two rangers. Left side or WASD + Space for Player 1.<br>Right side or arrows + Enter for Player 2. Rescues go to ${p.name}'s shelter.</div>
+        <div class="row">
+          <button class="btn big green" id="btnCoop" type="button">Co-op Rescue</button>
+        </div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnCoop'), () => { DV.Audio.click(); map(true); });
+    DV.bindTap(panel.querySelector('#btnBack'), () => { DV.Audio.click(); title(); });
+  }
+
+  function profiles() {
+    DV.screen = 'profiles';
+    hidePlayChrome();
+    const cards = ['p1', 'p2'].map((id) => {
+      const meta = DV.profiles[id];
+      const p = DV.Save.profile(id);
+      const lives = meta.infiniteLives ? '∞ lives · slower trail · animal magnet' : '3 lives · quicker desert';
+      return `<button class="profile-card" type="button" data-id="${id}">
+        <h2>${p.name}</h2>
+        <div class="meta">${meta.label}<br>${lives}<br>${p.badges} badges · ${p.coins} coins</div>
+      </button>`;
+    }).join('');
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Profiles</div>
+        <div class="sub">Player 1 is gentler and can't run out of lives. Player 2 is a sharper, faster chase.</div>
+        <div class="row">${cards}</div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    panel.querySelectorAll('.profile-card').forEach((card) => {
+      DV.bindTap(card, () => {
+        DV.Audio.click();
+        DV.Save.setProfile(card.getAttribute('data-id'));
+        map(false);
+      });
+    });
+    DV.bindTap(panel.querySelector('#btnBack'), () => { DV.Audio.click(); title(); });
+  }
+
+  function map(coop) {
+    DV.screen = 'levels';
+    hidePlayChrome();
+    const pid = coop ? (DV.state.lastProfile || 'p1') : (DV.state.lastProfile || 'p1');
+    const p = DV.Save.profile(pid);
+    const easy = DV.profiles[pid].infiniteLives && !coop;
+    const next = p.currentLevel || 1;
+    const loc = DV.World.locate(next);
+    const areaStart = next - loc.localLevel + 1;
+    const cells = [];
+    for (let i = 1; i <= DV.LEVELS_PER_AREA; i++) {
+      const id = areaStart + i - 1;
+      const unlocked = easy || id <= p.maxLevel;
+      const done = !!p.cleared[id];
+      const cur = id === next;
+      cells.push(`<button class="lvl${done ? ' done' : ''}${unlocked ? '' : ' locked'}${cur ? ' cur' : ''}" type="button" data-id="${id}" ${unlocked ? '' : 'disabled'}>${i}${done ? '<span>★</span>' : ''}</button>`);
+    }
+    const parkName = loc.park.name + (loc.remix ? (loc.remix % 3 === 1 ? ' · Twilight' : loc.remix % 3 === 2 ? ' · Spring' : ' · Night') : '');
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${coop ? 'Co-op Rescue' : loc.area.name}</div>
+        <div class="sub">${parkName} · Area ${loc.areaIndex + 1}/${loc.park.areas.length} · Level ${loc.localLevel} of 70<br>${p.badges} badges · ${p.coins} coins · Shelter ${p.shelterLevel}<br>${p.name}${easy ? ' · ∞ lives' : ' · 3 lives'}</div>
+        <div class="row">
+          <button class="btn big green" id="btnGo" type="button">Continue ${next}</button>
+          <button class="btn orange" id="btnShelter" type="button">Shelter</button>
+          <button class="btn blue" id="btnPass" type="button">Passport</button>
+        </div>
+        <div class="level-grid">${cells.join('')}</div>
+        <div class="row"><button class="btn ghost" id="btnBack" type="button">Back</button></div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnGo'), () => { DV.Audio.click(); DV.Game.start(next, { profile: pid, coop: !!coop }); });
+    DV.bindTap(panel.querySelector('#btnShelter'), () => { DV.Audio.click(); shelter(coop); });
+    DV.bindTap(panel.querySelector('#btnPass'), () => { DV.Audio.click(); passport(coop); });
+    panel.querySelectorAll('.lvl:not(.locked)').forEach((btn) => {
+      DV.bindTap(btn, () => {
+        DV.Audio.click();
+        DV.Game.start(parseInt(btn.getAttribute('data-id'), 10), { profile: pid, coop: !!coop });
+      });
+    });
+    DV.bindTap(panel.querySelector('#btnBack'), () => { DV.Audio.click(); coop ? twoPlayer() : profiles(); });
+  }
+
+  function how() {
+    DV.screen = 'how';
+    hidePlayChrome();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">How to Play</div>
+        <div class="sub" style="text-align:left;max-width:640px">
+          Change lanes to dodge rocks, cacti, tumbleweeds, dust devils and washouts. Jump over the low ones.<br><br>
+          Catch every injured animal before the finish flag. Miss one? They wait in a calm cove at the end.<br><br>
+          Each new level earns a badge and coins. At 10 badges your rescue shelter opens, and it grows at 20, 30, 40… Visit often to bring food, water and medicine. Friends get hungry as you play, but they never leave you — they just look sad until you care for them. Well-loved animals may have babies, and some arrive with a little one already.<br><br>
+          After 70 levels you move to a new part of the park. Finish a park to stamp your passport. The trail never ends.<br><br>
+          Keyboard: arrows or WASD to change lanes, Space to jump. On a phone, use the left/right buttons and the jump button — or swipe.
+        </div>
+        <div class="row"><button class="btn green" id="btnBack" type="button">Got it</button></div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnBack'), () => { DV.Audio.click(); title(); });
+  }
+
+  function shelter(fromCoop) {
+    DV.screen = 'shelter';
+    hidePlayChrome();
+    const p = DV.Save.profile();
+    if (!p.animals.length) DV.shelterSel = 0;
+    else if (!p.animals.some((a) => a.id === DV.shelterSel)) DV.shelterSel = p.animals[0].id;
+    const up = DV.SHELTER_UPGRADES.filter((u) => p.badges >= u.at);
+    const next = DV.SHELTER_UPGRADES.find((u) => p.badges < u.at);
+    const sel = p.animals.find((a) => a.id === DV.shelterSel);
+    const chips = p.animals.map((a) => {
+      const sad = a.hunger < 35 || a.thirst < 35 || a.health < 40;
+      const spec = DV.SPECIES[a.species];
+      return `<button class="animal-chip${a.id === DV.shelterSel ? ' sel' : ''}${sad ? ' sad' : ''}" type="button" data-id="${a.id}">${a.name}${a.baby ? ' 🍼' : ''}${a.age === 'old' ? ' ★' : ''}<span>${(spec && spec.name) || a.species}</span></button>`;
+    }).join('');
+    const meters = sel ? `
+      <div style="width:100%;text-align:left">
+        <div style="font-weight:800;margin:2px 0 6px">${sel.name} · ${(DV.SPECIES[sel.species] || {}).name || ''} · ${sel.age}${sel.baby ? ' · baby' : ''}</div>
+        <div class="row" style="width:100%;align-items:center">
+          <div style="flex:1;min-width:120px">Food<div class="meter food"><i style="width:${sel.hunger}%"></i></div></div>
+          <div style="flex:1;min-width:120px">Water<div class="meter water"><i style="width:${sel.thirst}%"></i></div></div>
+          <div style="flex:1;min-width:120px">Health<div class="meter health"><i style="width:${sel.health}%"></i></div></div>
+        </div>
+      </div>` : '<div class="sub" style="margin:4px 0">Rescue animals on the trail and they will rest here.</div>';
+    const blurb = p.shelterLevel < 1
+      ? ('Shade tent · ' + p.badges + '/10 badges to build the camp · ' + p.coins + ' coins')
+      : ('Upgrade ' + p.shelterLevel + (next ? ' · next ' + next.at + ' (' + next.name + ')' : ' · thriving') + ' · ' + p.coins + ' coins · ' + p.animals.length + ' friends' + (up.length ? ' · ' + up[up.length - 1].name : ''));
+    const panel = overlayPanel(`
+      <div class="care-card">
+        <div class="row" style="width:100%;justify-content:space-between">
+          <div style="text-align:left;flex:1">
+            <div class="title" style="font-size:22px;margin:0;text-align:left">Rescue Shelter</div>
+            <div class="sub" style="margin:2px 0 0;text-align:left">${blurb}</div>
+          </div>
+          <button class="btn ghost" id="btnBack" type="button">Back</button>
+        </div>
+        <div class="animal-list">${chips || '<span class="chip">No friends yet — go rescue some!</span>'}</div>
+        ${meters}
+        <div class="row">
+          <button class="btn green" id="btnFood" type="button" ${sel ? '' : 'disabled'}>Food · 6</button>
+          <button class="btn blue" id="btnWater" type="button" ${sel ? '' : 'disabled'}>Water · 6</button>
+          <button class="btn pink" id="btnMed" type="button" ${sel ? '' : 'disabled'}>Medicine · 10</button>
+          <button class="btn orange" id="btnFoodAll" type="button" ${p.animals.length ? '' : 'disabled'}>Feed all</button>
+          <button class="btn blue" id="btnWaterAll" type="button" ${p.animals.length ? '' : 'disabled'}>Water all</button>
+          <button class="btn pink" id="btnMedAll" type="button" ${p.animals.length ? '' : 'disabled'}>Treat all</button>
+        </div>
+      </div>`, true);
+    panel.querySelectorAll('.animal-chip').forEach((c) => {
+      DV.bindTap(c, () => { DV.shelterSel = c.getAttribute('data-id'); shelter(fromCoop); });
+    });
+    function doCare(kind, all) {
+      DV.Audio.unlock();
+      const res = all ? DV.Save.careAll(p, kind) : DV.Save.care(p, DV.shelterSel, kind);
+      if (!res.ok) {
+        if (res.reason === 'coins') DV.toast('Need ' + res.cost + ' coins — finish a level to earn more!');
+        else DV.toast('Pick a friend first.');
+        return;
+      }
+      DV.Audio.care();
+      shelter(fromCoop);
+    }
+    DV.bindTap(panel.querySelector('#btnFood'), () => doCare('food', false));
+    DV.bindTap(panel.querySelector('#btnWater'), () => doCare('water', false));
+    DV.bindTap(panel.querySelector('#btnMed'), () => doCare('med', false));
+    DV.bindTap(panel.querySelector('#btnFoodAll'), () => doCare('food', true));
+    DV.bindTap(panel.querySelector('#btnWaterAll'), () => doCare('water', true));
+    DV.bindTap(panel.querySelector('#btnMedAll'), () => doCare('med', true));
+    DV.bindTap(panel.querySelector('#btnBack'), () => { DV.Audio.click(); fromCoop ? map(true) : title(); });
+  }
+
+  function passport(fromCoop) {
+    DV.screen = 'passport';
+    hidePlayChrome();
+    const p = DV.Save.profile();
+    const pages = Math.ceil(DV.PARKS.length / 4);
+    if (DV.passportPage >= pages) DV.passportPage = pages - 1;
+    const stamps = Object.keys(p.stamps || {}).length;
+    const panel = overlayPanel(`
+      <div class="care-card">
+        <div class="sub" style="margin:0 0 8px">${stamps} park stamp${stamps === 1 ? '' : 's'} · page ${DV.passportPage + 1}/${pages}</div>
+        <div class="row">
+          <button class="btn ghost" id="btnPrev" type="button" ${DV.passportPage <= 0 ? 'disabled' : ''}>Prev</button>
+          <button class="btn ghost" id="btnNext" type="button" ${DV.passportPage >= pages - 1 ? 'disabled' : ''}>Next</button>
+          <button class="btn green" id="btnBack" type="button">Back</button>
+        </div>
+      </div>`, true);
+    DV.bindTap(panel.querySelector('#btnPrev'), () => { if (DV.passportPage > 0) { DV.passportPage--; passport(fromCoop); } });
+    DV.bindTap(panel.querySelector('#btnNext'), () => { if (DV.passportPage < pages - 1) { DV.passportPage++; passport(fromCoop); } });
+    DV.bindTap(panel.querySelector('#btnBack'), () => { DV.Audio.click(); fromCoop ? map(true) : title(); });
+  }
+
+  function intro(world) {
+    hidePlayChrome();
+    DV.screen = 'intro';
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">${world.title}</div>
+        <div class="sub">${world.park.name}<br>${world.fact}</div>
+        <div class="row"><button class="btn big green" id="btnGo" type="button">Let\'s Rescue!</button></div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnGo'), () => {
+      DV.Audio.click();
+      if (DV.run) DV.run.intro = 0;
+      DV.screen = 'play';
+      playHud();
+    });
+  }
+
+  function playHud() {
+    DV.screen = 'play';
+    DV.overlay.innerHTML = '';
+    DV.overlay.classList.remove('sheet');
+    showPlayChrome();
+    refreshHud();
+  }
+
+  function refreshHud() {
+    const run = DV.run;
+    if (!run || !DV.hud || DV.screen !== 'play') return;
+    const w = run.world;
+    const got = w.animals.filter((a) => a.got).length;
+    const lives = run.players.map((p) => p.infinite ? '∞' : ('♥'.repeat(Math.max(0, p.lives)) || '—')).join(' · ');
+    DV.hud.innerHTML = `
+      <span class="hud-pill">${w.title}</span>
+      <span class="hud-pill">Lv ${w.globalLevel}</span>
+      <span class="hud-pill">🐾 ${got}/${w.animals.length}</span>
+      <span class="hud-pill">✦ ${run.coinsGot}</span>
+      <span class="hud-pill">${lives}</span>`;
+    DV.hud.classList.remove('hidden');
+  }
+
+  function pause() {
+    const run = DV.run;
+    if (!run) return;
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Paused</div>
+        <div class="sub">The desert will wait.</div>
+        <div class="row">
+          <button class="btn big green" id="btnResume" type="button">Resume</button>
+          <button class="btn orange" id="btnShelter" type="button">Shelter</button>
+          <button class="btn ghost" id="btnQuit" type="button">Quit</button>
+        </div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnResume'), () => { DV.Audio.click(); run.paused = false; playHud(); });
+    DV.bindTap(panel.querySelector('#btnShelter'), () => { DV.Audio.click(); run.paused = false; DV.run = null; shelter(); });
+    DV.bindTap(panel.querySelector('#btnQuit'), () => { DV.Audio.click(); DV.run = null; title(); });
+  }
+
+  function win(run) {
+    hidePlayChrome();
+    const p = DV.Save.profile(run.soloProfile);
+    const res = run.result || {};
+    const newUp = DV.SHELTER_UPGRADES.find((u) => p.badges === u.at);
+    const stamp = res && res.stamps && Object.keys(res.stamps).length && p.stamps[run.world.park.id];
+    const babyMsg = res.babies && res.babies.length ? '<br>A baby arrived at the shelter! ' + res.babies.map((b) => b.name).join(', ') : '';
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Badge earned!</div>
+        <div class="sub">You rescued every friend in ${run.world.title}.<br>+1 badge · ${p.badges} total · ${p.coins} coins${newUp ? '<br>Shelter upgrade: ' + newUp.name + '!' : ''}${stamp && p.stamps[run.world.park.id] ? '<br>Passport stamp: ' + run.world.park.name + '!' : ''}${babyMsg}</div>
+        <div class="row">
+          <button class="btn big green" id="btnNext" type="button">Next Level</button>
+          <button class="btn orange" id="btnShelter" type="button">Shelter</button>
+          <button class="btn blue" id="btnPass" type="button">Passport</button>
+          <button class="btn ghost" id="btnMap" type="button">Map</button>
+        </div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnNext'), () => { DV.Audio.click(); DV.Game.start(run.world.globalLevel + 1, { profile: run.soloProfile, coop: run.mode === 'coop' }); });
+    DV.bindTap(panel.querySelector('#btnShelter'), () => { DV.Audio.click(); DV.run = null; shelter(); });
+    DV.bindTap(panel.querySelector('#btnPass'), () => { DV.Audio.click(); DV.run = null; passport(); });
+    DV.bindTap(panel.querySelector('#btnMap'), () => { DV.Audio.click(); map(run.mode === 'coop'); });
+  }
+
+  function lose(run) {
+    hidePlayChrome();
+    const panel = overlayPanel(`
+      <div class="col">
+        <div class="title">Let's try again</div>
+        <div class="sub">A bump in the trail — the animals are still waiting, and nobody is left behind.</div>
+        <div class="row">
+          <button class="btn big green" id="btnRetry" type="button">Retry</button>
+          <button class="btn ghost" id="btnMap" type="button">Map</button>
+        </div>
+      </div>`);
+    DV.bindTap(panel.querySelector('#btnRetry'), () => { DV.Audio.click(); DV.Game.start(run.world.globalLevel, { profile: run.soloProfile, coop: run.mode === 'coop' }); });
+    DV.bindTap(panel.querySelector('#btnMap'), () => { DV.Audio.click(); map(run.mode === 'coop'); });
+  }
+
+  function bindTouch() {
+    const setLane = (player, dir, down) => {
+      DV.laneHold[player] = down ? dir : (DV.laneHold[player] === dir ? 0 : DV.laneHold[player]);
+      if (down && DV.run && DV.screen === 'play' && !DV.run.paused) {
+        const p = DV.run.players[player];
+        if (p) p.lane = DV.clamp(Math.round(p.laneF) + dir, 0, 2);
+      }
+    };
+    const setJump = (player, down) => {
+      DV.jumpHold[player] = down;
+      if (down && DV.run && DV.screen === 'play' && !DV.run.paused) {
+        const p = DV.run.players[player];
+        if (p) DV.Game.doJump(p);
+      }
+    };
+    function bindBtn(id, fnDown, fnUp) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); el.classList.add('down'); DV.Audio.unlock(); fnDown(e); });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => el.addEventListener(t, (e) => { el.classList.remove('down'); fnUp && fnUp(e); }));
+    }
+    bindBtn('laneLeft', () => setLane(0, -1, true), () => setLane(0, -1, false));
+    bindBtn('laneRight', () => setLane(0, 1, true), () => setLane(0, 1, false));
+    bindBtn('jump1', () => setJump(0, true), () => setJump(0, false));
+    bindBtn('laneLeft2', () => setLane(1, -1, true), () => setLane(1, -1, false));
+    bindBtn('laneRight2', () => setLane(1, 1, true), () => setLane(1, 1, false));
+    bindBtn('jump2', () => setJump(1, true), () => setJump(1, false));
+
+    // swipes on canvas
+    let sx = 0, sy = 0, sid = null;
+    const cvs = () => DV.canvas;
+    const onDown = (e) => {
+      if (e.target && e.target.closest && e.target.closest('button,a,.panel')) return;
+      sx = e.clientX; sy = e.clientY; sid = e.pointerId;
+    };
+    const onUp = (e) => {
+      if (sid !== e.pointerId) return;
+      sid = null;
+      if (!DV.run || DV.screen !== 'play' || DV.run.paused) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.hypot(dx, dy) < 28) return;
+      const coop = DV.run.mode === 'coop';
+      const mid = window.innerWidth / 2;
+      const pi = coop && e.clientX > mid ? 1 : 0;
+      const p = DV.run.players[pi];
+      if (!p) return;
+      if (Math.abs(dx) > Math.abs(dy)) p.lane = DV.clamp(Math.round(p.laneF) + (dx > 0 ? 1 : -1), 0, 2);
+      else if (dy < 0) DV.Game.doJump(p);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('pointerup', onUp);
+  }
+
+  return {
+    title, profiles, map, levels: map, how, twoPlayer, shelter, passport, intro,
+    playHud, refreshHud, pause, win, lose, showTouch, hidePlayChrome, bindTouch, overlayPanel
+  };
+})();
+
+})();
+/* ==== 70-boot.js ==== */
+;(function(){
+/* Boot, input, loop, fullscreen, debug hook */
+(function boot() {
+  function loop(t) {
+    const dt = Math.min(0.033, (t - (DV.lastT || t)) / 1000);
+    DV.lastT = t;
+    if (DV._rotateHintTimer > 0) {
+      DV._rotateHintTimer -= dt;
+      if (DV._rotateHintTimer <= 0) {
+        DV._rotateDismissed = true;
+        const tip = document.getElementById('rotateTip');
+        if (tip) tip.classList.add('hidden');
+      }
+    }
+    DV.fitCanvas();
+    if (DV.run && (DV.screen === 'play' || DV.screen === 'intro' || DV.screen === 'win' || DV.screen === 'lose')) {
+      if (DV.screen === 'play' || DV.screen === 'intro') DV.Game.tick(dt);
+      DV.Game.draw();
+    } else if (DV.screen === 'shelter') {
+      DV.Art.drawShelter(DV.ctx, DV.Save.profile(), t / 1000, DV.shelterSel);
+    } else if (DV.screen === 'passport') {
+      DV.Art.drawPassport(DV.ctx, DV.Save.profile(), DV.passportPage, t / 1000);
+    } else {
+      DV.Art.titleScene(DV.ctx, t / 1000);
+    }
+    DV.raf = requestAnimationFrame(loop);
+  }
+
+  function bindInput() {
+    window.addEventListener('keydown', (e) => {
+      DV.Audio.unlock();
+      DV.keys[e.key] = true;
+      if (e.code) DV.keys[e.code] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Enter'].indexOf(e.key) >= 0) e.preventDefault();
+      if ((e.key === 'p' || e.key === 'P' || e.key === 'Escape') && DV.run && DV.screen === 'play') {
+        DV.Game.togglePause();
+      }
+      if (DV.run && DV.screen === 'play' && !DV.run.paused && !DV.run.over) {
+        const coop = DV.run.mode === 'coop';
+        const p0 = DV.run.players[0];
+        const p1 = DV.run.players[1];
+        if (p0 && (e.key === 'a' || e.key === 'A' || (!coop && e.key === 'ArrowLeft'))) p0.lane = DV.clamp(Math.round(p0.laneF) - 1, 0, 2);
+        if (p0 && (e.key === 'd' || e.key === 'D' || (!coop && e.key === 'ArrowRight'))) p0.lane = DV.clamp(Math.round(p0.laneF) + 1, 0, 2);
+        if (p0 && (e.key === 'w' || e.key === 'W' || e.key === ' ' || e.code === 'Space' || (!coop && e.key === 'ArrowUp'))) DV.Game.doJump(p0);
+        if (p1 && e.key === 'ArrowLeft') p1.lane = DV.clamp(Math.round(p1.laneF) - 1, 0, 2);
+        if (p1 && e.key === 'ArrowRight') p1.lane = DV.clamp(Math.round(p1.laneF) + 1, 0, 2);
+        if (p1 && (e.key === 'ArrowUp' || e.key === 'Enter')) DV.Game.doJump(p1);
+      }
+    }, { passive: false });
+    window.addEventListener('keyup', (e) => {
+      DV.keys[e.key] = false;
+      if (e.code) DV.keys[e.code] = false;
+    });
+    const unlock = () => DV.Audio.unlock();
+    window.addEventListener('pointerdown', unlock);
+    window.addEventListener('touchstart', unlock, { passive: true });
+
+    try {
+      DV._rotateSeenEver = localStorage.getItem('dvc-rotate-hint-v1') === '1';
+    } catch (e) { DV._rotateSeenEver = false; }
+    DV._rotateDismissed = !!DV._rotateSeenEver;
+    DV._rotateHintTimer = 0;
+    DV.refreshRotateHint = () => {
+      const tip = document.getElementById('rotateTip');
+      if (!tip) return;
+      const show = !!DV.portrait && !DV._rotateDismissed && DV.screen === 'play';
+      if (show && tip.classList.contains('hidden')) {
+        tip.classList.remove('hidden');
+        DV._rotateHintTimer = 4.0;
+        try { localStorage.setItem('dvc-rotate-hint-v1', '1'); DV._rotateSeenEver = true; } catch (err) {}
+      }
+      if (!show) tip.classList.add('hidden');
+    };
+    window.addEventListener('resize', () => {
+      DV.fitCanvas();
+      if (DV.screen === 'play' && DV.run) DV.UI.showTouch(DV.run.mode === 'coop');
+    });
+    window.addEventListener('orientationchange', () => setTimeout(() => {
+      DV.fitCanvas();
+      if (DV.screen === 'play' && DV.run) DV.UI.showTouch(DV.run.mode === 'coop');
+    }, 50));
+
+    const mute = document.getElementById('muteBtn');
+    if (mute) mute.onclick = () => { DV.Audio.unlock(); DV.Audio.setMuted(!DV.muted); };
+    const fs = document.getElementById('fsBtn');
+    if (fs) fs.onclick = () => {
+      DV.Audio.unlock();
+      const app = document.getElementById('app');
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const req = app.requestFullscreen || app.webkitRequestFullscreen;
+        if (req) req.call(app).catch(() => {});
+      } else {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) ex.call(document);
+      }
+    };
+    const pause = document.getElementById('pauseBtn');
+    if (pause) {
+      pause.classList.add('hidden');
+      pause.onclick = () => { DV.Audio.unlock(); DV.Game.togglePause(); };
+    }
+    DV.UI.bindTouch();
+  }
+
+  function init() {
+    DV.canvas = document.getElementById('game');
+    DV.ctx = DV.canvas.getContext('2d');
+    DV.overlay = document.getElementById('overlay');
+    DV.hud = document.getElementById('hud');
+    DV.touchEl = document.getElementById('touch');
+    DV.fitCanvas();
+    DV.Save.load();
+    DV.Audio.loadMute();
+    bindInput();
+    DV.screen = 'title';
+    DV.UI.title();
+    DV.raf = requestAnimationFrame(loop);
+
+    window.__game = {
+      DV,
+      start(level, profile, coop) {
+        if (profile && !coop) DV.Save.setProfile(profile);
+        return DV.Game.start(level || 1, { profile: profile, coop: !!coop, autoplay: false, skipIntro: true });
+      },
+      startCoop(level) { return DV.Game.start(level || 1, { coop: true, skipIntro: true }); },
+      autoplay(on) { DV.autoplay = on !== false; if (DV.run) DV.run.autoplay = DV.autoplay; return DV.autoplay; },
+      state: () => DV.state,
+      run: () => DV.run,
+      screen: () => DV.screen,
+      goTitle: () => DV.UI.title(),
+      goProfiles: () => DV.UI.profiles(),
+      goLevels: (coop) => DV.UI.map(!!coop),
+      goHow: () => DV.UI.how(),
+      goTwo: () => DV.UI.twoPlayer(),
+      goShelter: () => DV.UI.shelter(),
+      goPassport: () => DV.UI.passport(),
+      pause: () => DV.Game.togglePause(),
+      key(k, down) { DV.keys[k] = !!down; },
+      setLane(i, dir) {
+        if (!DV.run || !DV.run.players[i]) return;
+        DV.run.players[i].lane = DV.clamp(Math.round(DV.run.players[i].laneF) + dir, 0, 2);
+      },
+      jump(i) { if (DV.run && DV.run.players[i]) DV.Game.doJump(DV.run.players[i]); },
+      muted: () => DV.muted,
+      players: () => DV.run && DV.run.players,
+      resetSave: () => DV.Save.resetAll(),
+      fastForward: (s) => DV.Game.fastForward(s),
+      locate: (n) => DV.World.locate(n),
+      generate: (n, pid) => DV.World.generate(n, pid || 'p1'),
+      solve: (n, pid) => DV.World.solve(DV.World.generate(n, pid || 'p1'), pid || 'p1'),
+      solveRange: (pid, from, to, extra) => DV.World.solveRange(pid || 'p1', from, to, extra),
+      completeUpTo: (n, pid) => DV.Save.completeUpTo(n, pid),
+      jumpTo(level, pid) {
+        const p = DV.Save.profile(pid);
+        p.currentLevel = level;
+        if (p.maxLevel < level) p.maxLevel = level;
+        DV.Save.save();
+        return DV.Game.start(level, { profile: pid || p.id, skipIntro: true });
+      },
+      care: (id, kind) => DV.Save.care(DV.Save.profile(), id, kind),
+      careAll: (kind) => DV.Save.careAll(DV.Save.profile(), kind),
+      tickCare: (n) => DV.Save.tickCare(DV.Save.profile(), n || 1),
+      addAnimal: (spec, opts) => {
+        const p = DV.Save.profile();
+        const a = DV.Save.blankAnimal(spec || 'tortoise', opts || {});
+        p.animals.push(a);
+        DV.Save.save();
+        return a;
+      },
+      autoSolve: () => DV.Game.autoSolveCurrent(),
+      officialCount: () => DV.World.officialCount()
+    };
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+})();</script>
+<style id="car-mode-css">
+/* Game Night car mode: shared styles (Tesla browser, touch only, >= 64px tap targets) */
+.car-back {
+  position: fixed; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 132px; height: 64px; padding: 0 20px 0 14px; box-sizing: border-box;
+  border-radius: 32px; border: 3px solid rgba(255, 255, 255, 0.92);
+  background: rgba(16, 20, 34, 0.86); color: #fff; text-decoration: none;
+  font: 800 24px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.3px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  pointer-events: auto; cursor: pointer;
+}
+.car-back .car-back-arrow { font-size: 30px; line-height: 1; margin-top: -3px; }
+.car-back:active, .car-back.down { transform: translateY(2px) scale(0.97); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+.car-back.tl { left: calc(12px + env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); }
+.car-back.bl { left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.car-back.inflow { position: relative; left: auto; top: auto; bottom: auto; flex: 0 0 auto; }
+
+/* generic car game tweaks (none) */
+</style>
+<script id="car-mode-js">
+window.__CAR_GAME = "death-valley-chase";
+/* Game Night car mode, part 2 (shared): back button + helpers. window.__CAR_GAME is set by the build. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR = window.__CAR || {};
+  CAR.game = window.__CAR_GAME || '';
+  CAR.events = CAR.events || [];
+  if (CAR.tesla === undefined) CAR.tesla = /Tesla/i.test(navigator.userAgent || '') || /[?&]car=tesla\b/.test(location.search);
+  var root = document.documentElement;
+  root.classList.add('car-mode', 'car-' + CAR.game);
+  if (CAR.tesla) root.classList.add('car-tesla');
+
+  CAR.leave = function () {
+    if (CAR.leaving) return;
+    CAR.leaving = true;
+    try { if (CAR.beforeLeave) CAR.beforeLeave(); } catch (e) {}
+    location.href = '../';
+  };
+
+  // The big "<- Games" button. Navigation is done on pointerup as well as click, because some games
+  // lock the page down (preventDefault on touches) which can swallow the synthetic click.
+  CAR.backButton = function (cls, parent, before) {
+    var a = document.createElement('a');
+    a.href = '../';
+    a.id = 'car-back';
+    a.className = 'car-back ' + (cls || 'tl');
+    a.setAttribute('aria-label', 'Back to the games menu');
+    a.innerHTML = '<span class="car-back-arrow" aria-hidden="true">\u2190</span><span class="car-back-label">Games</span>';
+    var downId = null;
+    a.addEventListener('pointerdown', function (e) { downId = e.pointerId; a.classList.add('down'); e.stopPropagation(); });
+    a.addEventListener('pointerup', function (e) {
+      a.classList.remove('down');
+      if (downId === e.pointerId) { e.preventDefault(); e.stopPropagation(); CAR.leave(); }
+      downId = null;
+    });
+    a.addEventListener('pointercancel', function () { downId = null; a.classList.remove('down'); });
+    a.addEventListener('pointerleave', function () { a.classList.remove('down'); });
+    a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); CAR.leave(); });
+    ['touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (t) { a.addEventListener(t, function (e) { e.stopPropagation(); }); });
+    parent = parent || document.body;
+    if (before) parent.insertBefore(a, before); else parent.appendChild(a);
+    CAR.back = a;
+    return a;
+  };
+
+  CAR.ready = function (fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  };
+})();
+
+/* Generic Game Night car mode: just the back button. */
+(function () {
+  'use strict';
+  var CAR = window.__CAR;
+  CAR.ready(function () { CAR.backButton('tl'); });
+})();
+</script>
+</body>
+</html>
